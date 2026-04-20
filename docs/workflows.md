@@ -75,7 +75,33 @@ This document outlines the core features of the Luno app and the step-by-step wo
 
 ---
 
-## 6. Personalization & Settings
+## 6. Accounts Tab
+**Feature:** Multi-account management and detailed account views.
+**Codebase Domain:** `app/(main)/accounts.tsx` (Phase 6)
+
+**Workflow:**
+1. User navigates to the 'Accounts' tab from the bottom app bar.
+2. Views list of all created accounts with balances.
+3. Tapping an account opens detail view with filtered transaction list.
+4. FAB visible for adding new transactions to selected account.
+
+---
+
+## 7. Navigation Structure (Phase 6)
+**Feature:** Bottom app bar with 4 tabs + FAB for unified navigation.
+**Codebase Domain:** `app/(main)/_layout.tsx`
+
+**Tab Structure (left to right):**
+1. **Home** (`house` icon) → Dashboard screen
+2. **Accounts** (`wallet` icon) → Accounts list screen
+3. **Pulse** (`activity` icon) → Analytics screen (formerly Stats)
+4. **Settings** (`cog` icon) → Settings screen
+
+**FAB:** Positioned on the right side of the bottom bar. Lime accent color (`#86C53C`). Opens Add Transaction sheet. Visible on all 4 tabs.
+
+---
+
+## 8. Personalization & Settings
 **Feature:** User control over aesthetics, localization, and data management.
 **Codebase Domain:** `app/(main)/settings.tsx`
 
