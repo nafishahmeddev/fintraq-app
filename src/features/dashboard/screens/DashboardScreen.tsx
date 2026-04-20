@@ -5,6 +5,7 @@ import React, { useCallback } from 'react';
 import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import { EmptyState } from '../../../components/ui/EmptyState';
 import { Header } from '../../../components/ui/Header';
 import { MoneyText } from '../../../components/ui/MoneyText';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
@@ -425,14 +426,16 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
               );
             })
           ) : (
-            <View style={styles.emptyActivity}>
-              <Ionicons name="receipt-outline" size={28} color={colors.textMuted} />
-              <Text style={styles.emptyActivityText}>No transactions yet</Text>
-              <TouchableOpacity style={styles.emptyActivityAction} onPress={navigateToCreateTransaction}>
-                <Text style={styles.emptyActivityActionText}>Add one now</Text>
-                <Ionicons name="arrow-forward" size={12} color={colors.background} />
-              </TouchableOpacity>
-            </View>
+            <EmptyState
+              icon="receipt-outline"
+              title="No transactions yet"
+              description="Start tracking your spending by adding your first transaction."
+              actionLabel="Add Transaction"
+              onAction={navigateToCreateTransaction}
+              size="compact"
+              variant="card"
+              fullHeight={false}
+            />
           )}
         </View>
 
@@ -534,7 +537,7 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   currencyTab: {
     paddingHorizontal: 12,
     paddingVertical: 5,
-    borderRadius: 999,
+    borderRadius: 12,
     backgroundColor: colors.background + 'AA',
     borderWidth: 1,
     borderColor: colors.border,
@@ -805,31 +808,6 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     marginHorizontal: 24,
     borderRadius: 20,
     overflow: 'hidden',
-  },
-  emptyActivity: {
-    paddingVertical: 32,
-    alignItems: 'center',
-    gap: 8,
-  },
-  emptyActivityText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  emptyActivityAction: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    height: 30,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    backgroundColor: colors.primary,
-    marginTop: 4,
-  },
-  emptyActivityActionText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 11,
-    color: colors.background,
   },
 
   /* ── FAB ── */

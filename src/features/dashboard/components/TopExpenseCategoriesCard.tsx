@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useCallback } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { EmptyState } from '../../../components/ui/EmptyState';
 import { MoneyText } from '../../../components/ui/MoneyText';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { TYPOGRAPHY } from '../../../theme/typography';
@@ -94,10 +95,14 @@ export const TopExpenseCategoriesCard = React.memo(function TopExpenseCategories
           );
         })
       ) : (
-        <View style={styles.empty}>
-          <Ionicons name="pie-chart-outline" size={18} color={colors.textMuted} />
-          <Text style={styles.emptyText}>No expense data yet for {selectedCurrency}</Text>
-        </View>
+        <EmptyState
+          icon="pie-chart-outline"
+          title="No expenses yet"
+          description={`Add expense transactions in ${selectedCurrency} to see your top categories.`}
+          size="compact"
+          variant="card"
+          fullHeight={false}
+        />
       )}
     </View>
   );
@@ -123,7 +128,7 @@ const createStyles = (colors: { [key: string]: string }) =>
     },
     tab: {
       height: 26,
-      borderRadius: 999,
+      borderRadius: 12,
       borderWidth: 1,
       borderColor: colors.border,
       backgroundColor: colors.background + 'AA',
@@ -217,17 +222,5 @@ const createStyles = (colors: { [key: string]: string }) =>
       fontFamily: TYPOGRAPHY.fonts.regular,
       color: colors.textMuted,
       fontSize: 10,
-    },
-    empty: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      paddingHorizontal: 14,
-      paddingVertical: 14,
-    },
-    emptyText: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      color: colors.textMuted,
-      fontSize: 12,
     },
   });

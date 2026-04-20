@@ -61,7 +61,7 @@ const createStyles = (colors: { [key: string]: string }) =>
     badge: {
       alignSelf: 'flex-start',
       height: 34,
-      borderRadius: 999,
+      borderRadius: 12,
       paddingHorizontal: 12,
       backgroundColor: colors.primary,
       flexDirection: 'row',

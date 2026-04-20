@@ -83,7 +83,7 @@ const createStyles = (colors: { [key: string]: string }) =>
       gap: 10,
     },
     chip: {
-      borderRadius: 999,
+      borderRadius: 16,
       minHeight: 42,
       paddingHorizontal: 14,
       paddingVertical: 10,

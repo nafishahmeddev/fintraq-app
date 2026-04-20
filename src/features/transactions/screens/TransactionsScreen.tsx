@@ -15,6 +15,7 @@ import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import { EmptyState } from '../../../components/ui/EmptyState';
 import { Header } from '../../../components/ui/Header';
 import { KPICard } from '../../../components/ui/KPICard';
 import { MoneyText } from '../../../components/ui/MoneyText';
@@ -531,21 +532,19 @@ export function TransactionsScreen() {
           </View>
         )}
         ListEmptyComponent={(
-          <View style={styles.emptyWrap}>
-            <View style={styles.emptyIconBox}>
-              <Ionicons name="receipt-outline" size={32} color={colors.textMuted} />
-            </View>
-            <Text style={styles.emptyTitle}>Nothing here yet</Text>
-            <Text style={styles.emptySubtitle}>
-              {activeFilterCount > 0
-                ? 'No transactions match the active filters.'
-                : 'Add your first transaction to start tracking.'}
-            </Text>
-            <TouchableOpacity style={styles.emptyAction} onPress={() => router.push('/transactions/create')}>
-              <Text style={styles.emptyActionText}>Add Transaction</Text>
-              <Ionicons name="arrow-forward" size={14} color={colors.background} />
-            </TouchableOpacity>
-          </View>
+          <EmptyState
+            icon="receipt-outline"
+            title={activeFilterCount > 0 ? 'No matches found' : 'Nothing here yet'}
+            description={activeFilterCount > 0
+              ? 'Try adjusting your filters to see more results.'
+              : 'Add your first transaction to start tracking your finances.'}
+            actionLabel="Add Transaction"
+            onAction={() => router.push('/transactions/create')}
+            secondaryActionLabel={activeFilterCount > 0 ? 'Clear Filters' : undefined}
+            onSecondaryAction={activeFilterCount > 0 ? clearFilters : undefined}
+            size="default"
+            variant="page"
+          />
         )}
         ListFooterComponent={txQuery.isFetchingNextPage ? (
           <View style={styles.loadMoreWrap}>
@@ -687,47 +686,6 @@ const createStyles = (colors: ThemeColors) =>
     dayCard: {
       borderRadius: RADIUS.xl,
       overflow: 'hidden',
-    },
-    emptyWrap: {
-      paddingVertical: 60,
-      alignItems: 'center',
-      gap: SPACING['4'],
-    },
-    emptyIconBox: {
-      width: 80,
-      height: 80,
-      borderRadius: RADIUS['2xl'],
-      backgroundColor: colors.surface,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    emptyTitle: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      color: colors.text,
-      fontSize: 18,
-    },
-    emptySubtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      color: colors.textMuted,
-      fontSize: 14,
-      textAlign: 'center',
-      maxWidth: 240,
-      lineHeight: 20,
-    },
-    emptyAction: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING['2.5'],
-      paddingHorizontal: SPACING['5'],
-      height: 48,
-      borderRadius: RADIUS.lg,
-      backgroundColor: colors.text,
-      marginTop: SPACING['2'],
-    },
-    emptyActionText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      color: colors.background,
-      fontSize: 15,
     },
     loadMoreWrap: {
       paddingVertical: SPACING['7'],

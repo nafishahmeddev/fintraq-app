@@ -4,6 +4,7 @@ import React from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurBackground } from '../../../src/components/ui/BlurBackground';
+import { EmptyState } from '../../../src/components/ui/EmptyState';
 import { MetricCard } from '../../../src/features/reports/components/MetricCard';
 import { ReportHeader } from '../../../src/features/reports/components/ReportHeader';
 import { useMonthlyReport } from '../../../src/features/reports/hooks/useReports';
@@ -112,9 +113,14 @@ export default function MonthlyReport() {
                   </View>
                 </View>
               )) : (
-                <View style={styles.emptyActivity}>
-                  <Text style={styles.emptyText}>No sector data available.</Text>
-                </View>
+                <EmptyState
+                  icon="pie-chart-outline"
+                  title="No category data"
+                  description="Add transactions with categories to see your monthly spending breakdown."
+                  size="compact"
+                  variant="card"
+                  fullHeight={false}
+                />
               )}
             </View>
           </View>
@@ -230,15 +236,6 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   progressFill: {
     height: '100%',
     borderRadius: 2,
-  },
-  emptyActivity: {
-    padding: 32,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 13,
-    color: colors.textMuted,
   },
   brandingBox: {
     alignItems: 'center',

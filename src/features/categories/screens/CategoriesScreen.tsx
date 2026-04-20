@@ -4,6 +4,7 @@ import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, TouchableOpac
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import { EmptyState } from '../../../components/ui/EmptyState';
 import { Header } from '../../../components/ui/Header';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { useTheme } from '../../../providers/ThemeProvider';
@@ -136,14 +137,17 @@ export const CategoriesScreen = () => {
             showsVerticalScrollIndicator={false}
             key={`${activeType}-list`}
             ListEmptyComponent={
-              <View style={styles.emptyContainer}>
-                <Ionicons name="sparkles-outline" size={22} color={colors.textMuted} />
-                <Text style={styles.emptyTitle}>Nothing here yet</Text>
-                <Text style={styles.emptyText}>No {activeType === 'DR' ? 'expense' : 'income'} categories match your current filter.</Text>
-                <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate}>
-                  <Text style={styles.emptyBtnText}>Create category</Text>
-                </TouchableOpacity>
-              </View>
+              <EmptyState
+                icon="pricetag-outline"
+                title="No categories yet"
+                description={query.trim()
+                  ? `No ${activeType === 'DR' ? 'expense' : 'income'} categories match "${query.trim()}".`
+                  : `Create your first ${activeType === 'DR' ? 'expense' : 'income'} category to organize your transactions.`}
+                actionLabel="Create category"
+                onAction={handleCreate}
+                size="default"
+                variant="page"
+              />
             }
           />
         </View>
@@ -231,45 +235,6 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     letterSpacing: 0.4,
     color: colors.textMuted,
     textTransform: 'uppercase',
-  },
-
-  emptyContainer: {
-    paddingVertical: 60,
-    alignItems: 'center',
-  },
-
-  emptyTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
-    fontSize: 20,
-    marginTop: 10,
-    letterSpacing: -0.4,
-  },
-
-  emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
-    fontSize: 13,
-    marginTop: 4,
-    marginBottom: 14,
-    textAlign: 'center',
-    maxWidth: 260,
-  },
-
-  emptyBtn: {
-    height: 38,
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyBtnText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 12,
-    color: colors.text,
   },
 
   fab: {

@@ -1,6 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { EmptyState } from '../../../components/ui/EmptyState';
 import { PremiumGuard } from '../../../components/ui/PremiumGuard';
 import { usePremium } from '../../../providers/PremiumProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
@@ -64,8 +64,14 @@ export function InsightsSection({ currency }: InsightsSectionProps) {
           </ScrollView>
         ) : (
           <View style={[styles.emptyCard, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
-            <Ionicons name="analytics-outline" size={24} color={colors.textMuted} />
-            <Text style={[styles.emptyText, { color: colors.textMuted }]}>No insights available yet. Keep tracking to unlock trends.</Text>
+            <EmptyState
+              icon="analytics-outline"
+              title="No insights yet"
+              description="Keep tracking your transactions to unlock personalized insights and trends."
+              size="compact"
+              variant="inline"
+              fullHeight={false}
+            />
           </View>
         )}
       </PremiumGuard>
@@ -118,12 +124,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 8,
-  },
-  emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 11,
-    textAlign: 'center',
-    lineHeight: 16,
-    maxWidth: '80%',
   },
 });

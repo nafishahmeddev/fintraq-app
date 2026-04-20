@@ -272,13 +272,17 @@ export default function SettingsScreen() {
               title="Export CSV"
               subtitle="Download transactions as spreadsheet"
               onPress={() => router.push('/export')}
+              isLast
             />
+            {/* Backup & Restore - hidden for now
             <PreferenceRow
               icon="cloud-outline"
               title="Backup & Restore"
               subtitle="Full data backup and restore"
               onPress={() => router.push('/backup')}
             />
+            */}
+            {/* Factory Reset - hidden for now
             <PreferenceRow
               icon="trash-bin-outline"
               title="Factory Reset"
@@ -287,6 +291,7 @@ export default function SettingsScreen() {
               onPress={handleResetData}
               isLast
             />
+            */}
           </View>
         </View>
 

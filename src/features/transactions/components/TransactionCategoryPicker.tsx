@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: 12,
     height: 36,
-    borderRadius: 18,
+    borderRadius: 12,
     borderWidth: 1,
   },
   name: {

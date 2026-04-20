@@ -4,6 +4,7 @@ import React from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurBackground } from '../../../src/components/ui/BlurBackground';
+import { EmptyState } from '../../../src/components/ui/EmptyState';
 import { MetricCard } from '../../../src/features/reports/components/MetricCard';
 import { ReportHeader } from '../../../src/features/reports/components/ReportHeader';
 import { useWeeklyReport } from '../../../src/features/reports/hooks/useReports';
@@ -97,9 +98,14 @@ export default function WeeklyReport() {
                   </View>
                 </View>
               )) : (
-                <View style={styles.emptyActivity}>
-                  <Text style={styles.emptyText}>No activity recorded.</Text>
-                </View>
+                <EmptyState
+                  icon="calendar-outline"
+                  title="No activity this week"
+                  description="Start logging your transactions to see your weekly spending breakdown."
+                  size="compact"
+                  variant="card"
+                  fullHeight={false}
+                />
               )}
             </View>
           </View>
@@ -218,15 +224,6 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   inlineMoney: {
     fontSize: 14,
-  },
-  emptyActivity: {
-    padding: 32,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 13,
-    color: colors.textMuted,
   },
   brandingBox: {
     alignItems: 'center',

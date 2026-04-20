@@ -148,39 +148,24 @@ Monetization is driven by `src/components/ui/PremiumGuard.tsx`.
 - **Rule**: Non-premium users must *never* see premium data elements. The `PremiumGuard` completely hides its children and renders an elegant "Teaser Card" placeholder containing a watermark and a call-to-action to natively convert the user.
 - **Philosophy**: **Free = Tracking.** **Premium = Insights + Control.**
 
-## 5. Current Roadmap Status
-- **Phase 1 (Done)**: Core Tracking, local SQLite configuration.
-- **Phase 2 (Done)**: Paywall Integration, Freemium Split, iOS/Android Subscriptions.
-- **Phase 3 (Done)**: Insights Layer (Contextual analytics, runway tracking, categoric burn).
-- **Phase 4 (Done)**: Retention System (Weekly/Monthly reports, Usage Streaks, Notifications).
-- **Phase 5 (Done)**: Power Features (Backup/Restore, CSV Export, Advanced Filters, Global Search).
-- **Phase 6 (Next)**: Polish & Growth (App Store optimisation, onboarding improvements, widget support).
+## 5. Current Status
 
-### Phase 5 Features (All Complete — Premium-gated)
+**All Phases Complete** — Luno is feature-complete and in maintenance/polish mode.
 
-1. **Backup & Restore** (`src/features/backup/`)
-   - Full data export to JSON (accounts, categories, transactions, settings)
-   - Cross-platform save: Android (Storage Access Framework), iOS (Share sheet)
-   - Import from backup file with validation
+### Completed Features
 
-2. **CSV Export** (`src/features/export/`)
-   - Export transactions to CSV for Excel/Google Sheets
-   - Date range presets (This Month, Last 3 Months, This Year, etc.)
-   - Multi-filter support (accounts, categories, types)
+**Phase 1 (Done)**: Core Tracking, local SQLite configuration.  
+**Phase 2 (Done)**: Paywall Integration, Freemium Split, iOS/Android Subscriptions.  
+**Phase 3 (Done)**: Insights Layer (Contextual analytics, runway tracking, categoric burn).  
+**Phase 4 (Done)**: Retention System (Weekly/Monthly reports, Usage Streaks, Notifications).  
+**Phase 5 (Done)**: Power Features (CSV Export, Advanced Filters, Global Search).
 
-3. **Advanced Filters** (`src/features/filters/`)
-   - Multi-select: Accounts, Categories, Types (Income/Expense)
-   - Date range filtering with native date pickers
-   - Amount range (min/max) filtering
-   - Full-text search in notes, categories, accounts
-   - Sort options (Date/Amount, Asc/Desc)
-   - Hybrid filtering: Server-side for single selects, client-side for multi-select
+### Key Feature Locations
 
-4. **Global Search** (`src/features/search/`)
-   - Full-text search across transactions, accounts, and categories in one screen
-   - 300ms debounce, min 2 chars, React Query with 15s stale time
-   - Category/account results deep-link into filtered Transactions screen
-   - Premium-gated at route level (`app/search.tsx`) with a full-screen upsell gate
+- **CSV Export** (`src/features/export/`): Settings > Data > Export CSV
+- **Advanced Filters** (`src/features/filters/`): Transactions screen > Filter button
+- **Global Search** (`src/features/search/`): Dashboard/Transactions header search icon
+- **Backup & Restore** (`src/features_backup/`): Hidden from UI (code preserved for future use)
 
 ## 6. Cross-Platform File Export Pattern
 When implementing file export features (CSV, Backup), use this pattern:

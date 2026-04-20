@@ -255,34 +255,24 @@ const contextValue = useMemo(() => ({
 }), [colors, isDark]);
 ```
 
-## Current Phase
+## Current Status
 
-**Phase 5 (Done)**: Power Features - Backup/Restore, CSV Export, Advanced Filters, Global Search.
-**Phase 6 (Next)**: Polish & Growth - App Store optimisation, onboarding improvements, widget support.
+**All Phases Complete** — Luno is feature-complete and in maintenance/polish mode.
 
-### Phase 5 Features (All Shipped — Premium-gated)
+### Completed Features
 
-1. **Backup & Restore** (`src/features/backup/`)
-   - Full JSON backup: accounts, transactions, categories, settings
-   - Cross-platform export: Android (SAF folder picker), iOS (Share sheet)
-   - Located in: Settings > Data > Backup & Restore
+**Phase 1 (Done)**: Core Tracking, local SQLite configuration.  
+**Phase 2 (Done)**: Paywall Integration, Freemium Split, iOS/Android Subscriptions.  
+**Phase 3 (Done)**: Insights Layer (Contextual analytics, runway tracking, categoric burn).  
+**Phase 4 (Done)**: Retention System (Weekly/Monthly reports, Usage Streaks, Notifications).  
+**Phase 5 (Done)**: Power Features (CSV Export, Advanced Filters, Global Search).
 
-2. **CSV Export** (`src/features/export/`)
-   - Transaction export to CSV for spreadsheets/accounting
-   - Filters: Date range, accounts, categories, types
-   - Located in: Settings > Data > Export CSV
+### Key Feature Locations
 
-3. **Advanced Filters** (`src/features/filters/`)
-   - Multi-select: Accounts, Categories, Income/Expense types
-   - Date range, amount range (min/max), full-text search, sort options
-   - Hybrid filtering strategy (server + client-side)
-   - Located in: Transactions screen > Filter button
-
-4. **Global Search** (`src/features/search/`)
-   - Cross-entity full-text search: transactions, accounts, categories
-   - Premium-gated at route level with full-screen upsell gate (`app/search.tsx`)
-   - Deep-links: account result → filtered transactions, category result → filtered transactions
-   - Located in: Dashboard header search icon / Transactions header search icon
+- **CSV Export** (`src/features/export/`): Settings > Data > Export CSV
+- **Advanced Filters** (`src/features/filters/`): Transactions screen > Filter button
+- **Global Search** (`src/features/search/`): Dashboard/Transactions header search icon
+- **Backup & Restore** (`src/features_backup/`): Hidden from UI (code preserved for future use)
 
 ### Key Patterns
 

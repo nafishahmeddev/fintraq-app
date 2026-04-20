@@ -288,7 +288,8 @@ export default function OnboardingScreen() {
   const renderStepContent = () => {
     switch (currentStep.id) {
       case 'welcome':
-        return <WelcomeStep onImportPress={handleImportFromBackup} />;
+        // Backup/restore import hidden for now: onImportPress={handleImportFromBackup}
+        return <WelcomeStep />;
       case 'profile':
         return <ProfileStep />;
       case 'account':

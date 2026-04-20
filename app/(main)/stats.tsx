@@ -5,6 +5,7 @@ import React, { useCallback, useMemo } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurBackground } from '../../src/components/ui/BlurBackground';
+import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Header } from '../../src/components/ui/Header';
 import { MoneyText } from '../../src/components/ui/MoneyText';
 import { PremiumGuard } from '../../src/components/ui/PremiumGuard';
@@ -508,9 +509,13 @@ const StatsScreen = React.memo(function StatsScreen() {
                 </View>
               </View>
             ) : (
-              <View style={styles.emptyStateCompact}>
-                <Text style={styles.emptyText}>Comparison requires a fixed date range.</Text>
-              </View>
+              <EmptyState
+                title="Comparison unavailable"
+                description="Select a fixed date range (7D, 30D, or 90D) to see period comparison."
+                size="compact"
+                variant="inline"
+                fullHeight={false}
+              />
             )}
           </View>
         </PremiumGuard>
@@ -539,11 +544,14 @@ const StatsScreen = React.memo(function StatsScreen() {
         </View>
         <View style={styles.sectionCard}>
           {topCategoriesRender || (
-            <View style={styles.emptyState}>
-              <Ionicons name="analytics-outline" size={26} color={colors.textMuted} />
-              <Text style={styles.emptyTitle}>No spending data</Text>
-              <Text style={styles.emptyText}>Add expense transactions in {selectedCurrency} to populate this section.</Text>
-            </View>
+            <EmptyState
+              icon="analytics-outline"
+              title="No spending data"
+              description={`Add expense transactions in ${selectedCurrency} to see your top spending categories.`}
+              size="compact"
+              variant="card"
+              fullHeight={false}
+            />
           )}
         </View>
 
@@ -553,11 +561,14 @@ const StatsScreen = React.memo(function StatsScreen() {
         </View>
         <View style={styles.sectionCard}>
           {accountBreakdownRender || (
-            <View style={styles.emptyState}>
-              <Ionicons name="wallet-outline" size={26} color={colors.textMuted} />
-              <Text style={styles.emptyTitle}>No accounts in this currency</Text>
-              <Text style={styles.emptyText}>Create an account in {selectedCurrency} to view allocation stats.</Text>
-            </View>
+            <EmptyState
+              icon="wallet-outline"
+              title="No accounts in this currency"
+              description={`Create an account in ${selectedCurrency} to view your account allocation.`}
+              size="compact"
+              variant="card"
+              fullHeight={false}
+            />
           )}
         </View>
 
@@ -567,11 +578,14 @@ const StatsScreen = React.memo(function StatsScreen() {
         </View>
         <View style={styles.sectionCard}>
           {latestTransactionsRender || (
-            <View style={styles.emptyState}>
-              <Ionicons name="receipt-outline" size={26} color={colors.textMuted} />
-              <Text style={styles.emptyTitle}>No transactions in range</Text>
-              <Text style={styles.emptyText}>Try switching the currency or widening the time range.</Text>
-            </View>
+            <EmptyState
+              icon="receipt-outline"
+              title="No transactions in range"
+              description="Try switching the currency or widening the time range."
+              size="compact"
+              variant="card"
+              fullHeight={false}
+            />
           )}
         </View>
 
@@ -608,9 +622,13 @@ const StatsScreen = React.memo(function StatsScreen() {
               </View>
             </View>
           ) : (
-            <View style={styles.emptyStateCompact}>
-              <Text style={styles.emptyText}>No expense transactions in the selected range.</Text>
-            </View>
+            <EmptyState
+              title="No expenses found"
+              description="No expense transactions in the selected range."
+              size="compact"
+              variant="inline"
+              fullHeight={false}
+            />
           )}
         </View>
       </ScrollView>
@@ -1002,27 +1020,5 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-  },
-  emptyState: {
-    paddingVertical: 40,
-    alignItems: 'center',
-    gap: 8,
-  },
-  emptyStateCompact: {
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  emptyTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
-    fontSize: 15,
-  },
-  emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
-    fontSize: 12,
-    textAlign: 'center',
-    maxWidth: 240,
-    lineHeight: 18,
   },
 });
