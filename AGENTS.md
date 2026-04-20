@@ -257,22 +257,36 @@ const contextValue = useMemo(() => ({
 
 ## Current Status
 
-**All Phases Complete** — Luno is feature-complete and in maintenance/polish mode.
+**Phases 1-5 Complete** — Core app is stable. **Phase 6 In Progress** — Navigation overhaul.
 
 ### Completed Features
 
-**Phase 1 (Done)**: Core Tracking, local SQLite configuration.  
-**Phase 2 (Done)**: Paywall Integration, Freemium Split, iOS/Android Subscriptions.  
-**Phase 3 (Done)**: Insights Layer (Contextual analytics, runway tracking, categoric burn).  
-**Phase 4 (Done)**: Retention System (Weekly/Monthly reports, Usage Streaks, Notifications).  
-**Phase 5 (Done)**: Power Features (CSV Export, Advanced Filters, Global Search).
+**Phase 1 (Done)**: Core Tracking — Onboarding, transactions, accounts, categories, SQLite.  
+**Phase 2 (Done)**: Freemium Setup — Premium gating, subscriptions, lifetime purchases.  
+**Phase 3 (Done)**: Insights Layer — Weekly summaries, spending alerts, runway tracking.  
+**Phase 4 (Done)**: Retention System — Monthly reports, streak tracking, reminders.  
+**Phase 5 (Done)**: Power Features — Advanced filters, global search.
+
+### Active Development
+
+**Phase 6 (In Progress)**: Navigation Overhaul — Bottom app bar with 4 tabs (Home, Accounts, Pulse, Settings) + FAB.
+
+**Phase 7 (Next)**: Charts & Optimization — Merge redundant screens, add charts (react-native-gifted-charts), unify filters.
+
+**Phase 8 (Planned)**: Core Finance — Account transfers, recurring transactions, biometric lock.
+
+**Phase 9 (Planned)**: Planning Layer — Budget system, savings goals.
+
+**Phase 10 (Planned)**: Data Portability — CSV export, backup & restore.
 
 ### Key Feature Locations
 
+- **Dashboard** (`app/(main)/index.tsx`): Home tab with net position, recent transactions
+- **Stats/Pulse** (`app/(main)/stats.tsx`): Analytics screen (being merged with Weekly Summary)
+- **Advanced Filters** (`src/features/filters/`): Transaction filtering with multi-select
+- **Global Search** (`src/features/search/`): Cross-entity search (Premium)
 - **CSV Export** (`src/features/export/`): Settings > Data > Export CSV
-- **Advanced Filters** (`src/features/filters/`): Transactions screen > Filter button
-- **Global Search** (`src/features/search/`): Dashboard/Transactions header search icon
-- **Backup & Restore** (`src/features_backup/`): Hidden from UI (code preserved for future use)
+- **Backup & Restore** (`src/features_backup/`): Code preserved, UI hidden
 
 ### Key Patterns
 
