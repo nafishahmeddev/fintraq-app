@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
 import { Header } from '@/src/components/ui/Header';
 import { OptionsDialog } from '@/src/components/ui/OptionsDialog';
 import { PremiumGuard } from '@/src/components/ui/PremiumGuard';
@@ -156,8 +155,6 @@ export function ExportScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
-
       <Header title="Export CSV" subtitle="Download your data" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>

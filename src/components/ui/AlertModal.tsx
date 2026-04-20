@@ -28,9 +28,9 @@ export const AlertModal = React.memo(function AlertModal({
   onClose,
   type = 'info',
 }: AlertModalProps) {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const { width } = useWindowDimensions();
-  const styles = useMemo(() => createStyles(colors, isDark, width), [colors, isDark, width]);
+  const styles = useMemo(() => createStyles(colors, width), [colors, width]);
 
   const icon = useMemo(() => {
     switch (type) {
@@ -96,7 +96,7 @@ export const AlertModal = React.memo(function AlertModal({
   );
 });
 
-const createStyles = (colors: ThemeColors, isDark: boolean, width: number) =>
+const createStyles = (colors: ThemeColors, width: number) =>
   StyleSheet.create({
     overlay: {
       flex: 1,

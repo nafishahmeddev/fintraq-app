@@ -1,9 +1,9 @@
+import { Header } from '@/src/components/ui/Header';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
 import { SearchScreen } from '@/src/features/search/screens/SearchScreen';
 import { usePremium } from '@/src/providers/PremiumProvider';
 import { useTheme } from '@/src/providers/ThemeProvider';
@@ -24,11 +24,7 @@ function SearchGate() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
-
-      <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} activeOpacity={0.75}>
-        <Ionicons name="arrow-back" size={20} color={colors.text} />
-      </TouchableOpacity>
+      <Header title="Search" subtitle="Find across your data" showBack />
 
       <View style={styles.body}>
         <View style={styles.iconWrap}>
@@ -82,15 +78,6 @@ const createStyles = (colors: ThemeColors) =>
     container: {
       flex: 1,
       backgroundColor: colors.background,
-    },
-    backBtn: {
-      width: 44,
-      height: 44,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.surface,
-      alignItems: 'center',
-      justifyContent: 'center',
-      margin: SPACING['4'],
     },
     body: {
       flex: 1,

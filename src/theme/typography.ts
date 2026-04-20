@@ -24,6 +24,9 @@ export type TypographyFonts = {
   bold: 'BricolageGrotesque_700Bold';
   amountRegular: 'JetBrainsMono_400Regular';
   amountBold: 'JetBrainsMono_700Bold';
+  mono: 'JetBrainsMono_400Regular';
+  monoBold: 'JetBrainsMono_700Bold';
+  monoSemibold: 'JetBrainsMono_600SemiBold';
 };
 
 export type TypographyTheme = {
@@ -57,5 +60,8 @@ export const TYPOGRAPHY: TypographyTheme = {
     bold: 'BricolageGrotesque_700Bold',
     amountRegular: 'JetBrainsMono_400Regular',
     amountBold: 'JetBrainsMono_700Bold',
+    mono: 'JetBrainsMono_400Regular',
+    monoBold: 'JetBrainsMono_700Bold',
+    monoSemibold: 'JetBrainsMono_600SemiBold',
   },
 };

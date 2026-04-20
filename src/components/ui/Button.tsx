@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
 import React, { useMemo, useCallback } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
 import { ThemeColors } from '../../theme/colors';
 import { TYPOGRAPHY } from '../../theme/typography';
@@ -51,7 +50,7 @@ export const Button = React.memo(function Button({
   shadow: shadowToken,
   icon,
 }: ButtonProps) {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const sizeConfig = COMPONENT_SIZES.button[size];
@@ -104,7 +103,7 @@ export const Button = React.memo(function Button({
           borderRadius: sizeConfig.borderRadius,
           backgroundColor,
           borderColor,
-          borderWidth: variant === 'secondary' || variant === 'outline' ? 1 : 0,
+          borderWidth: 0,
           opacity: disabled ? 0.5 : 1,
         },
         shadowStyle,
@@ -115,14 +114,7 @@ export const Button = React.memo(function Button({
       activeOpacity={0.75}
     >
       {(variant === 'secondary' || variant === 'outline') && (
-        <BlurView
-          blurAmount={Platform.OS === 'ios' ? 20 : 0}
-          blurType={isDark ? "dark" : "light"}
-          style={[StyleSheet.absoluteFillObject, { 
-            backgroundColor: Platform.OS === 'android' ? colors.surface : 'transparent',
-            borderRadius: sizeConfig.borderRadius,
-          }]}
-        />
+        <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.surface, borderRadius: sizeConfig.borderRadius }]} />
       )}
       
       {icon && !isLoading && (

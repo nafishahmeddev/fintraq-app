@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  ScrollView,
   SectionList,
   SectionListData,
   SectionListRenderItemInfo,
@@ -13,7 +14,6 @@ import {
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { Header } from '../../../components/ui/Header';
@@ -22,7 +22,7 @@ import { MoneyText } from '../../../components/ui/MoneyText';
 import { TransactionRow } from '../../../components/ui/TransactionRow';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
-import { RADIUS, SHADOWS, SPACING } from '../../../theme/tokens';
+import { radius, RADIUS, SHADOWS, SPACING } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useCategories } from '../../categories/hooks/categories';
@@ -159,11 +159,11 @@ const SwipeableRow = React.memo(function SwipeableRow({
 
   // Memoize action colors to prevent re-renders of RightActions
   const actionColors = React.useMemo(() => ({
-    editBg: colors.primary + '1A',
+    editBg: colors.card,
     editIcon: colors.primary,
-    deleteBg: colors.danger + '1A',
+    deleteBg: colors.card,
     deleteIcon: colors.danger,
-  }), [colors.primary, colors.danger]);
+  }), [colors.card, colors.primary, colors.danger]);
 
   // Use stable render function reference
   const renderRightActions = React.useCallback(
@@ -449,10 +449,10 @@ export function TransactionsScreen() {
         <Text style={styles.dayTitle}>{title}</Text>
         <View style={styles.dayTotals}>
           {dayTotal.in > 0 && (
-            <MoneyText amount={dayTotal.in} type="CR" style={styles.dayTotalValue} />
+            <MoneyText amount={dayTotal.in} type="CR" style={styles.dayTotalValue} showSign={false} />
           )}
           {dayTotal.out > 0 && (
-            <MoneyText amount={dayTotal.out} type="DR" style={styles.dayTotalValue} />
+            <MoneyText amount={dayTotal.out} type="DR" style={styles.dayTotalValue} showSign={false} />
           )}
         </View>
       </View>
@@ -473,8 +473,6 @@ export function TransactionsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
-
       <Header
         title="Transactions"
         subtitle={`${transactions.length} records`}
@@ -496,6 +494,37 @@ export function TransactionsScreen() {
         )}
       />
 
+      {/* ── Global Currency Picker ── */}
+      {kpiCurrencies.length > 1 && (
+        <View style={styles.currencyPickerContainer}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            contentContainerStyle={styles.currencyTabsRow}
+          >
+            {kpiCurrencies.map(curr => (
+              <TouchableOpacity
+                key={curr}
+                style={[
+                  styles.currencyTab, 
+                  { borderColor: colors.border },
+                  selectedKpiCurrency === curr && { backgroundColor: colors.text, borderColor: colors.text }
+                ]}
+                onPress={() => setSelectedKpiCurrency(curr)}
+                activeOpacity={0.8}
+              >
+                <Text style={[
+                  styles.currencyTabText, 
+                  { color: selectedKpiCurrency === curr ? colors.background : colors.textMuted }
+                ]}>
+                  {curr}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
       <SectionList
         sections={groupedByDate}
         keyExtractor={keyExtractor}
@@ -514,9 +543,9 @@ export function TransactionsScreen() {
         ListHeaderComponent={(
           <View style={styles.listHeader}>
             <KPICard
-              currencies={kpiCurrencies}
+              currencies={[]}
               selectedCurrency={selectedKpiCurrency}
-              onSelectCurrency={setSelectedKpiCurrency}
+              onSelectCurrency={() => {}}
               metrics={activeTotals}
               colors={colors}
             />
@@ -602,9 +631,9 @@ const createStyles = (colors: ThemeColors) =>
       gap: SPACING['2'],
     },
     headerBtn: {
-      width: 44,
-      height: 44,
-      borderRadius: RADIUS.md,
+      width: 36,
+      height: 36,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
@@ -627,6 +656,26 @@ const createStyles = (colors: ThemeColors) =>
       fontFamily: TYPOGRAPHY.fonts.semibold,
       fontSize: 10,
     },
+    /* ── Global Currency Picker ── */
+    currencyPickerContainer: {
+      marginHorizontal: SPACING['6'],
+      marginTop: SPACING['3'],
+      marginBottom: SPACING['2'],
+    },
+    currencyTabsRow: {
+      flexDirection: 'row',
+      gap: SPACING['1'],
+    },
+    currencyTab: {
+      paddingHorizontal: SPACING['3'],
+      paddingVertical: SPACING['1'],
+      borderRadius: radius('md'),
+    },
+    currencyTabText: {
+      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontSize: 11,
+      letterSpacing: 0.4,
+    },
     content: {
       paddingHorizontal: SPACING['6'],
       paddingTop: SPACING['3'],
@@ -648,7 +697,7 @@ const createStyles = (colors: ThemeColors) =>
       letterSpacing: 1.5,
     },
     clearChip: {
-      backgroundColor: colors.danger + '12',
+      backgroundColor: colors.danger,
       paddingHorizontal: SPACING['3'],
       height: 28,
       borderRadius: RADIUS.md,

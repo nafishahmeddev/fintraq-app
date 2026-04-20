@@ -51,7 +51,7 @@ export const InsightCard = React.memo(function InsightCard({ insight }: InsightC
       </View>
 
       <View style={styles.body}>
-        <Text style={[styles.value, { color: colors.text }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{displayValue}</Text>
+        <Text style={[styles.value, { color: colors.text }]} numberOfLines={1}>{displayValue}</Text>
         <View style={styles.trendContainer}>
            <Text style={[styles.subtitle, { color: colors.textMuted }]} numberOfLines={1}>
              {insight.subtitle}
@@ -77,7 +77,6 @@ const styles = StyleSheet.create({
     width: 210,
     minHeight: 115,
     borderRadius: 22,
-    borderWidth: 1,
     padding: 14,
     marginRight: 10,
     justifyContent: 'space-between',
@@ -107,8 +106,8 @@ const styles = StyleSheet.create({
   },
   value: {
     fontFamily: TYPOGRAPHY.fonts.amountBold,
-    fontSize: 24,
-    letterSpacing: -1,
+    fontSize: 20,
+    letterSpacing: -0.5,
   },
   trendContainer: {
     flexDirection: 'row',

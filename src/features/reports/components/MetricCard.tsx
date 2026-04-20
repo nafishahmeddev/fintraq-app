@@ -84,8 +84,6 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     padding: 16,
     borderRadius: 20,
     backgroundColor: colors.surface + '80',
-    borderWidth: 1,
-    borderColor: colors.border, 
     flex: 1,
     minHeight: 100,
     justifyContent: 'center',

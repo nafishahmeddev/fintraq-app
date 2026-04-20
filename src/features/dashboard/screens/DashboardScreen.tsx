@@ -1,6 +1,5 @@
 import { usePremium } from '@/src/providers/PremiumProvider';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
 import { useRouter } from 'expo-router';
 import React, { useCallback } from 'react';
 import { ActivityIndicator, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
@@ -87,13 +86,6 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
 
   const { data: topCategoriesData } = useTopExpenseCategories(selectedCurrency);
   const topExpenseCategories = React.useMemo(() => topCategoriesData ?? [], [topCategoriesData]);
-
-  const topCategoryCurrencies = currencyKeys;
-  const [selectedTopCategoryCurrency, setSelectedTopCategoryCurrency] = React.useState<string>(selectedCurrency);
-
-  React.useEffect(() => {
-    setSelectedTopCategoryCurrency(selectedCurrency);
-  }, [selectedCurrency]);
 
   const handleAccountLongPress = useCallback((acc: Account) => {
     setActiveAccount(acc);
@@ -185,35 +177,29 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
     <View style={styles.container}>
       {/* Static background circles - subtle in dark mode */}
       <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-        <View style={[styles.bgCircle, { 
-          top: -60, 
-          left: -60, 
-          width: 340, 
-          height: 340, 
-          backgroundColor: colors.primary, 
-          opacity: isDark ? 0.35 : 0.72 
+        <View style={[styles.bgCircle, {
+          top: -60,
+          left: -60,
+          width: 340,
+          height: 340,
+          backgroundColor: colors.primary
         }]} />
-        <View style={[styles.bgCircle, { 
-          top: 180, 
-          right: -110, 
-          width: 440, 
-          height: 440, 
-          backgroundColor: colors.primaryDark, 
-          opacity: isDark ? 0.25 : 0.52 
+        <View style={[styles.bgCircle, {
+          top: 180,
+          right: -110,
+          width: 440,
+          height: 440,
+          backgroundColor: colors.primaryDark
         }]} />
-        <View style={[styles.bgCircle, { 
-          bottom: -110, 
-          left: 40, 
-          width: 380, 
-          height: 380, 
-          backgroundColor: colors.primary, 
-          opacity: isDark ? 0.30 : 0.6 
+        <View style={[styles.bgCircle, {
+          bottom: -110,
+          left: 40,
+          width: 380,
+          height: 380,
+          backgroundColor: colors.primary
         }]} />
       </View>
-      <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
-      {Platform.OS === 'android' && (
-        <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]} pointerEvents="none" />
-      )}
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background }]} pointerEvents="none" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
@@ -223,9 +209,17 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
           subtitle={`${getGreeting()}${profile.name ? `, ${profile.name.split(' ')[0]}` : ''}`}
           rightAction={(
             <View style={styles.headerActions}>
+              {/* All Transactions */}
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={navigateToTransactions}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="list-outline" size={18} color={colors.text} />
+              </TouchableOpacity>
               {/* Search - Pro feature, not in bottom nav */}
               <TouchableOpacity
-                style={[styles.iconButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                style={styles.iconButton}
                 onPress={isPremium ? navigateToSearch : navigateToPremium}
                 activeOpacity={0.85}
               >
@@ -236,17 +230,20 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
           )}
         />
 
-        {/* ── Hero balance card ── */}
-        <View style={[styles.heroCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          {/* Currency switcher tabs */}
-          {currencyKeys.length > 1 && (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.currencyTabsRow}>
+        {/* ── Global Currency Picker ── */}
+        {currencyKeys.length > 1 && (
+          <View style={styles.currencyPickerContainer}>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              contentContainerStyle={styles.currencyTabsRow}
+            >
               {currencyKeys.map(curr => (
                 <TouchableOpacity
                   key={curr}
                   style={[
                     styles.currencyTab, 
-                    selectedCurrency === curr && { backgroundColor: colors.text, borderColor: colors.text }
+                    selectedCurrency === curr && { backgroundColor: colors.text }
                   ]}
                   onPress={() => handleCurrencySelect(curr)}
                   activeOpacity={0.8}
@@ -260,8 +257,11 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-          )}
+          </View>
+        )}
 
+        {/* ── Hero balance card ── */}
+        <View style={[styles.heroCard, { backgroundColor: colors.surface }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing('1') }}>
             <Text style={[styles.heroBadge, { color: colors.textMuted }]}>TOTAL BALANCE</Text>
             <StreakBadge />
@@ -278,13 +278,13 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
             <View style={styles.splitItem}>
               <View style={[styles.splitDot, { backgroundColor: colors.success }]} />
               <Text style={[styles.splitLabel, { color: colors.textMuted }]}>IN</Text>
-              <MoneyText amount={totals.income} currency={selectedCurrency} type="CR" weight="bold" style={styles.splitValue} />
+              <MoneyText amount={totals.income} currency={selectedCurrency} type="CR" weight="bold" style={styles.splitValue} showSign={false} />
             </View>
             <View style={[styles.splitDivider, { backgroundColor: colors.border }]} />
             <View style={styles.splitItem}>
               <View style={[styles.splitDot, { backgroundColor: colors.danger }]} />
               <Text style={[styles.splitLabel, { color: colors.textMuted }]}>OUT</Text>
-              <MoneyText amount={totals.expense} currency={selectedCurrency} type="DR" weight="bold" style={styles.splitValue} />
+              <MoneyText amount={totals.expense} currency={selectedCurrency} type="DR" weight="bold" style={styles.splitValue} showSign={false} />
             </View>
           </View>
 
@@ -297,18 +297,6 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
 
         {/* ── Insights Layer (Pro Only) ── */}
         <InsightsSection currency={selectedCurrency} />
-
-        {/* ── Single Quick Action: All Transactions ── */}
-        <View style={styles.quickActions}>
-          <TouchableOpacity 
-            style={[styles.quickActionButton, { backgroundColor: colors.surface, borderColor: colors.border }]} 
-            onPress={navigateToTransactions} 
-            activeOpacity={0.85}
-          >
-            <Ionicons name="list-outline" size={18} color={colors.text} />
-            <Text style={[styles.quickActionText, { color: colors.text }]}>All Transactions</Text>
-          </TouchableOpacity>
-        </View>
 
         {/* ── Accounts section ── */}
         <SectionHeader
@@ -328,7 +316,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
             return (
               <TouchableOpacity
                 key={acc.id}
-                style={[styles.accountCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                style={[styles.accountCard, { backgroundColor: colors.surface }]}
                 onPress={() => navigateToAccountTransactions(acc.id)}
                 onLongPress={() => handleAccountLongPress(acc)}
                 delayLongPress={250}
@@ -362,12 +350,12 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
                   <View style={styles.accountCardStats}>
                     <View style={styles.accountCardStatCol}>
                       <Text style={[styles.accountCardStatLabel, { color: colors.textMuted }]}>TOTAL IN</Text>
-                      <MoneyText amount={acc.income} currency={acc.currency} style={styles.accountCardStatValue} type="CR" />
+                      <MoneyText amount={acc.income} currency={acc.currency} style={styles.accountCardStatValue} type="CR" showSign={true} />
                     </View>
                     <View style={[styles.accountCardStatDivider, { backgroundColor: colors.border }]} />
                     <View style={styles.accountCardStatCol}>
                       <Text style={[styles.accountCardStatLabel, { color: colors.textMuted }]}>TOTAL OUT</Text>
-                      <MoneyText amount={acc.expense} currency={acc.currency} style={styles.accountCardStatValue} type="DR" />
+                      <MoneyText amount={acc.expense} currency={acc.currency} style={styles.accountCardStatValue} type="DR" showSign={true} />
                     </View>
                   </View>
                 </View>
@@ -376,12 +364,12 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
           })}
 
           <TouchableOpacity
-            style={[styles.accountPlaceholderCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            style={[styles.accountPlaceholderCard, { backgroundColor: colors.surface }]}
             onPress={openAccountForm}
             activeOpacity={0.88}
           >
             <View style={styles.accountPlaceholderInner}>
-              <View style={[styles.accountPlaceholderIcon, { backgroundColor: colors.background + '88' }]}>
+              <View style={[styles.accountPlaceholderIcon, { backgroundColor: colors.surface }]}>
                 <Ionicons name="add" size={22} color={colors.text} />
               </View>
               <Text style={[styles.accountPlaceholderTitle, { color: colors.text }]}>New Account</Text>
@@ -391,11 +379,9 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
         </ScrollView>
 
         {/* ── Top expense categories ── */}
-        <SectionHeader title="TOP EXPENSE CATEGORIES" rightText={selectedTopCategoryCurrency} />
+        <SectionHeader title="TOP EXPENSE CATEGORIES" rightText={selectedCurrency} />
         <TopExpenseCategoriesCard
-          currencies={topCategoryCurrencies}
-          selectedCurrency={selectedTopCategoryCurrency}
-          onSelectCurrency={setSelectedTopCategoryCurrency}
+          currency={selectedCurrency}
           categories={topExpenseCategories}
         />
 
@@ -488,21 +474,31 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     gap: spacing('2'),
   },
   iconButton: {
-    width: spacing('9'),
-    height: spacing('9'),
+    width: 36,
+    height: 36,
     borderRadius: radius('full'),
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
     position: 'relative',
   },
   proDot: {
     position: 'absolute',
-    top: spacing('1.5'),
-    right: spacing('1.5'),
-    width: 6,
-    height: 6,
+    top: spacing('1'),
+    right: spacing('1'),
+    width: 5,
+    height: 5,
     borderRadius: 3,
+  },
+
+  /* ── Global Currency Picker ── */
+  currencyPickerContainer: {
+    marginHorizontal: spacing('6'),
+    marginBottom: spacing('3'),
+  },
+  currencyTabsRow: {
+    flexDirection: 'row',
+    gap: spacing('1'),
   },
 
   /* ── Hero balance card ── */
@@ -510,20 +506,14 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     marginHorizontal: spacing('6'),
     marginBottom: spacing('4'),
     borderRadius: radius('2xl'),
-    borderWidth: 1,
     padding: spacing('5'),
     overflow: 'hidden',
   },
-  currencyTabsRow: {
-    flexDirection: 'row',
-    gap: spacing('1'),
-    marginBottom: spacing('4'),
-  },
   currencyTab: {
     paddingHorizontal: spacing('3'),
-    paddingVertical: spacing('1'),
-    borderRadius: radius('md'),
-    borderWidth: 1,
+    paddingVertical: spacing('1.5'),
+    borderRadius: radius('full'),
+    backgroundColor: colors.card,
   },
   currencyTabText: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
@@ -537,9 +527,9 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     marginBottom: spacing('1.5'),
   },
   heroBalance: {
-    fontSize: 42,
-    lineHeight: 46,
-    letterSpacing: -1.5,
+    fontSize: 36,
+    lineHeight: 40,
+    letterSpacing: -1,
     marginBottom: spacing('5'),
   },
   splitRow: {
@@ -585,25 +575,6 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     borderRadius: radius('full'),
   },
 
-  /* ── Quick actions ── */
-  quickActions: {
-    marginHorizontal: spacing('6'),
-    marginBottom: spacing('6'),
-  },
-  quickActionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing('2'),
-    height: spacing('12'),
-    borderRadius: radius('lg'),
-    borderWidth: 1,
-  },
-  quickActionText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 14,
-  },
-
   /* ── Accounts carousel ── */
   accountsScroll: {
     paddingLeft: spacing('6'),
@@ -617,15 +588,12 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     width: screenWidth * 0.7,
     minHeight: 160,
     borderRadius: radius('xl'),
-    borderWidth: 1,
     overflow: 'hidden',
   },
   accountPlaceholderCard: {
     width: screenWidth * 0.7,
     minHeight: 160,
     borderRadius: radius('xl'),
-    borderWidth: 1,
-    borderStyle: 'dashed',
     overflow: 'hidden',
   },
   accountPlaceholderInner: {
@@ -636,9 +604,9 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     justifyContent: 'center',
   },
   accountPlaceholderIcon: {
-    width: spacing('11'),
-    height: spacing('11'),
-    borderRadius: radius('lg'),
+    width: 40,
+    height: 40,
+    borderRadius: radius('md'),
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing('4'),
@@ -675,8 +643,8 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     gap: spacing('2.5'),
   },
   accountIconBox: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     borderRadius: radius('md'),
     justifyContent: 'center',
     alignItems: 'center',
@@ -700,7 +668,7 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     borderRadius: radius('full'),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background + '80',
+    backgroundColor: colors.surface,
   },
   accountCurrencyText: {
     fontFamily: TYPOGRAPHY.fonts.semibold,

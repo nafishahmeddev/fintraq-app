@@ -12,7 +12,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
 import { ConfirmDialog } from '@/src/components/ui/ConfirmDialog';
 import { Header } from '@/src/components/ui/Header';
 import { OptionsDialog } from '@/src/components/ui/OptionsDialog';
@@ -163,8 +162,6 @@ export function BackupScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
-
       <Header title="Backup & Restore" subtitle="Data management" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>

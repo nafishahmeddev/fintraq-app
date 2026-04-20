@@ -6,57 +6,73 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../providers/ThemeProvider';
 import { ThemeColors } from '../../theme/colors';
-import { LAYOUT, RADIUS, SPACING } from '../../theme/tokens';
+import { RADIUS, SPACING } from '../../theme/tokens';
 import { TYPOGRAPHY } from '../../theme/typography';
 
+// ─── Types ───────────────────────────────────────────────────────────────────
+
 type TabItem = {
-  name: string;
-  label: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  activeIcon: keyof typeof Ionicons.glyphMap;
+  readonly name: string;
+  readonly label: string;
+  readonly icon: keyof typeof Ionicons.glyphMap;
+  readonly activeIcon: keyof typeof Ionicons.glyphMap;
 };
-
-const TAB_ITEMS: TabItem[] = [
-  { name: 'index', label: 'Home', icon: 'grid-outline', activeIcon: 'grid' },
-  { name: 'accounts', label: 'Accounts', icon: 'wallet-outline', activeIcon: 'wallet' },
-  { name: 'stats', label: 'Stats', icon: 'pulse-outline', activeIcon: 'pulse' },
-  { name: 'settings', label: 'Settings', icon: 'settings-outline', activeIcon: 'settings-sharp' },
-];
-
-export const TAB_BAR_HEIGHT = 60;
 
 type TabButtonProps = {
   tab: TabItem;
   isActive: boolean;
   onPress: (name: string) => void;
-  styles: ReturnType<typeof createStyles>;
   colors: ThemeColors;
+  styles: ReturnType<typeof createStyles>;
 };
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const TAB_ITEMS: readonly TabItem[] = [
+  { name: 'index',    label: 'Home',     icon: 'grid-outline',     activeIcon: 'grid'     },
+  { name: 'accounts', label: 'Accounts', icon: 'wallet-outline',   activeIcon: 'wallet'   },
+  { name: 'stats',    label: 'Stats',    icon: 'pulse-outline',    activeIcon: 'pulse'    },
+  { name: 'settings', label: 'Settings', icon: 'settings-outline', activeIcon: 'settings' },
+] as const;
+
+export const TAB_BAR_HEIGHT = 60;
+
+// ─── Tab button ───────────────────────────────────────────────────────────────
 
 const TabButton = React.memo(function TabButton({
   tab,
   isActive,
   onPress,
-  styles,
   colors,
+  styles,
 }: TabButtonProps) {
   const handlePress = useCallback(() => onPress(tab.name), [onPress, tab.name]);
 
   return (
     <Pressable
-      style={styles.tabButton}
       onPress={handlePress}
-      android_ripple={{ color: colors.text + '15', borderless: true }}
+      style={styles.tabTouch}
+      android_ripple={{ color: colors.primary + '20', borderless: true, radius: 32 }}
     >
+      {/* Top indicator line */}
+      <View style={[styles.topLine, isActive && { backgroundColor: colors.primary }]} />
+
+      {/* Icon */}
       <Ionicons
         name={isActive ? tab.activeIcon : tab.icon}
-        size={LAYOUT.iconLg}
-        color={isActive ? colors.text : colors.textMuted}
+        size={22}
+        color={isActive ? colors.primary : colors.textMuted}
       />
-      <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>{tab.label}</Text>
+
+      {/* Label */}
+      <Text style={[styles.tabLabel, { color: isActive ? colors.primary : colors.textMuted }]}>
+        {tab.label}
+      </Text>
     </Pressable>
   );
 });
+
+// ─── Bar ─────────────────────────────────────────────────────────────────────
 
 export const BottomTabBar = React.memo(function BottomTabBar({
   state,
@@ -65,7 +81,7 @@ export const BottomTabBar = React.memo(function BottomTabBar({
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const styles = useMemo(() => createStyles(colors, insets.bottom), [colors, insets.bottom]);
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const activeRouteName = state.routes[state.index]?.name;
 
@@ -90,83 +106,107 @@ export const BottomTabBar = React.memo(function BottomTabBar({
     [state.routes, navigation, activeRouteName],
   );
 
+  const bottomPad = useMemo(
+    () => Math.max(insets.bottom, SPACING['1']),
+    [insets.bottom],
+  );
+
   return (
     <View style={styles.container}>
-      <View style={styles.bar}>
-        {TAB_ITEMS.slice(0, 2).map((tab) => (
-          <TabButton
-            key={tab.name}
-            tab={tab}
-            isActive={activeRouteName === tab.name}
-            onPress={handleTabPress}
-            styles={styles}
-            colors={colors}
-          />
-        ))}
+      <View style={styles.row}>
+        {/* Left — Home & Accounts */}
+        <View style={styles.tabGroup}>
+          {TAB_ITEMS.slice(0, 2).map((tab) => (
+            <TabButton
+              key={tab.name}
+              tab={tab}
+              isActive={activeRouteName === tab.name}
+              onPress={handleTabPress}
+              colors={colors}
+              styles={styles}
+            />
+          ))}
+        </View>
 
-        <View style={styles.fabSlot}>
+        {/* Center FAB */}
+        <View style={styles.fabWrap}>
           <Pressable
             style={styles.fab}
             onPress={handleFABPress}
-            android_ripple={{ color: colors.primary + '30', borderless: false }}
+            android_ripple={{ color: colors.background + '30', borderless: false }}
           >
-            <Ionicons name="add" size={LAYOUT.iconXl} color={colors.background} />
+            <Ionicons name="add" size={24} color={colors.background} />
           </Pressable>
         </View>
 
-        {TAB_ITEMS.slice(2).map((tab) => (
-          <TabButton
-            key={tab.name}
-            tab={tab}
-            isActive={activeRouteName === tab.name}
-            onPress={handleTabPress}
-            styles={styles}
-            colors={colors}
-          />
-        ))}
+        {/* Right — Stats & Settings */}
+        <View style={styles.tabGroup}>
+          {TAB_ITEMS.slice(2).map((tab) => (
+            <TabButton
+              key={tab.name}
+              tab={tab}
+              isActive={activeRouteName === tab.name}
+              onPress={handleTabPress}
+              colors={colors}
+              styles={styles}
+            />
+          ))}
+        </View>
       </View>
+      {/* Safe area spacer */}
+      <View style={{ height: bottomPad, backgroundColor: colors.card }} />
     </View>
   );
 });
 
-const createStyles = (colors: ThemeColors, bottomInset: number) =>
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     container: {
-      backgroundColor: colors.surface,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-      paddingBottom: bottomInset,
+      backgroundColor: colors.card,
     },
-    bar: {
+    row: {
       flexDirection: 'row',
-      alignItems: 'stretch',
+      alignItems: 'center',
       height: TAB_BAR_HEIGHT,
     },
-    tabButton: {
+    tabGroup: {
       flex: 1,
+      flexDirection: 'row',
+    },
+    tabTouch: {
+      flex: 1,
+      height: TAB_BAR_HEIGHT,
       alignItems: 'center',
       justifyContent: 'center',
       gap: SPACING['0.5'],
     },
+    topLine: {
+      position: 'absolute',
+      top: 0,
+      left: '20%',
+      right: '20%',
+      height: 2,
+      borderBottomLeftRadius: RADIUS.xs,
+      borderBottomRightRadius: RADIUS.xs,
+      backgroundColor: 'transparent',
+    },
     tabLabel: {
       fontFamily: TYPOGRAPHY.fonts.semibold,
       fontSize: 10,
-      color: colors.textMuted,
-      letterSpacing: 0.3,
+      letterSpacing: 0.1,
     },
-    tabLabelActive: {
-      color: colors.text,
-    },
-    fabSlot: {
-      width: SPACING['7'] + SPACING['5'],
+    fabWrap: {
       alignItems: 'center',
       justifyContent: 'center',
+      paddingHorizontal: SPACING['3'],
     },
     fab: {
-      width: SPACING['7'] + SPACING['3'],
-      height: SPACING['7'] + SPACING['3'],
-      borderRadius: RADIUS.lg,
-      backgroundColor: colors.text,
+      width: 44,
+      height: 44,
+      borderRadius: RADIUS.full,
+      backgroundColor: colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
     },

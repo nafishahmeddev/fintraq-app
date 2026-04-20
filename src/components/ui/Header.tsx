@@ -52,7 +52,7 @@ export const Header = React.memo(function Header({
           >
             <Ionicons 
               name="arrow-back" 
-              size={20} 
+              size={18} 
               color={colors.text} 
             />
           </TouchableOpacity>
@@ -95,14 +95,12 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     gap: spacing('4'),
   },
   backBtn: {
-    width: LAYOUT.minTouchTarget,
-    height: LAYOUT.minTouchTarget,
-    borderRadius: radius('md'),
+    width: 36,
+    height: 36,
+    borderRadius: radius('full'),
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   titleBlock: {
     flex: 1,

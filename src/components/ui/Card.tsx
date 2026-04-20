@@ -1,6 +1,5 @@
-import { BlurView } from '@sbaiahmed1/react-native-blur';
 import React, { useMemo } from 'react';
-import { StyleSheet, View, ViewStyle, Platform } from 'react-native';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
 import { ThemeColors } from '../../theme/colors';
 import { COMPONENT_SIZES, shadow, ShadowToken } from '../../theme/tokens';
@@ -36,7 +35,7 @@ export const Card = React.memo(function Card({
   variant = 'default',
   shadow: shadowToken,
 }: CardProps) {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const sizeConfig = COMPONENT_SIZES.card[size];
@@ -46,10 +45,10 @@ export const Card = React.memo(function Card({
       case 'filled':
         return { backgroundColor: colors.surface };
       case 'outlined':
-        return { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border };
+        return { backgroundColor: 'transparent' };
       case 'default':
       default:
-        return { backgroundColor: Platform.OS === 'android' ? colors.card : 'transparent' };
+        return { backgroundColor: colors.card };
     }
   }, [variant, colors.surface, colors.card, colors.border]);
 
@@ -58,12 +57,6 @@ export const Card = React.memo(function Card({
     if (variant === 'default') return shadow('sm');
     return shadow('none');
   }, [shadowToken, variant]);
-
-  const blurStyle = useMemo(() => ({
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: Platform.OS === 'android' ? colors.card : 'transparent',
-    borderRadius: sizeConfig.borderRadius,
-  }), [colors.card, sizeConfig.borderRadius]);
 
   return (
     <View
@@ -78,16 +71,7 @@ export const Card = React.memo(function Card({
         style,
       ]}
     >
-      {variant === 'default' && (
-        <BlurView
-          blurAmount={Platform.OS === 'ios' ? 25 : 0}
-          blurType={isDark ? "dark" : "light"}
-          style={blurStyle}
-        />
-      )}
-      <View style={styles.content}>
-        {children}
-      </View>
+      {children}
     </View>
   );
 });

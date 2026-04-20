@@ -82,6 +82,7 @@ export const KPICard = React.memo(function KPICard({
               type={metrics.income >= metrics.expense ? 'CR' : 'DR'}
               weight="bold"
               style={styles.kpiValueLarge}
+              showSign={false}
             />
           </View>
         </View>
@@ -98,6 +99,7 @@ export const KPICard = React.memo(function KPICard({
               type="CR"
               weight="semibold"
               style={styles.kpiValueSmall}
+              showSign={false}
             />
           </View>
           <View style={styles.kpiVerticalSep} />
@@ -109,6 +111,7 @@ export const KPICard = React.memo(function KPICard({
               type="DR"
               weight="semibold"
               style={styles.kpiValueSmall}
+              showSign={false}
             />
           </View>
         </View>
@@ -122,8 +125,6 @@ const createStyles = (colors: ThemeColors) =>
     kpiCard: {
       borderRadius: radius('lg'),
       backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
       overflow: 'hidden',
     },
     kpiTabsWrap: {
@@ -142,8 +143,6 @@ const createStyles = (colors: ThemeColors) =>
       paddingVertical: spacing('2'),
       borderRadius: radius('full'),
       backgroundColor: colors.background,
-      borderWidth: 1,
-      borderColor: colors.border,
     },
     currencyTabActive: {
       backgroundColor: colors.primary,

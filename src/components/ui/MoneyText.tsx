@@ -10,6 +10,7 @@ interface MoneyTextProps extends TextProps {
   currency?: string;
   type?: TransactionType | 'NONE';
   weight?: 'regular' | 'medium' | 'semibold' | 'bold';
+  showSign?: boolean;
 }
 
 export const MoneyText = React.memo(function MoneyText({
@@ -17,6 +18,7 @@ export const MoneyText = React.memo(function MoneyText({
   currency,
   type = 'NONE',
   weight = 'bold',
+  showSign = false,
   style,
   ...props
 }: MoneyTextProps) {
@@ -31,10 +33,10 @@ export const MoneyText = React.memo(function MoneyText({
     let c = colors.text;
 
     if (type === 'CR') {
-      p = '+';
+      p = showSign ? '+' : '';
       c = colors.success;
     } else if (type === 'DR') {
-      p = '-';
+      p = showSign ? '-' : '';
       c = colors.danger;
     }
 
@@ -43,7 +45,7 @@ export const MoneyText = React.memo(function MoneyText({
       : TYPOGRAPHY.fonts.amountBold;
 
     return { prefix: p, color: c, formattedAmount: formatted, fontFamily: ff };
-  }, [amount, currency, type, weight, colors.text, colors.success, colors.danger]);
+  }, [amount, currency, type, weight, colors.text, colors.success, colors.danger, showSign]);
 
   return (
     <Text
@@ -52,10 +54,6 @@ export const MoneyText = React.memo(function MoneyText({
         { color, fontFamily },
         style
       ]}
-      numberOfLines={1}
-      adjustsFontSizeToFit
-      minimumFontScale={0.72}
-      ellipsizeMode="tail"
       {...props}
     >
       {prefix}{formattedAmount}

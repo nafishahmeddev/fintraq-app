@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useMemo, useCallback } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useMemo } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { MoneyText } from '../../../components/ui/MoneyText';
 import { useTheme } from '../../../providers/ThemeProvider';
+import { spacing, radius } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 
 type IoniconName = keyof typeof Ionicons.glyphMap;
@@ -16,9 +17,7 @@ type TopExpenseCategory = {
 };
 
 type TopExpenseCategoriesCardProps = {
-  currencies: string[];
-  selectedCurrency: string;
-  onSelectCurrency: (value: string) => void;
+  currency: string;
   categories: TopExpenseCategory[];
 };
 
@@ -32,9 +31,7 @@ const resolveIconName = (raw: string | null | undefined, fallback: IoniconName):
 };
 
 export const TopExpenseCategoriesCard = React.memo(function TopExpenseCategoriesCard({
-  currencies,
-  selectedCurrency,
-  onSelectCurrency,
+  currency,
   categories,
 }: TopExpenseCategoriesCardProps) {
   const { colors } = useTheme();
@@ -45,34 +42,29 @@ export const TopExpenseCategoriesCard = React.memo(function TopExpenseCategories
     [categories]
   );
 
-  const handleCurrencyPress = useCallback((curr: string) => {
-    onSelectCurrency(curr);
-  }, [onSelectCurrency]);
+  if (categories.length === 0) {
+    return (
+      <View style={styles.card}>
+        <EmptyState
+          icon="pie-chart-outline"
+          title="No expenses yet"
+          description={`Add expense transactions in ${currency} to see your top categories.`}
+          size="compact"
+          variant="card"
+          fullHeight={false}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.card}>
-      {currencies.length > 1 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
-          {currencies.map((curr) => (
-            <TouchableOpacity
-              key={curr}
-              style={[styles.tab, selectedCurrency === curr && styles.tabActive]}
-              onPress={() => handleCurrencyPress(curr)}
-              activeOpacity={0.85}
-            >
-              <Text style={[styles.tabText, selectedCurrency === curr && styles.tabTextActive]}>{curr}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
-
-      {categories.length > 0 ? (
-        categories.map((category, idx) => {
-          const isLast = idx === categories.length - 1;
-          const accent = `#${category.color.toString(16).padStart(6, '0')}`;
-          const ratio = maxAmount > 0 ? category.amount / maxAmount : 0;
-          return (
-            <View key={`${category.name}-${idx}`} style={[styles.row, isLast && styles.rowLast]}>
+      {categories.map((category, idx) => {
+        const accent = `#${category.color.toString(16).padStart(6, '0')}`;
+        const ratio = maxAmount > 0 ? category.amount / maxAmount : 0;
+        return (
+          <React.Fragment key={`${category.name}-${idx}`}>
+            <View style={styles.row}>
               <View style={styles.left}>
                 <View style={styles.rankBadge}>
                   <Text style={styles.rankText}>{idx + 1}</Text>
@@ -88,22 +80,14 @@ export const TopExpenseCategoriesCard = React.memo(function TopExpenseCategories
                 </View>
               </View>
               <View style={styles.right}>
-                <MoneyText amount={category.amount} currency={selectedCurrency} type="DR" weight="bold" style={styles.amount} />
+                <MoneyText amount={category.amount} currency={currency} type="DR" weight="bold" style={styles.amount} showSign={false} />
                 <Text style={styles.percent}>{`${(ratio * 100).toFixed(0)}%`}</Text>
               </View>
             </View>
-          );
-        })
-      ) : (
-        <EmptyState
-          icon="pie-chart-outline"
-          title="No expenses yet"
-          description={`Add expense transactions in ${selectedCurrency} to see your top categories.`}
-          size="compact"
-          variant="card"
-          fullHeight={false}
-        />
-      )}
+            {idx < categories.length - 1 && <View style={styles.divider} />}
+          </React.Fragment>
+        );
+      })}
     </View>
   );
 });
@@ -111,61 +95,30 @@ export const TopExpenseCategoriesCard = React.memo(function TopExpenseCategories
 const createStyles = (colors: { [key: string]: string }) =>
   StyleSheet.create({
     card: {
-      marginHorizontal: 24,
-      borderRadius: 18,
+      marginHorizontal: spacing('6'),
+      borderRadius: radius('xl'),
       backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
       overflow: 'hidden',
-      marginBottom: 22,
-    },
-    tabsRow: {
-      flexDirection: 'row',
-      gap: 6,
-      paddingHorizontal: 12,
-      paddingTop: 10,
-      paddingBottom: 6,
-    },
-    tab: {
-      height: 26,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.background + 'AA',
-      paddingHorizontal: 10,
-      justifyContent: 'center',
-    },
-    tabActive: {
-      backgroundColor: colors.text,
-      borderColor: colors.text,
-    },
-    tabText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      color: colors.textMuted,
-      fontSize: 11,
-      letterSpacing: 0.4,
-    },
-    tabTextActive: {
-      color: colors.background,
+      marginBottom: spacing('6'),
     },
     row: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      gap: 12,
-      paddingHorizontal: 14,
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      gap: spacing('3'),
+      paddingHorizontal: spacing('3.5'),
+      paddingVertical: spacing('2.5'),
     },
-    rowLast: {
-      borderBottomWidth: 0,
+    divider: {
+      height: 1,
+      backgroundColor: colors.border,
+      marginHorizontal: spacing('3.5'),
     },
     left: {
       flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 9,
+      gap: spacing('2'),
     },
     rankBadge: {
       width: 20,
@@ -173,9 +126,7 @@ const createStyles = (colors: { [key: string]: string }) =>
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: colors.background + 'AA',
-      borderWidth: 1,
-      borderColor: colors.border,
+      backgroundColor: colors.card,
     },
     rankText: {
       fontFamily: TYPOGRAPHY.fonts.semibold,
@@ -201,7 +152,7 @@ const createStyles = (colors: { [key: string]: string }) =>
     barTrack: {
       height: 4,
       borderRadius: 999,
-      backgroundColor: colors.background + 'CC',
+      backgroundColor: colors.card,
       overflow: 'hidden',
     },
     barFill: {

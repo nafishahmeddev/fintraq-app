@@ -3,12 +3,12 @@ import * as Notifications from 'expo-notifications';
 import React from 'react';
 import { Alert, DevSettings, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../src/components/ui/BlurBackground';
 import { toErrorMessage } from '../src/utils/errors';
 import { ConfirmDialog } from '../src/components/ui/ConfirmDialog';
 import { Header } from '../src/components/ui/Header';
 import { useTheme } from '../src/providers/ThemeProvider';
 import { ThemeColors } from '../src/theme/colors';
+import { RADIUS, SPACING } from '../src/theme/tokens';
 import { TYPOGRAPHY } from '../src/theme/typography';
 import { usePremium } from '../src/providers/PremiumProvider';
 import { Input } from '../src/components/ui/Input';
@@ -68,7 +68,6 @@ export default function DeveloperScreen() {
   if (!isAuthenticated) {
     return (
       <SafeAreaView style={styles.container}>
-        <BlurBackground />
         <Header title="Restricted" subtitle="Authentication required" showBack />
         
         <KeyboardAvoidingView 
@@ -76,7 +75,7 @@ export default function DeveloperScreen() {
           style={styles.keyboardContent}
         >
           <View style={styles.lockContainer}>
-            <View style={[styles.lockIconBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.lockIconBox, { backgroundColor: colors.surface }]}>
               <Ionicons name="lock-closed" size={32} color={colors.text} />
             </View>
             
@@ -111,7 +110,6 @@ export default function DeveloperScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
       <Header title="Developer" subtitle="Secret system tools" showBack />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -246,33 +244,37 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     backgroundColor: colors.background,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 48,
+    paddingHorizontal: SPACING['6'],
+    paddingTop: SPACING['2'],
+    paddingBottom: SPACING['12'],
   },
   keyboardContent: {
     flex: 1,
   },
+
+  // ─── Lock screen ────────────────────────────────────────────────────────
   lockContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
-    paddingBottom: 80,
+    paddingHorizontal: SPACING['9'],
+    paddingBottom: SPACING['11'],
   },
   lockIconBox: {
-    width: 80,
-    height: 80,
-    borderRadius: 24,
+    width: 72,
+    height: 72,
+    borderRadius: RADIUS.xl,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    marginBottom: 24,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    marginBottom: SPACING['6'],
   },
   lockInfo: {
     alignItems: 'center',
-    marginBottom: 32,
-    gap: 8,
+    marginBottom: SPACING['7'],
+    gap: SPACING['2'],
   },
   lockTitle: {
     fontFamily: TYPOGRAPHY.fonts.bold,
@@ -285,7 +287,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     fontSize: 14,
     color: colors.textMuted,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
   },
   inputWrap: {
     width: '100%',
@@ -297,95 +299,105 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     letterSpacing: 10,
   },
   securityBranding: {
-    marginTop: 48,
+    marginTop: SPACING['12'],
   },
   securityText: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
     fontSize: 9,
     color: colors.textMuted,
     letterSpacing: 1.5,
-    opacity: 0.5,
+    opacity: 0.4,
   },
+
+  // ─── Sections ────────────────────────────────────────────────────────────
   section: {
-    marginBottom: 28,
+    marginBottom: SPACING['7'],
   },
   sectionLabel: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
     fontSize: 10,
     color: colors.textMuted,
     letterSpacing: 2,
-    marginBottom: 12,
-    paddingLeft: 4,
+    marginBottom: SPACING['3'],
+    paddingLeft: SPACING['1'],
   },
   card: {
-    borderRadius: 20,
-    backgroundColor: colors.surface,
+    borderRadius: RADIUS.xl,
+    backgroundColor: colors.card,
     overflow: 'hidden',
   },
+
+  // ─── Rows ────────────────────────────────────────────────────────────────
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: SPACING['4'],
   },
   overrideHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    paddingBottom: 10,
-  },
-  tripleButtonGroup: {
-    flexDirection: 'row',
-    padding: 16,
-    paddingTop: 0,
-    gap: 8,
-  },
-  smallBtn: {
-    flex: 1,
-    height: 36,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#00000010',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#00000005',
-  },
-  btnLabel: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
-    fontSize: 10,
-    letterSpacing: 0.5,
+    padding: SPACING['4'],
+    paddingBottom: SPACING['2'],
   },
   iconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.md,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.surface,
-    marginRight: 14,
+    marginRight: SPACING['3'],
   },
   textDetails: {
     flex: 1,
   },
   rowTitle: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 16,
+    fontSize: 15,
     color: colors.text,
   },
   rowSubtitle: {
     fontFamily: TYPOGRAPHY.fonts.regular,
     fontSize: 12,
     color: colors.textMuted,
-    marginTop: 2,
+    marginTop: SPACING['0.5'],
   },
+
+  // ─── Premium toggle buttons ───────────────────────────────────────────
+  tripleButtonGroup: {
+    flexDirection: 'row',
+    paddingHorizontal: SPACING['4'],
+    paddingBottom: SPACING['4'],
+    gap: SPACING['2'],
+  },
+  smallBtn: {
+    flex: 1,
+    height: 36,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+  },
+  btnLabel: {
+    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontSize: 10,
+    letterSpacing: 0.5,
+  },
+
+  // ─── Info rows ────────────────────────────────────────────────────────
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 16,
+    alignItems: 'center',
+    paddingHorizontal: SPACING['4'],
+    paddingVertical: SPACING['3'],
     borderBottomWidth: 1,
-    borderBottomColor: colors.text + '08',
+    borderBottomColor: colors.border,
   },
   infoLabel: {
-    fontFamily: TYPOGRAPHY.fonts.medium,
+    fontFamily: TYPOGRAPHY.fonts.regular,
     fontSize: 13,
     color: colors.textMuted,
   },
@@ -394,10 +406,12 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     fontSize: 13,
     color: colors.text,
   },
+
+  // ─── Footer ────────────────────────────────────────────────────────────
   footer: {
-    marginTop: 48,
+    marginTop: SPACING['9'],
     alignItems: 'center',
-    gap: 6,
+    gap: SPACING['1.5'],
   },
   footerBrand: {
     fontFamily: TYPOGRAPHY.fonts.semibold,

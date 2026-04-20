@@ -7,7 +7,6 @@ import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Alert, KeyboardAvoidingView, Modal, Platform, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { BlurBackground } from '../../src/components/ui/BlurBackground';
 import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
 import { Header } from '../../src/components/ui/Header';
 import { OptionsDialog } from '../../src/components/ui/OptionsDialog';
@@ -21,7 +20,7 @@ import { TYPOGRAPHY } from '../../src/theme/typography';
 
 export default function SettingsScreen() {
   const { colors } = useTheme();
-  const { isPremium, resetPremium } = usePremium();
+  const { isPremium } = usePremium();
   const { profile, updateProfile } = useSettings();
   const styles = React.useMemo(() => createStyles(colors), [colors]);
   const router = useRouter();
@@ -143,8 +142,6 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <BlurBackground />
-
       <Header title="Settings" subtitle="System preferences" />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -300,17 +297,6 @@ export default function SettingsScreen() {
           </TouchableOpacity>
           <Text style={styles.footerCopy}>ALL DATA IS ENCRYPTED AND STORED LOCALLY BY DEFAULT.</Text>
 
-          {devClickCount > 0 && (
-            <TouchableOpacity
-              style={{ marginTop: 20, padding: 10 }}
-              onPress={async () => {
-                await resetPremium();
-                Alert.alert("Premium Reset", "Account downgraded to Free.");
-              }}
-            >
-              <Text style={{ color: colors.danger, fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 10 }}>RESET SUBSCRIPTION ({7 - devClickCount})</Text>
-            </TouchableOpacity>
-          )}
         </View>
       </ScrollView>
 

@@ -122,6 +122,7 @@ export const TransactionRow = React.memo(function TransactionRow({
           type={tx.type}
           weight="bold"
           style={styles.amount}
+          showSign={false}
         />
         <Text style={[styles.date, { color: colors.textMuted }]}>
           {showDate

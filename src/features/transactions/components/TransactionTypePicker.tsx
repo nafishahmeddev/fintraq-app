@@ -53,7 +53,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
   },
   pillText: {
     fontFamily: TYPOGRAPHY.fonts.semibold,

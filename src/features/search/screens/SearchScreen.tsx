@@ -1,4 +1,4 @@
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
+import { Header } from '@/src/components/ui/Header';
 import { MoneyText } from '@/src/components/ui/MoneyText';
 import { TransactionRow } from '@/src/components/ui/TransactionRow';
 import type { Account } from '@/src/features/accounts/api/accounts';
@@ -216,8 +216,8 @@ const categoryRowStyles = StyleSheet.create({
 
 export function SearchScreen() {
   const { colors } = useTheme();
-  const router = useRouter();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const router = useRouter();
   const inputRef = useRef<TextInput>(null);
 
   const [query, setQuery] = useState('');
@@ -230,7 +230,6 @@ export function SearchScreen() {
 
   const handleClear = useCallback(() => setQuery(''), []);
 
-  const handleBack = useCallback(() => router.back(), [router]);
 
   const handleTransactionPress = useCallback((tx: { id: number }) => {
     router.push(`/transactions/edit/${tx.id}`);
@@ -334,20 +333,16 @@ export function SearchScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
-
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={handleBack} activeOpacity={0.75}>
-          <Ionicons name="arrow-back" size={20} color={colors.text} />
-        </TouchableOpacity>
-        <View style={styles.headerText}>
-          <Text style={styles.title}>Search</Text>
-        </View>
-        {isFetching && isEnabled && (
-          <ActivityIndicator size="small" color={colors.primary} style={styles.loadingIndicator} />
-        )}
-      </View>
+      <Header
+        title="Search"
+        subtitle="Find across your data"
+        showBack
+        rightAction={
+          isFetching && isEnabled ? (
+            <ActivityIndicator size="small" color={colors.primary} />
+          ) : undefined
+        }
+      />
 
       {/* Search input */}
       <View style={styles.searchRow}>
@@ -418,35 +413,6 @@ const createStyles = (colors: ThemeColors) =>
       backgroundColor: colors.background,
     },
 
-    // ─── Header ────────────────────────────────────────────────────────────
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['3'],
-      paddingBottom: SPACING['2'],
-      gap: SPACING['4'],
-    },
-    backBtn: {
-      width: 44,
-      height: 44,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.surface,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    headerText: {
-      flex: 1,
-    },
-    title: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 28,
-      color: colors.text,
-      letterSpacing: -1,
-    },
-    loadingIndicator: {
-      marginRight: SPACING['1'],
-    },
 
     // ─── Search input ───────────────────────────────────────────────────────
     searchRow: {

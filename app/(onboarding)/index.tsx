@@ -12,7 +12,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../src/components/ui/BlurBackground';
 import { Button } from '../../src/components/ui/Button';
 import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
 import { ACCOUNT_COLORS, ACCOUNT_ICONS } from '../../src/constants/picker';
@@ -310,8 +309,6 @@ export default function OnboardingScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground androidOverlayOpacity="76" />
-
       <FormProvider {...methods}>
         <KeyboardAvoidingView style={styles.keyboardWrap} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.header}>

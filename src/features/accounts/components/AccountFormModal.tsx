@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { resolveIcon } from '../../../utils/icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
@@ -38,7 +37,7 @@ export type AccountFormModalProps = {
 };
 
 export function AccountFormModal({ visible, onClose, account }: AccountFormModalProps) {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const isEditing = !!account;
@@ -124,18 +123,7 @@ export function AccountFormModal({ visible, onClose, account }: AccountFormModal
             <View style={[styles.glow, { bottom: -90, left: 40, width: 320, height: 320, backgroundColor: colors.primary + '1C' }]} />
           </View>
 
-          <BlurView
-            blurAmount={Platform.OS === 'ios' ? 80 : 96}
-            blurType={isDark ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFillObject}
-          />
-
-          {Platform.OS === 'android' && (
-            <View
-              pointerEvents="none"
-              style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]}
-            />
-          )}
+          <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background }]} />
 
           <View style={styles.handle} />
 
@@ -433,11 +421,11 @@ const createStyles = (colors: ThemeColors) =>
     answerLine: {
       height: 2,
       borderRadius: 999,
-      backgroundColor: colors.primary + '55',
+      backgroundColor: colors.primary,
       marginTop: 4,
     },
     answerLineError: {
-      backgroundColor: colors.danger + '88',
+      backgroundColor: colors.danger,
     },
     currencyRow: {
       flexDirection: 'row',
@@ -480,8 +468,8 @@ const createStyles = (colors: ThemeColors) =>
       height: 46,
       borderRadius: 23,
       borderWidth: 1,
-      borderColor: colors.text + '10',
-      backgroundColor: colors.background + 'B8',
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
       justifyContent: 'center',
       alignItems: 'center',
     },

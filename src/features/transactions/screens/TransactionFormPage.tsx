@@ -14,7 +14,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { Header } from '../../../components/ui/Header';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
@@ -195,7 +194,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
       <Header title={isEditMode ? 'Edit Entry' : 'New Entry'} subtitle="Record flow with precision" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
@@ -315,8 +313,6 @@ const createStyles = (colors: ThemeColors) =>
       height: 48,
       borderRadius: 16,
       backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -330,8 +326,6 @@ const createStyles = (colors: ThemeColors) =>
     noteContainer: {
       borderRadius: 16,
       backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
       padding: 12,
       minHeight: 100,
     },

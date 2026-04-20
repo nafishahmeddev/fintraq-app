@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { Header } from '../../../components/ui/Header';
@@ -80,8 +79,6 @@ export const CategoriesScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
-
       <Header title="Categories" subtitle="Organize your spending" showBack />
 
       {isLoading ? (
@@ -206,8 +203,6 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   searchWrap: {
     height: 42,
     borderRadius: 13,
-    borderWidth: 1,
-    borderColor: colors.border,
     backgroundColor: colors.background + 'B8',
     paddingHorizontal: 12,
     flexDirection: 'row',

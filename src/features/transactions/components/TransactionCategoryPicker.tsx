@@ -83,7 +83,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     height: 36,
     borderRadius: 12,
-    borderWidth: 1,
   },
   name: {
     fontFamily: TYPOGRAPHY.fonts.medium,
