@@ -30,12 +30,12 @@ This document outlines the core features of the Luno app and the step-by-step wo
 
 ---
 
-## 3. Advanced Analytics & Stats
+## 3. Pulse (Analytics)
 **Feature:** Deep insights into spending behavior segmented by time cohorts and currencies.
-**Codebase Domain:** `app/(main)/stats.tsx`
+**Codebase Domain:** `app/(main)/stats.tsx` (being renamed to Pulse)
 
 **Workflow:**
-1. User navigates to the 'Stats' tab from the bottom navigation bar.
+1. User navigates to the 'Pulse' tab from the bottom app bar.
 2. User selects a specific **Currency** and **Window** (7D, 30D, 90D, or ALL TIME). 
 3. **Free Tier Flow:** Limited to the basic 7-day sliding window. Users see Summary tabs featuring Net Position, total Income, total Expense, and Balance. 
 4. **Premium Tier Workflow:** If the free user attempts to select 30D, 90D, or ALL TIME, or triggers a locked advanced insight, the `PremiumGuard` intercepts the tap and opens the Paywall presentation.
@@ -44,7 +44,7 @@ This document outlines the core features of the Luno app and the step-by-step wo
    - *Savings Rate*: Net Position / Income.
    - *Runway*: Balance / Avg Daily Burn.
    - *In/Out Ratio*: Income / Expense.
-6. **Visual Output:** A dynamic 7-day visual cash flow trend is rendered alongside a top spend categories progress breakdown and account-weighted splits.
+6. **Visual Output:** Charts powered by react-native-gifted-charts including trend lines, category breakdowns, and income vs expense visualizations.
 
 ---
 
@@ -61,24 +61,27 @@ This document outlines the core features of the Luno app and the step-by-step wo
 
 ---
 
-## 5. Dashboard & Financial Pulse
+## 5. Dashboard (Home Tab)
 **Feature:** The primary home hub providing at-a-glance financial health.
 **Codebase Domain:** `app/(main)/index.tsx`, `src/features/dashboard`
 
 **Workflow:**
-1. Mounts the main dashboard fetching real-time balances across all created accounts.
-2. Aggregates a master 'Net Position' hero unit at the very top.
-3. Streams a 'Recent Transactions' live feed constrained to the most recent elements.
-4. Acts as the foundational anchor giving immediate paths to settings, analytics, and new entries.
+1. User is on the 'Home' tab of the bottom app bar.
+2. Dashboard mounts fetching real-time balances across all created accounts.
+3. Aggregates a master 'Net Position' hero unit at the very top.
+4. Streams a 'Recent Transactions' live feed constrained to the most recent elements.
+5. Charts section shows Income vs Expense bars and Spending category donut (Phase 7).
+6. FAB (Floating Action Button) visible on all tabs for quick transaction creation.
 
 ---
 
 ## 6. Personalization & Settings
-**Feature:** User control over aesthetics, localization, and local data persistence.
+**Feature:** User control over aesthetics, localization, and data management.
 **Codebase Domain:** `app/(main)/settings.tsx`
 
 **Workflow:**
-1. User routes to the 'Settings' tab.
+1. User navigates to the 'Settings' tab from the bottom app bar.
 2. User toggles the App Theme (Light, Dark, System Adaptive) applying to the global context instantly.
-3. User accesses Data Maintenance flows if necessary (Factor Reset).
-4. **Destruction Flow:** Approving a Factory Reset executes a full cascade drop across all local SQLite tables, completely erasing traces of the user's footprint for absolute privacy.
+3. Configure Reminder notifications (time and enable/disable).
+4. Access Premium status and upgrade options.
+5. Data management: Export CSV (Phase 10), Backup & Restore (Phase 10 - hidden for now).
