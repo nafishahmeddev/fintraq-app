@@ -9,6 +9,23 @@ Your code must mirror the product's soul: **Editorial Brutalism.**
 - **Strictly Local**: SQLite + Drizzle ORM. Zero cloud. Zero tracking.
 - **Code Tone**: Write concise, confident, uncommented (unless mathematical/complex) typescript. Early returns. Clean destruction. No 'I think' or 'maybe'.
 
+## 🔥 Code Quality Standards
+
+All code must be **production-ready**, **well-structured**, and **type-safe**.
+
+### Non-Negotiables
+- **Zero `any` types** - Strict TypeScript only. All functions, props, state fully typed.
+- **No TODOs, no hacks, no temporary fixes** - Every line must be shippable.
+- **No patchwork** - Solve root causes properly. If messy, rewrite cleanly.
+- **Well-structured architecture** - Domain-driven folders, single responsibility, React.memo on all components.
+- **Self-documenting code** - Clear naming, minimal comments (only for complex logic).
+
+### Architecture Rules
+- One component per file (React.memo wrapped)
+- One feature per domain folder (`src/features/{domain}/`)
+- Never duplicate logic - abstract to hooks or services
+- Database changes require migrations (`npm run db:generate`)
+
 ## 📚 Required Context
 Before generating UI or Data mutations, you MUST read:
 - `AGENTS.md` (Critical patterns, design tokens, performance rules)

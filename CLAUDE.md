@@ -26,6 +26,24 @@ See `AGENTS.md` for complete design token reference.
 - **Styling**: `StyleSheet.create` relying strictly on the app's internal `useTheme()` provider. Never use hardcoded colors.
 - **Performance**: See Performance Patterns section below - mandatory React.memo, useCallback, useMemo usage.
 
+## 2.0 Code Quality Standards (Mandatory)
+
+All code must be **production-ready**, **well-structured**, and **type-safe**. No exceptions.
+
+### Non-Negotiables
+- **Strict TypeScript**: Zero `any` types. All functions, props, and state must be fully typed.
+- **Well-Structured**: Follow existing architecture patterns. Domain-driven folder structure. Single responsibility for components and functions.
+- **Production Ready**: No TODOs, no hacks, no temporary fixes. Every line of code must be shippable.
+- **No Patchwork**: Don't add quick fixes or workarounds. Solve the root cause properly. If it feels messy, rewrite it cleanly.
+- **Self-Documenting**: Clear naming, logical structure, minimal comments (only for complex logic).
+
+### Architecture Rules
+- One component per file (React.memo wrapped)
+- One feature per domain folder (`src/features/{domain}/`)
+- Shared utilities only in `src/utils/` or `src/components/ui/`
+- Never duplicate logic - abstract to hooks or services
+- Database changes require migrations (`npm run db:generate`)
+
 ## 2.1 TypeScript Standards (Zero `any` Policy)
 
 **No `as any` or `: any` is permitted anywhere in the codebase.** Use these patterns instead:
