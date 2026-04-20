@@ -1,9 +1,9 @@
+import { usePremium } from '@/src/providers/PremiumProvider';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from '@sbaiahmed1/react-native-blur';
 import { useRouter } from 'expo-router';
 import React, { useCallback } from 'react';
-import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { Header } from '../../../components/ui/Header';
@@ -14,17 +14,17 @@ import { DEFAULT_CURRENCY } from '../../../constants/currency';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
+import { radius, spacing } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import type { Account } from '../../accounts/api/accounts';
 import { AccountFormModal } from '../../accounts/components/AccountFormModal';
 import { useAccounts, useDeleteAccount } from '../../accounts/hooks/accounts';
+import { StreakBadge } from '../../reports/components/StreakBadge';
 import { useTransactions } from '../../transactions/hooks/transactions';
-import { usePremium } from '@/src/providers/PremiumProvider';
+import { InsightsSection } from '../components/InsightsSection';
 import { SectionHeader } from '../components/SectionHeader';
 import { TopExpenseCategoriesCard } from '../components/TopExpenseCategoriesCard';
 import { useDashboardStats, useTopExpenseCategories } from '../hooks/dashboard';
-import { InsightsSection } from '../components/InsightsSection';
-import { StreakBadge } from '../../reports/components/StreakBadge';
 
 const getGreeting = () => {
   const h = new Date().getHours();
@@ -82,11 +82,9 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
     }
   }, [currencyKeys, selectedCurrency]);
 
-  // Get stats from the optimized SQL hook
   const { data: statsQueryData } = useDashboardStats(selectedCurrency);
   const totals = React.useMemo(() => statsQueryData ?? { income: 0, expense: 0 }, [statsQueryData]);
 
-  // Get top categories from the optimized SQL hook
   const { data: topCategoriesData } = useTopExpenseCategories(selectedCurrency);
   const topExpenseCategories = React.useMemo(() => topCategoriesData ?? [], [topCategoriesData]);
 
@@ -110,28 +108,12 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
     router.push('/search');
   }, [router]);
 
-  const navigateToStats = useCallback(() => {
-    router.push('/(main)/stats');
-  }, [router]);
-
-  const navigateToReports = useCallback(() => {
-    router.push('/(main)/reports');
-  }, [router]);
-
-  const navigateToSettings = useCallback(() => {
-    router.push('/settings');
-  }, [router]);
-
   const navigateToPremium = useCallback(() => {
     router.push('/premium');
   }, [router]);
 
   const navigateToTransactions = useCallback(() => {
     router.push('/transactions');
-  }, [router]);
-
-  const navigateToCreateTransaction = useCallback(() => {
-    router.push('/transactions/create');
   }, [router]);
 
   const navigateToAccountTransactions = useCallback((accountId: number) => {
@@ -200,12 +182,33 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
     : 0.5;
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Static background circles */}
+    <View style={styles.container}>
+      {/* Static background circles - subtle in dark mode */}
       <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-        <View style={[styles.bgCircle, { top: -60, left: -60, width: 340, height: 340, backgroundColor: colors.primary, opacity: 0.72 }]} />
-        <View style={[styles.bgCircle, { top: 180, right: -110, width: 440, height: 440, backgroundColor: colors.primaryDark, opacity: 0.52 }]} />
-        <View style={[styles.bgCircle, { bottom: -110, left: 40, width: 380, height: 380, backgroundColor: colors.primary, opacity: 0.6 }]} />
+        <View style={[styles.bgCircle, { 
+          top: -60, 
+          left: -60, 
+          width: 340, 
+          height: 340, 
+          backgroundColor: colors.primary, 
+          opacity: isDark ? 0.35 : 0.72 
+        }]} />
+        <View style={[styles.bgCircle, { 
+          top: 180, 
+          right: -110, 
+          width: 440, 
+          height: 440, 
+          backgroundColor: colors.primaryDark, 
+          opacity: isDark ? 0.25 : 0.52 
+        }]} />
+        <View style={[styles.bgCircle, { 
+          bottom: -110, 
+          left: 40, 
+          width: 380, 
+          height: 380, 
+          backgroundColor: colors.primary, 
+          opacity: isDark ? 0.30 : 0.6 
+        }]} />
       </View>
       <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
       {Platform.OS === 'android' && (
@@ -214,69 +217,59 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-        {/* ── Header ── */}
+        {/* ── Refined Header ── */}
         <Header
           title="Dashboard"
           subtitle={`${getGreeting()}${profile.name ? `, ${profile.name.split(' ')[0]}` : ''}`}
           rightAction={(
             <View style={styles.headerActions}>
+              {/* Search - Pro feature, not in bottom nav */}
               <TouchableOpacity
-                style={styles.iconButton}
+                style={[styles.iconButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
                 onPress={isPremium ? navigateToSearch : navigateToPremium}
                 activeOpacity={0.85}
               >
                 <Ionicons name="search-outline" size={18} color={isPremium ? colors.text : colors.textMuted} />
                 {!isPremium && <View style={[styles.proDot, { backgroundColor: colors.primary }]} />}
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={isPremium ? navigateToStats : navigateToPremium}
-                activeOpacity={0.85}
-              >
-                <Ionicons name="stats-chart-outline" size={18} color={isPremium ? colors.text : colors.textMuted} />
-                {!isPremium && <View style={[styles.proDot, { backgroundColor: colors.primary }]} />}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={isPremium ? navigateToReports : navigateToPremium}
-                activeOpacity={0.85}
-              >
-                <Ionicons name="newspaper-outline" size={18} color={isPremium ? colors.text : colors.textMuted} />
-                {!isPremium && <View style={[styles.proDot, { backgroundColor: colors.primary }]} />}
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.iconButton} onPress={navigateToSettings} activeOpacity={0.85}>
-                <Ionicons name="settings-outline" size={19} color={colors.text} />
-              </TouchableOpacity>
             </View>
           )}
         />
 
         {/* ── Hero balance card ── */}
-        <View style={styles.heroCard}>
+        <View style={[styles.heroCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {/* Currency switcher tabs */}
           {currencyKeys.length > 1 && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.currencyTabsRow}>
               {currencyKeys.map(curr => (
                 <TouchableOpacity
                   key={curr}
-                  style={[styles.currencyTab, selectedCurrency === curr && styles.currencyTabActive]}
+                  style={[
+                    styles.currencyTab, 
+                    selectedCurrency === curr && { backgroundColor: colors.text, borderColor: colors.text }
+                  ]}
                   onPress={() => handleCurrencySelect(curr)}
                   activeOpacity={0.8}
                 >
-                  <Text style={[styles.currencyTabText, selectedCurrency === curr && styles.currencyTabTextActive]}>{curr}</Text>
+                  <Text style={[
+                    styles.currencyTabText, 
+                    { color: selectedCurrency === curr ? colors.background : colors.textMuted }
+                  ]}>
+                    {curr}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
           )}
 
-           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-             <Text style={styles.heroBadge}>TOTAL BALANCE</Text>
-             <StreakBadge />
-           </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing('1') }}>
+            <Text style={[styles.heroBadge, { color: colors.textMuted }]}>TOTAL BALANCE</Text>
+            <StreakBadge />
+          </View>
           <MoneyText
             amount={balancesByCurrency[selectedCurrency] || 0}
             currency={selectedCurrency}
-            style={styles.heroBalance}
+            style={[styles.heroBalance, { color: colors.text }]}
             weight="bold"
           />
 
@@ -284,36 +277,36 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
           <View style={styles.splitRow}>
             <View style={styles.splitItem}>
               <View style={[styles.splitDot, { backgroundColor: colors.success }]} />
-              <Text style={styles.splitLabel}>IN</Text>
+              <Text style={[styles.splitLabel, { color: colors.textMuted }]}>IN</Text>
               <MoneyText amount={totals.income} currency={selectedCurrency} type="CR" weight="bold" style={styles.splitValue} />
             </View>
-            <View style={styles.splitDivider} />
+            <View style={[styles.splitDivider, { backgroundColor: colors.border }]} />
             <View style={styles.splitItem}>
               <View style={[styles.splitDot, { backgroundColor: colors.danger }]} />
-              <Text style={styles.splitLabel}>OUT</Text>
+              <Text style={[styles.splitLabel, { color: colors.textMuted }]}>OUT</Text>
               <MoneyText amount={totals.expense} currency={selectedCurrency} type="DR" weight="bold" style={styles.splitValue} />
             </View>
           </View>
 
           {/* Visual bar */}
           <View style={styles.flowBar}>
-            <View style={[styles.flowBarIncome, { flex: incomeBarRatio }]} />
-            <View style={[styles.flowBarExpense, { flex: 1 - incomeBarRatio }]} />
+            <View style={[styles.flowBarIncome, { flex: incomeBarRatio, backgroundColor: colors.success }]} />
+            <View style={[styles.flowBarExpense, { flex: 1 - incomeBarRatio, backgroundColor: colors.danger }]} />
           </View>
         </View>
 
         {/* ── Insights Layer (Pro Only) ── */}
         <InsightsSection currency={selectedCurrency} />
 
-        {/* ── Quick actions ── */}
+        {/* ── Single Quick Action: All Transactions ── */}
         <View style={styles.quickActions}>
-          <TouchableOpacity style={styles.quickActionPrimary} onPress={navigateToCreateTransaction} activeOpacity={0.85}>
-            <Ionicons name="add" size={20} color={colors.background} />
-            <Text style={styles.quickActionPrimaryText}>Add Transaction</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickActionSecondary} onPress={navigateToTransactions} activeOpacity={0.85}>
+          <TouchableOpacity 
+            style={[styles.quickActionButton, { backgroundColor: colors.surface, borderColor: colors.border }]} 
+            onPress={navigateToTransactions} 
+            activeOpacity={0.85}
+          >
             <Ionicons name="list-outline" size={18} color={colors.text} />
-            <Text style={styles.quickActionSecondaryText}>All Transactions</Text>
+            <Text style={[styles.quickActionText, { color: colors.text }]}>All Transactions</Text>
           </TouchableOpacity>
         </View>
 
@@ -335,7 +328,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
             return (
               <TouchableOpacity
                 key={acc.id}
-                style={styles.accountCard}
+                style={[styles.accountCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
                 onPress={() => navigateToAccountTransactions(acc.id)}
                 onLongPress={() => handleAccountLongPress(acc)}
                 delayLongPress={250}
@@ -350,8 +343,8 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
                         <Ionicons name={resolveIconName(acc.icon, 'wallet-outline')} size={18} color={accColor} />
                       </View>
                       <View style={styles.accountCardMeta}>
-                        <Text style={styles.accountCardName} numberOfLines={1}>{acc.name}</Text>
-                        <Text style={styles.accountCardHint}>
+                        <Text style={[styles.accountCardName, { color: colors.text }]} numberOfLines={1}>{acc.name}</Text>
+                        <Text style={[styles.accountCardHint, { color: colors.textMuted }]}>
                           {acc.accountNumber && acc.accountNumber !== 'N/A'
                             ? `•••• ${acc.accountNumber.slice(-4)}`
                             : 'Tap to view activity'}
@@ -363,17 +356,17 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
                     </View>
                   </View>
 
-                  <Text style={styles.accountBalanceLabel}>AVAILABLE</Text>
-                  <MoneyText amount={acc.balance} currency={acc.currency} style={styles.accountCardBalance} weight="bold" />
+                  <Text style={[styles.accountBalanceLabel, { color: colors.textMuted }]}>AVAILABLE</Text>
+                  <MoneyText amount={acc.balance} currency={acc.currency} style={[styles.accountCardBalance, { color: colors.text }]} weight="bold" />
 
                   <View style={styles.accountCardStats}>
                     <View style={styles.accountCardStatCol}>
-                      <Text style={styles.accountCardStatLabel}>TOTAL IN</Text>
+                      <Text style={[styles.accountCardStatLabel, { color: colors.textMuted }]}>TOTAL IN</Text>
                       <MoneyText amount={acc.income} currency={acc.currency} style={styles.accountCardStatValue} type="CR" />
                     </View>
-                    <View style={styles.accountCardStatDivider} />
+                    <View style={[styles.accountCardStatDivider, { backgroundColor: colors.border }]} />
                     <View style={styles.accountCardStatCol}>
-                      <Text style={styles.accountCardStatLabel}>TOTAL OUT</Text>
+                      <Text style={[styles.accountCardStatLabel, { color: colors.textMuted }]}>TOTAL OUT</Text>
                       <MoneyText amount={acc.expense} currency={acc.currency} style={styles.accountCardStatValue} type="DR" />
                     </View>
                   </View>
@@ -383,16 +376,16 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
           })}
 
           <TouchableOpacity
-            style={styles.accountPlaceholderCard}
+            style={[styles.accountPlaceholderCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
             onPress={openAccountForm}
             activeOpacity={0.88}
           >
             <View style={styles.accountPlaceholderInner}>
-              <View style={styles.accountPlaceholderIcon}>
+              <View style={[styles.accountPlaceholderIcon, { backgroundColor: colors.background + '88' }]}>
                 <Ionicons name="add" size={22} color={colors.text} />
               </View>
-              <Text style={styles.accountPlaceholderTitle}>New Account</Text>
-              <Text style={styles.accountPlaceholderText}>Add another wallet, bank, or cash account.</Text>
+              <Text style={[styles.accountPlaceholderTitle, { color: colors.text }]}>New Account</Text>
+              <Text style={[styles.accountPlaceholderText, { color: colors.textMuted }]}>Add another wallet, bank, or cash account.</Text>
             </View>
           </TouchableOpacity>
         </ScrollView>
@@ -409,7 +402,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
         {/* ── Recent activity ── */}
         <SectionHeader title="RECENT" rightText="See all" onPressRight={navigateToTransactions} />
 
-        <View style={styles.activityCard}>
+        <View style={[styles.activityCard, { backgroundColor: colors.surface }]}>
           {transactions && transactions.length > 0 ? (
             transactions.slice(0, 6).map((tx, idx) => {
               const isLast = idx === Math.min(transactions.length, 6) - 1;
@@ -431,7 +424,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
               title="No transactions yet"
               description="Start tracking your spending by adding your first transaction."
               actionLabel="Add Transaction"
-              onAction={navigateToCreateTransaction}
+              onAction={navigateToTransactions}
               size="compact"
               variant="card"
               fullHeight={false}
@@ -440,11 +433,6 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
         </View>
 
       </ScrollView>
-
-      {/* FAB */}
-      <TouchableOpacity style={styles.fab} onPress={navigateToCreateTransaction} activeOpacity={0.9}>
-        <Ionicons name="add" size={28} color={colors.background} />
-      </TouchableOpacity>
 
       <AccountFormModal
         visible={showAccountForm}
@@ -468,7 +456,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
         confirmLabel="Delete"
         onConfirm={handleDeleteConfirm}
       />
-    </SafeAreaView>
+    </View>
   );
 });
 
@@ -477,6 +465,7 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     flex: 1,
     backgroundColor: colors.background,
     overflow: 'hidden',
+    paddingTop: StatusBar.currentHeight
   },
   bgCircle: {
     position: 'absolute',
@@ -489,30 +478,28 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     backgroundColor: colors.background,
   },
   content: {
-    paddingBottom: 110,
+    paddingBottom: spacing('10'),
   },
 
   /* ── Header actions ── */
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing('2'),
   },
   iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.surface,
+    width: spacing('9'),
+    height: spacing('9'),
+    borderRadius: radius('full'),
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: colors.border,
     position: 'relative',
   },
   proDot: {
     position: 'absolute',
-    top: 6,
-    right: 6,
+    top: spacing('1.5'),
+    right: spacing('1.5'),
     width: 6,
     height: 6,
     borderRadius: 3,
@@ -520,64 +507,51 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
 
   /* ── Hero balance card ── */
   heroCard: {
-    marginHorizontal: 24,
-    marginBottom: 16,
-    borderRadius: 24,
-    backgroundColor: colors.surface,
+    marginHorizontal: spacing('6'),
+    marginBottom: spacing('4'),
+    borderRadius: radius('2xl'),
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: 20,
+    padding: spacing('5'),
     overflow: 'hidden',
   },
   currencyTabsRow: {
     flexDirection: 'row',
-    gap: 4,
-    marginBottom: 16,
+    gap: spacing('1'),
+    marginBottom: spacing('4'),
   },
   currencyTab: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 12,
-    backgroundColor: colors.background + 'AA',
+    paddingHorizontal: spacing('3'),
+    paddingVertical: spacing('1'),
+    borderRadius: radius('md'),
     borderWidth: 1,
-    borderColor: colors.border,
-  },
-  currencyTabActive: {
-    backgroundColor: colors.text,
-    borderColor: colors.text,
   },
   currencyTabText: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
     fontSize: 11,
     letterSpacing: 0.4,
   },
-  currencyTabTextActive: {
-    color: colors.background,
-  },
   heroBadge: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
     fontSize: 10,
     letterSpacing: 1.5,
-    marginBottom: 6,
+    marginBottom: spacing('1.5'),
   },
   heroBalance: {
     fontSize: 42,
     lineHeight: 46,
     letterSpacing: -1.5,
-    marginBottom: 20,
+    marginBottom: spacing('5'),
   },
   splitRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: spacing('3'),
   },
   splitItem: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
+    gap: spacing('1.5'),
   },
   splitDot: {
     width: 7,
@@ -586,7 +560,6 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   },
   splitLabel: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
     fontSize: 10,
     letterSpacing: 1.2,
   },
@@ -596,118 +569,87 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   splitDivider: {
     width: 1,
     height: 28,
-    backgroundColor: colors.border,
-    marginHorizontal: 14,
+    marginHorizontal: spacing('3.5'),
   },
   flowBar: {
     flexDirection: 'row',
     height: 4,
-    borderRadius: 999,
+    borderRadius: radius('full'),
     overflow: 'hidden',
-    gap: 2,
+    gap: spacing('0.5'),
   },
   flowBarIncome: {
-    borderRadius: 999,
-    backgroundColor: colors.success,
+    borderRadius: radius('full'),
   },
   flowBarExpense: {
-    borderRadius: 999,
-    backgroundColor: colors.danger,
+    borderRadius: radius('full'),
   },
 
   /* ── Quick actions ── */
   quickActions: {
-    flexDirection: 'row',
-    marginHorizontal: 24,
-    marginBottom: 24,
-    gap: 10,
+    marginHorizontal: spacing('6'),
+    marginBottom: spacing('6'),
   },
-  quickActionPrimary: {
-    flex: 1,
+  quickActionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: colors.text,
-  },
-  quickActionPrimaryText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.background,
-    fontSize: 14,
-  },
-  quickActionSecondary: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: colors.surface,
+    gap: spacing('2'),
+    height: spacing('12'),
+    borderRadius: radius('lg'),
     borderWidth: 1,
-    borderColor: colors.border,
   },
-  quickActionSecondaryText: {
+  quickActionText: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
     fontSize: 14,
   },
 
   /* ── Accounts carousel ── */
   accountsScroll: {
-    paddingLeft: 24,
-    marginBottom: 24,
+    paddingLeft: spacing('6'),
+    marginBottom: spacing('6'),
   },
   accountsScrollContent: {
-    paddingRight: 32,
-    gap: 12,
+    paddingRight: spacing('8'),
+    gap: spacing('3'),
   },
   accountCard: {
     width: screenWidth * 0.7,
     minHeight: 160,
-    borderRadius: 20,
-    backgroundColor: colors.surface,
+    borderRadius: radius('xl'),
     borderWidth: 1,
-    borderColor: colors.border,
     overflow: 'hidden',
   },
   accountPlaceholderCard: {
     width: screenWidth * 0.7,
     minHeight: 160,
-    borderRadius: 20,
-    backgroundColor: colors.surface,
+    borderRadius: radius('xl'),
     borderWidth: 1,
-    borderColor: colors.border,
     borderStyle: 'dashed',
     overflow: 'hidden',
   },
   accountPlaceholderInner: {
     flex: 1,
     minHeight: 157,
-    padding: 18,
+    padding: spacing('5'),
     alignItems: 'flex-start',
     justifyContent: 'center',
   },
   accountPlaceholderIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: colors.background + '88',
+    width: spacing('11'),
+    height: spacing('11'),
+    borderRadius: radius('lg'),
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: spacing('4'),
   },
   accountPlaceholderTitle: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
     fontSize: 16,
-    marginBottom: 6,
+    marginBottom: spacing('1.5'),
   },
   accountPlaceholderText: {
     fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
     fontSize: 12,
     lineHeight: 18,
     maxWidth: 180,
@@ -717,25 +659,25 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     width: '100%',
   },
   accountCardInner: {
-    padding: 14,
+    padding: spacing('3.5'),
   },
   accountCardTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
-    gap: 10,
+    marginBottom: spacing('3'),
+    gap: spacing('2.5'),
   },
   accountCardLead: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: spacing('2.5'),
   },
   accountIconBox: {
     width: 38,
     height: 38,
-    borderRadius: 12,
+    borderRadius: radius('md'),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -744,20 +686,18 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   },
   accountCardName: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
     fontSize: 14,
   },
   accountCardHint: {
     fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
     fontSize: 11,
-    marginTop: 2,
+    marginTop: spacing('0.5'),
   },
   accountCurrencyBadge: {
     height: 24,
     minWidth: 48,
-    paddingHorizontal: 8,
-    borderRadius: 999,
+    paddingHorizontal: spacing('2'),
+    borderRadius: radius('full'),
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.background + '80',
@@ -770,14 +710,13 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   accountBalanceLabel: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
     fontSize: 9,
-    color: colors.textMuted,
     letterSpacing: 1.2,
-    marginBottom: 6,
+    marginBottom: spacing('1.5'),
   },
   accountCardBalance: {
     fontSize: 22,
     lineHeight: 25,
-    marginBottom: 12,
+    marginBottom: spacing('3'),
   },
   accountCardStats: {
     flexDirection: 'row',
@@ -785,12 +724,11 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   },
   accountCardStatCol: {
     flex: 1,
-    gap: 4,
+    gap: spacing('1'),
   },
   accountCardStatLabel: {
     fontFamily: TYPOGRAPHY.fonts.semibold,
     fontSize: 8,
-    color: colors.textMuted,
     letterSpacing: 1,
   },
   accountCardStatValue: {
@@ -799,32 +737,13 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   accountCardStatDivider: {
     width: 1,
     height: 20,
-    backgroundColor: colors.border,
-    marginHorizontal: 12,
+    marginHorizontal: spacing('3'),
   },
 
   /* ── Recent activity ── */
   activityCard: {
-    marginHorizontal: 24,
-    borderRadius: 20,
+    marginHorizontal: spacing('6'),
+    borderRadius: radius('xl'),
     overflow: 'hidden',
-  },
-
-  /* ── FAB ── */
-  fab: {
-    position: 'absolute',
-    bottom: 30,
-    right: 30,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.text,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 6,
   },
 });

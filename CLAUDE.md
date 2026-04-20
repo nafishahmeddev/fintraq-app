@@ -168,8 +168,8 @@ Monetization is driven by `src/components/ui/PremiumGuard.tsx`.
 
 ## 5. Current Roadmap Status
 
-**Phases 1-5 Complete** — Core app is stable.  
-**Phase 6 In Progress** — Navigation overhaul with bottom app bar.
+**Phases 1-6 Complete** — Core app is stable with bottom navigation.  
+**Phase 7 Up Next** — Charts & Optimization.
 
 ### Completed Phases
 
@@ -181,7 +181,7 @@ Monetization is driven by `src/components/ui/PremiumGuard.tsx`.
 
 ### In Progress & Upcoming
 
-- **Phase 6 (In Progress)**: Navigation Overhaul — Bottom app bar with 4 tabs (Home, Accounts, Pulse, Settings) + FAB.
+- **Phase 6 (Done)**: Navigation Overhaul — Bottom app bar with 4 tabs (Home, Accounts, Pulse, Settings) + FAB.
 - **Phase 7 (Next)**: Charts & Optimization — react-native-gifted-charts, merge redundant screens.
 - **Phase 8 (Planned)**: Core Finance — Account transfers, recurring transactions, biometric lock.
 - **Phase 9 (Planned)**: Planning Layer — Budget system, savings goals.

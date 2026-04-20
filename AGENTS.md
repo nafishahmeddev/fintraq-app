@@ -27,7 +27,7 @@ npm run lint           # ESLint via expo config
 ### Directory Ownership
 
 - `app/` - Expo Router screens and layouts
-- `src/features/{domain}/` - Domain-driven modules (dashboard, transactions, accounts, categories, insights, reports, **backup**, **export**, **filters**, **search**)
+- `src/features/{domain}/` - Domain-driven modules (dashboard, transactions, accounts, categories, insights, reports, stats, **backup**, **export**, **filters**, **search**)
 - `src/components/ui/` - Universal components: `PremiumGuard`, `MoneyText`, `TransactionRow`, `KPICard`, etc.
 - `src/providers/` - Context providers: `ThemeProvider`, `PremiumProvider`, `QueryProvider`, `DatabaseProvider`
 - `src/theme/` - Design tokens: `colors.ts`, `typography.ts`, `tokens.ts`
@@ -275,7 +275,7 @@ const contextValue = useMemo(() => ({
 
 ## Current Status
 
-**Phases 1-5 Complete** — Core app is stable. **Phase 6 In Progress** — Navigation overhaul.
+**Phases 1–7 Complete** — Core app stable with charts + merged reports.
 
 ### Completed Features
 
@@ -283,15 +283,13 @@ const contextValue = useMemo(() => ({
 **Phase 2 (Done)**: Freemium Setup — Premium gating, subscriptions, lifetime purchases.  
 **Phase 3 (Done)**: Insights Layer — Weekly summaries, spending alerts, runway tracking.  
 **Phase 4 (Done)**: Retention System — Monthly reports, streak tracking, reminders.  
-**Phase 5 (Done)**: Power Features — Advanced filters, global search.
+**Phase 5 (Done)**: Power Features — Advanced filters, global search.  
+**Phase 6 (Done)**: Navigation Overhaul — Bottom tab bar with 4 tabs (Home, Accounts, Stats, Settings) + central FAB. Custom `BottomTabBar` component.  
+**Phase 7 (Done)**: Charts & Optimization — `react-native-gifted-charts` + `react-native-svg` installed. Stats screen overhauled with OVERVIEW | WEEKLY | MONTHLY tab switcher and real `BarChart` (7-day income/expense). Weekly/monthly reports absorbed into Stats; `app/reports/` deleted.
 
 ### Active Development
 
-**Phase 6 (In Progress)**: Navigation Overhaul — Bottom app bar with 4 tabs (Home, Accounts, Pulse, Settings) + FAB.
-
-**Phase 7 (Next)**: Charts & Optimization — Merge redundant screens, add charts (react-native-gifted-charts), unify filters.
-
-**Phase 8 (Planned)**: Core Finance — Account transfers, recurring transactions, biometric lock.
+**Phase 8 (Next)**: Core Finance — Account transfers, recurring transactions, biometric lock.
 
 **Phase 9 (Planned)**: Planning Layer — Budget system, savings goals.
 
@@ -299,8 +297,11 @@ const contextValue = useMemo(() => ({
 
 ### Key Feature Locations
 
-- **Dashboard** (`app/(main)/index.tsx`): Home tab with net position, recent transactions
-- **Stats/Pulse** (`app/(main)/stats.tsx`): Analytics screen (being merged with Weekly Summary)
+- **Dashboard** (`app/(main)/index.tsx`): Home tab — net position, recent transactions, streak badge
+- **Stats** (`app/(main)/stats.tsx`): Analytics tab — OVERVIEW (bar chart, insights, period delta), WEEKLY (editorial hero + MetricCards + categories), MONTHLY (audit + 4 MetricCards + sectors)
+- **Accounts** (`app/(main)/accounts.tsx` → `src/features/accounts/screens/AccountsScreen.tsx`): Balances, add/edit/delete
+- **Stats panels** (`src/features/stats/components/`): `WeeklyPanel.tsx`, `MonthlyPanel.tsx`
+- **Reports hooks/components** (`src/features/reports/`): Still used by Stats panels — `useWeeklyReport`, `useMonthlyReport`, `MetricCard`, `StreakBadge`
 - **Advanced Filters** (`src/features/filters/`): Transaction filtering with multi-select
 - **Global Search** (`src/features/search/`): Cross-entity search (Premium)
 - **CSV Export** (`src/features/export/`): Settings > Data > Export CSV
@@ -334,6 +335,36 @@ export default function Route() {
   const { isPremium } = usePremium();
   return isPremium ? <FeatureScreen /> : <ProGateScreen />;
 }
+```
+
+**Charts Pattern (react-native-gifted-charts):**
+```typescript
+import { BarChart } from 'react-native-gifted-charts';
+import { useWindowDimensions } from 'react-native';
+
+// Width = screen - horizontal padding - card padding
+const { width: screenWidth } = useWindowDimensions();
+const chartWidth = screenWidth - LAYOUT.screenPadding * 2 - SPACING['3.5'] * 2;
+
+// Paired bars per day: income (success) + expense (danger)
+const chartData = trendDays.flatMap((day, i) => [
+  { value: day.income, frontColor: colors.success, label: 'Mon', spacing: 3 },
+  { value: day.expense, frontColor: colors.danger, spacing: i < last ? 14 : 3 },
+]);
+
+<BarChart
+  data={chartData}
+  barWidth={10}
+  height={90}
+  maxValue={trendMax}
+  noOfSections={3}
+  yAxisThickness={0}
+  xAxisThickness={0}
+  hideYAxisText
+  disableScroll
+  width={chartWidth}
+  isAnimated
+/>
 ```
 
 **File Export Pattern:**

@@ -3,17 +3,17 @@ import * as Notifications from 'expo-notifications';
 import React from 'react';
 import { Alert, DevSettings, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../src/components/ui/BlurBackground';
-import { toErrorMessage } from '../../src/utils/errors';
-import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
-import { Header } from '../../src/components/ui/Header';
-import { useTheme } from '../../src/providers/ThemeProvider';
-import { ThemeColors } from '../../src/theme/colors';
-import { TYPOGRAPHY } from '../../src/theme/typography';
-import { usePremium } from '../../src/providers/PremiumProvider';
-import { Input } from '../../src/components/ui/Input';
-import { seedDummyData } from '../../src/utils/seed';
-import { NotificationService } from '../../src/services/notification.service';
+import { BlurBackground } from '../src/components/ui/BlurBackground';
+import { toErrorMessage } from '../src/utils/errors';
+import { ConfirmDialog } from '../src/components/ui/ConfirmDialog';
+import { Header } from '../src/components/ui/Header';
+import { useTheme } from '../src/providers/ThemeProvider';
+import { ThemeColors } from '../src/theme/colors';
+import { TYPOGRAPHY } from '../src/theme/typography';
+import { usePremium } from '../src/providers/PremiumProvider';
+import { Input } from '../src/components/ui/Input';
+import { seedDummyData } from '../src/utils/seed';
+import { NotificationService } from '../src/services/notification.service';
 
 export default function DeveloperScreen() {
   const { colors } = useTheme();
@@ -44,7 +44,6 @@ export default function DeveloperScreen() {
       setIsAuthenticated(true);
     } else if (val.length >= 5) {
       setError('Invalid Access Token');
-      // Clear after a short delay for feedback
       setTimeout(() => setPin(''), 1000);
     }
   };

@@ -7,9 +7,9 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { DatabaseProvider } from '@/src/providers/DatabaseProvider';
 import { OnboardingProvider } from '@/src/providers/OnboardingProvider';
+import { PremiumProvider } from '@/src/providers/PremiumProvider';
 import { QueryProvider } from '@/src/providers/QueryProvider';
 import { SettingsProvider } from '@/src/providers/SettingsProvider';
-import { PremiumProvider } from '@/src/providers/PremiumProvider';
 import { ThemeProvider as CustomThemeProvider } from '@/src/providers/ThemeProvider';
 import { NotificationService } from '@/src/services/notification.service';
 import {
@@ -70,9 +70,7 @@ export default function RootLayout() {
               <OnboardingProvider>
                 <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
                   <CustomThemeProvider>
-                    <Stack screenOptions={{ headerShown: false }}>
-                      {/* Rely on auto-resolution for groups */}
-                    </Stack>
+                    <Stack screenOptions={{ headerShown: false }} />
                     <StatusBar style="auto" />
                   </CustomThemeProvider>
                 </ThemeProvider>
