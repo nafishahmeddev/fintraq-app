@@ -38,7 +38,7 @@ export const MoneyText = React.memo(function MoneyText({
       c = colors.danger;
     }
 
-    const ff = weight === 'regular' || weight === 'medium'
+    const ff = (weight === 'regular' || weight === 'medium')
       ? TYPOGRAPHY.fonts.amountRegular
       : TYPOGRAPHY.fonts.amountBold;
 

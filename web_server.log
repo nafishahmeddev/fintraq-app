@@ -1,0 +1,33 @@
+
+> luno@1.0.2 web
+> expo start --web
+
+🔍 [expo-iap] Config values: horizonAppId=undefined, isHorizonEnabled=false, isOnsideEnabled=false
+📦 [expo-iap] Using OpenIAP from CocoaPods
+Starting project at /app
+React Compiler enabled
+Starting Metro Bundler
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Web node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 81.8% (1563/1737)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 87.5% (1502/1606)
+Web Bundled 4602ms node_modules/expo-router/entry.js (2076 modules)
+λ Bundled 5942ms node_modules/expo-router/node/render.js (1961 modules)
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+Web node_modules/expo-router/entry.js ▓▓▓▓▓░░░░░░░░░░░ 31.4% (154/355)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓░░░░░░░░░░░ 35.8% (341/670)
+| 🔍 [expo-iap] Config values: horizonAppId=undefined, isHorizonEnabled=false, isOnsideEnabled=false
+| 📦 [expo-iap] Using OpenIAP from CocoaPods
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓░░░░░░░░░░ 41.6% (560/901)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓░░░░░░░░░ 45.1% ( 793/1353)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓░░░░ 76.9% (1389/1584)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 88.9% (1772/1897)
+Web Bundled 22894ms node_modules/expo-router/entry.js (2078 modules)
+Web node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 124ms node_modules/expo-router/node/render.js (1 module)
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+Web Bundled 832ms node_modules/expo-router/entry.js (1 module)
+Web Bundled 85ms node_modules/expo-router/entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
+Web Bundled 1242ms node_modules/expo-sqlite/web/worker.ts (16 modules)

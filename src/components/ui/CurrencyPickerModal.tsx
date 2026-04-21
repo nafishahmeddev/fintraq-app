@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
+import { BlurView } from './BlurView';
 import React, { useMemo, useState, useCallback } from 'react';
 import {
     FlatList,
@@ -16,6 +16,7 @@ import { CURRENCIES } from '../../constants/currency';
 import { useTheme } from '../../providers/ThemeProvider';
 import { ThemeColors } from '../../theme/colors';
 import { TYPOGRAPHY } from '../../theme/typography';
+import { spacing, radius } from '../../theme/tokens';
 
 export type CurrencyPickerModalProps = {
   visible: boolean;
@@ -103,12 +104,14 @@ export const CurrencyPickerModal = React.memo(function CurrencyPickerModal({
             <View style={[styles.glow, { bottom: -60, right: -80, width: 360, height: 360, backgroundColor: colors.text + '0A' }]} />
           </View>
 
-          <BlurView
-            blurAmount={Platform.OS === 'ios' ? 80 : 96}
-            blurType={isDark ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFillObject}
-          />
-          {Platform.OS === 'android' && (
+          {Platform.OS !== 'web' && (
+            <BlurView
+              blurAmount={Platform.OS === 'ios' ? 80 : 96}
+              blurType={isDark ? 'dark' : 'light'}
+              style={StyleSheet.absoluteFillObject}
+            />
+          )}
+          {(Platform.OS === 'android' || Platform.OS === 'web') && (
             <View
               pointerEvents="none"
               style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]}
@@ -178,7 +181,7 @@ const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.55)',
+      backgroundColor: '#000000CC',
       justifyContent: 'flex-end',
     },
     backdrop: {
@@ -186,8 +189,8 @@ const createStyles = (colors: ThemeColors) =>
     },
     sheet: {
       height: '82%',
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
+      borderTopLeftRadius: radius('2xl'),
+      borderTopRightRadius: radius('2xl'),
       borderTopWidth: 1,
       borderColor: colors.border,
       overflow: 'hidden',
@@ -206,9 +209,9 @@ const createStyles = (colors: ThemeColors) =>
       backgroundColor: colors.textMuted + '55',
     },
     header: {
-      paddingHorizontal: 24,
-      paddingTop: 14,
-      paddingBottom: 10,
+      paddingHorizontal: spacing('6'),
+      paddingTop: spacing('3.5'),
+      paddingBottom: spacing('2.5'),
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -238,15 +241,15 @@ const createStyles = (colors: ThemeColors) =>
     searchWrap: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginHorizontal: 24,
-      marginBottom: 10,
+      marginHorizontal: spacing('6'),
+      marginBottom: spacing('2.5'),
       height: 44,
-      borderRadius: 14,
+      borderRadius: radius('lg'),
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
-      paddingHorizontal: 12,
-      gap: 8,
+      paddingHorizontal: spacing('3'),
+      gap: spacing('2'),
     },
     searchIcon: {
       flexShrink: 0,
@@ -259,8 +262,8 @@ const createStyles = (colors: ThemeColors) =>
       paddingVertical: 0,
     },
     listContent: {
-      paddingHorizontal: 24,
-      paddingBottom: Platform.OS === 'ios' ? 24 : 32,
+      paddingHorizontal: spacing('6'),
+      paddingBottom: Platform.OS === 'ios' ? spacing('6') : spacing('8'),
     },
     separator: {
       height: 1,
@@ -270,14 +273,14 @@ const createStyles = (colors: ThemeColors) =>
     row: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: 13,
-      gap: 12,
+      paddingVertical: spacing('3.5'),
+      gap: spacing('3'),
     },
     rowSelected: {},
     codeWrap: {
       width: 42,
       height: 30,
-      borderRadius: 8,
+      borderRadius: radius('sm'),
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,

@@ -8,7 +8,7 @@ import { SearchScreen } from '@/src/features/search/screens/SearchScreen';
 import { usePremium } from '@/src/providers/PremiumProvider';
 import { useTheme } from '@/src/providers/ThemeProvider';
 import { ThemeColors } from '@/src/theme/colors';
-import { RADIUS, SPACING } from '@/src/theme/tokens';
+import { radius, spacing } from '@/src/theme/tokens';
 import { TYPOGRAPHY } from '@/src/theme/typography';
 
 const SEARCH_FEATURES = [
@@ -86,28 +86,28 @@ const createStyles = (colors: ThemeColors) =>
     backBtn: {
       width: 44,
       height: 44,
-      borderRadius: RADIUS.md,
+      borderRadius: radius('md'),
       backgroundColor: colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
-      margin: SPACING['4'],
+      margin: spacing('4'),
     },
     body: {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: SPACING['8'],
+      paddingHorizontal: spacing('8'),
       paddingBottom: 80,
-      gap: SPACING['4'],
+      gap: spacing('4'),
     },
     iconWrap: {
       width: 72,
       height: 72,
-      borderRadius: RADIUS['2xl'],
+      borderRadius: radius('2xl'),
       backgroundColor: colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: SPACING['2'],
+      marginBottom: spacing('2'),
     },
     proBadge: {
       position: 'absolute',
@@ -118,7 +118,7 @@ const createStyles = (colors: ThemeColors) =>
       gap: 3,
       paddingHorizontal: 7,
       height: 20,
-      borderRadius: RADIUS.sm,
+      borderRadius: radius('xs'),
       backgroundColor: colors.text,
     },
     proBadgeText: {
@@ -143,18 +143,18 @@ const createStyles = (colors: ThemeColors) =>
     },
     featureList: {
       width: '100%',
-      gap: SPACING['2'],
-      marginVertical: SPACING['2'],
+      gap: spacing('2'),
+      marginVertical: spacing('2'),
     },
     featureRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: SPACING['3'],
+      gap: spacing('3'),
     },
     featureIcon: {
       width: 34,
       height: 34,
-      borderRadius: RADIUS.md,
+      borderRadius: radius('md'),
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -167,18 +167,18 @@ const createStyles = (colors: ThemeColors) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: SPACING['2'],
+      gap: spacing('2'),
       width: '100%',
       height: 52,
-      borderRadius: RADIUS.lg,
-      marginTop: SPACING['2'],
+      borderRadius: radius('lg'),
+      marginTop: spacing('2'),
     },
     ctaBtnText: {
       fontFamily: TYPOGRAPHY.fonts.semibold,
       fontSize: 15,
     },
     dismissBtn: {
-      paddingVertical: SPACING['2'],
+      paddingVertical: spacing('2'),
     },
     dismissText: {
       fontFamily: TYPOGRAPHY.fonts.regular,

@@ -16,7 +16,7 @@ export type ThemePalette = {
 
 export const DARK_THEME: ThemePalette = {
   background: '#000100',
-  card: 'rgba(255, 255, 255, 0.02)', // Extremely subtle phantom bounds
+  card: 'rgba(255, 255, 255, 0.02)',
   surface: 'rgba(255, 255, 255, 0.05)',
   primary: '#B8D641',
   primaryLight: '#cae560',
@@ -24,7 +24,7 @@ export const DARK_THEME: ThemePalette = {
   secondary: '#f9fff3',
   text: '#fbfff3',
   textMuted: '#b2bb8b',
-  border: 'transparent', // Edgeless UI implies no literal borders
+  border: '#ffffff15',
   success: '#6BD498',
   danger: '#EF4444', // Red
   warning: '#F59E0B',
@@ -40,7 +40,7 @@ export const LIGHT_THEME: ThemePalette = {
   secondary: '#000100',
   text: '#000100', 
   textMuted: '#737a5f', 
-  border: 'transparent',
+  border: '#00000010',
   success: '#43B875', 
   danger: '#DC2626', 
   warning: '#D97706',

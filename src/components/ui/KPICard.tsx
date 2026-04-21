@@ -75,7 +75,7 @@ export const KPICard = React.memo(function KPICard({
         {/* Top: Net Balance */}
         <View style={styles.kpiMainContent}>
           <View>
-            <Text style={styles.kpiLabel}>NET SAVINGS</Text>
+            <Text style={styles.kpiLabel}>Net savings</Text>
             <MoneyText
               amount={Math.abs(metrics.income - metrics.expense)}
               currency={selectedCurrency ?? undefined}
@@ -91,7 +91,7 @@ export const KPICard = React.memo(function KPICard({
         {/* Bottom: In/Out Split */}
         <View style={styles.kpiSecondaryContent}>
           <View style={styles.kpiCell}>
-            <Text style={styles.kpiLabelSmall}>INCOME</Text>
+            <Text style={styles.kpiLabelSmall}>Income</Text>
             <MoneyText
               amount={metrics.income}
               currency={selectedCurrency ?? undefined}
@@ -102,7 +102,7 @@ export const KPICard = React.memo(function KPICard({
           </View>
           <View style={styles.kpiVerticalSep} />
           <View style={styles.kpiCell}>
-            <Text style={styles.kpiLabelSmall}>EXPENSES</Text>
+            <Text style={styles.kpiLabelSmall}>Expenses</Text>
             <MoneyText
               amount={metrics.expense}
               currency={selectedCurrency ?? undefined}
@@ -120,7 +120,7 @@ export const KPICard = React.memo(function KPICard({
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     kpiCard: {
-      borderRadius: radius('lg'),
+      borderRadius: radius('xl'),
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -188,7 +188,6 @@ const createStyles = (colors: ThemeColors) =>
       fontFamily: TYPOGRAPHY.fonts.semibold,
       fontSize: 9,
       letterSpacing: 1.2,
-      textTransform: 'uppercase',
       marginBottom: spacing('0.5'),
     },
     kpiLabelSmall: {
@@ -196,7 +195,6 @@ const createStyles = (colors: ThemeColors) =>
       fontFamily: TYPOGRAPHY.fonts.semibold,
       fontSize: 8,
       letterSpacing: 1,
-      textTransform: 'uppercase',
     },
     kpiValueLarge: {
       fontSize: 24,

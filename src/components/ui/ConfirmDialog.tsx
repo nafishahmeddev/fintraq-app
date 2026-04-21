@@ -3,6 +3,7 @@ import { ActivityIndicator, Modal, Platform, StyleSheet, Text, TouchableOpacity,
 import { useTheme } from '../../providers/ThemeProvider';
 import { ThemeColors } from '../../theme/colors';
 import { TYPOGRAPHY } from '../../theme/typography';
+import { spacing, radius } from '../../theme/tokens';
 
 type ConfirmDialogProps = {
   visible: boolean;
@@ -79,18 +80,18 @@ const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.52)',
+      backgroundColor: '#000000CC',
       justifyContent: 'flex-end',
-      paddingHorizontal: 24,
-      paddingBottom: 42,
+      paddingHorizontal: spacing('6'),
+      paddingBottom: spacing('10.5'),
     },
     card: {
       alignSelf: 'stretch',
-      borderRadius: 22,
+      borderRadius: radius('2xl'),
       backgroundColor: Platform.OS === 'ios' ? colors.background + 'F2' : colors.background,
       borderWidth: 1,
-      borderColor: colors.text + '18',
-      padding: 18,
+      borderColor: colors.border,
+      padding: spacing('4.5'),
       shadowColor: '#000000',
       shadowOpacity: 0.22,
       shadowRadius: 24,
@@ -104,8 +105,8 @@ const createStyles = (colors: ThemeColors) =>
       letterSpacing: -0.6,
     },
     message: {
-      marginTop: 6,
-      marginBottom: 16,
+      marginTop: spacing('1.5'),
+      marginBottom: spacing('4'),
       fontFamily: TYPOGRAPHY.fonts.regular,
       fontSize: 13,
       lineHeight: 18,
@@ -113,14 +114,14 @@ const createStyles = (colors: ThemeColors) =>
     },
     actionsRow: {
       flexDirection: 'row',
-      gap: 10,
+      gap: spacing('2.5'),
     },
     cancelButton: {
       flex: 1,
       height: 46,
-      borderRadius: 12,
+      borderRadius: radius('md'),
       borderWidth: 1,
-      borderColor: colors.primary + '22',
+      borderColor: colors.border,
       backgroundColor: colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
@@ -133,7 +134,7 @@ const createStyles = (colors: ThemeColors) =>
     confirmButton: {
       flex: 1,
       height: 46,
-      borderRadius: 12,
+      borderRadius: radius('md'),
       alignItems: 'center',
       justifyContent: 'center',
     },

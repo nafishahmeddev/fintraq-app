@@ -21,7 +21,7 @@ import { MoneyText } from '../../../components/ui/MoneyText';
 import { TransactionRow } from '../../../components/ui/TransactionRow';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
-import { RADIUS, SHADOWS, SPACING } from '../../../theme/tokens';
+import { RADIUS, SHADOWS, SPACING, LAYOUT, spacing } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useCategories } from '../../categories/hooks/categories';
@@ -629,8 +629,8 @@ const createStyles = (colors: ThemeColors) =>
       fontSize: 10,
     },
     content: {
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['3'],
+      paddingHorizontal: LAYOUT.screenPadding,
+      paddingTop: spacing('3'),
       paddingBottom: 120,
     },
     listHeader: {

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
+import { BlurView } from './BlurView';
 import React, { useMemo, useCallback } from 'react';
 import { ActivityIndicator, Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
@@ -114,12 +114,12 @@ export const Button = React.memo(function Button({
       disabled={disabled || isLoading}
       activeOpacity={0.75}
     >
-      {(variant === 'secondary' || variant === 'outline') && (
+      {(variant === 'secondary' || variant === 'outline') && Platform.OS !== 'web' && (
         <BlurView
           blurAmount={Platform.OS === 'ios' ? 20 : 0}
           blurType={isDark ? "dark" : "light"}
           style={[StyleSheet.absoluteFillObject, { 
-            backgroundColor: Platform.OS === 'android' ? colors.surface : 'transparent',
+            backgroundColor: (Platform.OS === 'android' || Platform.OS === 'web') ? colors.surface : 'transparent',
             borderRadius: sizeConfig.borderRadius,
           }]}
         />

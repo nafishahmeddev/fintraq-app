@@ -1,4 +1,4 @@
-import { BlurView } from '@sbaiahmed1/react-native-blur';
+import { BlurView } from './BlurView';
 import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
@@ -74,13 +74,15 @@ export function BlurBackground({
         ))}
       </View>
 
-      <BlurView
-        blurAmount={resolvedBlurAmount}
-        blurType={isDark ? 'dark' : 'light'}
-        style={StyleSheet.absoluteFillObject}
-      />
+      {Platform.OS !== 'web' && (
+        <BlurView
+          blurAmount={resolvedBlurAmount}
+          blurType={isDark ? 'dark' : 'light'}
+          style={StyleSheet.absoluteFillObject}
+        />
+      )}
 
-      {Platform.OS === 'android' ? (
+      {(Platform.OS === 'android' || Platform.OS === 'web') ? (
         <View
           style={[
             StyleSheet.absoluteFillObject,

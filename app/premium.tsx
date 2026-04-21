@@ -4,8 +4,9 @@ import { usePremium } from '@/src/providers/PremiumProvider';
 import { useTheme } from '@/src/providers/ThemeProvider';
 import { ThemeColors } from '@/src/theme/colors';
 import { TYPOGRAPHY } from '@/src/theme/typography';
+import { spacing, radius } from '@/src/theme/tokens';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
+import { BlurView } from '@/src/components/ui/BlurView';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
@@ -47,7 +48,9 @@ export default function PremiumScreen() {
           <View style={[styles.bgCircle, { top: -100, left: -100, width: 500, height: 500, backgroundColor: colors.primary, opacity: 0.15 }]} />
           <View style={[styles.bgCircle, { bottom: -150, right: -150, width: 600, height: 600, backgroundColor: colors.primary, opacity: 0.1 }]} />
         </View>
-        <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
+        {Platform.OS !== 'web' && (
+          <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
+        )}
 
         <SafeAreaView style={styles.successWrapper}>
           <View style={styles.proContent}>
@@ -95,8 +98,10 @@ export default function PremiumScreen() {
         <View style={[styles.bgCircle, { top: 180, right: -110, width: 440, height: 440, backgroundColor: colors.primaryDark, opacity: 0.52 }]} />
         <View style={[styles.bgCircle, { bottom: -110, left: 40, width: 380, height: 380, backgroundColor: colors.primary, opacity: 0.6 }]} />
       </View>
-      <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
-      {Platform.OS === 'android' && (
+      {Platform.OS !== 'web' && (
+        <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
+      )}
+      {(Platform.OS === 'android' || Platform.OS === 'web') && (
         <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]} pointerEvents="none" />
       )}
 
@@ -218,19 +223,19 @@ export default function PremiumScreen() {
 
 const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  bgCircle: { position: 'absolute', borderRadius: 999 },
-  scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
+  bgCircle: { position: 'absolute', borderRadius: radius('full') },
+  scrollContent: { paddingHorizontal: spacing('6'), paddingBottom: spacing('8') },
 
-  heroSection: { marginTop: 20, marginBottom: 24 },
-  heroKicker: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.primary, letterSpacing: 2.5, marginBottom: 8 },
-  heroTitle: { fontFamily: TYPOGRAPHY.fonts.headingRegular, fontSize: 40, lineHeight: 44, color: colors.text, letterSpacing: -2, marginBottom: 4 },
+  heroSection: { marginTop: spacing('5'), marginBottom: spacing('6') },
+  heroKicker: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.primary, letterSpacing: 2.5, marginBottom: spacing('2') },
+  heroTitle: { fontFamily: TYPOGRAPHY.fonts.headingRegular, fontSize: 40, lineHeight: 44, color: colors.text, letterSpacing: -2, marginBottom: spacing('1') },
   heroSubtitle: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 14, color: colors.textMuted, lineHeight: 22, maxWidth: '85%' },
 
-  offerSection: { marginBottom: 28 },
+  offerSection: { marginBottom: spacing('7') },
   lifetimeCard: {
     backgroundColor: colors.surface + '80',
-    borderRadius: 24,
-    padding: 22,
+    borderRadius: radius('2xl'),
+    padding: spacing('5.5'),
     borderWidth: 1.5,
     borderColor: colors.primary,
     position: 'relative',
@@ -243,27 +248,27 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   },
   cardTitle: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 18, color: colors.text, letterSpacing: 0.5 },
   cardSubtitle: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 12, color: colors.textMuted, marginTop: 1 },
-  cardBadge: { backgroundColor: colors.primary, paddingHorizontal: 9, height: 20, borderRadius: 10, justifyContent: 'center' },
+  cardBadge: { backgroundColor: colors.primary, paddingHorizontal: spacing('2'), height: 20, borderRadius: radius('sm'), justifyContent: 'center' },
   cardBadgeText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 8, color: colors.background, letterSpacing: 1 },
 
-  priceContainer: { marginBottom: 18 },
-  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
+  priceContainer: { marginBottom: spacing('4.5') },
+  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing('2.5') },
   originalPrice: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 18, color: colors.textMuted, textDecorationLine: 'line-through', opacity: 0.6 },
   priceValue: { fontFamily: TYPOGRAPHY.fonts.amountBold, fontSize: 44, color: colors.text, letterSpacing: -1.5 },
   priceSuffix: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 13, color: colors.textMuted, opacity: 0.8 },
   priceError: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 14, color: colors.danger },
 
-  cardDivider: { height: 1, backgroundColor: colors.border, marginBottom: 14, opacity: 0.5 },
-  trustInfo: { gap: 8 },
-  trustRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  cardDivider: { height: 1, backgroundColor: colors.border, marginBottom: spacing('3.5'), opacity: 0.5 },
+  trustInfo: { gap: spacing('2') },
+  trustRow: { flexDirection: 'row', alignItems: 'center', gap: spacing('1.5') },
   trustText: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 11, color: colors.success, letterSpacing: 0.1 },
 
-  sectionLabel: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.textMuted, letterSpacing: 2, marginBottom: 14, opacity: 0.8 },
+  sectionLabel: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.textMuted, letterSpacing: 2, marginBottom: spacing('3.5'), opacity: 0.8 },
   
   /* ── Settings-like Feature Styles ── */
-  featuresSection: { marginBottom: 32 },
+  featuresSection: { marginBottom: spacing('8') },
   settingsCard: {
-    borderRadius: 20,
+    borderRadius: radius('xl'),
     backgroundColor: colors.surface + '80',
     overflow: 'hidden',
     borderWidth: 1,
@@ -272,18 +277,18 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   settingsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: spacing('4'),
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
   iconBox: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: radius('full'),
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    marginRight: 14,
+    marginRight: spacing('3.5'),
   },
   textDetails: {
     flex: 1,
@@ -308,37 +313,37 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   brandingBox: { alignItems: 'center', marginTop: 10, marginBottom: 0 },
   brandingText: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 10, color: colors.text + '20', letterSpacing: 3 },
 
-  footer: { padding: 24, paddingBottom: Platform.OS === 'ios' ? 40 : 32, backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.primary + '10' },
-  buyBtn: { backgroundColor: colors.primary, height: 60, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
+  footer: { padding: spacing('6'), paddingBottom: Platform.OS === 'ios' ? spacing('10') : spacing('8'), backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.border },
+  buyBtn: { backgroundColor: colors.primary, height: 60, borderRadius: radius('lg'), justifyContent: 'center', alignItems: 'center', marginBottom: spacing('5') },
   buyBtnText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 16, color: colors.background, letterSpacing: 0.5 },
-  legalRows: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16 },
+  legalRows: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: spacing('4') },
   legalLink: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 10, color: colors.textMuted, letterSpacing: 1.5 },
-  legalSeparator: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.primary + '20' },
+  legalSeparator: { width: 4, height: 4, borderRadius: radius('xs'), backgroundColor: colors.primary + '20' },
 
-  successWrapper: { flex: 1, padding: 32, justifyContent: 'space-between' },
+  successWrapper: { flex: 1, padding: spacing('8'), justifyContent: 'space-between' },
   proContent: { flex: 1, justifyContent: 'center' },
-  proBadge: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.primary + '20', justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
-  proHero: { marginBottom: 24 },
+  proBadge: { width: 64, height: 64, borderRadius: radius('xl'), backgroundColor: colors.primary + '20', justifyContent: 'center', alignItems: 'center', marginBottom: spacing('6') },
+  proHero: { marginBottom: spacing('6') },
   proKicker: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 11, color: colors.primary, letterSpacing: 3, marginBottom: 8 },
   proHeading: { fontFamily: TYPOGRAPHY.fonts.heading, fontSize: 56, lineHeight: 60, color: colors.text, letterSpacing: -3 },
   
-  proStatusRow: { flexDirection: 'row', marginBottom: 32 },
+  proStatusRow: { flexDirection: 'row', marginBottom: spacing('8') },
   statusPill: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    gap: 8, 
-    paddingHorizontal: 12, 
-    paddingVertical: 6, 
-    borderRadius: 20, 
+    gap: spacing('2'),
+    paddingHorizontal: spacing('3'),
+    paddingVertical: spacing('1.5'),
+    borderRadius: radius('xl'),
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.primary + '30'
   },
-  statusDot: { width: 6, height: 6, borderRadius: 3 },
+  statusDot: { width: 6, height: 6, borderRadius: radius('xs') },
   statusText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.text, letterSpacing: 1 },
 
   proDescription: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 16, color: colors.textMuted, lineHeight: 26, maxWidth: '90%' },
-  proActions: { gap: 16, marginBottom: 12 },
-  actionBtn: { height: 68, backgroundColor: colors.text, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16 },
+  proActions: { gap: spacing('4'), marginBottom: spacing('3') },
+  actionBtn: { height: 68, backgroundColor: colors.text, borderRadius: radius('lg'), flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing('4') },
   actionBtnText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 15, color: colors.background, letterSpacing: 1 },
 });

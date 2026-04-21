@@ -4,6 +4,7 @@ import { Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react
 import { useTheme } from '../../providers/ThemeProvider';
 import { ThemeColors } from '../../theme/colors';
 import { TYPOGRAPHY } from '../../theme/typography';
+import { spacing, radius } from '../../theme/tokens';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -115,18 +116,18 @@ const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.52)',
+      backgroundColor: '#000000CC',
       justifyContent: 'flex-end',
-      paddingHorizontal: 24,
-      paddingBottom: 42,
+      paddingHorizontal: spacing('6'),
+      paddingBottom: spacing('10.5'),
     },
     card: {
       alignSelf: 'stretch',
-      borderRadius: 22,
+      borderRadius: radius('2xl'),
       backgroundColor: Platform.OS === 'ios' ? colors.background + 'F2' : colors.background,
       borderWidth: 1,
-      borderColor: colors.text + '18',
-      padding: 18,
+      borderColor: colors.border,
+      padding: spacing('4.5'),
       shadowColor: '#000000',
       shadowOpacity: 0.22,
       shadowRadius: 24,
@@ -143,21 +144,21 @@ const createStyles = (colors: ThemeColors) =>
       fontFamily: TYPOGRAPHY.fonts.regular,
       fontSize: 12,
       color: colors.textMuted,
-      marginTop: 4,
-      marginBottom: 16,
+      marginTop: spacing('1'),
+      marginBottom: spacing('4'),
     },
     optionsWrap: {
-      borderRadius: 16,
+      borderRadius: radius('lg'),
       overflow: 'hidden',
     },
     optionRow: {
       height: 48,
-      borderRadius: 12,
-      marginBottom: 8,
+      borderRadius: radius('md'),
+      marginBottom: spacing('2'),
       backgroundColor: colors.surface,
       borderWidth: 1,
-      borderColor: colors.text + '10',
-      paddingHorizontal: 10,
+      borderColor: colors.border,
+      paddingHorizontal: spacing('2.5'),
       flexDirection: 'row',
       alignItems: 'center',
     },
@@ -172,11 +173,11 @@ const createStyles = (colors: ThemeColors) =>
     optionIconWrap: {
       width: 26,
       height: 26,
-      borderRadius: 13,
+      borderRadius: radius('md'),
       backgroundColor: colors.background + 'CC',
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: 10,
+      marginRight: spacing('2.5'),
     },
     optionIconWrapActive: {
       backgroundColor: colors.background + '66',
@@ -194,11 +195,11 @@ const createStyles = (colors: ThemeColors) =>
       color: colors.danger,
     },
     closeButton: {
-      marginTop: 8,
+      marginTop: spacing('2'),
       height: 44,
-      borderRadius: 12,
+      borderRadius: radius('md'),
       borderWidth: 1,
-      borderColor: colors.primary + '22',
+      borderColor: colors.border,
       backgroundColor: colors.surface,
       justifyContent: 'center',
       alignItems: 'center',

@@ -1,4 +1,4 @@
-import { BlurView } from '@sbaiahmed1/react-native-blur';
+import { BlurView } from './BlurView';
 import React, { useMemo } from 'react';
 import { StyleSheet, View, ViewStyle, Platform } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
@@ -61,7 +61,7 @@ export const Card = React.memo(function Card({
 
   const blurStyle = useMemo(() => ({
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: Platform.OS === 'android' ? colors.card : 'transparent',
+    backgroundColor: (Platform.OS === 'android' || Platform.OS === 'web') ? colors.card : 'transparent',
     borderRadius: sizeConfig.borderRadius,
   }), [colors.card, sizeConfig.borderRadius]);
 
@@ -78,7 +78,7 @@ export const Card = React.memo(function Card({
         style,
       ]}
     >
-      {variant === 'default' && (
+      {variant === 'default' && Platform.OS !== 'web' && (
         <BlurView
           blurAmount={Platform.OS === 'ios' ? 25 : 0}
           blurType={isDark ? "dark" : "light"}

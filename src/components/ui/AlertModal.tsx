@@ -4,6 +4,7 @@ import { useTheme } from '../../providers/ThemeProvider';
 import { TYPOGRAPHY } from '../../theme/typography';
 import { ThemeColors } from '../../theme/colors';
 import { Ionicons } from '@expo/vector-icons';
+import { spacing, radius } from '../../theme/tokens';
 
 export type AlertButton = {
   text: string;
@@ -84,7 +85,7 @@ export const AlertModal = React.memo(function AlertModal({
                     styles.buttonText,
                     isCancel && { color: colors.text }
                   ]}>
-                    {button.text.toUpperCase()}
+                    {button.text}
                   </Text>
                 </TouchableOpacity>
               );
@@ -100,30 +101,30 @@ const createStyles = (colors: ThemeColors, isDark: boolean, width: number) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.7)',
+      backgroundColor: '#000000CC',
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 24,
+      padding: spacing('6'),
     },
     content: {
-      width: Math.min(width - 48, 340),
+      width: Math.min(width - spacing('12'), 340),
       backgroundColor: colors.background,
-      borderRadius: 22,
+      borderRadius: radius('2xl'),
       borderWidth: 1,
       borderColor: colors.border,
-      padding: 24,
+      padding: spacing('6'),
       alignItems: 'flex-start',
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 16,
-      marginBottom: 20,
+      gap: spacing('4'),
+      marginBottom: spacing('5'),
     },
     iconContainer: {
       width: 48,
       height: 48,
-      borderRadius: 16,
+      borderRadius: radius('lg'),
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -139,17 +140,17 @@ const createStyles = (colors: ThemeColors, isDark: boolean, width: number) =>
       fontSize: 15,
       color: colors.textMuted,
       lineHeight: 22,
-      marginBottom: 32,
+      marginBottom: spacing('8'),
     },
     buttonContainer: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 12,
+      gap: spacing('3'),
       width: '100%',
     },
     button: {
       height: 56,
-      borderRadius: 20,
+      borderRadius: radius('xl'),
       justifyContent: 'center',
       alignItems: 'center',
     },
