@@ -93,7 +93,7 @@ export const TransactionRow = React.memo(function TransactionRow({
       <View
         style={[
           styles.iconBox,
-          { backgroundColor: categoryColor + '20' },
+          { backgroundColor: colors.background },
         ]}
       >
         <Ionicons name={iconName} size={18} color={categoryColor} />
@@ -157,6 +157,8 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     borderRadius: radius('md'),
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   info: {
     flex: 1,

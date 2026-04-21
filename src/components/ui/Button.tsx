@@ -103,7 +103,7 @@ export const Button = React.memo(function Button({
           borderRadius: sizeConfig.borderRadius,
           backgroundColor,
           borderColor,
-          borderWidth: 0,
+          borderWidth: (variant === 'secondary' || variant === 'outline') ? 1 : 0,
           opacity: disabled ? 0.5 : 1,
         },
         shadowStyle,

@@ -19,6 +19,7 @@ import { PremiumGuard } from '@/src/components/ui/PremiumGuard';
 import { useTheme } from '@/src/providers/ThemeProvider';
 import { ThemeColors } from '@/src/theme/colors';
 import { TYPOGRAPHY } from '@/src/theme/typography';
+import { spacing, radius, LAYOUT } from '@/src/theme/tokens';
 import { CsvExportService, ExportDateRange } from '../api/csv-export.service';
 import { useAccounts } from '@/src/features/accounts/hooks/accounts';
 
@@ -402,25 +403,27 @@ const createStyles = (colors: ThemeColors) =>
       backgroundColor: colors.background,
     },
     content: {
-      paddingHorizontal: 24,
-      paddingTop: 12,
-      paddingBottom: 48,
+      paddingHorizontal: LAYOUT.screenPadding,
+      paddingTop: spacing('3'),
+      paddingBottom: spacing('9'),
     },
     heroCard: {
       backgroundColor: colors.surface,
-      borderRadius: 20,
-      padding: 24,
+      borderRadius: radius('xl'),
+      padding: spacing('6'),
       alignItems: 'center',
-      marginBottom: 32,
+      marginBottom: spacing('7'),
     },
     heroIconContainer: {
       width: 64,
       height: 64,
-      borderRadius: 32,
-      backgroundColor: colors.primary + '15',
+      borderRadius: radius('full'),
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: 16,
+      marginBottom: spacing('4'),
     },
     heroTitle: {
       fontFamily: TYPOGRAPHY.fonts.heading,
@@ -436,26 +439,26 @@ const createStyles = (colors: ThemeColors) =>
       lineHeight: 20,
     },
     section: {
-      marginBottom: 24,
+      marginBottom: spacing('6'),
     },
     sectionLabel: {
       fontFamily: TYPOGRAPHY.fonts.semibold,
       fontSize: 10,
       color: colors.textMuted,
       letterSpacing: 2,
-      marginBottom: 12,
-      paddingLeft: 4,
+      marginBottom: spacing('3'),
+      paddingLeft: spacing('1'),
     },
     card: {
       backgroundColor: colors.surface,
-      borderRadius: 20,
+      borderRadius: radius('xl'),
       overflow: 'hidden',
     },
     presetRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: 16,
+      padding: spacing('4'),
       borderBottomWidth: 1,
       borderColor: colors.border,
     },
@@ -470,7 +473,7 @@ const createStyles = (colors: ThemeColors) =>
     radioCircle: {
       width: 20,
       height: 20,
-      borderRadius: 10,
+      borderRadius: radius('full'),
       borderWidth: 1.5,
       borderColor: colors.border,
       alignItems: 'center',
@@ -479,7 +482,7 @@ const createStyles = (colors: ThemeColors) =>
     radioDot: {
       width: 10,
       height: 10,
-      borderRadius: 5,
+      borderRadius: radius('full'),
     },
     presetLabel: {
       fontFamily: TYPOGRAPHY.fonts.medium,
@@ -489,21 +492,21 @@ const createStyles = (colors: ThemeColors) =>
     divider: {
       height: 1,
       backgroundColor: colors.border,
-      marginHorizontal: 16,
+      marginHorizontal: spacing('4'),
     },
     customDatesContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
-      padding: 16,
-      paddingTop: 8,
+      gap: spacing('3'),
+      padding: spacing('4'),
+      paddingTop: spacing('2'),
       backgroundColor: colors.background,
     },
     dateButton: {
       flex: 1,
       backgroundColor: colors.surface,
-      borderRadius: 12,
-      padding: 12,
+      borderRadius: radius('md'),
+      padding: spacing('3'),
       borderWidth: 1,
       borderColor: colors.border,
     },
@@ -523,7 +526,7 @@ const createStyles = (colors: ThemeColors) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: 14,
+      padding: spacing('3.5'),
       borderBottomWidth: 1,
       borderColor: colors.border,
     },
@@ -531,19 +534,22 @@ const createStyles = (colors: ThemeColors) =>
       borderBottomWidth: 0,
     },
     filterRowSelected: {
-      backgroundColor: colors.primary + '08',
+      backgroundColor: colors.background,
     },
     filterLeft: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
+      gap: spacing('3'),
     },
     filterIconBox: {
       width: 36,
       height: 36,
-      borderRadius: 10,
+      borderRadius: radius('md'),
       alignItems: 'center',
       justifyContent: 'center',
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     filterLabel: {
       fontFamily: TYPOGRAPHY.fonts.medium,
@@ -552,13 +558,13 @@ const createStyles = (colors: ThemeColors) =>
     },
     typeGrid: {
       flexDirection: 'row',
-      gap: 10,
+      gap: spacing('2.5'),
     },
     typeChip: {
       flex: 1,
-      paddingVertical: 12,
-      paddingHorizontal: 8,
-      borderRadius: 12,
+      paddingVertical: spacing('3'),
+      paddingHorizontal: spacing('2'),
+      borderRadius: radius('md'),
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -571,10 +577,10 @@ const createStyles = (colors: ThemeColors) =>
     },
     summaryCard: {
       backgroundColor: colors.surface,
-      borderRadius: 16,
-      padding: 16,
-      marginBottom: 20,
-      gap: 12,
+      borderRadius: radius('lg'),
+      padding: spacing('4'),
+      marginBottom: spacing('5'),
+      gap: spacing('3'),
     },
     summaryRow: {
       flexDirection: 'row',
@@ -600,11 +606,11 @@ const createStyles = (colors: ThemeColors) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 10,
+      gap: spacing('2.5'),
       height: 56,
-      borderRadius: 16,
+      borderRadius: radius('lg'),
       backgroundColor: colors.text,
-      marginBottom: 16,
+      marginBottom: spacing('4'),
     },
     exportButtonText: {
       fontFamily: TYPOGRAPHY.fonts.semibold,
@@ -614,10 +620,12 @@ const createStyles = (colors: ThemeColors) =>
     warningCard: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      gap: 12,
-      backgroundColor: (colors.warning || '#F59E0B') + '10',
-      borderRadius: 12,
-      padding: 12,
+      gap: spacing('3'),
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.warning || colors.border,
+      borderRadius: radius('md'),
+      padding: spacing('3'),
     },
     warningText: {
       flex: 1,

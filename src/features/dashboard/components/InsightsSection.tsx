@@ -5,6 +5,7 @@ import { PremiumGuard } from '../../../components/ui/PremiumGuard';
 import { usePremium } from '../../../providers/PremiumProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { TYPOGRAPHY } from '../../../theme/typography';
+import { radius, spacing } from '../../../theme/tokens';
 import { useDashboardInsights } from '../hooks/dashboard';
 import { InsightCard } from './InsightCard';
 import { SectionHeader } from './SectionHeader';
@@ -23,6 +24,7 @@ interface InsightsSectionProps {
  */
 export function InsightsSection({ currency }: InsightsSectionProps) {
   const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { isPremium } = usePremium();
   const { data: insights, isLoading } = useDashboardInsights(currency);
 
@@ -63,7 +65,7 @@ export function InsightsSection({ currency }: InsightsSectionProps) {
             <View style={{ width: 14 }} />
           </ScrollView>
         ) : (
-          <View style={[styles.emptyCard, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
+          <View style={[styles.emptyCard, { borderColor: colors.border }]}>
             <EmptyState
               icon="analytics-outline"
               title="No insights yet"
@@ -79,13 +81,13 @@ export function InsightsSection({ currency }: InsightsSectionProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     marginVertical: 4,
     marginBottom: 20,
   },
   premiumContainer: {
-    borderRadius: 20,
+    borderRadius: radius('xl'),
     overflow: 'hidden',
     marginHorizontal: 0, // Default to 0 for pro scrolling context
   },
@@ -95,19 +97,19 @@ const styles = StyleSheet.create({
   },
   placeholderCard: {
     height: 110,
-    marginHorizontal: 24,
-    borderRadius: 18,
-    backgroundColor: 'rgba(0,0,0,0.03)',
+    marginHorizontal: spacing('6'),
+    borderRadius: radius('lg'),
+    backgroundColor: '#00000008',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing('3'),
   },
   loadingCircle: {
      width: 20,
      height: 20,
      borderRadius: 10,
      borderWidth: 2,
-     borderColor: 'rgba(0,0,0,0.1)',
+     borderColor: colors.border,
      borderStyle: 'dashed',
   },
   loadingText: {
@@ -117,12 +119,13 @@ const styles = StyleSheet.create({
   },
   emptyCard: {
     height: 110,
-    marginHorizontal: 24,
-    borderRadius: 18,
+    marginHorizontal: spacing('6'),
+    borderRadius: radius('lg'),
     borderWidth: 1,
-    padding: 20,
+    backgroundColor: colors.surface,
+    padding: spacing('5'),
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing('2'),
   },
 });

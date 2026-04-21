@@ -24,7 +24,7 @@ type CardProps = {
  * - lg: 20px padding, 24px radius (2xl)
  * 
  * Variants:
- * - default: Subtle surface background with blur
+ * - default: Solid card background
  * - filled: Solid surface background
  * - outlined: Border only, transparent background
  */

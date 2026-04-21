@@ -100,7 +100,7 @@ const createStyles = (colors: ThemeColors, width: number) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.7)',
+      backgroundColor: '#000000CC',
       justifyContent: 'center',
       alignItems: 'center',
       padding: 24,

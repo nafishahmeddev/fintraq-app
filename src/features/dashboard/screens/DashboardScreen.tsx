@@ -455,7 +455,7 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   },
   bgCircle: {
     position: 'absolute',
-    borderRadius: 999,
+    borderRadius: radius('full'),
   },
   loadingContainer: {
     flex: 1,
@@ -486,9 +486,9 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     position: 'absolute',
     top: spacing('1'),
     right: spacing('1'),
-    width: 5,
-    height: 5,
-    borderRadius: 3,
+    width: 6,
+    height: 6,
+    borderRadius: radius('full'),
   },
 
   /* ── Global Currency Picker ── */
@@ -544,9 +544,9 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     gap: spacing('1.5'),
   },
   splitDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
+    width: 8,
+    height: 8,
+    borderRadius: radius('full'),
   },
   splitLabel: {
     fontFamily: TYPOGRAPHY.fonts.semibold,

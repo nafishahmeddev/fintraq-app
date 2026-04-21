@@ -536,7 +536,7 @@ const createStyles = (colors: ThemeColors) =>
     // Modal
     modalOverlay: {
       flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.5)',
+      backgroundColor: '#000000CC',
       justifyContent: 'center',
       paddingHorizontal: spacing('8'),
     },

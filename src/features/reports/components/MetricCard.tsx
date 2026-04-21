@@ -4,6 +4,7 @@ import { MoneyText } from '../../../components/ui/MoneyText';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
 import { TYPOGRAPHY } from '../../../theme/typography';
+import { radius, spacing } from '../../../theme/tokens';
 
 import { TrendMode } from '../../../types';
 
@@ -63,7 +64,7 @@ export const MetricCard = React.memo(function MetricCard({
             weight="bold" 
           />
         ) : (
-          <Text style={[styles.value, { color: colors.text }]}>
+          <Text style={[styles.value, { color: colors.text, fontFamily: TYPOGRAPHY.fonts.monoBold }]}>
             {value.toFixed(1)}{suffix}
           </Text>
         )}
@@ -81,9 +82,9 @@ export const MetricCard = React.memo(function MetricCard({
 
 const createStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
-    padding: 16,
-    borderRadius: 20,
-    backgroundColor: colors.surface + '80',
+    padding: spacing('4'),
+    borderRadius: radius('xl'),
+    backgroundColor: colors.surface,
     flex: 1,
     minHeight: 100,
     justifyContent: 'center',

@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { TYPOGRAPHY } from '../../../theme/typography';
+import { radius, spacing } from '../../../theme/tokens';
 import { formatCurrency } from '../../../utils/format';
 import { DashboardInsight } from '../api/insights';
 
@@ -22,13 +23,13 @@ export const InsightCard = React.memo(function InsightCard({ insight }: InsightC
 
   const status = useMemo(() => {
     switch (insight.type) {
-      case 'success': return { bg: colors.success + '15', text: colors.success };
-      case 'danger': return { bg: colors.danger + '15', text: colors.danger };
-      case 'warning': return { bg: colors.warning + '15', text: colors.warning };
-      case 'info': return { bg: colors.primary + '15', text: colors.primary };
-      default: return { bg: colors.surface, text: colors.text };
+      case 'success': return { bg: colors.background, text: colors.success };
+      case 'danger': return { bg: colors.background, text: colors.danger };
+      case 'warning': return { bg: colors.background, text: colors.warning };
+      case 'info': return { bg: colors.background, text: colors.primary };
+      default: return { bg: colors.background, text: colors.text };
     }
-  }, [insight.type, colors.success, colors.danger, colors.warning, colors.primary, colors.surface, colors.text]);
+  }, [insight.type, colors.success, colors.danger, colors.warning, colors.primary, colors.background, colors.text]);
 
   const displayValue = useMemo(() => {
     switch (insight.valueType) {
@@ -42,7 +43,7 @@ export const InsightCard = React.memo(function InsightCard({ insight }: InsightC
   }, [insight]);
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.surface + '90', borderColor: colors.border }]}>
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.header}>
         <View style={[styles.iconBox, { backgroundColor: status.bg }]}>
           <Ionicons name={insight.icon} size={16} color={status.text} />
@@ -76,9 +77,9 @@ const styles = StyleSheet.create({
   card: {
     width: 210,
     minHeight: 115,
-    borderRadius: 22,
-    padding: 14,
-    marginRight: 10,
+    borderRadius: radius('xl'),
+    padding: spacing('3.5'),
+    marginRight: spacing('2.5'),
     justifyContent: 'space-between',
     overflow: 'hidden',
   },
@@ -94,6 +95,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   title: {
     fontFamily: TYPOGRAPHY.fonts.bold,
@@ -130,6 +133,5 @@ const styles = StyleSheet.create({
     right: 20,
     height: 3,
     borderRadius: 1.5,
-    opacity: 0.8,
   },
 });

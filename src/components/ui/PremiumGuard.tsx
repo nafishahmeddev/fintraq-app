@@ -96,12 +96,12 @@ export const PremiumGuard = React.memo(function PremiumGuard({
       style={containerStyles}
     >
       {/* Background Accent & Watermark */}
-      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.primary, opacity: 0.02 }]} />
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.surface }]} />
       <Ionicons
         name="sparkles"
         size={isSmall ? 60 : 120}
-        color={colors.primary}
-        style={[styles.watermark, { opacity: 0.05 }]}
+        color={colors.surface}
+        style={[styles.watermark, { textShadowColor: colors.border, textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 1 }]}
         pointerEvents="none"
       />
 
