@@ -51,25 +51,25 @@ export default function PremiumScreen() {
 
         <SafeAreaView style={styles.successWrapper}>
           <View style={styles.proContent}>
-             <View style={styles.proBadge}>
-               <Ionicons name="sparkles" size={32} color={colors.primary} />
-             </View>
-             
-             <View style={styles.proHero}>
-               <Text style={styles.proKicker}>Lifetime access</Text>
-               <Text style={styles.proHeading}>Luno Pro{"\n"}Unlocked.</Text>
-             </View>
+            <View style={styles.proBadge}>
+              <Ionicons name="sparkles" size={32} color={colors.primary} />
+            </View>
 
-             <View style={styles.proStatusRow}>
-               <View style={styles.statusPill}>
-                 <View style={[styles.statusDot, { backgroundColor: colors.primary }]} />
-                 <Text style={styles.statusText}>Forever member</Text>
-               </View>
-             </View>
+            <View style={styles.proHero}>
+              <Text style={styles.proKicker}>Lifetime access</Text>
+              <Text style={styles.proHeading}>Luno Pro{"\n"}Unlocked.</Text>
+            </View>
 
-             <Text style={styles.proDescription}>
-               You have permanent, unrestricted access to the complete professional suite. All current and future features are yours.
-             </Text>
+            <View style={styles.proStatusRow}>
+              <View style={styles.statusPill}>
+                <View style={[styles.statusDot, { backgroundColor: colors.primary }]} />
+                <Text style={styles.statusText}>Forever member</Text>
+              </View>
+            </View>
+
+            <Text style={styles.proDescription}>
+              You have permanent, unrestricted access to the complete professional suite. All current and future features are yours.
+            </Text>
           </View>
 
           <View style={styles.proActions}>
@@ -144,16 +144,16 @@ export default function PremiumScreen() {
             </View>
 
             <View style={styles.cardDivider} />
-            
+
             <View style={styles.trustInfo}>
-                <View style={styles.trustRow}>
-                  <Ionicons name="shield-checkmark" size={14} color={colors.success} />
-                  <Text style={styles.trustText}>Permanent Device Account License</Text>
-                </View>
-                <View style={styles.trustRow}>
-                    <Ionicons name="cloud-done" size={14} color={colors.success} />
-                    <Text style={styles.trustText}>All future tool updates included</Text>
-                </View>
+              <View style={styles.trustRow}>
+                <Ionicons name="shield-checkmark" size={14} color={colors.success} />
+                <Text style={styles.trustText}>Permanent Device Account License</Text>
+              </View>
+              <View style={styles.trustRow}>
+                <Ionicons name="cloud-done" size={14} color={colors.success} />
+                <Text style={styles.trustText}>All future tool updates included</Text>
+              </View>
             </View>
           </View>
         </View>
@@ -172,7 +172,7 @@ export default function PremiumScreen() {
                   <Text style={styles.rowSubtitle} numberOfLines={1}>{feature.description}</Text>
                 </View>
                 <View style={styles.rowRightSide}>
-                   <Ionicons name="sparkles" size={14} color={colors.primary} />
+                  <Ionicons name="sparkles" size={14} color={colors.primary} />
                 </View>
               </View>
             ))}
@@ -249,7 +249,7 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   priceContainer: { marginBottom: 18 },
   priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
   originalPrice: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 18, color: colors.textMuted, textDecorationLine: 'line-through', opacity: 0.6 },
-  priceValue: { fontFamily: TYPOGRAPHY.fonts.amountBold, fontSize: 44, color: colors.text, letterSpacing: -1.5 },
+  priceValue: { fontFamily: TYPOGRAPHY.fonts.monoBold, fontSize: 44, color: colors.text, letterSpacing: -1.5 },
   priceSuffix: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 13, color: colors.textMuted, opacity: 0.8 },
   priceError: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 14, color: colors.danger },
 
@@ -259,7 +259,7 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   trustText: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 11, color: colors.success, letterSpacing: 0.1 },
 
   sectionLabel: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.textMuted, letterSpacing: 2, marginBottom: 14, opacity: 0.8 },
-  
+
   /* ── Settings-like Feature Styles ── */
   featuresSection: { marginBottom: 32 },
   settingsCard: {
@@ -321,15 +321,15 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   proHero: { marginBottom: 24 },
   proKicker: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 11, color: colors.primary, letterSpacing: 3, marginBottom: 8 },
   proHeading: { fontFamily: TYPOGRAPHY.fonts.heading, fontSize: 56, lineHeight: 60, color: colors.text, letterSpacing: -3 },
-  
+
   proStatusRow: { flexDirection: 'row', marginBottom: 32 },
-  statusPill: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    gap: 8, 
-    paddingHorizontal: 12, 
-    paddingVertical: 6, 
-    borderRadius: 20, 
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.primary + '30'

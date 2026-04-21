@@ -53,17 +53,17 @@ export const InsightCard = React.memo(function InsightCard({ insight }: InsightC
       <View style={styles.body}>
         <Text style={[styles.value, { color: colors.text }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{displayValue}</Text>
         <View style={styles.trendContainer}>
-           <Text style={[styles.subtitle, { color: colors.textMuted }]} numberOfLines={1}>
-             {insight.subtitle}
-           </Text>
-           {insight.trend && (
-             <Ionicons 
-               name={insight.trend === 'up' ? 'arrow-up' : 'arrow-down'} 
-               size={12} 
-               color={insight.type === 'danger' ? colors.danger : colors.success} 
-               style={styles.trendIcon}
-             />
-           )}
+          <Text style={[styles.subtitle, { color: colors.textMuted }]} numberOfLines={1}>
+            {insight.subtitle}
+          </Text>
+          {insight.trend && (
+            <Ionicons
+              name={insight.trend === 'up' ? 'arrow-up' : 'arrow-down'}
+              size={12}
+              color={insight.type === 'danger' ? colors.danger : colors.success}
+              style={styles.trendIcon}
+            />
+          )}
         </View>
       </View>
 
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   value: {
-    fontFamily: TYPOGRAPHY.fonts.amountBold,
+    fontFamily: TYPOGRAPHY.fonts.monoBold,
     fontSize: 24,
     letterSpacing: -1,
   },

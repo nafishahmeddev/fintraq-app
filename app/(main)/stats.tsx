@@ -838,7 +838,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     fontSize: 13,
   },
   metricPlainValue: {
-    fontFamily: TYPOGRAPHY.fonts.amountBold,
+    fontFamily: TYPOGRAPHY.fonts.monoBold,
     color: colors.text,
     fontSize: 14,
   },

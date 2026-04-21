@@ -238,7 +238,7 @@ const createStyles = (colors: { [key: string]: string }) =>
       color: colors.textMuted,
     },
     previewBalance: {
-      fontFamily: TYPOGRAPHY.fonts.amountBold,
+      fontFamily: TYPOGRAPHY.fonts.monoBold,
       fontSize: 16,
       color: colors.text,
     },
@@ -267,7 +267,7 @@ const createStyles = (colors: { [key: string]: string }) =>
       paddingVertical: 4,
     },
     answerInputAmount: {
-      fontFamily: TYPOGRAPHY.fonts.amountBold,
+      fontFamily: TYPOGRAPHY.fonts.monoBold,
       letterSpacing: 0,
     },
     answerLine: {

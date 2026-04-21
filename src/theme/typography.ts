@@ -22,8 +22,8 @@ export type TypographyFonts = {
   medium: 'BricolageGrotesque_500Medium';
   semibold: 'BricolageGrotesque_600SemiBold';
   bold: 'BricolageGrotesque_700Bold';
-  amountRegular: 'JetBrainsMono_400Regular';
-  amountBold: 'JetBrainsMono_700Bold';
+  monoRegular: 'JetBrainsMono_400Regular';
+  monoBold: 'JetBrainsMono_700Bold';
 };
 
 export type TypographyTheme = {
@@ -55,7 +55,7 @@ export const TYPOGRAPHY: TypographyTheme = {
     medium: 'BricolageGrotesque_500Medium',
     semibold: 'BricolageGrotesque_600SemiBold',
     bold: 'BricolageGrotesque_700Bold',
-    amountRegular: 'JetBrainsMono_400Regular',
-    amountBold: 'JetBrainsMono_700Bold',
+    monoRegular: 'JetBrainsMono_400Regular',
+    monoBold: 'JetBrainsMono_700Bold',
   },
 };

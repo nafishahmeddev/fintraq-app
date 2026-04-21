@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { resolveIcon } from '../../../utils/icons';
 import { BlurView } from '@sbaiahmed1/react-native-blur';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -20,9 +19,10 @@ import { ACCOUNT_COLORS, ACCOUNT_ICONS } from '../../../constants/picker';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
 import { TYPOGRAPHY } from '../../../theme/typography';
+import { parseAmount, toDbColor } from '../../../utils/format';
+import { resolveIcon } from '../../../utils/icons';
 import { Account } from '../api/accounts';
 import { useCreateAccount, useUpdateAccount } from '../hooks/accounts';
-import { parseAmount, toDbColor } from '../../../utils/format';
 
 type AccountFormValues = {
   name: string;
@@ -427,7 +427,7 @@ const createStyles = (colors: ThemeColors) =>
       paddingVertical: 4,
     },
     answerInputAmount: {
-      fontFamily: TYPOGRAPHY.fonts.amountBold,
+      fontFamily: TYPOGRAPHY.fonts.monoBold,
       letterSpacing: 0,
     },
     answerLine: {

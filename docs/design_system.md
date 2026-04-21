@@ -54,8 +54,8 @@ Typography is the absolute backbone of Luno's interface.
 | **`medium`** | `BricolageGrotesque_500Medium` | Elevated body text (e.g., table cells). |
 | **`semibold`** | `BricolageGrotesque_600SemiBold` | Labels, buttons, action items, segment pill text. |
 | **`bold`** | `BricolageGrotesque_700Bold` | Emphasized text, strong category names. |
-| **`amountRegular`** | `JetBrainsMono_400Regular` | Secondary numbers, percentages, dates. |
-| **`amountBold`** | `JetBrainsMono_700Bold` | Core financial readouts, Net Position, Transaction amounts. |
+| **`monoRegular`** | `JetBrainsMono_400Regular` | Secondary numbers, percentages, dates. |
+| **`monoBold`** | `JetBrainsMono_700Bold` | Core financial readouts, Net Position, Transaction amounts. |
 
 ### Size Scale
 

@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, TextProps } from 'react-native';
-import { formatCurrency } from '../../utils/format';
 import { useTheme } from '../../providers/ThemeProvider';
 import { TYPOGRAPHY } from '../../theme/typography';
 import { TransactionType } from '../../types';
+import { formatCurrency } from '../../utils/format';
 
 interface MoneyTextProps extends TextProps {
   amount: number;
@@ -39,8 +39,8 @@ export const MoneyText = React.memo(function MoneyText({
     }
 
     const ff = weight === 'regular' || weight === 'medium'
-      ? TYPOGRAPHY.fonts.amountRegular
-      : TYPOGRAPHY.fonts.amountBold;
+      ? TYPOGRAPHY.fonts.monoRegular
+      : TYPOGRAPHY.fonts.monoBold;
 
     return { prefix: p, color: c, formattedAmount: formatted, fontFamily: ff };
   }, [amount, currency, type, weight, colors.text, colors.success, colors.danger]);
