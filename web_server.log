@@ -31,3 +31,4 @@ Web Bundled 832ms node_modules/expo-router/entry.js (1 module)
 Web Bundled 85ms node_modules/expo-router/entry.js (1 module)
  LOG  [web] Logs will appear in the browser console
 Web Bundled 1242ms node_modules/expo-sqlite/web/worker.ts (16 modules)
+› Detected a change in metro.config.js. Restart the server to see the new results.

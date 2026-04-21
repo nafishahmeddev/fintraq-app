@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { resolveIcon } from '../../../utils/icons';
-import { BlurView } from '../../../components/ui/BlurView';
+import { BlurView } from '@sbaiahmed1/react-native-blur';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
@@ -124,15 +124,13 @@ export function AccountFormModal({ visible, onClose, account }: AccountFormModal
             <View style={[styles.glow, { bottom: -90, left: 40, width: 320, height: 320, backgroundColor: colors.primary + '1C' }]} />
           </View>
 
-          {Platform.OS !== 'web' && (
-            <BlurView
-              blurAmount={Platform.OS === 'ios' ? 80 : 96}
-              blurType={isDark ? 'dark' : 'light'}
-              style={StyleSheet.absoluteFillObject}
-            />
-          )}
+          <BlurView
+            blurAmount={Platform.OS === 'ios' ? 80 : 96}
+            blurType={isDark ? 'dark' : 'light'}
+            style={StyleSheet.absoluteFillObject}
+          />
 
-          {(Platform.OS === 'android' || Platform.OS === 'web') && (
+          {Platform.OS === 'android' && (
             <View
               pointerEvents="none"
               style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]}

@@ -6,7 +6,7 @@ import { ThemeColors } from '@/src/theme/colors';
 import { TYPOGRAPHY } from '@/src/theme/typography';
 import { spacing, radius } from '@/src/theme/tokens';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@/src/components/ui/BlurView';
+import { BlurView } from '@sbaiahmed1/react-native-blur';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
@@ -48,9 +48,7 @@ export default function PremiumScreen() {
           <View style={[styles.bgCircle, { top: -100, left: -100, width: 500, height: 500, backgroundColor: colors.primary, opacity: 0.15 }]} />
           <View style={[styles.bgCircle, { bottom: -150, right: -150, width: 600, height: 600, backgroundColor: colors.primary, opacity: 0.1 }]} />
         </View>
-        {Platform.OS !== 'web' && (
-          <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
-        )}
+        <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
 
         <SafeAreaView style={styles.successWrapper}>
           <View style={styles.proContent}>
@@ -98,10 +96,8 @@ export default function PremiumScreen() {
         <View style={[styles.bgCircle, { top: 180, right: -110, width: 440, height: 440, backgroundColor: colors.primaryDark, opacity: 0.52 }]} />
         <View style={[styles.bgCircle, { bottom: -110, left: 40, width: 380, height: 380, backgroundColor: colors.primary, opacity: 0.6 }]} />
       </View>
-      {Platform.OS !== 'web' && (
-        <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
-      )}
-      {(Platform.OS === 'android' || Platform.OS === 'web') && (
+      <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
+      {Platform.OS === 'android' && (
         <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]} pointerEvents="none" />
       )}
 

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from './BlurView';
+import { BlurView } from '@sbaiahmed1/react-native-blur';
 import React, { useMemo, useState, useCallback } from 'react';
 import {
     FlatList,
@@ -104,14 +104,12 @@ export const CurrencyPickerModal = React.memo(function CurrencyPickerModal({
             <View style={[styles.glow, { bottom: -60, right: -80, width: 360, height: 360, backgroundColor: colors.text + '0A' }]} />
           </View>
 
-          {Platform.OS !== 'web' && (
-            <BlurView
-              blurAmount={Platform.OS === 'ios' ? 80 : 96}
-              blurType={isDark ? 'dark' : 'light'}
-              style={StyleSheet.absoluteFillObject}
-            />
-          )}
-          {(Platform.OS === 'android' || Platform.OS === 'web') && (
+          <BlurView
+            blurAmount={Platform.OS === 'ios' ? 80 : 96}
+            blurType={isDark ? 'dark' : 'light'}
+            style={StyleSheet.absoluteFillObject}
+          />
+          {Platform.OS === 'android' && (
             <View
               pointerEvents="none"
               style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]}
