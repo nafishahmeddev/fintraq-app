@@ -290,11 +290,11 @@ export function TransactionsScreen() {
       
       // Multi-select category filter
       if (advancedFilters.categoryIds && advancedFilters.categoryIds.length > 0) {
-        if (!advancedFilters.categoryIds.includes(transaction.categoryId)) {
+        if (!transaction.categoryId || !advancedFilters.categoryIds.includes(transaction.categoryId)) {
           return false;
         }
       }
-      
+
       // Amount range filter
       if (advancedFilters.amountRange) {
         const amount = transaction.amount;
@@ -305,14 +305,14 @@ export function TransactionsScreen() {
           return false;
         }
       }
-      
+
       // Search in notes/category/account
       if (advancedFilters.searchQuery?.trim()) {
         const query = advancedFilters.searchQuery.toLowerCase().trim();
         const noteMatch = transaction.note.toLowerCase().includes(query);
-        const categoryMatch = transaction.category.name.toLowerCase().includes(query);
+        const categoryMatch = transaction.category?.name.toLowerCase().includes(query) ?? false;
         const accountMatch = transaction.account.name.toLowerCase().includes(query);
-        
+
         if (!noteMatch && !categoryMatch && !accountMatch) {
           return false;
         }
@@ -605,7 +605,7 @@ const createStyles = (colors: ThemeColors) =>
     headerBtn: {
       width: 44,
       height: 44,
-      borderRadius: RADIUS.md,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
@@ -652,7 +652,7 @@ const createStyles = (colors: ThemeColors) =>
       backgroundColor: colors.danger + '12',
       paddingHorizontal: SPACING['3'],
       height: 28,
-      borderRadius: RADIUS.md,
+      borderRadius: RADIUS.full,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -685,7 +685,7 @@ const createStyles = (colors: ThemeColors) =>
       fontSize: 12,
     },
     dayCard: {
-      borderRadius: RADIUS.xl,
+      borderRadius: RADIUS.full,
       overflow: 'hidden',
     },
     emptyWrap: {
@@ -696,7 +696,7 @@ const createStyles = (colors: ThemeColors) =>
     emptyIconBox: {
       width: 80,
       height: 80,
-      borderRadius: RADIUS['2xl'],
+      borderRadius: RADIUS.full,
       backgroundColor: colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
@@ -720,7 +720,7 @@ const createStyles = (colors: ThemeColors) =>
       gap: SPACING['2.5'],
       paddingHorizontal: SPACING['5'],
       height: 48,
-      borderRadius: RADIUS.lg,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.text,
       marginTop: SPACING['2'],
     },
@@ -739,7 +739,7 @@ const createStyles = (colors: ThemeColors) =>
       right: SPACING['6'],
       width: 60,
       height: 60,
-      borderRadius: RADIUS.xl,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.text,
       alignItems: 'center',
       justifyContent: 'center',

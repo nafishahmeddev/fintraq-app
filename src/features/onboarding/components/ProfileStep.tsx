@@ -3,6 +3,7 @@ import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { useTheme } from '../../../providers/ThemeProvider';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { OnboardingFormValues } from '../types';
 
@@ -75,7 +76,7 @@ const createStyles = (colors: { [key: string]: string }) =>
     noteRow: {
       marginTop: 4,
       minHeight: 46,
-      borderRadius: 16,
+      borderRadius: RADIUS.lg,
       paddingHorizontal: 14,
       paddingVertical: 12,
       backgroundColor: colors.primary + '12',

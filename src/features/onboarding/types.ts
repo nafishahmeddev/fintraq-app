@@ -12,5 +12,6 @@ export type OnboardingFormValues = {
   accountName: string;
   accountHolder: string;
   accountNumber: string;
+  accountType: string;
   openingBalance: string;
 };

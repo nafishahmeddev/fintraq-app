@@ -228,7 +228,7 @@ const createStyles = (colors: ThemeColors) =>
     closeBtn: {
       width: 38,
       height: 38,
-      borderRadius: 19,
+      borderRadius: 999,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -241,7 +241,7 @@ const createStyles = (colors: ThemeColors) =>
       marginHorizontal: 24,
       marginBottom: 10,
       height: 44,
-      borderRadius: 14,
+      borderRadius: 999,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -277,7 +277,7 @@ const createStyles = (colors: ThemeColors) =>
     codeWrap: {
       width: 42,
       height: 30,
-      borderRadius: 8,
+      borderRadius: 999,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,

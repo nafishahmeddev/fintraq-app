@@ -1,18 +1,20 @@
 # Luno Application Architecture & Context
 
-This document serves as the core system memory for the AI assistant working on the **Luno** codebase. It outlines the project's technical stack, aesthetic guidelines, folder structure, and current roadmap state.
+This document serves as the core system memory for the AI assistant working on the **Luno** codebase. It outlines the project's technical stack, aesthetic guidelines, and folder structure.
+
+**For roadmap and feature status, see `docs/roadmap.md`.**
 
 ## 1. App Aesthetic: "Editorial Brutalist"
 Luno aims to be a top-tier, premium financial tracker. The design system rigidly adheres to an **Editorial Brutalist** aesthetic:
 - **Flawless Minimalism**: No aggressive drop shadows, no soft blurry borders, just stark, flat, elegant surfaces.
 - **Micro-borders**: Heavy reliance on 1px solid borders (`colors.border`) to demarcate components and cards.
 - **Typography & Casing**: High-contrast, sophisticated typography. Action buttons and primary text elements must use **Sentence case** (e.g., "Upgrade to Pro", not "UPGRADE TO PRO") to feel mature and journalistic rather than salesy.
-- **Shape Language**: Interactive elements and buttons strictly use **12px - 16px rounded corners**. Avoid pill-shaped (999px) buttons unless they are tiny micro-badges.
+- **Shape Language**: **Buttons and interactive chips use pill shape (`radius('full')` = 999px)**. Cards and content containers use **28px rounded corners** (`radius('3xl')`). Icon containers and color/icon pickers are always fully round (999px). Progress bars and accent bars stay small (2–4px).
 
 ### 1.1 Design Token System
 All styling MUST use the design tokens in `/src/theme/tokens.ts`:
 - **Spacing**: `spacing('1')` through `spacing('12')` - 4px base grid
-- **Radius**: `radius('xs')` through `radius('2xl')` - Never use arbitrary values
+- **Radius**: `radius('xs')` through `radius('3xl')` and `radius('full')` - Never use arbitrary values
 - **Component Sizes**: `COMPONENT_SIZES.button|card|input.{size}.{property}`
 - **Shadows**: `shadow('sm')` for cards, `shadow('md')` for elevated elements
 - **Layout**: `LAYOUT.screenPadding`, `LAYOUT.minTouchTarget`
@@ -138,7 +140,11 @@ All FlatList/SectionList must have:
 
 ## 3. Directory Structure (Domain-Driven)
 - `app/` - Expo Router configuration and Screen definitions.
-- `src/components/ui/` - Universal, generic, pure components (`PremiumGuard`, `MoneyText`, `TransactionRow`, etc).
+  - `account/create.tsx` - Create new account
+  - `account/edit/[id].tsx` - Edit existing account
+  - `category/create.tsx` - Create new category
+  - `category/edit/[id].tsx` - Edit existing category
+- `src/components/ui/` - Universal, generic, pure components (`PremiumGuard`, `MoneyText`, `TransactionRow`, `IconPickerDialog`, etc).
 - `src/features/` - Domain-specific layers containing their own `api/`, `components/`, `hooks/`, and `screens/` (e.g., `dashboard`, `transactions`, `accounts`, `categories`).
 - `src/providers/` - React Context providers (`ThemeProvider`, `PremiumProvider`).
 - `src/theme/` - Design tokens (`colors.ts`, `typography.ts`).
@@ -148,41 +154,45 @@ Monetization is driven by `src/components/ui/PremiumGuard.tsx`.
 - **Rule**: Non-premium users must *never* see premium data elements. The `PremiumGuard` completely hides its children and renders an elegant "Teaser Card" placeholder containing a watermark and a call-to-action to natively convert the user.
 - **Philosophy**: **Free = Tracking.** **Premium = Insights + Control.**
 
-## 5. Current Roadmap Status
-- **Phase 1 (Done)**: Core Tracking, local SQLite configuration.
-- **Phase 2 (Done)**: Paywall Integration, Freemium Split, iOS/Android Subscriptions.
-- **Phase 3 (Done)**: Insights Layer (Contextual analytics, runway tracking, categoric burn).
-- **Phase 4 (Done)**: Retention System (Weekly/Monthly reports, Usage Streaks, Notifications).
-- **Phase 5 (Done)**: Power Features (Backup/Restore, CSV Export, Advanced Filters, Global Search).
-- **Phase 6 (Next)**: Polish & Growth (App Store optimisation, onboarding improvements, widget support).
+## 5. Current Status
 
-### Phase 5 Features (All Complete — Premium-gated)
+**Completed**: Phases 1-6 (Core tracking through Account Types, Transfer Transactions, Page-based Forms)
 
-1. **Backup & Restore** (`src/features/backup/`)
-   - Full data export to JSON (accounts, categories, transactions, settings)
-   - Cross-platform save: Android (Storage Access Framework), iOS (Share sheet)
-   - Import from backup file with validation
+**Next**: Phase 7 - Recurring & Budgeting
 
-2. **CSV Export** (`src/features/export/`)
-   - Export transactions to CSV for Excel/Google Sheets
-   - Date range presets (This Month, Last 3 Months, This Year, etc.)
-   - Multi-filter support (accounts, categories, types)
+**See `docs/roadmap.md` for full feature roadmap and phase details.**
 
-3. **Advanced Filters** (`src/features/filters/`)
-   - Multi-select: Accounts, Categories, Types (Income/Expense)
-   - Date range filtering with native date pickers
-   - Amount range (min/max) filtering
-   - Full-text search in notes, categories, accounts
-   - Sort options (Date/Amount, Asc/Desc)
-   - Hybrid filtering: Server-side for single selects, client-side for multi-select
+## 6. Transfer Transaction Pattern
 
-4. **Global Search** (`src/features/search/`)
-   - Full-text search across transactions, accounts, and categories in one screen
-   - 300ms debounce, min 2 chars, React Query with 15s stale time
-   - Category/account results deep-link into filtered Transactions screen
-   - Premium-gated at route level (`app/search.tsx`) with a full-screen upsell gate
+When implementing transfer transactions:
 
-## 6. Cross-Platform File Export Pattern
+```typescript
+// Transfer affects two accounts, no income/expense impact
+if (data.type === 'TRANSFER') {
+  // Decrease from source account
+  await tx.update(accounts).set({ 
+    balance: sql`${accounts.balance} - ${data.amount}`,
+  }).where(eq(accounts.id, data.accountId));
+  
+  // Increase to destination account
+  await tx.update(accounts).set({ 
+    balance: sql`${accounts.balance} + ${data.amount}`,
+  }).where(eq(accounts.id, data.toAccountId));
+} else {
+  // Regular transaction affects single account
+  const balanceChange = data.type === 'CR' ? data.amount : -data.amount;
+  const incomeChange = data.type === 'CR' ? data.amount : 0;
+  const expenseChange = data.type === 'DR' ? data.amount : 0;
+  
+  await tx.update(accounts).set({ 
+    balance: sql`${accounts.balance} + ${balanceChange}`,
+    income: sql`${accounts.income} + ${incomeChange}`,
+    expense: sql`${accounts.expense} + ${expenseChange}`,
+  }).where(eq(accounts.id, data.accountId));
+}
+```
+
+## 7. Cross-Platform File Export Pattern
 When implementing file export features (CSV, Backup), use this pattern:
 
 ```typescript
@@ -207,7 +217,13 @@ static async exportFile(content: string, filename: string): Promise<void> {
 }
 ```
 
-## 6. How to Collaborate
+## 8. How to Collaborate
 1. Before modifying UI, cross-reference the components against the "Editorial Brutalist" rules.
 2. Avoid generic tools (like using typical mapping inside FlatList `renderItem` without React native best practices).
-3. Always update this document or `roadmap.md` if significant architectural patterns are introduced.
+3. Always update `docs/roadmap.md` if significant features are introduced.
+
+## References
+- Agent instructions: `AGENTS.md`
+- Feature roadmap: `docs/roadmap.md`
+- Database schema: `src/db/schema.ts`
+- Drizzle config: `drizzle.config.ts`

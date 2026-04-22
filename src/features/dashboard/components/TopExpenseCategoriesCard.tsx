@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useMemo, useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MoneyText } from '../../../components/ui/MoneyText';
 import { useTheme } from '../../../providers/ThemeProvider';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 
 type IoniconName = keyof typeof Ionicons.glyphMap;
@@ -73,9 +74,6 @@ export const TopExpenseCategoriesCard = React.memo(function TopExpenseCategories
           return (
             <View key={`${category.name}-${idx}`} style={[styles.row, isLast && styles.rowLast]}>
               <View style={styles.left}>
-                <View style={styles.rankBadge}>
-                  <Text style={styles.rankText}>{idx + 1}</Text>
-                </View>
                 <View style={[styles.iconWrap, { backgroundColor: accent + '22' }]}>
                   <Ionicons name={resolveIconName(category.icon, 'pricetag-outline')} size={14} color={accent} />
                 </View>
@@ -107,7 +105,7 @@ const createStyles = (colors: { [key: string]: string }) =>
   StyleSheet.create({
     card: {
       marginHorizontal: 24,
-      borderRadius: 18,
+      borderRadius: RADIUS.xl,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -180,7 +178,7 @@ const createStyles = (colors: { [key: string]: string }) =>
     iconWrap: {
       width: 28,
       height: 28,
-      borderRadius: 9,
+      borderRadius: RADIUS.md,
       justifyContent: 'center',
       alignItems: 'center',
     },

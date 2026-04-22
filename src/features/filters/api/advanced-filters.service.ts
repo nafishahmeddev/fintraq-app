@@ -1,4 +1,5 @@
 import { TransactionFilters } from '@/src/features/transactions/api/transactions';
+import { TransactionType } from '@/src/types';
 
 export interface AdvancedFilters {
   // Date range
@@ -6,15 +7,15 @@ export interface AdvancedFilters {
     startDate: Date;
     endDate: Date;
   };
-  
+
   // Multi-select accounts
   accountIds?: number[];
-  
+
   // Multi-select categories
   categoryIds?: number[];
-  
-  // Transaction types (can select multiple: ['CR', 'DR'] or single)
-  types?: ('CR' | 'DR')[];
+
+  // Transaction types (can select multiple: ['CR', 'DR', 'TRANSFER'] or single)
+  types?: TransactionType[];
   
   // Amount range
   amountRange?: {
@@ -122,7 +123,11 @@ export class AdvancedFilterService {
     }
     
     if (advanced.types && advanced.types.length > 0) {
-      const typeLabels = advanced.types.map(t => t === 'CR' ? 'Income' : 'Expense');
+      const typeLabels = advanced.types.map(t => {
+        if (t === 'CR') return 'Income';
+        if (t === 'DR') return 'Expense';
+        return 'Transfer';
+      });
       parts.push(typeLabels.join(' & '));
     }
     

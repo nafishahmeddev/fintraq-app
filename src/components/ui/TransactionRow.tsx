@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
-import React, { useMemo, useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ThemeColors } from '../../theme/colors';
+import { RADIUS, spacing } from '../../theme/tokens';
 import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, radius } from '../../theme/tokens';
 import { TransactionType } from '../../types';
 import { MoneyText } from './MoneyText';
 
@@ -18,11 +18,14 @@ type TransactionData = {
     name: string;
     currency: string;
   };
-  category: {
+  toAccount?: {
+    name: string;
+  } | null;
+  category?: {
     name: string;
     icon: string;
     color: number;
-  };
+  } | null;
 };
 
 type Props = {
@@ -45,24 +48,30 @@ const toHexColor = (value: number) => `#${value.toString(16).padStart(6, '0')}`;
  * - Gap: 10px between elements
  * - Icon box: 40px, 12px radius (md)
  */
-export const TransactionRow = React.memo(function TransactionRow({ 
-  tx, 
-  colors, 
-  onPress, 
-  isFirst, 
-  isLast, 
-  showDate 
+export const TransactionRow = React.memo(function TransactionRow({
+  tx,
+  colors,
+  onPress,
+  isFirst,
+  isLast,
+  showDate
 }: Props) {
   const styles = useMemo(() => createStyles(colors), [colors]);
-  
-  const categoryColor = useMemo(() => toHexColor(tx.category.color), [tx.category.color]);
-  
-  const iconName: keyof typeof Ionicons.glyphMap = useMemo(() =>
-    tx.category.icon in Ionicons.glyphMap
+
+  const isTransfer = tx.type === 'TRANSFER';
+  const categoryColor = useMemo(() => {
+    if (isTransfer) return colors.primary;
+    if (!tx.category) return colors.textMuted;
+    return toHexColor(tx.category.color);
+  }, [tx.category, isTransfer, colors.primary, colors.textMuted]);
+
+  const iconName: keyof typeof Ionicons.glyphMap = useMemo(() => {
+    if (isTransfer) return 'swap-horizontal-outline';
+    if (!tx.category) return 'pricetag-outline';
+    return tx.category.icon in Ionicons.glyphMap
       ? (tx.category.icon as keyof typeof Ionicons.glyphMap)
-      : 'pricetag-outline',
-    [tx.category.icon]
-  );
+      : 'pricetag-outline';
+  }, [tx.category, isTransfer]);
 
   const handlePress = useCallback(() => {
     onPress?.(tx);
@@ -72,11 +81,16 @@ export const TransactionRow = React.memo(function TransactionRow({
     borderBottomWidth: isLast ? 0 : 1,
     borderBottomColor: colors.border,
     backgroundColor: colors.surface,
-    borderTopLeftRadius: isFirst ? radius('lg') : 0,
-    borderTopRightRadius: isFirst ? radius('lg') : 0,
-    borderBottomLeftRadius: isLast ? radius('lg') : 0,
-    borderBottomRightRadius: isLast ? radius('lg') : 0,
+    borderTopLeftRadius: isFirst ? RADIUS['2xl'] : 0,
+    borderTopRightRadius: isFirst ? RADIUS['2xl'] : 0,
+    borderBottomLeftRadius: isLast ? RADIUS['2xl'] : 0,
+    borderBottomRightRadius: isLast ? RADIUS['2xl'] : 0,
   }), [isFirst, isLast, colors.border, colors.surface]);
+
+  const categoryName = isTransfer
+    ? (tx.toAccount?.name ?? 'Transfer')
+    : (tx.category?.name ?? 'Transaction');
+  const displayNote = tx.note || categoryName;
 
   return (
     <TouchableOpacity
@@ -84,12 +98,7 @@ export const TransactionRow = React.memo(function TransactionRow({
       activeOpacity={0.75}
       onPress={handlePress}
     >
-      <View
-        style={[
-          styles.accentBar,
-          { backgroundColor: tx.type === 'CR' ? colors.success : colors.danger },
-        ]}
-      />
+
       <View
         style={[
           styles.iconBox,
@@ -103,15 +112,17 @@ export const TransactionRow = React.memo(function TransactionRow({
           style={[styles.title, { color: colors.text }]}
           numberOfLines={1}
         >
-          {tx.note || tx.category.name}
+          {displayNote}
         </Text>
         <View style={styles.metaRow}>
-          <View style={[styles.dot, { backgroundColor: categoryColor }]} />
           <Text
             style={[styles.meta, { color: colors.textMuted }]}
             numberOfLines={1}
           >
-            {tx.category.name} · {tx.account.name}
+            {isTransfer
+              ? `Transfer to ${tx.toAccount?.name ?? 'account'} · ${tx.account.name}`
+              : `${categoryName} · ${tx.account.name}`
+            }
           </Text>
         </View>
       </View>
@@ -139,21 +150,13 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing('3.5'),
-    paddingRight: spacing('3.5'),
+    padding: spacing('3.5'),
     gap: spacing('2.5'),
-  },
-  accentBar: {
-    width: 3,
-    alignSelf: 'stretch',
-    borderRadius: radius('full'),
-    marginLeft: spacing('1'),
-    marginVertical: spacing('1.5'),
   },
   iconBox: {
     width: 40,
     height: 40,
-    borderRadius: radius('md'),
+    borderRadius: RADIUS['2xl'],
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -169,11 +172,6 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing('1'),
-  },
-  dot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
   },
   meta: {
     fontFamily: TYPOGRAPHY.fonts.regular,

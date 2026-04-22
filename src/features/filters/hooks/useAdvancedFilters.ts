@@ -80,7 +80,7 @@ export function useAdvancedFilters(
       
       // Multi-select category filter
       if (filters.categoryIds && filters.categoryIds.length > 0) {
-        if (!filters.categoryIds.includes(transaction.categoryId)) {
+        if (!transaction.categoryId || !filters.categoryIds.includes(transaction.categoryId)) {
           return false;
         }
       }
@@ -100,9 +100,9 @@ export function useAdvancedFilters(
       if (filters.searchQuery?.trim()) {
         const query = filters.searchQuery.toLowerCase().trim();
         const noteMatch = transaction.note.toLowerCase().includes(query);
-        const categoryMatch = transaction.category.name.toLowerCase().includes(query);
+        const categoryMatch = transaction.category?.name.toLowerCase().includes(query) ?? false;
         const accountMatch = transaction.account.name.toLowerCase().includes(query);
-        
+
         if (!noteMatch && !categoryMatch && !accountMatch) {
           return false;
         }

@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useMemo, useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
 import { ThemeColors } from '../../theme/colors';
+import { RADIUS } from '../../theme/tokens';
 import { TYPOGRAPHY } from '../../theme/typography';
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -122,7 +123,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     card: {
       alignSelf: 'stretch',
-      borderRadius: 22,
+      borderRadius: RADIUS.full,
       backgroundColor: Platform.OS === 'ios' ? colors.background + 'F2' : colors.background,
       borderWidth: 1,
       borderColor: colors.text + '18',
@@ -147,12 +148,12 @@ const createStyles = (colors: ThemeColors) =>
       marginBottom: 16,
     },
     optionsWrap: {
-      borderRadius: 16,
+      borderRadius: RADIUS.full,
       overflow: 'hidden',
     },
     optionRow: {
       height: 48,
-      borderRadius: 12,
+      borderRadius: 999,
       marginBottom: 8,
       backgroundColor: colors.surface,
       borderWidth: 1,
@@ -172,7 +173,7 @@ const createStyles = (colors: ThemeColors) =>
     optionIconWrap: {
       width: 26,
       height: 26,
-      borderRadius: 13,
+      borderRadius: 999,
       backgroundColor: colors.background + 'CC',
       justifyContent: 'center',
       alignItems: 'center',
@@ -196,7 +197,7 @@ const createStyles = (colors: ThemeColors) =>
     closeButton: {
       marginTop: 8,
       height: 44,
-      borderRadius: 12,
+      borderRadius: 999,
       borderWidth: 1,
       borderColor: colors.primary + '22',
       backgroundColor: colors.surface,

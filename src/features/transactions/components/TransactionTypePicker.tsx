@@ -2,39 +2,60 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ThemeColors } from '../../../theme/colors';
 import { TYPOGRAPHY } from '../../../theme/typography';
+import { TransactionType } from '../../../types';
 
 type Props = {
-  value: 'CR' | 'DR';
-  onChange: (value: 'CR' | 'DR') => void;
+  value: TransactionType;
+  onChange: (value: TransactionType) => void;
   colors: ThemeColors;
+  disabled?: boolean;
 };
 
-export const TransactionTypePicker = ({ value, onChange, colors }: Props) => {
+const TYPE_CONFIG: Record<TransactionType, { label: string; colorKey: keyof ThemeColors }> = {
+  DR: { label: 'Expense', colorKey: 'danger' },
+  CR: { label: 'Income', colorKey: 'success' },
+  TRANSFER: { label: 'Transfer', colorKey: 'primary' },
+};
+
+export const TransactionTypePicker = ({ value, onChange, colors, disabled }: Props) => {
+  if (disabled) {
+    // Show only the selected type as a static display
+    const config = TYPE_CONFIG[value];
+    const activeColor = colors[config.colorKey];
+
+    return (
+      <View style={styles.container}>
+        <View style={[styles.pill, { backgroundColor: activeColor, borderColor: activeColor }]}>
+          <Text style={[styles.pillText, { color: colors.background }]}>{config.label}</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={[
-          styles.pill,
-          { backgroundColor: colors.surface, borderColor: colors.border },
-          value === 'DR' && { backgroundColor: colors.danger, borderColor: colors.danger },
-        ]}
-        onPress={() => onChange('DR')}
-        activeOpacity={0.8}
-      >
-        <Text style={[styles.pillText, { color: value === 'DR' ? colors.background : colors.textMuted }]}>Expense</Text>
-      </TouchableOpacity>
+      {(Object.keys(TYPE_CONFIG) as TransactionType[]).map((type) => {
+        const config = TYPE_CONFIG[type];
+        const isSelected = value === type;
+        const activeColor = colors[config.colorKey];
 
-      <TouchableOpacity
-        style={[
-          styles.pill,
-          { backgroundColor: colors.surface, borderColor: colors.border },
-          value === 'CR' && { backgroundColor: colors.success, borderColor: colors.success },
-        ]}
-        onPress={() => onChange('CR')}
-        activeOpacity={0.8}
-      >
-        <Text style={[styles.pillText, { color: value === 'CR' ? colors.background : colors.textMuted }]}>Income</Text>
-      </TouchableOpacity>
+        return (
+          <TouchableOpacity
+            key={type}
+            style={[
+              styles.pill,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              isSelected && { backgroundColor: activeColor, borderColor: activeColor },
+            ]}
+            onPress={() => onChange(type)}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.pillText, { color: isSelected ? colors.background : colors.textMuted }]}>
+              {config.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };
@@ -50,7 +71,7 @@ const styles = StyleSheet.create({
   pill: {
     paddingHorizontal: 16,
     height: 36,
-    borderRadius: 18,
+    borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,

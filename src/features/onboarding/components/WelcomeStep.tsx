@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../../../providers/ThemeProvider';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 
 interface WelcomeStepProps {
@@ -118,14 +119,14 @@ const createStyles = (colors: { [key: string]: string }) =>
       marginTop: 24,
       padding: 16,
       backgroundColor: colors.surface,
-      borderRadius: 16,
+      borderRadius: RADIUS.xl,
       borderWidth: 1,
       borderColor: colors.border,
     },
     importIconBox: {
       width: 40,
       height: 40,
-      borderRadius: 12,
+      borderRadius: RADIUS.md,
       backgroundColor: colors.primary + '15',
       alignItems: 'center',
       justifyContent: 'center',

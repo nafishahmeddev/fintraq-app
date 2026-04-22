@@ -2,6 +2,8 @@
 
 A React Native financial tracker built with Expo, following an "Editorial Brutalist" design system.
 
+**For roadmap and feature status, see `docs/roadmap.md`.**
+
 ## Quick Commands
 
 ```bash
@@ -22,13 +24,17 @@ npm run lint           # ESLint via expo config
 
 **Stack**: React Native 0.81 + Expo 54 + Expo Router 6 + TypeScript (strict)
 **Data**: SQLite local-first via `expo-sqlite`, Drizzle ORM, React Query for async state
-**Routing**: File-based in `/app` - `(main)` has tab nav, `(onboarding)` flow, `premium.tsx` standalone
+**Routing**: File-based in `/app` - `(main)` has tab nav, `(onboarding)` flow, `premium.tsx` standalone, `account/` and `category/` for form pages
 
 ### Directory Ownership
 
 - `app/` - Expo Router screens and layouts
-- `src/features/{domain}/` - Domain-driven modules (dashboard, transactions, accounts, categories, insights, reports, **backup**, **export**, **filters**, **search**)
-- `src/components/ui/` - Universal components: `PremiumGuard`, `MoneyText`, `TransactionRow`, `KPICard`, etc.
+  - `account/create.tsx` - Create account page
+  - `account/edit/[id].tsx` - Edit account page
+  - `category/create.tsx` - Create category page
+  - `category/edit/[id].tsx` - Edit category page
+- `src/features/{domain}/` - Domain-driven modules (dashboard, transactions, accounts, categories, insights, reports, backup, export, filters, search)
+- `src/components/ui/` - Universal components: `PremiumGuard`, `MoneyText`, `TransactionRow`, `KPICard`, `IconPickerDialog`, etc.
 - `src/providers/` - Context providers: `ThemeProvider`, `PremiumProvider`, `QueryProvider`, `DatabaseProvider`
 - `src/theme/` - Design tokens: `colors.ts`, `typography.ts`, `tokens.ts`
 - `src/db/` - Schema and migrations (Drizzle config at root)
@@ -73,6 +79,13 @@ From `CLAUDE.md` - **cross-reference before UI changes**:
 ### 5. Path Alias
 
 Use `@/` prefix for imports: `import { useTheme } from '@/src/providers/ThemeProvider'`
+
+### 6. Form Pages Pattern
+
+Account and Category forms are now **page-based** (not modals):
+- Navigate with `router.push('/account/create')` or `router.push('/category/create')`
+- Edit pages use `[id]` dynamic route: `router.push(`/account/edit/${id}`)`
+- Icon selection uses `IconPickerDialog` component with grouped icons
 
 ## Design System
 
@@ -257,73 +270,64 @@ const contextValue = useMemo(() => ({
 
 ## Current Phase
 
-**Phase 5 (Done)**: Power Features - Backup/Restore, CSV Export, Advanced Filters, Global Search.
-**Phase 6 (Next)**: Polish & Growth - App Store optimisation, onboarding improvements, widget support.
+**Phase 6 (Done)**: Core Enhancements - Account Types, Transfer Transactions, Page-based Forms.
 
-### Phase 5 Features (All Shipped — Premium-gated)
+**Phase 7 (Next)**: Recurring & Budgeting (Freemium).
 
-1. **Backup & Restore** (`src/features/backup/`)
-   - Full JSON backup: accounts, transactions, categories, settings
-   - Cross-platform export: Android (SAF folder picker), iOS (Share sheet)
-   - Located in: Settings > Data > Backup & Restore
+**See `docs/roadmap.md` for full feature roadmap and phase details.**
 
-2. **CSV Export** (`src/features/export/`)
-   - Transaction export to CSV for spreadsheets/accounting
-   - Filters: Date range, accounts, categories, types
-   - Located in: Settings > Data > Export CSV
+## Key Patterns
 
-3. **Advanced Filters** (`src/features/filters/`)
-   - Multi-select: Accounts, Categories, Income/Expense types
-   - Date range, amount range (min/max), full-text search, sort options
-   - Hybrid filtering strategy (server + client-side)
-   - Located in: Transactions screen > Filter button
-
-4. **Global Search** (`src/features/search/`)
-   - Cross-entity full-text search: transactions, accounts, categories
-   - Premium-gated at route level with full-screen upsell gate (`app/search.tsx`)
-   - Deep-links: account result → filtered transactions, category result → filtered transactions
-   - Located in: Dashboard header search icon / Transactions header search icon
-
-### Key Patterns
-
-**Advanced Filters Architecture:**
+### Transfer Transaction Handling
 ```typescript
-AdvancedFilterService.toBasicFilters(advancedFilters)
-AdvancedFilterService.requiresClientSideFiltering(filters)
-AdvancedFilterService.countActiveFilters(filters)
-
-const { transactions, totalCount } = useAdvancedFilters(advancedFilters);
+// Transfer affects two accounts, no income/expense impact
+if (data.type === 'TRANSFER') {
+  await tx.update(accounts).set({ 
+    balance: sql`${accounts.balance} - ${data.amount}`,
+  }).where(eq(accounts.id, data.accountId));
+  
+  await tx.update(accounts).set({ 
+    balance: sql`${accounts.balance} + ${data.amount}`,
+  }).where(eq(accounts.id, data.toAccountId));
+}
 ```
 
-**Search Architecture:**
+### Icon Picker Usage
 ```typescript
-// Query
-const { data, isFetching } = useGlobalSearch(rawQuery); // 300ms debounce, min 2 chars
+import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
 
-// Deep-link into filtered transactions
-router.push(`/transactions?accountId=${id}`);
-router.push(`/transactions?categoryId=${id}`);
+<IconPickerDialog
+  visible={showIconPicker}
+  onClose={() => setShowIconPicker(false)}
+  selectedIcon={iconKey}
+  onSelect={setIconKey}
+  title="Select Icon"
+/>
 ```
 
-**Premium Route Gating Pattern:**
+### Navigation to Form Pages
 ```typescript
-// app/some-pro-feature.tsx
+router.push('/account/create');
+router.push(`/account/edit/${accountId}`);
+router.push('/category/create');
+router.push(`/category/edit/${categoryId}`);
+```
+
+### Premium Route Gating
+```typescript
 export default function Route() {
   const { isPremium } = usePremium();
   return isPremium ? <FeatureScreen /> : <ProGateScreen />;
 }
 ```
 
-**File Export Pattern:**
-- Android: `expo-file-system/legacy` StorageAccessFramework
-- iOS: `expo-sharing` with cache file
-
 ## No Test Suite
 
 This project has no automated tests. All verification is manual via the dev server.
 
-## Reference
+## References
 
 - Detailed architecture: `CLAUDE.md`
-- Database schema: `src/db/schema.ts` (accounts, categories, payments tables with relations)
+- Feature roadmap: `docs/roadmap.md`
+- Database schema: `src/db/schema.ts`
 - Drizzle config: `drizzle.config.ts`

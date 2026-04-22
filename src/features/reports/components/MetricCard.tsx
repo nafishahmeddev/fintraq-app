@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { MoneyText } from '../../../components/ui/MoneyText';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 
 import { TrendMode } from '../../../types';
@@ -82,7 +83,7 @@ export const MetricCard = React.memo(function MetricCard({
 const createStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     padding: 16,
-    borderRadius: 20,
+    borderRadius: RADIUS.xl,
     backgroundColor: colors.surface + '80',
     borderWidth: 1,
     borderColor: colors.border, 

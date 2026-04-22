@@ -67,29 +67,21 @@
 
 ---
 
-## 🔧 Phase 6 — Core Enhancements
-
-### Unified Stats System
-- [ ] Merge weekly/monthly reports into single flexible stats engine
-- [ ] Configurable periods: daily, weekly, monthly, quarterly, yearly, custom
-- [ ] Same underlying data - no duplication, period-agnostic queries
-- [ ] Comparative analysis across any two periods
-- [ ] Trend detection and visualization
+## 🔧 Phase 6 — Core Enhancements (Completed)
 
 ### Transfer Transaction Type
-- [ ] Add "transfer" as first-class transaction type (income/expense/transfer)
-- [ ] Source and destination account linking
-- [ ] Transfers only allowed between accounts with same currency
-- [ ] Transfer-specific category handling (optional / system categories)
-- [ ] Exclude from income/expense totals (optional setting)
-- [ ] Transfer fees handling (split transaction support)
+- [x] Add "transfer" as first-class transaction type (income/expense/transfer)
+- [x] Source and destination account linking
+- [x] Transfers only allowed between accounts with same currency
+- [x] Transfer-specific category handling (optional / system categories)
+- [x] Exclude from income/expense totals (no income/expense impact)
 
 ### Account Types
-- [ ] Add account type field: cash, card, savings, investment, loan, other
-- [ ] Account number field (optional) - for card/bank accounts
-- [ ] Type-specific icons and visual indicators
-- [ ] Filter accounts by type
-- [ ] Type-based insights (cash vs card spending)
+- [x] Add account type field: cash, card, savings, investment, loan, other
+- [x] Account number field (optional) - for card/bank accounts
+- [x] Type-specific icons and visual indicators
+- [x] Filter accounts by type
+- [x] Type-based insights (cash vs card spending)
 
 ---
 
@@ -190,6 +182,26 @@
 - [ ] Location-based insights ("You spend most at...")
 - [ ] **Free tier**: Up to 5 saved places, basic location tag
 - [ ] **Premium**: Unlimited places + map view + insights
+
+---
+
+## 📊 Phase 11 — Analytics & Reporting (Premium)
+
+### Unified Stats System
+- [ ] Merge weekly/monthly reports into single flexible stats engine
+- [ ] Configurable periods: daily, weekly, monthly, quarterly, yearly, custom
+- [ ] Same underlying data - no duplication, period-agnostic queries
+- [ ] Comparative analysis across any two periods
+- [ ] Trend detection and visualization
+
+### Advanced Reporting
+- [ ] PDF report generation
+- [ ] Custom report builder
+- [ ] Scheduled reports (weekly/monthly email)
+- [ ] Data export with visual charts
+- [ ] Cross-account analytics
+- [ ] Category trend analysis
+- [ ] **Premium**: Full reporting suite
 
 ---
 

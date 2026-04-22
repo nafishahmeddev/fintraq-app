@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
+import { RADIUS } from '../../theme/tokens';
 import { TYPOGRAPHY } from '../../theme/typography';
 import { ThemeColors } from '../../theme/colors';
 import { Ionicons } from '@expo/vector-icons';
@@ -108,7 +109,7 @@ const createStyles = (colors: ThemeColors, isDark: boolean, width: number) =>
     content: {
       width: Math.min(width - 48, 340),
       backgroundColor: colors.background,
-      borderRadius: 22,
+      borderRadius: RADIUS.full,
       borderWidth: 1,
       borderColor: colors.border,
       padding: 24,
@@ -123,7 +124,7 @@ const createStyles = (colors: ThemeColors, isDark: boolean, width: number) =>
     iconContainer: {
       width: 48,
       height: 48,
-      borderRadius: 16,
+      borderRadius: RADIUS.full,
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -149,7 +150,7 @@ const createStyles = (colors: ThemeColors, isDark: boolean, width: number) =>
     },
     button: {
       height: 56,
-      borderRadius: 20,
+      borderRadius: RADIUS.full,
       justifyContent: 'center',
       alignItems: 'center',
     },

@@ -15,6 +15,14 @@ export const useAccounts = () => {
   });
 };
 
+export const useAccountById = (id: number | null) => {
+  return useQuery({
+    queryKey: ACCOUNTS_KEYS.detail(id ?? 0),
+    queryFn: () => (id ? api.getAccountById(id) : Promise.resolve(null)),
+    enabled: !!id,
+  });
+};
+
 export const useCreateAccount = () => {
   const queryClient = useQueryClient();
   return useMutation({

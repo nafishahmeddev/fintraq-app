@@ -35,8 +35,6 @@ export type SpacingToken = keyof typeof SPACING;
 
 // ============================================
 // BORDER RADIUS SCALE
-// Editorial Brutalist: 12px-20px for most elements
-// Avoid 999px pill shapes except for micro-badges
 // ============================================
 export const RADIUS = {
   'none': 0,
@@ -46,7 +44,8 @@ export const RADIUS = {
   'lg': 16,
   'xl': 20,
   '2xl': 24,
-  'full': 999, // Use sparingly - only for micro-badges
+  '3xl': 28,
+  'full': 999,
 } as const;
 
 export type RadiusToken = keyof typeof RADIUS;
@@ -84,53 +83,53 @@ export const COMPONENT_SIZES = {
     sm: {
       height: 36,
       paddingHorizontal: SPACING['3'],
-      borderRadius: RADIUS.md,
+      borderRadius: RADIUS.full,
       fontSize: 14,
     },
     md: {
       height: 48,
       paddingHorizontal: SPACING['4'],
-      borderRadius: RADIUS.lg,
+      borderRadius: RADIUS.full,
       fontSize: 16,
     },
     lg: {
       height: 56,
       paddingHorizontal: SPACING['5'],
-      borderRadius: RADIUS.xl,
+      borderRadius: RADIUS.full,
       fontSize: 16,
     },
   },
-  
+
   input: {
     sm: {
       height: 40,
       paddingHorizontal: SPACING['3'],
-      borderRadius: RADIUS.md,
+      borderRadius: RADIUS.full,
     },
     md: {
       height: 56,
       paddingHorizontal: SPACING['4'],
-      borderRadius: RADIUS.lg,
+      borderRadius: RADIUS.full,
     },
     lg: {
       height: 64,
       paddingHorizontal: SPACING['4'],
-      borderRadius: RADIUS.xl,
+      borderRadius: RADIUS.full,
     },
   },
-  
+
   card: {
     sm: {
       padding: SPACING['3'],
-      borderRadius: RADIUS.lg,
+      borderRadius: RADIUS.xl,
     },
     md: {
       padding: SPACING['4'],
-      borderRadius: RADIUS.xl,
+      borderRadius: RADIUS['2xl'],
     },
     lg: {
       padding: SPACING['5'],
-      borderRadius: RADIUS['2xl'],
+      borderRadius: RADIUS['3xl'],
     },
   },
   

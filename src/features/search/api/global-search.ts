@@ -1,33 +1,9 @@
-import { desc, eq, like, or } from 'drizzle-orm';
+import { desc, eq, inArray, like, or } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { accounts, categories, payments } from '@/src/db/schema';
 import type { Account } from '@/src/features/accounts/api/accounts';
 import type { Category } from '@/src/features/categories/api/categories';
 import type { TransactionListItem } from '@/src/features/transactions/api/transactions';
-
-const TRANSACTION_SELECT = {
-  id: payments.id,
-  accountId: payments.accountId,
-  categoryId: payments.categoryId,
-  amount: payments.amount,
-  type: payments.type,
-  datetime: payments.datetime,
-  note: payments.note,
-  account: {
-    id: accounts.id,
-    name: accounts.name,
-    currency: accounts.currency,
-    color: accounts.color,
-  },
-  category: {
-    id: categories.id,
-    name: categories.name,
-    icon: categories.icon,
-    color: categories.color,
-  },
-  createdAt: payments.createdAt,
-  updatedAt: payments.updatedAt,
-} as const;
 
 export interface GlobalSearchResults {
   query: string;
@@ -41,11 +17,36 @@ const searchTransactions = async (
   limit = 12,
 ): Promise<TransactionListItem[]> => {
   const q = `%${query}%`;
-  return db
-    .select(TRANSACTION_SELECT)
+
+  // LEFT JOIN categories so category name is searchable and available without a second query
+  const rows = await db
+    .select({
+      id: payments.id,
+      accountId: payments.accountId,
+      toAccountId: payments.toAccountId,
+      categoryId: payments.categoryId,
+      amount: payments.amount,
+      type: payments.type,
+      datetime: payments.datetime,
+      note: payments.note,
+      createdAt: payments.createdAt,
+      updatedAt: payments.updatedAt,
+      account: {
+        id: accounts.id,
+        name: accounts.name,
+        currency: accounts.currency,
+        color: accounts.color,
+      },
+      category: {
+        id: categories.id,
+        name: categories.name,
+        icon: categories.icon,
+        color: categories.color,
+      },
+    })
     .from(payments)
     .innerJoin(accounts, eq(payments.accountId, accounts.id))
-    .innerJoin(categories, eq(payments.categoryId, categories.id))
+    .leftJoin(categories, eq(payments.categoryId, categories.id))
     .where(
       or(
         like(payments.note, q),
@@ -55,6 +56,25 @@ const searchTransactions = async (
     )
     .orderBy(desc(payments.datetime))
     .limit(limit);
+
+  // Batch fetch toAccounts (transfers only) to avoid N+1
+  const toAccountIds = [...new Set(rows.map(r => r.toAccountId).filter(Boolean))];
+  const toAccountsResult = toAccountIds.length > 0
+    ? await db.select({
+        id: accounts.id,
+        name: accounts.name,
+        currency: accounts.currency,
+        color: accounts.color,
+      }).from(accounts).where(inArray(accounts.id, toAccountIds as number[]))
+    : [];
+
+  const toAccountMap = new Map(toAccountsResult.map(a => [a.id, a]));
+
+  return rows.map(row => ({
+    ...row,
+    toAccount: row.toAccountId ? toAccountMap.get(row.toAccountId) ?? null : null,
+    category: row.category?.id ? row.category : null,
+  }));
 };
 
 const searchAccounts = async (query: string): Promise<Account[]> => {

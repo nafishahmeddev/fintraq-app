@@ -19,6 +19,7 @@ import { OptionsDialog } from '@/src/components/ui/OptionsDialog';
 import { PremiumGuard } from '@/src/components/ui/PremiumGuard';
 import { useTheme } from '@/src/providers/ThemeProvider';
 import { ThemeColors } from '@/src/theme/colors';
+import { RADIUS } from '@/src/theme/tokens';
 import { TYPOGRAPHY } from '@/src/theme/typography';
 import { CsvExportService, ExportDateRange } from '../api/csv-export.service';
 import { useAccounts } from '@/src/features/accounts/hooks/accounts';
@@ -411,7 +412,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     heroCard: {
       backgroundColor: colors.surface,
-      borderRadius: 20,
+      borderRadius: RADIUS.xl,
       padding: 24,
       alignItems: 'center',
       marginBottom: 32,
@@ -419,7 +420,7 @@ const createStyles = (colors: ThemeColors) =>
     heroIconContainer: {
       width: 64,
       height: 64,
-      borderRadius: 32,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.primary + '15',
       alignItems: 'center',
       justifyContent: 'center',
@@ -451,7 +452,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     card: {
       backgroundColor: colors.surface,
-      borderRadius: 20,
+      borderRadius: RADIUS.xl,
       overflow: 'hidden',
     },
     presetRow: {
@@ -505,7 +506,7 @@ const createStyles = (colors: ThemeColors) =>
     dateButton: {
       flex: 1,
       backgroundColor: colors.surface,
-      borderRadius: 12,
+      borderRadius: RADIUS.md,
       padding: 12,
       borderWidth: 1,
       borderColor: colors.border,
@@ -544,7 +545,7 @@ const createStyles = (colors: ThemeColors) =>
     filterIconBox: {
       width: 36,
       height: 36,
-      borderRadius: 10,
+      borderRadius: RADIUS.md,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -561,7 +562,7 @@ const createStyles = (colors: ThemeColors) =>
       flex: 1,
       paddingVertical: 12,
       paddingHorizontal: 8,
-      borderRadius: 12,
+      borderRadius: RADIUS.md,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -574,7 +575,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     summaryCard: {
       backgroundColor: colors.surface,
-      borderRadius: 16,
+      borderRadius: RADIUS.lg,
       padding: 16,
       marginBottom: 20,
       gap: 12,
@@ -605,7 +606,7 @@ const createStyles = (colors: ThemeColors) =>
       justifyContent: 'center',
       gap: 10,
       height: 56,
-      borderRadius: 16,
+      borderRadius: RADIUS.lg,
       backgroundColor: colors.text,
       marginBottom: 16,
     },
@@ -619,7 +620,7 @@ const createStyles = (colors: ThemeColors) =>
       alignItems: 'flex-start',
       gap: 12,
       backgroundColor: (colors.warning || '#F59E0B') + '10',
-      borderRadius: 12,
+      borderRadius: RADIUS.md,
       padding: 12,
     },
     warningText: {

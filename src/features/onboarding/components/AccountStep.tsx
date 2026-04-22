@@ -4,26 +4,50 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { CurrencyPickerModal } from '../../../components/ui/CurrencyPickerModal';
 import { ACCOUNT_COLORS, ACCOUNT_ICONS } from '../../../constants/picker';
+import { ACCOUNT_TYPES, AccountType } from '../../../db/schema';
 import { useTheme } from '../../../providers/ThemeProvider';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { OnboardingFormValues } from '../types';
+
+const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
+  cash: 'Cash',
+  card: 'Card',
+  savings: 'Savings',
+  investment: 'Investment',
+  loan: 'Loan',
+  other: 'Other',
+};
+
+const ACCOUNT_TYPE_ICONS: Record<AccountType, string> = {
+  cash: 'cash-outline',
+  card: 'card-outline',
+  savings: 'save-outline',
+  investment: 'trending-up-outline',
+  loan: 'receipt-outline',
+  other: 'folder-outline',
+};
 
 type AccountStepProps = {
   accountCurrency: string;
   accountIcon: string;
   accountColor: string;
+  accountType: AccountType;
   onCurrencyChange: (value: string) => void;
   onIconChange: (value: string) => void;
   onColorChange: (value: string) => void;
+  onTypeChange: (value: AccountType) => void;
 };
 
 export function AccountStep({
   accountCurrency,
   accountIcon,
   accountColor,
+  accountType,
   onCurrencyChange,
   onIconChange,
   onColorChange,
+  onTypeChange,
 }: AccountStepProps) {
   const { colors } = useTheme();
   const styles = React.useMemo(() => createStyles(colors), [colors]);
@@ -98,13 +122,12 @@ export function AccountStep({
         <View style={[styles.answerLine, errors.accountHolder && styles.answerLineError]} />
       </View>
 
-      {/* Q3 — account number */}
+      {/* Q3 — account number (optional) */}
       <View style={styles.qaBlock}>
-        <Text style={styles.question}>Account number or identifier?</Text>
+        <Text style={styles.question}>Account number or identifier? <Text style={styles.questionHint}>(optional)</Text></Text>
         <Controller
           control={control}
           name="accountNumber"
-          rules={{ required: true }}
           render={({ field }) => (
             <TextInput
               value={field.value}
@@ -119,7 +142,37 @@ export function AccountStep({
             />
           )}
         />
-        <View style={[styles.answerLine, errors.accountNumber && styles.answerLineError]} />
+        <View style={styles.answerLine} />
+      </View>
+
+      {/* Q3.5 — account type */}
+      <View style={styles.qaBlock}>
+        <Text style={styles.question}>Account type</Text>
+        <View style={styles.typeGrid}>
+          {ACCOUNT_TYPES.map((type) => {
+            const selected = accountType === type;
+            return (
+              <TouchableOpacity
+                key={type}
+                style={[
+                  styles.typeChip,
+                  selected && { backgroundColor: accountColor, borderColor: accountColor },
+                ]}
+                onPress={() => onTypeChange(type)}
+                activeOpacity={0.9}
+              >
+                <Ionicons
+                  name={ACCOUNT_TYPE_ICONS[type] as React.ComponentProps<typeof Ionicons>['name']}
+                  size={14}
+                  color={selected ? '#000100' : colors.text}
+                />
+                <Text style={[styles.typeLabel, { color: selected ? '#000100' : colors.text }]}>
+                  {ACCOUNT_TYPE_LABELS[type]}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
 
       {/* Q4 — opening balance */}
@@ -206,7 +259,7 @@ const createStyles = (colors: { [key: string]: string }) =>
     previewCard: {
       marginBottom: 28,
       minHeight: 78,
-      borderRadius: 20,
+      borderRadius: RADIUS.xl,
       padding: 14,
       backgroundColor: colors.surface,
       borderWidth: 1,
@@ -216,7 +269,7 @@ const createStyles = (colors: { [key: string]: string }) =>
     previewIconWrap: {
       width: 44,
       height: 44,
-      borderRadius: 22,
+      borderRadius: RADIUS.md,
       alignItems: 'center',
       justifyContent: 'center',
       marginRight: 12,
@@ -310,7 +363,7 @@ const createStyles = (colors: { [key: string]: string }) =>
     iconChip: {
       width: 46,
       height: 46,
-      borderRadius: 23,
+      borderRadius: RADIUS.md,
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: colors.background + 'B8',
@@ -325,7 +378,7 @@ const createStyles = (colors: { [key: string]: string }) =>
     colorChip: {
       width: 34,
       height: 34,
-      borderRadius: 17,
+      borderRadius: RADIUS.md,
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 2,
@@ -334,5 +387,25 @@ const createStyles = (colors: { [key: string]: string }) =>
     colorChipActive: {
       borderColor: colors.text,
       transform: [{ scale: 1.08 }],
+    },
+    typeGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    typeChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: colors.text + '10',
+      backgroundColor: colors.background + 'B8',
+    },
+    typeLabel: {
+      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontSize: 12,
     },
   });

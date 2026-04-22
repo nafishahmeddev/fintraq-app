@@ -15,6 +15,14 @@ export const useCategories = () => {
   });
 };
 
+export const useCategoryById = (id: number | null) => {
+  return useQuery({
+    queryKey: CATEGORIES_KEYS.detail(id ?? 0),
+    queryFn: () => (id ? api.getCategoryById(id) : Promise.resolve(null)),
+    enabled: !!id,
+  });
+};
+
 export const useCreateCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({

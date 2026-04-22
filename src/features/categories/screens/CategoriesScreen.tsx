@@ -6,6 +6,7 @@ import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Header } from '../../../components/ui/Header';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
+import { CategoryType } from '../../../db/schema';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
 import { TYPOGRAPHY } from '../../../theme/typography';
@@ -13,6 +14,7 @@ import { Category } from '../api/categories';
 import { CategoryCard } from '../components/CategoryCard';
 import { CategoryFormModal } from '../components/CategoryFormModal';
 import { CategoryTypeSelector } from '../components/CategoryTypeSelector';
+import { RADIUS } from '../../../theme/tokens';
 import { useCategories, useDeleteCategory } from '../hooks/categories';
 
 export const CategoriesScreen = () => {
@@ -23,7 +25,7 @@ export const CategoriesScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [activeType, setActiveType] = useState<'CR' | 'DR'>('DR');
+  const [activeType, setActiveType] = useState<CategoryType>('DR');
   const [query, setQuery] = useState('');
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -139,7 +141,9 @@ export const CategoriesScreen = () => {
               <View style={styles.emptyContainer}>
                 <Ionicons name="sparkles-outline" size={22} color={colors.textMuted} />
                 <Text style={styles.emptyTitle}>Nothing here yet</Text>
-                <Text style={styles.emptyText}>No {activeType === 'DR' ? 'expense' : 'income'} categories match your current filter.</Text>
+                <Text style={styles.emptyText}>
+                  No {activeType === 'DR' ? 'expense' : activeType === 'CR' ? 'income' : 'transfer'} categories match your current filter.
+                </Text>
                 <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate}>
                   <Text style={styles.emptyBtnText}>Create category</Text>
                 </TouchableOpacity>
@@ -201,7 +205,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
 
   searchWrap: {
     height: 42,
-    borderRadius: 13,
+    borderRadius: RADIUS.full,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.background + 'B8',
@@ -258,7 +262,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
 
   emptyBtn: {
     height: 38,
-    borderRadius: 999,
+    borderRadius: RADIUS.full,
     paddingHorizontal: 14,
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -278,7 +282,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     right: 24,
     width: 64, // Normalized size
     height: 64,
-    borderRadius: 32,
+    borderRadius: RADIUS.full,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',

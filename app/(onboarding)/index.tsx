@@ -17,6 +17,7 @@ import { Button } from '../../src/components/ui/Button';
 import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
 import { ACCOUNT_COLORS, ACCOUNT_ICONS } from '../../src/constants/picker';
 import { useCreateAccount } from '../../src/features/accounts/hooks/accounts';
+import { AccountType } from '../../src/db/schema';
 import { useCreateCategory } from '../../src/features/categories/hooks/categories';
 import { AccountStep } from '../../src/features/onboarding/components/AccountStep';
 import { ProfileStep } from '../../src/features/onboarding/components/ProfileStep';
@@ -50,6 +51,7 @@ export default function OnboardingScreen() {
   const [accountCurrency, setAccountCurrency] = React.useState<string>(() => getDeviceCurrencyCode());
   const [accountIcon, setAccountIcon] = React.useState<string>(ACCOUNT_ICONS[0]);
   const [accountColor, setAccountColor] = React.useState<string>(ACCOUNT_COLORS[0]);
+  const [accountType, setAccountType] = React.useState<AccountType>('cash');
 
   // Import from backup state
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
@@ -74,6 +76,7 @@ export default function OnboardingScreen() {
       accountName: '',
       accountHolder: '',
       accountNumber: '',
+      accountType: 'cash',
       openingBalance: '0',
     },
   });
@@ -167,7 +170,7 @@ export default function OnboardingScreen() {
       return trigger('name');
     }
     if (currentStep.id === 'account') {
-      return trigger(['accountName', 'accountHolder', 'accountNumber', 'openingBalance']);
+      return trigger(['accountName', 'accountHolder', 'openingBalance']);
     }
     return true;
   };
@@ -254,7 +257,8 @@ export default function OnboardingScreen() {
       await createAccount({
         name: values.accountName.trim(),
         holderName: values.accountHolder.trim(),
-        accountNumber: values.accountNumber.trim(),
+        accountNumber: values.accountNumber.trim() || null,
+        type: accountType,
         icon: accountIcon.replace('-outline', ''),
         color: toDbColor(accountColor),
         isDefault: true,
@@ -297,9 +301,11 @@ export default function OnboardingScreen() {
             accountCurrency={accountCurrency}
             accountIcon={accountIcon}
             accountColor={accountColor}
+            accountType={accountType}
             onCurrencyChange={setAccountCurrency}
             onIconChange={setAccountIcon}
             onColorChange={setAccountColor}
+            onTypeChange={setAccountType}
           />
         );
       default:

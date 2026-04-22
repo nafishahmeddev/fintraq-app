@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../../providers/ThemeProvider';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { formatCurrency } from '../../../utils/format';
 import { DashboardInsight } from '../api/insights';
@@ -66,8 +67,6 @@ export const InsightCard = React.memo(function InsightCard({ insight }: InsightC
           )}
         </View>
       </View>
-
-      <View style={[styles.accentLine, { backgroundColor: status.text }]} />
     </View>
   );
 });
@@ -76,7 +75,7 @@ const styles = StyleSheet.create({
   card: {
     width: 210,
     minHeight: 115,
-    borderRadius: 22,
+    borderRadius: RADIUS.xl,
     borderWidth: 1,
     padding: 14,
     marginRight: 10,
@@ -92,7 +91,7 @@ const styles = StyleSheet.create({
   iconBox: {
     width: 28,
     height: 28,
-    borderRadius: 10,
+    borderRadius: RADIUS.md,
     justifyContent: 'center',
     alignItems: 'center',
   },

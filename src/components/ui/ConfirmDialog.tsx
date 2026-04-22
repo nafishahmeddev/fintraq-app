@@ -2,6 +2,7 @@ import React, { useMemo, useCallback } from 'react';
 import { ActivityIndicator, Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
 import { ThemeColors } from '../../theme/colors';
+import { RADIUS } from '../../theme/tokens';
 import { TYPOGRAPHY } from '../../theme/typography';
 
 type ConfirmDialogProps = {
@@ -86,7 +87,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     card: {
       alignSelf: 'stretch',
-      borderRadius: 22,
+      borderRadius: RADIUS.full,
       backgroundColor: Platform.OS === 'ios' ? colors.background + 'F2' : colors.background,
       borderWidth: 1,
       borderColor: colors.text + '18',
@@ -118,7 +119,7 @@ const createStyles = (colors: ThemeColors) =>
     cancelButton: {
       flex: 1,
       height: 46,
-      borderRadius: 12,
+      borderRadius: 999,
       borderWidth: 1,
       borderColor: colors.primary + '22',
       backgroundColor: colors.surface,
@@ -133,7 +134,7 @@ const createStyles = (colors: ThemeColors) =>
     confirmButton: {
       flex: 1,
       height: 46,
-      borderRadius: 12,
+      borderRadius: 999,
       alignItems: 'center',
       justifyContent: 'center',
     },

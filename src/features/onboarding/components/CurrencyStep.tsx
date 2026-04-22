@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../../../providers/ThemeProvider';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { CURRENCIES } from '../../../constants/currency';
 
@@ -83,7 +84,7 @@ const createStyles = (colors: { [key: string]: string }) =>
       gap: 10,
     },
     chip: {
-      borderRadius: 999,
+      borderRadius: RADIUS.full,
       minHeight: 42,
       paddingHorizontal: 14,
       paddingVertical: 10,

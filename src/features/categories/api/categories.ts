@@ -9,6 +9,11 @@ export const getCategories = async (): Promise<Category[]> => {
   return await db.select().from(categories);
 };
 
+export const getCategoryById = async (id: number): Promise<Category | null> => {
+  const [category] = await db.select().from(categories).where(eq(categories.id, id)).limit(1);
+  return category ?? null;
+};
+
 export const createCategory = async (data: InsertCategory) => {
   const result = await db.insert(categories).values(data).returning();
   return result[0];

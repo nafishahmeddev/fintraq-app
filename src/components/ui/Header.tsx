@@ -1,11 +1,11 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useCallback } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
 import { ThemeColors } from '../../theme/colors';
 import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, radius, LAYOUT } from '../../theme/tokens';
+import { spacing, LAYOUT } from '../../theme/tokens';
+import { IconButton } from './IconButton';
 
 export type HeaderProps = {
   title: string;
@@ -17,15 +17,10 @@ export type HeaderProps = {
 /**
  * Header - Editorial Brutalist Design
  * 
- * Layout:
- * - Screen padding: 24px
- * - Top padding: 12px
- * - Bottom padding: 16px
- * - Gap between elements: 16px
- * 
- * Back button:
- * - Size: 44px (touch target)
- * - Radius: 12px (md)
+ * Consistent header with:
+ * - Back button: 36x36 pill-shaped (same as all action buttons)
+ * - Title and optional subtitle
+ * - Right action slot for custom buttons
  */
 export const Header = React.memo(function Header({ 
   title, 
@@ -45,17 +40,12 @@ export const Header = React.memo(function Header({
     <View style={styles.container}>
       <View style={styles.left}>
         {showBack && (
-          <TouchableOpacity 
-            onPress={handleBack} 
-            style={styles.backBtn} 
-            activeOpacity={0.75}
-          >
-            <Ionicons 
-              name="arrow-back" 
-              size={20} 
-              color={colors.text} 
-            />
-          </TouchableOpacity>
+          <IconButton
+            icon="arrow-back"
+            onPress={handleBack}
+            size="md"
+            variant="default"
+          />
         )}
         <View style={styles.titleBlock}>
           <Text style={styles.title} numberOfLines={1}>
@@ -94,16 +84,6 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
     gap: spacing('4'),
   },
-  backBtn: {
-    width: LAYOUT.minTouchTarget,
-    height: LAYOUT.minTouchTarget,
-    borderRadius: radius('md'),
-    backgroundColor: colors.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
   titleBlock: {
     flex: 1,
     justifyContent: 'center',
@@ -123,6 +103,8 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     marginTop: spacing('0.5'),
   },
   rightActionWrap: {
-    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing('2'),
   },
 });

@@ -18,11 +18,30 @@ import { CurrencyPickerModal } from '../../../components/ui/CurrencyPickerModal'
 import { ACCOUNT_COLORS, ACCOUNT_ICONS } from '../../../constants/picker';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { parseAmount, toDbColor } from '../../../utils/format';
-import { resolveIcon } from '../../../utils/icons';
-import { Account } from '../api/accounts';
+import { resolveIcon, IoniconName } from '../../../utils/icons';
+import { Account, AccountType, ACCOUNT_TYPES } from '../api/accounts';
 import { useCreateAccount, useUpdateAccount } from '../hooks/accounts';
+
+const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
+  cash: 'Cash',
+  card: 'Card',
+  savings: 'Savings',
+  investment: 'Investment',
+  loan: 'Loan',
+  other: 'Other',
+};
+
+const ACCOUNT_TYPE_ICONS: Record<AccountType, IoniconName> = {
+  cash: 'cash-outline',
+  card: 'card-outline',
+  savings: 'save-outline',
+  investment: 'trending-up-outline',
+  loan: 'receipt-outline',
+  other: 'folder-outline',
+};
 
 type AccountFormValues = {
   name: string;
@@ -51,6 +70,7 @@ export function AccountFormModal({ visible, onClose, account }: AccountFormModal
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
   const [colorHex, setColorHex] = useState<string>(ACCOUNT_COLORS[0]);
   const [iconKey, setIconKey] = useState<string>(ACCOUNT_ICONS[0]);
+  const [accountType, setAccountType] = useState<AccountType>('cash');
 
   const {
     control,
@@ -69,7 +89,7 @@ export function AccountFormModal({ visible, onClose, account }: AccountFormModal
       reset({
         name: account.name,
         holderName: account.holderName,
-        accountNumber: account.accountNumber,
+        accountNumber: account.accountNumber ?? '',
         balance: '',
       });
       setCurrency(account.currency);
@@ -77,6 +97,7 @@ export function AccountFormModal({ visible, onClose, account }: AccountFormModal
       // Re-attach '-outline' suffix so it matches the picker values
       const matchedIcon = ACCOUNT_ICONS.find((i) => i === `${account.icon}-outline`) ?? ACCOUNT_ICONS[0];
       setIconKey(matchedIcon);
+      setAccountType(account.type);
       return;
     }
 
@@ -87,10 +108,12 @@ export function AccountFormModal({ visible, onClose, account }: AccountFormModal
   }, [account, visible, reset]);
 
   const handleSave = handleSubmit(async (data) => {
+    const accountNum = data.accountNumber.trim();
     const payload = {
       name: data.name.trim(),
       holderName: data.holderName.trim(),
-      accountNumber: data.accountNumber.trim(),
+      accountNumber: accountNum || null,
+      type: accountType,
       balance: parseAmount(data.balance),
       currency,
       color: toDbColor(colorHex),
@@ -218,6 +241,36 @@ export function AccountFormModal({ visible, onClose, account }: AccountFormModal
               />
               <View style={styles.answerLine} />
 
+              <Text style={[styles.label, styles.labelSpaced]}>Account Type</Text>
+              <View style={styles.typeGrid}>
+                {ACCOUNT_TYPES.map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    activeOpacity={0.9}
+                    onPress={() => setAccountType(type)}
+                    style={[
+                      styles.typeCell,
+                      accountType === type && { backgroundColor: colorHex, borderColor: colorHex },
+                      accountType === type && styles.typeCellActive,
+                    ]}
+                  >
+                    <Ionicons
+                      name={ACCOUNT_TYPE_ICONS[type]}
+                      size={16}
+                      color={accountType === type ? '#000100' : colors.text}
+                    />
+                    <Text
+                      style={[
+                        styles.typeLabel,
+                        { color: accountType === type ? '#000100' : colors.text },
+                      ]}
+                    >
+                      {ACCOUNT_TYPE_LABELS[type]}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
               {!isEditing && (
                 <>
                   <Text style={[styles.label, styles.labelSpaced]}>Opening Balance</Text>
@@ -338,8 +391,8 @@ const createStyles = (colors: ThemeColors) =>
     },
     sheet: {
       height: '86%',
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
+      borderTopLeftRadius: RADIUS.full,
+      borderTopRightRadius: RADIUS.full,
       borderTopWidth: 1,
       borderColor: colors.border,
       overflow: 'hidden',
@@ -347,7 +400,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     glow: {
       position: 'absolute',
-      borderRadius: 999,
+      borderRadius: RADIUS.full,
     },
     handle: {
       alignSelf: 'center',
@@ -381,7 +434,7 @@ const createStyles = (colors: ThemeColors) =>
     closeBtn: {
       width: 38,
       height: 38,
-      borderRadius: 19,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -432,7 +485,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     answerLine: {
       height: 2,
-      borderRadius: 999,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.primary + '55',
       marginTop: 4,
     },
@@ -465,7 +518,7 @@ const createStyles = (colors: ThemeColors) =>
     colorCell: {
       width: 34,
       height: 34,
-      borderRadius: 17,
+      borderRadius: RADIUS.full,
       borderWidth: 2,
       borderColor: 'transparent',
       justifyContent: 'center',
@@ -478,7 +531,7 @@ const createStyles = (colors: ThemeColors) =>
     iconCell: {
       width: 46,
       height: 46,
-      borderRadius: 23,
+      borderRadius: RADIUS.full,
       borderWidth: 1,
       borderColor: colors.text + '10',
       backgroundColor: colors.background + 'B8',
@@ -486,6 +539,30 @@ const createStyles = (colors: ThemeColors) =>
       alignItems: 'center',
     },
     iconCellActive: {},
+    typeGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginTop: 8,
+    },
+    typeCell: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: RADIUS.full,
+      borderWidth: 1,
+      borderColor: colors.text + '10',
+      backgroundColor: colors.background + 'B8',
+    },
+    typeCellActive: {
+      borderColor: 'transparent',
+    },
+    typeLabel: {
+      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontSize: 12,
+    },
     footer: {
       paddingHorizontal: 24,
       paddingTop: 10,
@@ -496,7 +573,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     primaryBtn: {
       height: 56,
-      borderRadius: 16,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.primary,
       flexDirection: 'row',
       justifyContent: 'center',

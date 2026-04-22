@@ -19,6 +19,7 @@ import { Header } from '../../../components/ui/Header';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useCategories } from '../../categories/hooks/categories';
@@ -31,7 +32,6 @@ import { TransactionAmountInput } from '../components/TransactionAmountInput';
 import { TransactionTypePicker } from '../components/TransactionTypePicker';
 import { TransactionAccountPicker } from '../components/TransactionAccountPicker';
 import { TransactionCategoryPicker } from '../components/TransactionCategoryPicker';
-
 import { format } from 'date-fns';
 import { TransactionType } from '../../../types';
 
@@ -69,6 +69,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
 
   const [type, setType] = React.useState<TransactionType>('DR');
   const [selectedAccountId, setSelectedAccountId] = React.useState<number | null>(null);
+  const [selectedToAccountId, setSelectedToAccountId] = React.useState<number | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = React.useState<number | null>(null);
   const [transactionDateTime, setTransactionDateTime] = React.useState<Date>(() => new Date());
   const [showDatePicker, setShowDatePicker] = React.useState(false);
@@ -80,7 +81,8 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
     if (!isEditMode || !editingTransaction) return;
     setType(editingTransaction.type);
     setSelectedAccountId(editingTransaction.accountId);
-    setSelectedCategoryId(editingTransaction.categoryId);
+    setSelectedToAccountId(editingTransaction.toAccountId ?? null);
+    setSelectedCategoryId(editingTransaction.categoryId ?? null);
     setTransactionDateTime(new Date(editingTransaction.datetime));
     setAmountInput(String(editingTransaction.amount));
     setNote(editingTransaction.note ?? '');
@@ -90,6 +92,14 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
     () => categories.filter((category) => category.type === type),
     [categories, type]
   );
+
+  // Reset toAccount when switching away from transfer
+  React.useEffect(() => {
+    if (type !== 'TRANSFER') {
+      setSelectedToAccountId(null);
+    }
+  }, [type]);
+
 
   React.useEffect(() => {
     if (accounts.length === 0) {
@@ -108,19 +118,44 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
       return;
     }
     if (selectedCategoryId === null || !filteredCategories.some((category) => category.id === selectedCategoryId)) {
-      setSelectedCategoryId(filteredCategories[0].id);
+      setSelectedCategoryId(filteredCategories[0]?.id ?? null);
     }
   }, [filteredCategories, selectedCategoryId]);
 
-  const amountValue = React.useMemo(() => parseAmount(amountInput), [amountInput]);
   const selectedAccount = React.useMemo(
     () => accounts.find((account) => account.id === selectedAccountId) ?? null,
     [accounts, selectedAccountId]
   );
+
+  const eligibleToAccounts = React.useMemo(() => {
+    if (!selectedAccount) return [];
+    return accounts.filter(
+      (account) => account.id !== selectedAccountId && account.currency === selectedAccount.currency
+    );
+  }, [accounts, selectedAccountId, selectedAccount]);
+
+  // Reset toAccount when from account changes (currency might not match)
+  React.useEffect(() => {
+    if (type === 'TRANSFER' && selectedToAccountId !== null) {
+      // Check if the currently selected toAccount is still valid for the new from account
+      const isStillValid = eligibleToAccounts.some((acc) => acc.id === selectedToAccountId);
+      if (!isStillValid) {
+        setSelectedToAccountId(null);
+      }
+    }
+  }, [selectedAccountId, type, eligibleToAccounts, selectedToAccountId]);
+
+  const selectedToAccount = React.useMemo(
+    () => accounts.find((account) => account.id === selectedToAccountId) ?? null,
+    [accounts, selectedToAccountId]
+  );
+
   const selectedCategory = React.useMemo(
     () => categories.find((category) => category.id === selectedCategoryId) ?? null,
     [categories, selectedCategoryId]
   );
+
+  const amountValue = React.useMemo(() => parseAmount(amountInput), [amountInput]);
 
   const formattedDate = React.useMemo(
     () => format(transactionDateTime, 'EEE, d MMM yyyy'),
@@ -131,7 +166,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
     () => format(transactionDateTime, 'HH:mm'),
     [transactionDateTime]
   );
-
 
   const onDatePicked = (event: DateTimePickerEvent, picked?: Date) => {
     if (Platform.OS === 'android') setShowDatePicker(false);
@@ -156,21 +190,59 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
   };
 
   const isSubmitting = createTransaction.isPending || updateTransaction.isPending;
-  const canSubmit = amountValue > 0 && !!selectedAccountId && !!selectedCategoryId && !isSubmitting;
+
+  const canSubmit = React.useMemo(() => {
+    if (amountValue <= 0 || !selectedAccountId || !selectedCategoryId || isSubmitting) return false;
+    if (type === 'TRANSFER') return !!selectedToAccountId;
+    return true;
+  }, [amountValue, selectedAccountId, selectedToAccountId, selectedCategoryId, isSubmitting, type]);
 
   const handleSave = async () => {
-    if (!selectedAccountId || !selectedCategoryId || amountValue <= 0) {
-      Alert.alert('Missing details', 'Please select account, category, and a valid amount.');
+    if (amountValue <= 0 || !selectedAccountId) {
+      Alert.alert('Missing details', 'Please select an account and enter a valid amount.');
       return;
+    }
+
+    if (type === 'TRANSFER' && !selectedToAccountId) {
+      Alert.alert('Missing details', 'Please select a destination account for the transfer.');
+      return;
+    }
+
+    if (!selectedCategoryId) {
+      Alert.alert('Missing details', 'Please select a category.');
+      return;
+    }
+
+    // Validate same currency for transfers
+    if (type === 'TRANSFER' && selectedAccount && selectedToAccount) {
+      if (selectedAccount.currency !== selectedToAccount.currency) {
+        Alert.alert(
+          'Currency mismatch',
+          'Transfers are only allowed between accounts with the same currency.'
+        );
+        return;
+      }
+
+      // Validate sufficient balance for transfer
+      if (amountValue > selectedAccount.balance) {
+        Alert.alert(
+          'Insufficient balance',
+          `The transfer amount exceeds the available balance in ${selectedAccount.name} (${selectedAccount.balance.toFixed(2)} ${selectedAccount.currency}).`
+        );
+        return;
+      }
     }
 
     const payload = {
       accountId: selectedAccountId,
+      toAccountId: type === 'TRANSFER' ? selectedToAccountId : null,
       categoryId: selectedCategoryId,
       amount: amountValue,
       type,
       datetime: transactionDateTime.toISOString(),
-      note: note.trim() || selectedCategory?.name || 'Transaction',
+      note: note.trim() || (type === 'TRANSFER' 
+        ? `Transfer to ${selectedToAccount?.name ?? 'account'}` 
+        : selectedCategory?.name ?? 'Transaction'),
     };
 
     try {
@@ -199,7 +271,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
       <Header title={isEditMode ? 'Edit Entry' : 'New Entry'} subtitle="Record flow with precision" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <TransactionTypePicker value={type} onChange={setType} colors={colors} />
+        <TransactionTypePicker value={type} onChange={setType} colors={colors} disabled={isEditMode} />
 
         <TransactionAmountInput
           value={amountInput}
@@ -209,18 +281,46 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
         />
 
         <View style={styles.formBody}>
-          
           <TransactionAccountPicker
             accounts={accounts}
             selectedId={selectedAccountId}
             onSelect={setSelectedAccountId}
+            onAdd={() => router.push('/account/create')}
             colors={colors}
+            label={type === 'TRANSFER' ? 'From Account' : 'Account'}
           />
+
+          {type === 'TRANSFER' && (
+            <>
+              {eligibleToAccounts.length > 0 ? (
+                <TransactionAccountPicker
+                  accounts={eligibleToAccounts}
+                  selectedId={selectedToAccountId}
+                  onSelect={setSelectedToAccountId}
+                  onAdd={() => router.push('/account/create')}
+                  colors={colors}
+                  label="To Account"
+                />
+              ) : (
+                <View style={styles.section}>
+                  <Text style={styles.sectionLabel}>TO ACCOUNT</Text>
+                  <View style={[styles.disabledCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    <Text style={[styles.disabledText, { color: colors.textMuted }]}>
+                      {!selectedAccount
+                        ? 'Select source account first'
+                        : 'No accounts with same currency available'}
+                    </Text>
+                  </View>
+                </View>
+              )}
+            </>
+          )}
 
           <TransactionCategoryPicker
             categories={filteredCategories}
             selectedId={selectedCategoryId}
             onSelect={setSelectedCategoryId}
+            onAdd={() => router.push('/category/create')}
             colors={colors}
           />
 
@@ -274,9 +374,12 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           )}
         </TouchableOpacity>
       </View>
+
     </SafeAreaView>
   );
 }
+
+
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
@@ -313,7 +416,7 @@ const createStyles = (colors: ThemeColors) =>
     dateTimeBtn: {
       flex: 1,
       height: 48,
-      borderRadius: 16,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -328,7 +431,7 @@ const createStyles = (colors: ThemeColors) =>
       color: colors.text,
     },
     noteContainer: {
-      borderRadius: 16,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -349,7 +452,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     saveBtn: {
       height: 56,
-      borderRadius: 18,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.text,
       alignItems: 'center',
       justifyContent: 'center',
@@ -361,5 +464,39 @@ const createStyles = (colors: ThemeColors) =>
       fontFamily: TYPOGRAPHY.fonts.semibold,
       fontSize: 16,
       color: colors.background,
+    },
+    disabledCard: {
+      height: 56,
+      borderRadius: RADIUS.full,
+      borderWidth: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    disabledText: {
+      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontSize: 14,
+    },
+    accountList: {
+      gap: 8,
+    },
+    accountCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      padding: 12,
+      borderRadius: RADIUS.full,
+      borderWidth: 1,
+    },
+    accountIconBox: {
+      width: 36,
+      height: 36,
+      borderRadius: RADIUS.full,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    accountName: {
+      flex: 1,
+      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontSize: 15,
     },
   });

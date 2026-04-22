@@ -172,8 +172,9 @@ const StatsScreen = React.memo(function StatsScreen() {
     }>();
 
     filteredTransactions
-      .filter((transaction) => transaction.type === 'DR')
+      .filter((transaction) => transaction.type === 'DR' && transaction.category)
       .forEach((transaction) => {
+        if (!transaction.category) return;
         const current = categoryMap.get(transaction.category.id);
         const color = transaction.category.color
           ? `#${transaction.category.color.toString(16).padStart(6, '0')}`
@@ -308,18 +309,23 @@ const StatsScreen = React.memo(function StatsScreen() {
   const latestTransactionsRender = useMemo(() => {
     if (latestTransactions.length === 0) return null;
     return latestTransactions.map((transaction, index) => {
-      const accentColor = transaction.category.color
+      const isTransfer = transaction.type === 'TRANSFER';
+      const accentColor = transaction.category?.color
         ? `#${transaction.category.color.toString(16).padStart(6, '0')}`
-        : colors.primary;
+        : isTransfer ? colors.primary : colors.textMuted;
+      const iconName = isTransfer 
+        ? 'swap-horizontal-outline' 
+        : (transaction.category?.icon as keyof typeof Ionicons.glyphMap) || 'pricetag-outline';
+      const categoryName = transaction.category?.name || (isTransfer ? 'Transfer' : 'Transaction');
       return (
         <View key={transaction.id} style={[styles.txRow, index === latestTransactions.length - 1 && styles.listRowLast]}>
-          <View style={[styles.txAccent, { backgroundColor: transaction.type === 'CR' ? colors.success : colors.danger }]} />
+          <View style={[styles.txAccent, { backgroundColor: transaction.type === 'CR' ? colors.success : transaction.type === 'TRANSFER' ? colors.primary : colors.danger }]} />
           <View style={[styles.listIcon, { backgroundColor: accentColor + '18' }]}>
-            <Ionicons name={(transaction.category.icon as keyof typeof Ionicons.glyphMap) || 'swap-horizontal-outline'} size={16} color={accentColor} />
+            <Ionicons name={iconName} size={16} color={accentColor} />
           </View>
           <View style={styles.listBody}>
             <View style={styles.listTopLine}>
-              <Text style={styles.listTitle}>{transaction.note || transaction.category.name}</Text>
+              <Text style={styles.listTitle}>{transaction.note || categoryName}</Text>
               <MoneyText amount={transaction.amount} currency={selectedCurrency} type={transaction.type} style={styles.listAmount} weight="bold" />
             </View>
             <Text style={styles.listMeta}>{transaction.account.name} · {DAY_FORMATTER.format(new Date(transaction.datetime))}</Text>
@@ -327,7 +333,7 @@ const StatsScreen = React.memo(function StatsScreen() {
         </View>
       );
     });
-  }, [latestTransactions, selectedCurrency, colors.primary, colors.success, colors.danger, styles]);
+  }, [latestTransactions, selectedCurrency, colors.primary, colors.success, colors.danger, colors.textMuted, styles]);
 
   const comparison = React.useMemo(() => {
     if (selectedRange === null) return null;
@@ -580,7 +586,7 @@ const StatsScreen = React.memo(function StatsScreen() {
           <Text style={styles.sectionHint}>{practicalMetrics.expenseCount} expense entries</Text>
         </View>
         <View style={styles.sectionCard}>
-          {practicalMetrics.largestExpense ? (
+          {practicalMetrics.largestExpense && practicalMetrics.largestExpense.category ? (
             <View style={styles.highlightRow}>
               <View style={[styles.listIcon, { backgroundColor: colors.danger + '1A' }]}>
                 <Ionicons

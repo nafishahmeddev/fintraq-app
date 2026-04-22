@@ -18,9 +18,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CATEGORY_COLORS, CATEGORY_ICONS } from '../../../constants/picker';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { Category } from '../api/categories';
 import { useCreateCategory, useUpdateCategory } from '../hooks/categories';
+import { CategoryType } from '../../../db/schema';
 
 type CategoryFormValues = {
   name: string;
@@ -42,7 +44,7 @@ export function CategoryFormModal({ visible, onClose, category }: CategoryFormMo
   const { mutateAsync: createCategory } = useCreateCategory();
   const { mutateAsync: updateCategory } = useUpdateCategory();
 
-  const [type, setType] = useState<'CR' | 'DR'>('DR');
+  const [type, setType] = useState<CategoryType>('DR');
   const [icon, setIcon] = useState<string>(CATEGORY_ICONS[0]);
   const [colorHex, setColorHex] = useState<string>(CATEGORY_COLORS[0]);
 
@@ -261,8 +263,8 @@ const createStyles = (colors: ThemeColors) =>
     },
     sheet: {
       height: '86%',
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
+      borderTopLeftRadius: RADIUS.full,
+      borderTopRightRadius: RADIUS.full,
       borderTopWidth: 1,
       borderColor: colors.border,
       overflow: 'hidden',
@@ -270,7 +272,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     glow: {
       position: 'absolute',
-      borderRadius: 999,
+      borderRadius: RADIUS.full,
     },
     handle: {
       alignSelf: 'center',
@@ -304,7 +306,7 @@ const createStyles = (colors: ThemeColors) =>
     closeBtn: {
       width: 38,
       height: 38,
-      borderRadius: 19,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -348,7 +350,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     answerLine: {
       height: 2,
-      borderRadius: 999,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.primary + '55',
       marginTop: 4,
     },
@@ -363,7 +365,7 @@ const createStyles = (colors: ThemeColors) =>
     typeTab: {
       paddingHorizontal: 12,
       paddingVertical: 7,
-      borderRadius: 999,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.background + 'AA',
       borderWidth: 1,
       borderColor: colors.border,
@@ -397,7 +399,7 @@ const createStyles = (colors: ThemeColors) =>
     iconCell: {
       width: 46,
       height: 46,
-      borderRadius: 23,
+      borderRadius: RADIUS.full,
       borderWidth: 1,
       borderColor: colors.text + '10',
       backgroundColor: colors.background + 'B8',
@@ -413,7 +415,7 @@ const createStyles = (colors: ThemeColors) =>
     colorCell: {
       width: 34,
       height: 34,
-      borderRadius: 17,
+      borderRadius: RADIUS.full,
       borderWidth: 2,
       borderColor: 'transparent',
       justifyContent: 'center',
@@ -433,7 +435,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     primaryBtn: {
       height: 56,
-      borderRadius: 16,
+      borderRadius: RADIUS.full,
       backgroundColor: colors.primary,
       flexDirection: 'row',
       justifyContent: 'center',

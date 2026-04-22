@@ -3,6 +3,7 @@ import { resolveIcon } from '../../../utils/icons';
 import React, { useMemo, useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ThemeColors } from '../../../theme/colors';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { Category } from '../api/categories';
 
@@ -81,7 +82,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     position: 'relative',
     flex: 1,
     backgroundColor: colors.surface,
-    borderRadius: 18,
+    borderRadius: RADIUS.full,
     padding: 14,
     borderWidth: 1,
     borderColor: colors.border,
@@ -101,7 +102,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     top: -24,
     width: 88,
     height: 88,
-    borderRadius: 999,
+    borderRadius: RADIUS.full,
   },
   cardTopRow: {
     flexDirection: 'row',
@@ -112,13 +113,13 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   categoryIconBox: {
     width: 42,
     height: 42,
-    borderRadius: 14,
+    borderRadius: RADIUS.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
   typeBadge: {
     height: 22,
-    borderRadius: 999,
+    borderRadius: RADIUS.full,
     paddingHorizontal: 8,
     justifyContent: 'center',
     alignItems: 'center',
