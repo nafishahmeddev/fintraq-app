@@ -12,11 +12,12 @@ export type ThemePalette = {
   success: string;
   danger: string;
   warning: string;
+  info: string;
 };
 
 export const DARK_THEME: ThemePalette = {
   background: '#000100',
-  card: 'rgba(255, 255, 255, 0.02)', // Extremely subtle phantom bounds
+  card: 'rgba(255, 255, 255, 0.02)',
   surface: 'rgba(255, 255, 255, 0.05)',
   primary: '#B8D641',
   primaryLight: '#cae560',
@@ -24,26 +25,28 @@ export const DARK_THEME: ThemePalette = {
   secondary: '#f9fff3',
   text: '#fbfff3',
   textMuted: '#b2bb8b',
-  border: 'transparent', // Edgeless UI implies no literal borders
+  border: 'transparent',
   success: '#6BD498',
-  danger: '#EF4444', // Red
+  danger: '#EF4444',
   warning: '#F59E0B',
+  info: '#3B82F6',
 };
 
 export const LIGHT_THEME: ThemePalette = {
   background: '#F6FFF9',
-  card: 'rgba(0, 0, 0, 0.02)', 
+  card: 'rgba(0, 0, 0, 0.02)',
   surface: 'rgba(0, 0, 0, 0.05)',
   primary: '#a6c13a',
   primaryLight: '#b9d253',
   primaryDark: '#8caa14',
   secondary: '#000100',
-  text: '#000100', 
-  textMuted: '#737a5f', 
+  text: '#000100',
+  textMuted: '#737a5f',
   border: 'transparent',
-  success: '#43B875', 
-  danger: '#DC2626', 
+  success: '#43B875',
+  danger: '#DC2626',
   warning: '#D97706',
+  info: '#2563EB',
 };
 
 export type ThemeColors = ThemePalette;

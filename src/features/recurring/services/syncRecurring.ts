@@ -5,57 +5,57 @@ import { accounts, RecurringEndCondition, RecurringFrequency, RecurringIntervalU
 import { NotificationService } from '../../../services/notification.service';
 import { formatCurrency } from '../../../utils/format';
 
-export function getNextRecurringDate(
-  dateStr: string,
+export function calculateNextOccurrenceDate(
+  currentDateString: string,
   frequency: RecurringFrequency,
   interval: number = 1,
   intervalUnit: RecurringIntervalUnit = 'DAYS'
 ): string {
-  const date = parseISO(dateStr);
-  let nextDate: Date;
+  const baseDate = parseISO(currentDateString);
+  let calculatedNextDate: Date;
 
   switch (frequency) {
     case 'DAILY':
-      nextDate = addDays(date, 1);
+      calculatedNextDate = addDays(baseDate, 1);
       break;
     case 'WEEKLY':
-      nextDate = addWeeks(date, 1);
+      calculatedNextDate = addWeeks(baseDate, 1);
       break;
     case 'BI_WEEKLY':
-      nextDate = addWeeks(date, 2);
+      calculatedNextDate = addWeeks(baseDate, 2);
       break;
     case 'MONTHLY':
-      nextDate = addMonths(date, 1);
+      calculatedNextDate = addMonths(baseDate, 1);
       break;
     case 'QUARTERLY':
-      nextDate = addQuarters(date, 1);
+      calculatedNextDate = addQuarters(baseDate, 1);
       break;
     case 'YEARLY':
-      nextDate = addYears(date, 1);
+      calculatedNextDate = addYears(baseDate, 1);
       break;
     case 'CUSTOM':
       switch (intervalUnit) {
         case 'DAYS':
-          nextDate = addDays(date, interval);
+          calculatedNextDate = addDays(baseDate, interval);
           break;
         case 'WEEKS':
-          nextDate = addWeeks(date, interval);
+          calculatedNextDate = addWeeks(baseDate, interval);
           break;
         case 'MONTHS':
-          nextDate = addMonths(date, interval);
+          calculatedNextDate = addMonths(baseDate, interval);
           break;
         case 'YEARS':
-          nextDate = addYears(date, interval);
+          calculatedNextDate = addYears(baseDate, interval);
           break;
         default:
-          nextDate = addDays(date, interval);
+          calculatedNextDate = addDays(baseDate, interval);
       }
       break;
     default:
-      nextDate = addDays(date, 1);
+      calculatedNextDate = addDays(baseDate, 1);
   }
 
-  return nextDate.toISOString();
+  return calculatedNextDate.toISOString();
 }
 
 export function hasMetEndCondition(
@@ -89,8 +89,8 @@ export async function syncRecurringTransactions() {
 
   try {
     // Find all active recurring transactions that are due
-    const dueTemplates = await db.select({
-      template: recurringTransactions,
+    const pendingRecurringTransactions = await db.select({
+      transactionTemplate: recurringTransactions,
       templateAccount: accounts,
     })
       .from(recurringTransactions)
@@ -102,13 +102,13 @@ export async function syncRecurringTransactions() {
         )
       );
 
-    for (const { template, templateAccount } of dueTemplates) {
+    for (const { transactionTemplate, templateAccount } of pendingRecurringTransactions) {
       await NotificationService.scheduleRecurringReminder(
-        template.id,
-        template.name,
-        formatCurrency(template.amount, templateAccount?.currency || 'USD'),
-        template.nextDate,
-        template.reminderDays
+        transactionTemplate.id,
+        transactionTemplate.name,
+        formatCurrency(transactionTemplate.amount, templateAccount?.currency || 'USD'),
+        transactionTemplate.nextDate,
+        transactionTemplate.reminderDays
       );
     }
   } catch (error) {
