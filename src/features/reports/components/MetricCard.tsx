@@ -1,10 +1,7 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {  Text, View } from 'react-native';
 import { MoneyText } from '../../../components/ui/MoneyText';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 
 import { TrendMode } from '../../../types';
 
@@ -35,7 +32,6 @@ export const MetricCard = React.memo(function MetricCard({
   isAmount = true
 }: MetricCardProps) {
   const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const trendColor = useMemo(() => {
     if (changeValue === undefined || changeValue === 0 || trendMode === 'neutral') {
@@ -80,39 +76,3 @@ export const MetricCard = React.memo(function MetricCard({
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  container: {
-    padding: 16,
-    borderRadius: RADIUS.xl,
-    backgroundColor: colors.surface + '80',
-    borderWidth: 1,
-    borderColor: colors.border, 
-    flex: 1,
-    minHeight: 100,
-    justifyContent: 'center',
-  },
-  label: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
-    fontSize: 9,
-    color: colors.textMuted,
-    letterSpacing: 2,
-    marginBottom: 8,
-    textTransform: 'uppercase',
-  },
-  valueRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-  },
-  value: {
-    fontSize: 22,
-    lineHeight: 28,
-  },
-  percentageRow: {
-    marginTop: 8,
-  },
-  percentageText: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
-    fontSize: 9,
-    letterSpacing: 0.5,
-  },
-});

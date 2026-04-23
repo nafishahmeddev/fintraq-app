@@ -1,7 +1,10 @@
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
+    presets: [
+      ['babel-preset-expo', { jsxImportSource: 'nativewind' }],
+      'nativewind/babel'
+    ],
     plugins: [
       [
         'babel-plugin-inline-import',
@@ -9,6 +12,7 @@ module.exports = function (api) {
           extensions: ['.sql'],
         },
       ],
+      'react-native-reanimated/plugin',
     ],
   };
 };

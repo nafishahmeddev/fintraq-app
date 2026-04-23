@@ -1,53 +1,34 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Alert, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurBackground } from '@/src/components/ui/BlurBackground';
 import { ConfirmDialog } from '@/src/components/ui/ConfirmDialog';
 import { Header } from '@/src/components/ui/Header';
 import { OptionsDialog } from '@/src/components/ui/OptionsDialog';
 import { PremiumGuard } from '@/src/components/ui/PremiumGuard';
+import { BackupService } from '@/src/features/backup/api/backup.service';
 import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { RADIUS, SPACING } from '@/src/theme/tokens';
-import { TYPOGRAPHY } from '@/src/theme/typography';
-import { File } from 'expo-file-system';
-import { BackupService } from '../api/backup.service';
+import { Box, HStack, VStack, Pressable, Text, cn } from '@/src/components/ui';
 
 export function BackupScreen() {
-  const { colors } = useTheme();
+  const { isDark } = useTheme();
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
 
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
-  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+  const [exportedData, setExportedData] = useState<{ uri: string; filename: string } | null>(null);
   const [showExportOptions, setShowExportOptions] = useState(false);
-  const [exportedData, setExportedData] = useState<{ content: string; filename: string } | null>(null);
-  const [selectedBackupFile, setSelectedBackupFile] = useState<File | null>(null);
-  const [backupSummary, setBackupSummary] = useState<{
-    version: string;
-    exportedAt: string;
-    accountsCount: number;
-    categoriesCount: number;
-    transactionsCount: number;
-    hasProfile: boolean;
-  } | null>(null);
+
+  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+  const [selectedBackupFile, setSelectedBackupFile] = useState<string | null>(null);
+  const [backupSummary, setBackupSummary] = useState<any | null>(null);
 
   const handleExport = useCallback(async () => {
+    setIsExporting(true);
     try {
-      setIsExporting(true);
-      const result = await BackupService.createBackup();
+      const result = await BackupService.exportDatabase();
       setExportedData(result);
       setShowExportOptions(true);
     } catch (error) {
@@ -60,57 +41,48 @@ export function BackupScreen() {
     }
   }, []);
 
-  const handleSaveToFolder = useCallback(async () => {
-    if (!exportedData) return;
-    
-    setShowExportOptions(false);
-    
-    try {
-      await BackupService.saveToFolder(exportedData.content, exportedData.filename);
-    } catch (error) {
-      Alert.alert(
-        'Save Failed',
-        error instanceof Error ? error.message : 'Failed to save backup'
-      );
-    } finally {
-      setExportedData(null);
-    }
-  }, [exportedData]);
-
   const handleShare = useCallback(async () => {
     if (!exportedData) return;
     
-    setShowExportOptions(false);
+    try {
+      await BackupService.shareBackup(exportedData.uri);
+      setShowExportOptions(false);
+      setExportedData(null);
+    } catch (error) {
+      Alert.alert('Share Failed', 'Failed to share the backup file.');
+    }
+  }, [exportedData]);
+
+  const handleSaveToFolder = useCallback(async () => {
+    if (!exportedData) return;
     
     try {
-      await BackupService.shareFile(exportedData.content, exportedData.filename);
-    } catch (error) {
-      Alert.alert(
-        'Share Failed',
-        error instanceof Error ? error.message : 'Failed to share backup'
-      );
-    } finally {
+      await BackupService.saveToFolder(exportedData.uri, exportedData.filename);
+      setShowExportOptions(false);
       setExportedData(null);
+      Alert.alert('Success', 'Backup saved successfully.');
+    } catch (error) {
+      Alert.alert('Save Failed', 'Failed to save the backup file.');
     }
   }, [exportedData]);
 
   const handleImport = useCallback(async () => {
+    setIsImporting(true);
     try {
-      setIsImporting(true);
-      const file = await BackupService.pickBackupFile();
+      const result = await BackupService.pickBackupFile();
       
-      if (!file) {
+      if (!result) {
         setIsImporting(false);
         return;
       }
 
-      const summary = await BackupService.getBackupSummary(file);
-      setBackupSummary(summary);
-      setSelectedBackupFile(file);
+      setSelectedBackupFile(result.uri);
+      setBackupSummary(result.summary);
       setShowRestoreDialog(true);
+
     } catch (error) {
       Alert.alert(
-        'Invalid Backup',
+        'Import Failed',
         error instanceof Error ? error.message : 'Failed to read backup file'
       );
     } finally {
@@ -121,16 +93,13 @@ export function BackupScreen() {
   const handleConfirmRestore = useCallback(async () => {
     if (!selectedBackupFile) return;
 
+    setIsImporting(true);
     try {
-      setIsImporting(true);
-      setShowRestoreDialog(false);
-      
-      const data = await BackupService.readBackupFile(selectedBackupFile);
-      await BackupService.restoreBackup(data);
+      await BackupService.restoreDatabase(selectedBackupFile);
       
       Alert.alert(
         'Restore Complete',
-        'Your data has been restored successfully. The app will now reload.',
+        'Your data has been successfully restored.',
         [
           {
             text: 'OK',
@@ -162,98 +131,96 @@ export function BackupScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       <BlurBackground />
 
       <Header title="Backup & Restore" subtitle="Data management" showBack />
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 12, paddingBottom: 36 }} showsVerticalScrollIndicator={false}>
         <PremiumGuard label="Data Backup">
-          <View style={styles.heroCard}>
-            <View style={styles.heroIconContainer}>
-              <Ionicons name="shield-checkmark" size={32} color={colors.primary} />
-            </View>
-            <Text style={styles.heroTitle}>Protect Your Data</Text>
-            <Text style={styles.heroSubtitle}>
+          <VStack className="bg-surface rounded-[20px] border border-border p-6 items-center mb-7">
+            <Box className="w-16 h-16 rounded-[24px] bg-primary/15 items-center justify-center mb-4">
+              <Ionicons name="shield-checkmark" size={32} color={isDark ? '#B8D641' : '#a6c13a'} />
+            </Box>
+            <Text className="font-heading text-xl text-text mb-2">Protect Your Data</Text>
+            <Text className="font-regular text-sm text-text-muted text-center leading-5">
               Create backups of your financial data. Save to device storage or share to cloud storage for safekeeping.
             </Text>
-          </View>
+          </VStack>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>BACKUP OPTIONS</Text>
-            <View style={styles.card}>
-              <TouchableOpacity
-                style={styles.actionRow}
+          <VStack className="mb-6">
+            <Text className="font-semibold text-[10px] text-text-muted tracking-widest uppercase mb-3 pl-1">BACKUP OPTIONS</Text>
+            <VStack className="bg-surface rounded-xl border border-border overflow-hidden">
+              <Pressable
+                className="flex-row items-center p-4"
                 onPress={handleExport}
                 disabled={isExporting || isImporting}
-                activeOpacity={0.7}
               >
-                <View style={[styles.iconBox, { backgroundColor: colors.primary + '15' }]}>
+                <Box className="w-11 h-11 rounded-lg items-center justify-center mr-3.5 bg-primary/15">
                   {isExporting ? (
-                    <ActivityIndicator size="small" color={colors.primary} />
+                    <ActivityIndicator size="small" color={isDark ? '#B8D641' : '#a6c13a'} />
                   ) : (
-                    <Ionicons name="download-outline" size={20} color={colors.primary} />
+                    <Ionicons name="download-outline" size={20} color={isDark ? '#B8D641' : '#a6c13a'} />
                   )}
-                </View>
-                <View style={styles.actionTextContainer}>
-                  <Text style={styles.actionTitle}>Export Data</Text>
-                  <Text style={styles.actionSubtitle}>Create a backup file</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-              </TouchableOpacity>
+                </Box>
+                <VStack className="flex-1">
+                  <Text className="font-semibold text-base text-text mb-0.5">Export Data</Text>
+                  <Text className="font-regular text-[13px] text-text-muted">Create a backup file</Text>
+                </VStack>
+                <Ionicons name="chevron-forward" size={16} color={isDark ? '#b2bb8b' : '#737a5f'} />
+              </Pressable>
 
-              <View style={styles.divider} />
+              <Box className="h-px bg-border ml-[74px]" />
 
-              <TouchableOpacity
-                style={styles.actionRow}
+              <Pressable
+                className="flex-row items-center p-4"
                 onPress={handleImport}
                 disabled={isExporting || isImporting}
-                activeOpacity={0.7}
               >
-                <View style={[styles.iconBox, { backgroundColor: colors.success + '15' }]}>
+                <Box className="w-11 h-11 rounded-lg items-center justify-center mr-3.5 bg-success/15">
                   {isImporting ? (
-                    <ActivityIndicator size="small" color={colors.success} />
+                    <ActivityIndicator size="small" color={isDark ? '#6BD498' : '#43B875'} />
                   ) : (
-                    <Ionicons name="cloud-download-outline" size={20} color={colors.success} />
+                    <Ionicons name="cloud-download-outline" size={20} color={isDark ? '#6BD498' : '#43B875'} />
                   )}
-                </View>
-                <View style={styles.actionTextContainer}>
-                  <Text style={styles.actionTitle}>Restore Data</Text>
-                  <Text style={styles.actionSubtitle}>Import from a backup file</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-              </TouchableOpacity>
-            </View>
-          </View>
+                </Box>
+                <VStack className="flex-1">
+                  <Text className="font-semibold text-base text-text mb-0.5">Restore Data</Text>
+                  <Text className="font-regular text-[13px] text-text-muted">Import from a backup file</Text>
+                </VStack>
+                <Ionicons name="chevron-forward" size={16} color={isDark ? '#b2bb8b' : '#737a5f'} />
+              </Pressable>
+            </VStack>
+          </VStack>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>INFORMATION</Text>
-            <View style={styles.infoCard}>
-              <View style={styles.infoRow}>
-                <Ionicons name="document-text-outline" size={16} color={colors.textMuted} />
-                <Text style={styles.infoText}>Format: JSON (human-readable)</Text>
-              </View>
-              <View style={styles.infoRow}>
-                <Ionicons name="folder-open-outline" size={16} color={colors.textMuted} />
-                <Text style={styles.infoText}>
+          <VStack className="mb-6">
+            <Text className="font-semibold text-[10px] text-text-muted tracking-widest uppercase mb-3 pl-1">INFORMATION</Text>
+            <VStack className="bg-surface rounded-xl border border-border p-4 space-y-3">
+              <HStack className="items-center space-x-3">
+                <Ionicons name="document-text-outline" size={16} color={isDark ? '#b2bb8b' : '#737a5f'} />
+                <Text className="font-regular text-sm text-text-muted">Format: JSON (human-readable)</Text>
+              </HStack>
+              <HStack className="items-center space-x-3">
+                <Ionicons name="folder-open-outline" size={16} color={isDark ? '#b2bb8b' : '#737a5f'} />
+                <Text className="font-regular text-sm text-text-muted">
                   {Platform.OS === 'ios' 
                     ? 'Save to Files app or Share to other apps' 
                     : 'Save to any folder or Share to apps'}
                 </Text>
-              </View>
-              <View style={styles.infoRow}>
-                <Ionicons name="lock-closed-outline" size={16} color={colors.textMuted} />
-                <Text style={styles.infoText}>Not encrypted - keep files secure</Text>
-              </View>
-            </View>
-          </View>
+              </HStack>
+              <HStack className="items-center space-x-3">
+                <Ionicons name="lock-closed-outline" size={16} color={isDark ? '#b2bb8b' : '#737a5f'} />
+                <Text className="font-regular text-sm text-text-muted">Not encrypted - keep files secure</Text>
+              </HStack>
+            </VStack>
+          </VStack>
 
-          <View style={styles.warningCard}>
-            <Ionicons name="warning-outline" size={20} color={colors.danger} />
-            <Text style={styles.warningText}>
+          <HStack className="items-start space-x-3 bg-danger/10 rounded-lg border border-danger/25 p-4 mt-2">
+            <Ionicons name="warning-outline" size={20} color={isDark ? '#EF4444' : '#DC2626'} />
+            <Text className="flex-1 font-regular text-[13px] text-danger leading-tight">
               Restoring will replace all existing data. This action cannot be undone.
             </Text>
-          </View>
+          </HStack>
         </PremiumGuard>
       </ScrollView>
 
@@ -295,12 +262,21 @@ export function BackupScreen() {
         destructive
         message={
           backupSummary
-            ? `This backup contains:\n\n` +
-              `• ${backupSummary.accountsCount} account${backupSummary.accountsCount !== 1 ? 's' : ''}\n` +
-              `• ${backupSummary.categoriesCount} categor${backupSummary.categoriesCount !== 1 ? 'ies' : 'y'}\n` +
-              `• ${backupSummary.transactionsCount} transaction${backupSummary.transactionsCount !== 1 ? 's' : ''}\n` +
-              `• ${backupSummary.hasProfile ? 'Settings & profile' : 'No settings'}\n\n` +
-              `Exported: ${formatDate(backupSummary.exportedAt)}\n\n` +
+            ? `This backup contains:
+
+` +
+              `• ${backupSummary.accountsCount} account${backupSummary.accountsCount !== 1 ? 's' : ''}
+` +
+              `• ${backupSummary.categoriesCount} categor${backupSummary.categoriesCount !== 1 ? 'ies' : 'y'}
+` +
+              `• ${backupSummary.transactionsCount} transaction${backupSummary.transactionsCount !== 1 ? 's' : ''}
+` +
+              `• ${backupSummary.hasProfile ? 'Settings & profile' : 'No settings'}
+
+` +
+              `Exported: ${formatDate(backupSummary.exportedAt)}
+
+` +
               `Your current data will be replaced.`
             : 'Are you sure you want to restore this backup?'
         }
@@ -309,133 +285,3 @@ export function BackupScreen() {
     </SafeAreaView>
   );
 }
-
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    content: {
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['3'],
-      paddingBottom: SPACING['9'],
-    },
-    heroCard: {
-      backgroundColor: colors.surface,
-      borderRadius: RADIUS.xl,
-      borderWidth: 1,
-      borderColor: colors.border,
-      padding: SPACING['6'],
-      alignItems: 'center',
-      marginBottom: SPACING['7'],
-    },
-    heroIconContainer: {
-      width: 64,
-      height: 64,
-      borderRadius: RADIUS['2xl'],
-      backgroundColor: colors.primary + '15',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: SPACING['4'],
-    },
-    heroTitle: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 20,
-      color: colors.text,
-      marginBottom: SPACING['2'],
-    },
-    heroSubtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 14,
-      color: colors.textMuted,
-      textAlign: 'center',
-      lineHeight: 20,
-    },
-    section: {
-      marginBottom: SPACING['6'],
-    },
-    sectionLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-      color: colors.textMuted,
-      letterSpacing: 2,
-      marginBottom: SPACING['3'],
-      paddingLeft: SPACING['1'],
-    },
-    card: {
-      backgroundColor: colors.surface,
-      borderRadius: RADIUS.xl,
-      borderWidth: 1,
-      borderColor: colors.border,
-      overflow: 'hidden',
-    },
-    actionRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: SPACING['4'],
-    },
-    iconBox: {
-      width: 44,
-      height: 44,
-      borderRadius: RADIUS.md,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: SPACING['3.5'],
-    },
-    actionTextContainer: {
-      flex: 1,
-    },
-    actionTitle: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 16,
-      color: colors.text,
-      marginBottom: SPACING['0.5'],
-    },
-    actionSubtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 13,
-      color: colors.textMuted,
-    },
-    divider: {
-      height: 1,
-      backgroundColor: colors.border,
-      marginLeft: 74,
-    },
-    infoCard: {
-      backgroundColor: colors.surface,
-      borderRadius: RADIUS.xl,
-      borderWidth: 1,
-      borderColor: colors.border,
-      padding: SPACING['4'],
-      gap: SPACING['3'],
-    },
-    infoRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING['3'],
-    },
-    infoText: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 14,
-      color: colors.textMuted,
-    },
-    warningCard: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: SPACING['3'],
-      backgroundColor: colors.danger + '10',
-      borderRadius: RADIUS.lg,
-      borderWidth: 1,
-      borderColor: colors.danger + '25',
-      padding: SPACING['4'],
-      marginTop: SPACING['2'],
-    },
-    warningText: {
-      flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 13,
-      color: colors.danger,
-      lineHeight: 18,
-    },
-  });

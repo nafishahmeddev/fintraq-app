@@ -1,44 +1,34 @@
 import { useRouter } from 'expo-router';
-import React, { useMemo, useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useCallback } from 'react';
 import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, LAYOUT } from '../../theme/tokens';
 import { IconButton } from './IconButton';
+import { Box, HStack, VStack } from './Stack';
+import { Text, cn } from './Text';
 
 export type HeaderProps = {
   title: string;
   subtitle?: string;
   showBack?: boolean;
   rightAction?: React.ReactNode;
+  className?: string;
 };
 
-/**
- * Header - Editorial Brutalist Design
- * 
- * Consistent header with:
- * - Back button: 36x36 pill-shaped (same as all action buttons)
- * - Title and optional subtitle
- * - Right action slot for custom buttons
- */
 export const Header = React.memo(function Header({ 
   title, 
   subtitle, 
   showBack, 
-  rightAction 
+  rightAction,
+  className
 }: HeaderProps) {
   const router = useRouter();
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const handleBack = useCallback(() => {
     router.back();
   }, [router]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.left}>
+    <HStack className={cn('items-center justify-between px-6 pt-3 pb-4 bg-transparent', className)}>
+      <HStack className="flex-1 items-center space-x-4">
         {showBack && (
           <IconButton
             icon="arrow-back"
@@ -47,64 +37,29 @@ export const Header = React.memo(function Header({
             variant="default"
           />
         )}
-        <View style={styles.titleBlock}>
-          <Text style={styles.title} numberOfLines={1}>
+        <VStack className="flex-1 justify-center">
+          <Text
+            className="font-heading text-[28px] text-text tracking-tight leading-8"
+            numberOfLines={1}
+          >
             {title}
           </Text>
           {subtitle && (
-            <Text style={styles.subtitle} numberOfLines={1}>
+            <Text
+              className="font-regular text-[13px] text-text-muted mt-0.5 tracking-wide"
+              numberOfLines={1}
+            >
               {subtitle}
             </Text>
           )}
-        </View>
-      </View>
+        </VStack>
+      </HStack>
 
       {rightAction && (
-        <View style={styles.rightActionWrap}>
+        <HStack className="items-center space-x-2">
           {rightAction}
-        </View>
+        </HStack>
       )}
-    </View>
+    </HStack>
   );
-});
-
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('3'),
-    paddingBottom: spacing('4'),
-    backgroundColor: 'transparent',
-  },
-  left: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing('4'),
-  },
-  titleBlock: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  title: {
-    fontFamily: TYPOGRAPHY.fonts.heading,
-    color: colors.text,
-    fontSize: 28,
-    letterSpacing: -1,
-    lineHeight: 32,
-  },
-  subtitle: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
-    fontSize: 13,
-    letterSpacing: 0.1,
-    marginTop: spacing('0.5'),
-  },
-  rightActionWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing('2'),
-  },
 });

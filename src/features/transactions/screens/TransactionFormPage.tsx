@@ -7,7 +7,7 @@ import {
   Alert,
   Platform,
   ScrollView,
-  StyleSheet,
+
   Text,
   TextInput,
   TouchableOpacity,
@@ -18,9 +18,6 @@ import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { Header } from '../../../components/ui/Header';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useCategories } from '../../categories/hooks/categories';
 import {
@@ -54,7 +51,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
 
   const { colors } = useTheme();
   const { profile } = useSettings();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
 
   const accountsQuery = useAccounts();
   const categoriesQuery = useCategories();
@@ -400,122 +396,3 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
 
 
 
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    loadingWrap: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: colors.background,
-    },
-    content: {
-      paddingBottom: 120,
-    },
-    formBody: {
-      gap: 16,
-    },
-    section: {
-      paddingHorizontal: 24,
-      gap: 12,
-    },
-    sectionLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-      color: colors.textMuted,
-      letterSpacing: 1.5,
-    },
-    dateTimeRow: {
-      flexDirection: 'row',
-      gap: 12,
-    },
-    dateTimeBtn: {
-      flex: 1,
-      height: 48,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 8,
-    },
-    dateTimeText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 13,
-      color: colors.text,
-    },
-    noteContainer: {
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      padding: 12,
-      minHeight: 100,
-    },
-    noteInput: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 15,
-      color: colors.text,
-      textAlignVertical: 'top',
-    },
-    footer: {
-      position: 'absolute',
-      bottom: 34,
-      left: 24,
-      right: 24,
-    },
-    saveBtn: {
-      height: 56,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.text,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    saveBtnDisabled: {
-      opacity: 0.5,
-    },
-    saveBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 16,
-      color: colors.background,
-    },
-    disabledCard: {
-      height: 56,
-      borderRadius: RADIUS.full,
-      borderWidth: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    disabledText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 14,
-    },
-    accountList: {
-      gap: 8,
-    },
-    accountCard: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-      padding: 12,
-      borderRadius: RADIUS.full,
-      borderWidth: 1,
-    },
-    accountIconBox: {
-      width: 36,
-      height: 36,
-      borderRadius: RADIUS.full,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    accountName: {
-      flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 15,
-    },
-  });

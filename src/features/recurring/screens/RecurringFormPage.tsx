@@ -8,7 +8,7 @@ import {
   Alert,
   Platform,
   ScrollView,
-  StyleSheet,
+
   Text,
   TextInput,
   TouchableOpacity,
@@ -24,9 +24,6 @@ import { usePremium } from '../../../providers/PremiumProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { NotificationService } from '../../../services/notification.service';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { formatCurrency, toDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
 import { useAccounts } from '../../accounts/hooks/accounts';
@@ -70,7 +67,6 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
 
   const { colors } = useTheme();
   const { profile } = useSettings();
-  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const accountsQuery = useAccounts();
   const categoriesQuery = useCategories();
@@ -523,179 +519,3 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    loadingWrap: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: colors.background,
-    },
-    content: {
-      paddingBottom: 120,
-    },
-    formBody: {
-      gap: 16,
-    },
-    section: {
-      paddingHorizontal: 24,
-      gap: 12,
-    },
-    sectionLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-      color: colors.textMuted,
-      letterSpacing: 1.5,
-    },
-    inputContainer: {
-      height: 48,
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      paddingHorizontal: 16,
-      justifyContent: 'center',
-    },
-    textInput: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 15,
-      color: colors.text,
-    },
-    grid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 8,
-    },
-    gridBtn: {
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    gridBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 13,
-      color: colors.text,
-    },
-    dateBtn: {
-      height: 48,
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 8,
-    },
-    dateBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 14,
-      color: colors.text,
-    },
-    appearanceRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 16,
-    },
-    appearanceBtn: {
-      width: 72,
-      height: 72,
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
-      borderWidth: 2,
-      justifyContent: 'center',
-      alignItems: 'center',
-      gap: 4,
-    },
-    appearanceBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 11,
-      color: colors.textMuted,
-    },
-    colorScroll: {
-      alignItems: 'center',
-      gap: 12,
-      paddingRight: 24,
-    },
-    colorCell: {
-      width: 40,
-      height: 40,
-      borderRadius: RADIUS.full,
-      borderWidth: 2,
-      borderColor: 'transparent',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    colorCellActive: {
-      borderColor: colors.text,
-      transform: [{ scale: 1.1 }],
-    },
-    noteContainer: {
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      padding: 16,
-      minHeight: 100,
-    },
-    noteInput: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 15,
-      color: colors.text,
-      textAlignVertical: 'top',
-    },
-    footer: {
-      position: 'absolute',
-      bottom: 34,
-      left: 24,
-      right: 24,
-    },
-    saveBtn: {
-      height: 56,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.text,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    saveBtnDisabled: {
-      opacity: 0.5,
-    },
-    saveBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 16,
-      color: colors.background,
-    },
-    customFreqRow: {
-      flexDirection: 'row',
-      gap: 12,
-      marginTop: 8,
-      alignItems: 'center',
-    },
-    intervalUnitGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 4,
-      flex: 2,
-    },
-    unitBtn: {
-      paddingHorizontal: 8,
-      paddingVertical: 6,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    unitBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 11,
-      color: colors.text,
-      textTransform: 'capitalize',
-    },
-  });

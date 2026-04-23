@@ -8,7 +8,7 @@ import {
   Alert,
   Platform,
   ScrollView,
-  StyleSheet,
+
   Text,
   TextInput,
   TouchableOpacity,
@@ -22,9 +22,6 @@ import { BudgetMode, BudgetPeriod, BudgetScope } from '../../../db/schema';
 import { usePremium } from '../../../providers/PremiumProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { toDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
 import { useAccounts } from '../../accounts/hooks/accounts';
@@ -69,7 +66,6 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
 
   const { colors } = useTheme();
   const { profile } = useSettings();
-  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const categoriesQuery = useCategories();
   const accountsQuery = useAccounts();
@@ -466,192 +462,3 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    loadingWrap: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: colors.background,
-    },
-    content: {
-      paddingBottom: 120,
-    },
-    formBody: {
-      gap: 16,
-    },
-
-    section: {
-      paddingHorizontal: 24,
-      gap: 12,
-    },
-    sectionLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-      color: colors.textMuted,
-      letterSpacing: 1.5,
-    },
-    inputContainer: {
-      height: 48,
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      paddingHorizontal: 16,
-      justifyContent: 'center',
-    },
-    textInput: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 15,
-      color: colors.text,
-    },
-    grid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 8,
-    },
-    gridBtn: {
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    gridBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 13,
-      color: colors.text,
-    },
-    optionsList: {
-      gap: 12,
-    },
-    optionsGrid: {
-      flexDirection: 'row',
-      gap: 12,
-    },
-    optionCard: {
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      padding: 16,
-    },
-    optionCardHalf: {
-      flex: 1,
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      padding: 16,
-    },
-    optionHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 4,
-    },
-    optionTitle: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 14,
-      color: colors.textMuted,
-    },
-    optionDesc: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 11,
-      color: colors.textMuted,
-      lineHeight: 16,
-    },
-    categoriesWrap: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 8,
-    },
-    catChip: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    catChipText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 13,
-      color: colors.text,
-    },
-    emptyText: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 14,
-      color: colors.textMuted,
-    },
-    colorRow: {
-      marginHorizontal: -24,
-    },
-    colorWrap: {
-      paddingHorizontal: 24,
-    },
-    colorCell: {
-      width: 44,
-      height: 44,
-      borderRadius: RADIUS.full,
-      marginRight: 12,
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderWidth: 2,
-      borderColor: 'transparent',
-    },
-    colorCellActive: {
-      borderColor: colors.text,
-    },
-    footer: {
-      position: 'absolute',
-      bottom: 34,
-      left: 24,
-      right: 24,
-    },
-    saveBtn: {
-      height: 56,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.text,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    saveBtnDisabled: {
-      opacity: 0.5,
-    },
-    saveBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 16,
-      color: colors.background,
-    },
-    customDateRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      marginTop: 12,
-    },
-    dateBtn: {
-      height: 40,
-      borderRadius: RADIUS.lg,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 6,
-    },
-    dateBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 12,
-      color: colors.text,
-    },
-  });

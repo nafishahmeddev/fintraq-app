@@ -12,8 +12,6 @@ import { DEFAULT_CURRENCY } from '../../src/constants/currency';
 import { useAccounts } from '../../src/features/accounts/hooks/accounts';
 import { useTransactions } from '../../src/features/transactions/hooks/transactions';
 import { useTheme } from '../../src/providers/ThemeProvider';
-import { ThemeColors } from '../../src/theme/colors';
-import { TYPOGRAPHY } from '../../src/theme/typography';
 
 const RANGE_OPTIONS = [
   { label: '7D', value: 7 },

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList,  Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
@@ -8,18 +8,14 @@ import { Header } from '../../../components/ui/Header';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { CategoryType } from '../../../db/schema';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { Category } from '../api/categories';
 import { CategoryCard } from '../components/CategoryCard';
 import { CategoryFormModal } from '../components/CategoryFormModal';
 import { CategoryTypeSelector } from '../components/CategoryTypeSelector';
-import { RADIUS } from '../../../theme/tokens';
 import { useCategories, useDeleteCategory } from '../hooks/categories';
 
 export const CategoriesScreen = () => {
   const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
   const { data: categories, isLoading } = useCategories();
   const { mutateAsync: deleteCategory } = useDeleteCategory();
 
@@ -187,109 +183,3 @@ export const CategoriesScreen = () => {
   );
 };
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, overflow: 'hidden' },
-
-  listContent: {
-    paddingHorizontal: 20,
-    paddingTop: 6,
-    paddingBottom: 100,
-  },
-
-  filtersWrap: {
-    marginHorizontal: 20,
-    marginTop: 6,
-    marginBottom: 8,
-    gap: 8,
-  },
-
-  searchWrap: {
-    height: 42,
-    borderRadius: RADIUS.full,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.background + 'B8',
-    paddingHorizontal: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-
-  searchInput: {
-    flex: 1,
-    height: '100%',
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 14,
-    color: colors.text,
-  },
-
-  filterMetaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 2,
-  },
-
-  filterMetaText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 10,
-    letterSpacing: 0.4,
-    color: colors.textMuted,
-    textTransform: 'uppercase',
-  },
-
-  emptyContainer: {
-    paddingVertical: 60,
-    alignItems: 'center',
-  },
-
-  emptyTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
-    fontSize: 20,
-    marginTop: 10,
-    letterSpacing: -0.4,
-  },
-
-  emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
-    fontSize: 13,
-    marginTop: 4,
-    marginBottom: 14,
-    textAlign: 'center',
-    maxWidth: 260,
-  },
-
-  emptyBtn: {
-    height: 38,
-    borderRadius: RADIUS.full,
-    paddingHorizontal: 14,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyBtnText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 12,
-    color: colors.text,
-  },
-
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 64, // Normalized size
-    height: 64,
-    borderRadius: RADIUS.full,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-});

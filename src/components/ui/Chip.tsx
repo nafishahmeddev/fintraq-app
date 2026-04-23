@@ -1,10 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
+import React, { useMemo } from 'react';
 import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, radius } from '../../theme/tokens';
+import { Pressable } from './Pressable';
+import { Text, cn } from './Text';
+import { HStack } from './Stack';
 
 export type ChipVariant = 'default' | 'primary' | 'success' | 'danger' | 'warning';
 export type ChipSize = 'sm' | 'md' | 'lg';
@@ -17,26 +16,24 @@ export interface ChipProps {
   size?: ChipSize;
   icon?: keyof typeof Ionicons.glyphMap;
   disabled?: boolean;
-  style?: ViewStyle;
+  className?: string;
+  textClassName?: string;
 }
 
 const SIZES = {
   sm: {
-    height: 30,
-    paddingHorizontal: spacing('3'),
-    fontSize: 12,
+    container: 'h-8 px-3',
+    text: 'text-xs',
     iconSize: 14,
   },
   md: {
-    height: 36,
-    paddingHorizontal: spacing('4'),
-    fontSize: 13,
+    container: 'h-9 px-4',
+    text: 'text-sm',
     iconSize: 16,
   },
   lg: {
-    height: 44,
-    paddingHorizontal: spacing('5'),
-    fontSize: 14,
+    container: 'h-11 px-5',
+    text: 'text-base',
     iconSize: 18,
   },
 };
@@ -49,94 +46,86 @@ export const Chip = React.memo(function Chip({
   size = 'md',
   icon,
   disabled = false,
-  style,
+  className,
+  textClassName,
 }: ChipProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const { isDark } = useTheme();
   const dimensions = SIZES[size];
 
   const getBackgroundColor = () => {
-    if (disabled) return colors.surface;
-    if (!selected) return colors.surface;
+    if (disabled) return 'bg-surface';
+    if (!selected) return 'bg-surface';
     
     switch (variant) {
-      case 'primary': return colors.primary;
-      case 'success': return colors.success;
-      case 'danger': return colors.danger;
-      case 'warning': return colors.warning;
-      default: return colors.text;
+      case 'primary': return 'bg-primary';
+      case 'success': return 'bg-success';
+      case 'danger': return 'bg-danger';
+      case 'warning': return 'bg-warning';
+      default: return 'bg-text';
     }
   };
 
   const getTextColor = () => {
-    if (disabled) return colors.textMuted;
-    if (!selected) return colors.text;
-    return colors.background;
+    if (disabled) return 'text-text-muted';
+    if (!selected) return 'text-text';
+    return isDark ? 'text-background' : 'text-white';
+  };
+
+  const getIconColor = () => {
+    if (disabled) return isDark ? '#b2bb8b' : '#737a5f'; // text-muted
+    if (!selected) return isDark ? '#fbfff3' : '#000100'; // text
+    return isDark ? '#000100' : '#FFFFFF'; // background or white
   };
 
   const getBorderColor = () => {
-    if (disabled) return colors.border;
-    if (selected) return getBackgroundColor();
-    return colors.border;
+    if (disabled) return 'border-border';
+    if (selected) {
+        switch (variant) {
+            case 'primary': return 'border-primary';
+            case 'success': return 'border-success';
+            case 'danger': return 'border-danger';
+            case 'warning': return 'border-warning';
+            default: return 'border-text';
+        }
+    }
+    return 'border-border';
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
       disabled={disabled || !onPress}
-      activeOpacity={0.75}
-      style={[
-        styles.container,
-        {
-          height: dimensions.height,
-          paddingHorizontal: dimensions.paddingHorizontal,
-          backgroundColor: getBackgroundColor(),
-          borderColor: getBorderColor(),
-        },
-        style,
-      ]}
-    >
-      {icon && (
-        <Ionicons
-          name={icon}
-          size={dimensions.iconSize}
-          color={getTextColor()}
-          style={styles.icon}
-        />
+      className={cn(
+        'flex-row items-center justify-center rounded-full border space-x-1.5',
+        dimensions.container,
+        getBackgroundColor(),
+        getBorderColor(),
+        className
       )}
-      <Text
-        style={[
-          styles.label,
-          {
-            fontSize: dimensions.fontSize,
-            color: getTextColor(),
-          },
-        ]}
-        numberOfLines={1}
-      >
-        {label}
-      </Text>
-    </TouchableOpacity>
+    >
+      <HStack className="items-center justify-center">
+        {icon && (
+          <Ionicons
+            name={icon}
+            size={dimensions.iconSize}
+            color={getIconColor()}
+            style={{ marginRight: 4 }}
+          />
+        )}
+        <Text
+          className={cn(
+            'font-semibold tracking-wide',
+            dimensions.text,
+            getTextColor(),
+            textClassName
+          )}
+          numberOfLines={1}
+        >
+          {label}
+        </Text>
+      </HStack>
+    </Pressable>
   );
 });
-
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: radius('full'),
-      borderWidth: 1,
-      gap: spacing('2'),
-    },
-    icon: {
-      marginLeft: -spacing('1'),
-    },
-    label: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      letterSpacing: 0.3,
-    },
-  });
 
 export default Chip;

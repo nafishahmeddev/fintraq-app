@@ -4,7 +4,7 @@ import { format, isSameDay, parseISO } from 'date-fns';
 import { eq } from 'drizzle-orm';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList,  Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Badge,
@@ -23,9 +23,6 @@ import { db } from '../../../db/client';
 import { RecurringEndCondition, RecurringFrequency, RecurringIntervalUnit, payments, recurringTransactions as recurringTransactionsTable } from '../../../db/schema';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { NotificationService } from '../../../services/notification.service';
-import { ThemeColors } from '../../../theme/colors';
-import { COMPONENT_SIZES, LAYOUT, radius, shadow, spacing } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { TransactionType } from '../../../types';
 import { formatCurrency } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
@@ -39,7 +36,6 @@ const toHexColor = (value: number | null) => {
 
 export const RecurringScreen = React.memo(function RecurringScreen() {
   const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
   const router = useRouter();
 
   const { data: recurringTransactions, isLoading } = useRecurringTransactions();
@@ -388,140 +384,3 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  listContent: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
-    paddingBottom: 120,
-    gap: LAYOUT.cardGap,
-  },
-  card: {
-    borderRadius: radius('2xl'),
-    backgroundColor: colors.surface,
-    padding: spacing('4'),
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadow('sm'),
-  },
-  cardPaused: {
-    opacity: 0.6,
-  },
-  cardFooter: {
-    paddingTop: spacing('2'),
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    borderStyle: 'dashed',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 34,
-    right: 24,
-    width: 64,
-    height: 64,
-    borderRadius: radius('full'),
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...shadow('lg'),
-  },
-  emptyContainer: {
-    paddingVertical: 80,
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  emptyTitle: {
-    fontFamily: TYPOGRAPHY.fonts.heading,
-    color: colors.text,
-    fontSize: 24,
-    marginTop: spacing('4'),
-    textAlign: 'center',
-  },
-  emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
-    fontSize: 15,
-    marginTop: spacing('2'),
-    marginBottom: spacing('7'),
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  emptyBtn: {
-    height: COMPONENT_SIZES.button.md.height,
-    borderRadius: radius('full'),
-    paddingHorizontal: spacing('6'),
-    backgroundColor: colors.text,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyBtnText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 15,
-    color: colors.background,
-  },
-  tabBar: {
-    flexDirection: 'row',
-    paddingHorizontal: LAYOUT.screenPadding,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: spacing('4'),
-    alignItems: 'center',
-    position: 'relative',
-  },
-  activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: colors.text,
-  },
-  tabText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  activeTabText: {
-    color: colors.text,
-  },
-  dotIndicator: {
-    position: 'absolute',
-    top: spacing('3'),
-    right: '25%',
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.danger,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  actionBtn: {
-    flex: 1,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  skipBtn: {
-    borderRightWidth: 1,
-    borderRightColor: colors.border,
-  },
-  skipBtnText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 14,
-    color: colors.textMuted,
-  },
-  processBtn: {
-    backgroundColor: colors.primary + '10',
-  },
-  processBtnText: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
-    fontSize: 14,
-    color: colors.primary,
-  },
-});

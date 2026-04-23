@@ -1,7 +1,8 @@
 import { BlurView } from '@sbaiahmed1/react-native-blur';
 import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
+import { Box } from './Stack';
 
 export type BlurCircle = {
   top?: number;
@@ -14,39 +15,29 @@ export type BlurCircle = {
 };
 
 type BlurBackgroundProps = {
-  /**
-   * Override the three decorative circles. When omitted, the theme-default
-   * circles are used (bold primary + secondary blobs).
-   */
   circles?: BlurCircle[];
-  /** Override blur intensity (default: 80 iOS / 96 Android). */
   blurAmount?: number;
-  /**
-   * Two-character hex opacity suffix for the Android translucency overlay,
-   * e.g. '60'. Defaults to '60'.
-   */
   androidOverlayOpacity?: string;
 };
 
-/**
- * Full-screen frosted-glass background: decorative circles → BlurView →
- * Android translucency overlay. Drop this as the first child inside any
- * SafeAreaView / container View and it renders behind everything.
- */
 export function BlurBackground({
   circles,
   blurAmount,
   androidOverlayOpacity = '60',
 }: BlurBackgroundProps) {
-  const { colors, isDark } = useTheme();
+  const { isDark } = useTheme();
+
+  const primaryColor = isDark ? '#B8D641' : '#a6c13a';
+  const secondaryColor = isDark ? '#f9fff3' : '#000100';
+  const backgroundColor = isDark ? '#000100' : '#F6FFF9';
 
   const defaultCircles: BlurCircle[] = React.useMemo(
     () => [
-      { top: -100, left: -80, width: 360, height: 360, color: colors.primary + '70' },
-      { top: 220, right: -140, width: 460, height: 460, color: colors.primary + '40' },
-      { bottom: -80, left: -60, width: 300, height: 300, color: colors.secondary + '50' },
+      { top: -100, left: -80, width: 360, height: 360, color: primaryColor + '70' },
+      { top: 220, right: -140, width: 460, height: 460, color: primaryColor + '40' },
+      { bottom: -80, left: -60, width: 300, height: 300, color: secondaryColor + '50' },
     ],
-    [colors.primary, colors.secondary],
+    [primaryColor, secondaryColor],
   );
 
   const resolvedCircles = circles ?? defaultCircles;
@@ -54,25 +45,23 @@ export function BlurBackground({
 
   return (
     <>
-      <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+      <Box style={StyleSheet.absoluteFillObject} pointerEvents="none">
         {resolvedCircles.map((circle, index) => (
-          <View
+          <Box
             key={index}
-            style={[
-              styles.circle,
-              {
-                top: circle.top,
-                bottom: circle.bottom,
-                left: circle.left,
-                right: circle.right,
-                width: circle.width,
-                height: circle.height,
-                backgroundColor: circle.color,
-              },
-            ]}
+            className="absolute rounded-full"
+            style={{
+              top: circle.top,
+              bottom: circle.bottom,
+              left: circle.left,
+              right: circle.right,
+              width: circle.width,
+              height: circle.height,
+              backgroundColor: circle.color,
+            }}
           />
         ))}
-      </View>
+      </Box>
 
       <BlurView
         blurAmount={resolvedBlurAmount}
@@ -81,10 +70,10 @@ export function BlurBackground({
       />
 
       {Platform.OS === 'android' ? (
-        <View
+        <Box
           style={[
             StyleSheet.absoluteFillObject,
-            { backgroundColor: colors.background + androidOverlayOpacity },
+            { backgroundColor: backgroundColor + androidOverlayOpacity },
           ]}
           pointerEvents="none"
         />
@@ -92,10 +81,3 @@ export function BlurBackground({
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  circle: {
-    position: 'absolute',
-    borderRadius: 999,
-  },
-});

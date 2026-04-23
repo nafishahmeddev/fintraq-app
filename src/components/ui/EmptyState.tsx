@@ -1,10 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, radius } from '../../theme/tokens';
+import { Box, VStack } from './Stack';
+import { Pressable } from './Pressable';
+import { Text, cn } from './Text';
 
 export type EmptyStateSize = 'sm' | 'md' | 'lg';
 
@@ -15,30 +14,30 @@ export interface EmptyStateProps {
   actionLabel?: string;
   onAction?: () => void;
   size?: EmptyStateSize;
-  style?: ViewStyle;
+  className?: string;
 }
 
 const SIZES = {
   sm: {
-    iconBox: 48,
+    iconBox: 'w-12 h-12',
     iconSize: 24,
-    titleSize: 16,
-    subtitleSize: 13,
-    paddingVertical: spacing('8'),
+    titleSize: 'text-base',
+    subtitleSize: 'text-[13px]',
+    paddingVertical: 'py-8',
   },
   md: {
-    iconBox: 68,
+    iconBox: 'w-[68px] h-[68px]',
     iconSize: 32,
-    titleSize: 18,
-    subtitleSize: 14,
-    paddingVertical: spacing('12'),
+    titleSize: 'text-lg',
+    subtitleSize: 'text-sm',
+    paddingVertical: 'py-12',
   },
   lg: {
-    iconBox: 80,
+    iconBox: 'w-20 h-20',
     iconSize: 40,
-    titleSize: 20,
-    subtitleSize: 15,
-    paddingVertical: spacing('10'),
+    titleSize: 'text-xl',
+    subtitleSize: 'text-[15px]',
+    paddingVertical: 'py-10',
   },
 };
 
@@ -49,113 +48,63 @@ export const EmptyState = React.memo(function EmptyState({
   actionLabel,
   onAction,
   size = 'md',
-  style,
+  className,
 }: EmptyStateProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const { isDark } = useTheme();
   const dimensions = SIZES[size];
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingVertical: dimensions.paddingVertical,
-        },
-        style,
-      ]}
+    <VStack
+      className={cn(
+        'items-center px-6',
+        dimensions.paddingVertical,
+        className
+      )}
     >
-      <View
-        style={[
-          styles.iconBox,
-          {
-            width: dimensions.iconBox,
-            height: dimensions.iconBox,
-            borderRadius: radius('full'),
-          },
-        ]}
+      <Box
+        className={cn(
+          'bg-surface items-center justify-center rounded-full mb-4',
+          dimensions.iconBox
+        )}
       >
         <Ionicons
           name={icon}
           size={dimensions.iconSize}
-          color={colors.textMuted}
+          color={isDark ? '#b2bb8b' : '#737a5f'} // text-muted
         />
-      </View>
+      </Box>
       <Text
-        style={[
-          styles.title,
-          {
-            fontSize: dimensions.titleSize,
-            color: colors.text,
-          },
-        ]}
+        className={cn(
+          'font-semibold text-center mb-2',
+          dimensions.titleSize,
+          'text-text'
+        )}
       >
         {title}
       </Text>
       {subtitle && (
         <Text
-          style={[
-            styles.subtitle,
-            {
-              fontSize: dimensions.subtitleSize,
-              color: colors.textMuted,
-            },
-          ]}
+          className={cn(
+            'font-regular text-center max-w-[280px] leading-5',
+            dimensions.subtitleSize,
+            'text-text-muted'
+          )}
         >
           {subtitle}
         </Text>
       )}
       {actionLabel && onAction && (
-        <TouchableOpacity
-          style={styles.actionButton}
+        <Pressable
+          className="mt-4 py-2 px-4 rounded-full bg-surface border border-border"
           onPress={onAction}
-          activeOpacity={0.75}
         >
-          <Text style={[styles.actionText, { color: colors.primary }]}>
+          <Text className="font-semibold text-[13px] text-primary">
             {actionLabel}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       )}
-    </View>
+    </VStack>
   );
 });
-
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      alignItems: 'center',
-      paddingHorizontal: spacing('6'),
-    },
-    iconBox: {
-      backgroundColor: colors.surface,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: spacing('4'),
-    },
-    title: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      marginBottom: spacing('2'),
-      textAlign: 'center',
-    },
-    subtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      textAlign: 'center',
-      maxWidth: 280,
-      lineHeight: 20,
-    },
-    actionButton: {
-      marginTop: spacing('4'),
-      paddingVertical: spacing('2'),
-      paddingHorizontal: spacing('4'),
-      borderRadius: radius('full'),
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    actionText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 13,
-    },
-  });
 
 export default EmptyState;

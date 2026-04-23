@@ -1,9 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {  Text, View } from 'react-native';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { formatCurrency } from '../../../utils/format';
 import { DashboardInsight } from '../api/insights';
 
@@ -71,65 +69,3 @@ export const InsightCard = React.memo(function InsightCard({ insight }: InsightC
   );
 });
 
-const styles = StyleSheet.create({
-  card: {
-    width: 210,
-    minHeight: 115,
-    borderRadius: RADIUS.xl,
-    borderWidth: 1,
-    padding: 14,
-    marginRight: 10,
-    justifyContent: 'space-between',
-    overflow: 'hidden',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  iconBox: {
-    width: 28,
-    height: 28,
-    borderRadius: RADIUS.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
-    fontSize: 9,
-    letterSpacing: 1.5,
-  },
-  body: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  value: {
-    fontFamily: TYPOGRAPHY.fonts.monoBold,
-    fontSize: 24,
-    letterSpacing: -1,
-  },
-  trendContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 2,
-  },
-  subtitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 9,
-    letterSpacing: 0.2,
-    flex: 1,
-  },
-  trendIcon: {
-    marginLeft: 4,
-  },
-  accentLine: {
-    position: 'absolute',
-    bottom: -1,
-    left: 20,
-    right: 20,
-    height: 3,
-    borderRadius: 1.5,
-    opacity: 0.8,
-  },
-});

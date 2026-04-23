@@ -1,11 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, radius } from '../../theme/tokens';
 import { IconBox } from './IconBox';
+import { Box, HStack, VStack } from './Stack';
+import { Pressable } from './Pressable';
+import { Text, cn } from './Text';
 
 export interface ListItemProps {
   icon?: keyof typeof Ionicons.glyphMap;
@@ -19,7 +18,7 @@ export interface ListItemProps {
   isFirst?: boolean;
   isLast?: boolean;
   showDivider?: boolean;
-  style?: ViewStyle;
+  className?: string;
 }
 
 export const ListItem = React.memo(function ListItem({
@@ -34,22 +33,17 @@ export const ListItem = React.memo(function ListItem({
   isFirst = false,
   isLast = false,
   showDivider = true,
-  style,
+  className,
 }: ListItemProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const { isDark } = useTheme();
 
-  const containerStyle = [
-    styles.container,
-    {
-      backgroundColor: colors.surface,
-      borderBottomColor: showDivider && !isLast ? colors.border : 'transparent',
-      borderBottomWidth: showDivider && !isLast ? 1 : 0,
-    },
-    isFirst && styles.firstItem,
-    isLast && styles.lastItem,
-    style,
-  ];
+  const containerClasses = cn(
+    "flex-row items-center py-3 px-4 space-x-3 bg-surface",
+    showDivider && !isLast && "border-b border-border",
+    isFirst && "rounded-t-2xl",
+    isLast && "rounded-b-2xl",
+    className
+  );
 
   const content = (
     <>
@@ -58,83 +52,46 @@ export const ListItem = React.memo(function ListItem({
           icon={icon}
           size="md"
           shape="circle"
-          backgroundColor={iconBackgroundColor || colors.surface}
-          iconColor={iconColor || colors.text}
+          backgroundColor={iconBackgroundColor}
+          iconColor={iconColor}
         />
       )}
-      <View style={styles.content}>
+      <VStack className="flex-1 justify-center">
         <Text
-          style={[
-            styles.title,
-            { color: selected ? colors.primary : colors.text },
-          ]}
+          className={cn(
+            "font-semibold text-sm",
+            selected ? "text-primary" : "text-text"
+          )}
           numberOfLines={1}
         >
           {title}
         </Text>
         {subtitle && (
-          <Text style={styles.subtitle} numberOfLines={1}>
+          <Text className="font-regular text-xs text-text-muted mt-0.5" numberOfLines={1}>
             {subtitle}
           </Text>
         )}
-      </View>
+      </VStack>
       {rightElement && (
-        <View style={styles.rightElement}>
+        <Box className="ml-2">
           {rightElement}
-        </View>
+        </Box>
       )}
     </>
   );
 
   if (onPress) {
     return (
-      <TouchableOpacity
-        style={containerStyle}
+      <Pressable
+        className={containerClasses}
         onPress={onPress}
-        activeOpacity={0.75}
       >
         {content}
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 
-  return <View style={containerStyle}>{content}</View>;
+  return <Box className={containerClasses}>{content}</Box>;
 });
-
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: spacing('3'),
-      paddingHorizontal: spacing('4'),
-      gap: spacing('3'),
-    },
-    firstItem: {
-      borderTopLeftRadius: radius('lg'),
-      borderTopRightRadius: radius('lg'),
-    },
-    lastItem: {
-      borderBottomLeftRadius: radius('lg'),
-      borderBottomRightRadius: radius('lg'),
-    },
-    content: {
-      flex: 1,
-      justifyContent: 'center',
-    },
-    title: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 14,
-    },
-    subtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 12,
-      color: colors.textMuted,
-      marginTop: spacing('0.5'),
-    },
-    rightElement: {
-      marginLeft: spacing('2'),
-    },
-  });
 
 export default ListItem;

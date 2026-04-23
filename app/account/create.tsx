@@ -18,8 +18,6 @@ import { Header } from '@/src/components/ui/Header';
 import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
 import { ACCOUNT_COLORS } from '@/src/constants/picker';
 import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { TYPOGRAPHY } from '@/src/theme/typography';
 import { parseAmount, toDbColor } from '@/src/utils/format';
 import { resolveIcon } from '@/src/utils/icons';
 import { AccountType, ACCOUNT_TYPES } from '@/src/db/schema';

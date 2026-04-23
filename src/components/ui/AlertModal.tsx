@@ -1,10 +1,10 @@
-import React, { useMemo, useCallback } from 'react';
-import { Modal, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { Modal, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
-import { RADIUS } from '../../theme/tokens';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { ThemeColors } from '../../theme/colors';
 import { Ionicons } from '@expo/vector-icons';
+import { Box, HStack, VStack } from './Stack';
+import { Pressable } from './Pressable';
+import { Text, cn } from './Text';
 
 export type AlertButton = {
   text: string;
@@ -29,18 +29,17 @@ export const AlertModal = React.memo(function AlertModal({
   onClose,
   type = 'info',
 }: AlertModalProps) {
-  const { colors, isDark } = useTheme();
+  const { isDark } = useTheme();
   const { width } = useWindowDimensions();
-  const styles = useMemo(() => createStyles(colors, isDark, width), [colors, isDark, width]);
 
   const icon = useMemo(() => {
     switch (type) {
-      case 'success': return { name: 'checkmark-circle' as const, color: colors.primary };
-      case 'error': return { name: 'alert-circle' as const, color: colors.danger };
-      case 'warning': return { name: 'warning' as const, color: '#FFB800' };
-      default: return { name: 'information-circle' as const, color: colors.primary };
+      case 'success': return { name: 'checkmark-circle' as const, color: isDark ? '#B8D641' : '#a6c13a', bg: 'bg-primary/15' };
+      case 'error': return { name: 'alert-circle' as const, color: isDark ? '#EF4444' : '#DC2626', bg: 'bg-danger/15' };
+      case 'warning': return { name: 'warning' as const, color: '#FFB800', bg: 'bg-warning/15' };
+      default: return { name: 'information-circle' as const, color: isDark ? '#B8D641' : '#a6c13a', bg: 'bg-primary/15' };
     }
-  }, [type, colors.primary, colors.danger]);
+  }, [type, isDark]);
 
   const handleButtonPress = useCallback((button: AlertButton) => {
     if (button.onPress) button.onPress();
@@ -54,118 +53,57 @@ export const AlertModal = React.memo(function AlertModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <View style={[styles.iconContainer, { backgroundColor: icon.color + '15' }]}>
+      <Box className="flex-1 bg-black/70 justify-center items-center p-6">
+        <VStack
+          className="bg-background rounded-3xl border border-border p-6 items-start"
+          style={{ width: Math.min(width - 48, 340) }}
+        >
+          <HStack className="items-center space-x-4 mb-5">
+            <Box className={cn("w-12 h-12 rounded-full justify-center items-center", icon.bg)}>
               <Ionicons name={icon.name} size={28} color={icon.color} />
-            </View>
-            <Text style={styles.title}>{title}</Text>
-          </View>
+            </Box>
+            <Text className="flex-1 font-heading text-[22px] text-text tracking-tight">
+              {title}
+            </Text>
+          </HStack>
           
-          {message && <Text style={styles.message}>{message}</Text>}
+          {message && (
+            <Text className="font-regular text-[15px] text-text-muted leading-relaxed mb-8">
+              {message}
+            </Text>
+          )}
 
-          <View style={styles.buttonContainer}>
+          <Box className={cn(
+            "flex-row flex-wrap gap-3 w-full",
+          )}>
             {buttons.map((button, index) => {
               const isDestructive = button.style === 'destructive';
               const isCancel = button.style === 'cancel';
               
               return (
-                <TouchableOpacity
+                <Pressable
                   key={index}
-                  style={[
-                    styles.button,
-                    isCancel ? styles.cancelButton : styles.primaryButton,
-                    isDestructive && { backgroundColor: colors.danger },
-                    buttons.length > 2 ? { width: '100%' } : { flex: 1 }
-                  ]}
+                  className={cn(
+                    "h-14 rounded-full justify-center items-center",
+                    isCancel ? "bg-surface border border-border" : "bg-text",
+                    isDestructive && "bg-danger",
+                    buttons.length > 2 ? "w-full" : "flex-1"
+                  )}
                   onPress={() => handleButtonPress(button)}
                 >
-                  <Text style={[
-                    styles.buttonText,
-                    isCancel && { color: colors.text }
-                  ]}>
+                  <Text className={cn(
+                    "font-bold text-[13px] tracking-widest",
+                    isCancel ? "text-text" : "text-background",
+                    isDestructive && "text-white"
+                  )}>
                     {button.text.toUpperCase()}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               );
             })}
-          </View>
-        </View>
-      </View>
+          </Box>
+        </VStack>
+      </Box>
     </Modal>
   );
 });
-
-const createStyles = (colors: ThemeColors, isDark: boolean, width: number) =>
-  StyleSheet.create({
-    overlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.7)',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 24,
-    },
-    content: {
-      width: Math.min(width - 48, 340),
-      backgroundColor: colors.background,
-      borderRadius: RADIUS.full,
-      borderWidth: 1,
-      borderColor: colors.border,
-      padding: 24,
-      alignItems: 'flex-start',
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 16,
-      marginBottom: 20,
-    },
-    iconContainer: {
-      width: 48,
-      height: 48,
-      borderRadius: RADIUS.full,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    title: {
-      flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 22,
-      color: colors.text,
-      letterSpacing: -1,
-    },
-    message: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 15,
-      color: colors.textMuted,
-      lineHeight: 22,
-      marginBottom: 32,
-    },
-    buttonContainer: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 12,
-      width: '100%',
-    },
-    button: {
-      height: 56,
-      borderRadius: RADIUS.full,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    primaryButton: {
-      backgroundColor: colors.text,
-    },
-    cancelButton: {
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    buttonText: {
-      fontFamily: TYPOGRAPHY.fonts.bold,
-      fontSize: 13,
-      color: colors.background,
-      letterSpacing: 1,
-    },
-  });

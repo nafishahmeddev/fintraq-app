@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
+import React, { useMemo } from 'react';
 import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
+import { Pressable } from './Pressable';
+import { Box } from './Box';
+import { cn } from './Text';
 
 export type IconButtonProps = {
   icon: keyof typeof Ionicons.glyphMap;
@@ -10,14 +11,14 @@ export type IconButtonProps = {
   size?: 'sm' | 'md' | 'lg';
   variant?: 'default' | 'primary' | 'ghost';
   disabled?: boolean;
-  style?: ViewStyle;
+  className?: string;
   badge?: boolean;
 };
 
 const SIZES = {
-  sm: { container: 32, icon: 16 },
-  md: { container: 36, icon: 18 },
-  lg: { container: 44, icon: 20 },
+  sm: { className: 'w-8 h-8', icon: 16 },
+  md: { className: 'w-9 h-9', icon: 18 },
+  lg: { className: 'w-11 h-11', icon: 20 },
 };
 
 export const IconButton = React.memo(function IconButton({
@@ -26,72 +27,45 @@ export const IconButton = React.memo(function IconButton({
   size = 'md',
   variant = 'default',
   disabled = false,
-  style,
+  className,
   badge = false,
 }: IconButtonProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const { isDark } = useTheme();
   const dimensions = SIZES[size];
 
-  const getBackgroundColor = () => {
-    switch (variant) {
-      case 'primary':
-        return colors.text;
-      case 'ghost':
-        return 'transparent';
-      default:
-        return colors.surface;
-    }
+  const variantClasses = {
+    default: 'bg-surface',
+    primary: 'bg-text',
+    ghost: 'bg-transparent border-transparent',
   };
 
   const getIconColor = () => {
     switch (variant) {
       case 'primary':
-        return colors.background;
+        return isDark ? '#000100' : '#F6FFF9'; // background
       case 'ghost':
-        return colors.text;
+        return isDark ? '#fbfff3' : '#000100'; // text
       default:
-        return colors.text;
+        return isDark ? '#fbfff3' : '#000100'; // text
     }
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
       disabled={disabled}
-      activeOpacity={0.75}
-      style={[
-        styles.container,
-        {
-          width: dimensions.container,
-          height: dimensions.container,
-          backgroundColor: getBackgroundColor(),
-        },
-        style,
-      ]}
+      className={cn(
+        'rounded-full justify-center items-center border border-border relative',
+        dimensions.className,
+        variantClasses[variant],
+        disabled && 'opacity-50',
+        className
+      )}
     >
       <Ionicons name={icon} size={dimensions.icon} color={getIconColor()} />
-      {badge && <View style={styles.badge} />}
-    </TouchableOpacity>
+      {badge && (
+        <Box className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
+      )}
+    </Pressable>
   );
 });
-
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      borderRadius: 999,
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    badge: {
-      position: 'absolute',
-      top: 6,
-      right: 6,
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: colors.primary,
-    },
-  });

@@ -6,7 +6,7 @@ import {
   SectionList,
   SectionListData,
   SectionListRenderItemInfo,
-  StyleSheet,
+
   Text,
   TouchableOpacity,
   View,
@@ -20,9 +20,6 @@ import { KPICard } from '../../../components/ui/KPICard';
 import { MoneyText } from '../../../components/ui/MoneyText';
 import { TransactionRow } from '../../../components/ui/TransactionRow';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS, SHADOWS, SPACING } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useCategories } from '../../categories/hooks/categories';
 import { AdvancedFilterService, AdvancedFilters, DEFAULT_ADVANCED_FILTERS } from '../../filters/api/advanced-filters.service';
@@ -222,7 +219,6 @@ export function TransactionsScreen() {
   const initialCategoryId = React.useMemo(() => resolveParamNumber(params.categoryId), [params.categoryId]);
 
   const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
 
   // Advanced filters state
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilters>(() => {
@@ -585,164 +581,3 @@ export function TransactionsScreen() {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    loadingWrap: {
-      flex: 1,
-      backgroundColor: colors.background,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    headerActions: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING['2'],
-    },
-    headerBtn: {
-      width: 44,
-      height: 44,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    filterBadge: {
-      position: 'absolute',
-      top: -2,
-      right: -2,
-      minWidth: 18,
-      height: 18,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.primary,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 2,
-      borderColor: colors.background,
-    },
-    filterBadgeText: {
-      color: colors.background,
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-    },
-    content: {
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['3'],
-      paddingBottom: 120,
-    },
-    listHeader: {
-      gap: SPACING['5'],
-      marginBottom: SPACING['6'],
-    },
-    activeFiltersRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    activeFiltersLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-      color: colors.textMuted,
-      letterSpacing: 1.5,
-    },
-    clearChip: {
-      backgroundColor: colors.danger + '12',
-      paddingHorizontal: SPACING['3'],
-      height: 28,
-      borderRadius: RADIUS.full,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    clearChipText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 11,
-      color: colors.danger,
-    },
-    daySection: { gap: SPACING['3'] },
-    dayHeaderRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: SPACING['1'],
-      marginBottom: SPACING['3'],
-    },
-    dayTitle: {
-      color: colors.textMuted,
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 11,
-      letterSpacing: 1.2,
-      textTransform: 'uppercase',
-    },
-    dayTotals: {
-      flexDirection: 'row',
-      gap: SPACING['3'],
-    },
-    dayTotalValue: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 12,
-    },
-    dayCard: {
-      borderRadius: RADIUS.full,
-      overflow: 'hidden',
-    },
-    emptyWrap: {
-      paddingVertical: 60,
-      alignItems: 'center',
-      gap: SPACING['4'],
-    },
-    emptyIconBox: {
-      width: 80,
-      height: 80,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    emptyTitle: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      color: colors.text,
-      fontSize: 18,
-    },
-    emptySubtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      color: colors.textMuted,
-      fontSize: 14,
-      textAlign: 'center',
-      maxWidth: 240,
-      lineHeight: 20,
-    },
-    emptyAction: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING['2.5'],
-      paddingHorizontal: SPACING['5'],
-      height: 48,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.text,
-      marginTop: SPACING['2'],
-    },
-    emptyActionText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      color: colors.background,
-      fontSize: 15,
-    },
-    loadMoreWrap: {
-      paddingVertical: SPACING['7'],
-      alignItems: 'center',
-    },
-    fab: {
-      position: 'absolute',
-      bottom: 34,
-      right: SPACING['6'],
-      width: 60,
-      height: 60,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.text,
-      alignItems: 'center',
-      justifyContent: 'center',
-      ...SHADOWS.lg,
-    },
-  });

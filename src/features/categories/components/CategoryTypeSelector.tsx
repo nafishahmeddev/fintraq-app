@@ -1,8 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {  Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { CategoryType } from '../../../db/schema';
 
 interface CategoryTypeSelectorProps {
@@ -22,7 +20,6 @@ export const CategoryTypeSelector: React.FC<CategoryTypeSelectorProps> = ({
   onTypeChange,
   colors,
 }) => {
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
 
   return (
     <View style={styles.typeTabsRail}>
@@ -51,37 +48,3 @@ export const CategoryTypeSelector: React.FC<CategoryTypeSelectorProps> = ({
   );
 };
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  typeTabsRail: {
-    flexDirection: 'row',
-    height: 46,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface + 'D9',
-    padding: 4,
-    gap: 4,
-  },
-  segmentPill: {
-    flex: 1,
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 6,
-    borderRadius: 999,
-    backgroundColor: 'transparent',
-  },
-  segmentPillActive: {
-    backgroundColor: colors.text,
-  },
-  segmentPillText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
-    fontSize: 12,
-    letterSpacing: 0.3,
-  },
-  segmentPillTextActive: {
-    color: colors.background,
-  },
-});

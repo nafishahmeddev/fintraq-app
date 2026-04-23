@@ -1,189 +1,101 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useCallback } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { usePremium } from '@/src/providers/PremiumProvider';
 import { useTheme } from '../../providers/ThemeProvider';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, radius } from '../../theme/tokens';
+import { Box, HStack, VStack } from './Stack';
+import { Pressable } from './Pressable';
+import { Text, cn } from './Text';
 
 interface PremiumGuardProps {
   children: React.ReactNode;
   label?: string;
   size?: 'small' | 'medium' | 'large';
-  containerStyle?: any;
+  className?: string;
 }
 
-/**
- * PremiumGuard - Editorial Brutalist Design
- * 
- * Sizes:
- * - small: 56px min height, 12px padding, 12px radius (md)
- * - medium: 76px min height, 16px padding, 16px radius (lg)
- * - large: 90px min height, 20px padding, 20px radius (xl)
- * 
- * Icon box: 44px (md), 32px (sm)
- * Action badge: 12px radius (md), 8px (sm)
- */
 export const PremiumGuard = React.memo(function PremiumGuard({
   children,
   label = 'Pro only',
   size = 'large',
-  containerStyle
+  className
 }: PremiumGuardProps) {
   const { isPremium } = usePremium();
-  const { colors } = useTheme();
+  const { isDark } = useTheme();
   const router = useRouter();
 
   const handlePress = useCallback(() => {
     router.push('/premium');
   }, [router]);
 
-  const { isSmall, containerStyles, iconBoxStyles, iconSize, actionBadgeStyles, actionTextLabel } = useMemo(() => {
+  const { isSmall, containerClasses, iconBoxClasses, iconSize, actionBadgeClasses, actionTextLabel } = useMemo(() => {
     const small = size === 'small';
     const medium = size === 'medium';
     
-    // Size-specific values
-    const padding = small ? spacing('3') : medium ? spacing('4') : spacing('5');
-    const borderRadius = small ? radius('md') : medium ? radius('lg') : radius('xl');
-    const minHeight = small ? 56 : medium ? 76 : 90;
-    
     return {
       isSmall: small,
-      containerStyles: [
-        styles.container,
-        { 
-          backgroundColor: colors.surface, 
-          borderColor: colors.border,
-          padding,
-          borderRadius,
-          minHeight,
-        },
-        containerStyle
-      ],
-      iconBoxStyles: [
-        styles.iconBox,
-        { 
-          backgroundColor: colors.background, 
-          borderColor: colors.border,
-          width: small ? 32 : 44,
-          height: small ? 32 : 44,
-          borderRadius: small ? radius('sm') : radius('md'),
-        },
-      ],
+      containerClasses: cn(
+        "border border-border overflow-hidden justify-center bg-surface relative",
+        small ? "p-3 rounded-xl min-h-[56px]" : medium ? "p-4 rounded-2xl min-h-[76px]" : "p-5 rounded-3xl min-h-[90px]"
+      ),
+      iconBoxClasses: cn(
+        "justify-center items-center border border-border bg-background",
+        small ? "w-8 h-8 rounded-lg" : "w-11 h-11 rounded-xl"
+      ),
       iconSize: small ? 14 : 18,
-      actionBadgeStyles: [
-        styles.actionBadge,
-        { 
-          backgroundColor: colors.text,
-          paddingHorizontal: small ? spacing('2.5') : spacing('3.5'),
-          paddingVertical: small ? spacing('1.5') : spacing('2.5'),
-          borderRadius: small ? radius('sm') : radius('md'),
-        },
-      ],
+      actionBadgeClasses: cn(
+        "justify-center items-center bg-text",
+        small ? "px-2.5 py-1.5 rounded-lg" : "px-3.5 py-2.5 rounded-xl"
+      ),
       actionTextLabel: small ? 'Pro' : 'Unlock'
     };
-  }, [size, colors.surface, colors.border, colors.background, colors.text, containerStyle]);
+  }, [size]);
 
   if (isPremium) {
     return <>{children}</>;
   }
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.75}
+    <Pressable
       onPress={handlePress}
-      style={containerStyles}
+      className={cn(containerClasses, className)}
     >
       {/* Background Accent & Watermark */}
-      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.primary, opacity: 0.02 }]} />
+      <Box className="absolute inset-0 bg-primary/5" />
       <Ionicons
         name="sparkles"
         size={isSmall ? 60 : 120}
-        color={colors.primary}
-        style={[styles.watermark, { opacity: 0.05 }]}
-        pointerEvents="none"
+        color={isDark ? '#B8D641' : '#a6c13a'}
+        className="absolute -right-5 -bottom-8 opacity-5 -rotate-[15deg]"
       />
 
-      <View style={styles.content}>
-        <View style={styles.headerRow}>
+      <VStack className="flex-1 justify-center relative z-10">
+        <HStack className="items-center space-x-3.5">
 
-          <View style={iconBoxStyles}>
-             <Ionicons name="lock-closed" size={iconSize} color={colors.text} />
-          </View>
+          <Box className={iconBoxClasses}>
+             <Ionicons name="lock-closed" size={iconSize} color={isDark ? '#fbfff3' : '#000100'} />
+          </Box>
 
-          <View style={styles.textDetails}>
-             <Text style={[styles.title, { color: colors.text }, isSmall && styles.titleSmall]}>
+          <VStack className="flex-1">
+             <Text className={cn("font-bold text-text", isSmall ? "text-[11px]" : "text-sm mb-1")}>
                {label}
              </Text>
              {!isSmall && (
-               <Text style={[styles.subtitle, { color: colors.textMuted }]}>
+               <Text className="font-regular text-xs text-text-muted">
                  Premium member exclusive
                </Text>
              )}
-          </View>
+          </VStack>
 
-          <View style={actionBadgeStyles}>
-             <Text style={[styles.actionText, { color: colors.background }]}>
+          <Box className={actionBadgeClasses}>
+             <Text className="font-bold text-[10px] tracking-widest text-background">
                {actionTextLabel}
              </Text>
-          </View>
+          </Box>
 
-        </View>
-      </View>
-    </TouchableOpacity>
+        </HStack>
+      </VStack>
+    </Pressable>
   );
-});
-
-const styles = StyleSheet.create({
-  container: {
-    borderWidth: 1,
-    overflow: 'hidden',
-    justifyContent: 'center',
-  },
-  watermark: {
-    position: 'absolute',
-    right: -spacing('5'),
-    bottom: -spacing('8'),
-    transform: [{ rotate: '-15deg' }],
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing('3.5'),
-  },
-  iconBox: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-  },
-  textDetails: {
-    flex: 1,
-  },
-  title: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
-    fontSize: 14,
-    marginBottom: spacing('1'),
-  },
-  titleSmall: {
-    fontSize: 11,
-    marginBottom: 0,
-  },
-  subtitle: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 12,
-  },
-  actionBadge: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  actionText: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
-    fontSize: 10,
-    letterSpacing: 1,
-  },
 });

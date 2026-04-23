@@ -1,0 +1,43 @@
+
+> luno@1.0.2 web
+> expo start --web
+
+🔍 [expo-iap] Config values: horizonAppId=undefined, isHorizonEnabled=false, isOnsideEnabled=false
+📦 [expo-iap] Using OpenIAP from CocoaPods
+Starting project at /app
+React Compiler enabled
+Starting Metro Bundler
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Web node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓░░░░░░░░░░ 42.0% ( 808/1391)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓░░░░░░░░ 52.3% (1097/1558)
+λ Bundling failed 5120ms node_modules/expo-router/node/render.js (1872 modules)
+Web Bundling failed 5135ms node_modules/expo-router/entry.js (2140 modules)
+
+Metro error: Unable to resolve module @/src/features/export/api/export.service from /app/src/features/export/screens/ExportScreen.tsx: @/src/features/export/api/export.service could not be found within the project or in these directories:
+  node_modules
+[0m [90m  8 |[39m [36mimport[39m { [33mHeader[39m } [36mfrom[39m [32m'@/src/components/ui/Header'[39m[33m;[39m
+ [90m  9 |[39m [36mimport[39m { useAccounts } [36mfrom[39m [32m'@/src/features/accounts/hooks/accounts'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { useExportService } [36mfrom[39m [32m'@/src/features/export/api/export.service'[39m[33m;[39m
+ [90m    |[39m                                   [31m[1m^[22m[39m
+ [90m 11 |[39m [36mimport[39m { useSettings } [36mfrom[39m [32m'@/src/providers/SettingsProvider'[39m[33m;[39m
+ [90m 12 |[39m [36mimport[39m { useTheme } [36mfrom[39m [32m'@/src/providers/ThemeProvider'[39m[33m;[39m
+ [90m 13 |[39m [36mimport[39m { [33mBox[39m[33m,[39m [33mHStack[39m[33m,[39m [33mVStack[39m[33m,[39m [33mPressable[39m[33m,[39m [33mText[39m[33m,[39m cn } [36mfrom[39m [32m'@/src/components/ui'[39m[33m;[39m[0m
+
+Import stack:
+
+ src/features/export/screens/ExportScreen.tsx
+ | import "@/src/features/export/api/export.service"
+
+ app/(main)/export.tsx
+ | import "@/src/features/export/screens/ExportScreen"
+
+ app (require.context)
+
+
+Call Stack
+  <unknown> (src/features/export/screens/ExportScreen.tsx:0)
+Web node_modules/expo-router/_error.js ▓▓▓▓▓▓▓▓▓▓▓▓░░░░ 76.5% (321/367)
+Web Bundled 5000ms node_modules/expo-router/_error.js (398 modules)
+ LOG  [web] Logs will appear in the browser console

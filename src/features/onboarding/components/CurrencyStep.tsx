@@ -1,8 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {  Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { CURRENCIES } from '../../../constants/currency';
 
 type CurrencyStepProps = {
@@ -12,7 +10,6 @@ type CurrencyStepProps = {
 
 export function CurrencyStep({ currency, onCurrencyChange }: CurrencyStepProps) {
   const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
   const selectedCurrency = CURRENCIES.find((item) => item.code === currency);
 
   return (
@@ -43,69 +40,3 @@ export function CurrencyStep({ currency, onCurrencyChange }: CurrencyStepProps) 
   );
 }
 
-const createStyles = (colors: { [key: string]: string }) =>
-  StyleSheet.create({
-    wrapper: {
-      gap: 14,
-    },
-    hero: {
-      paddingVertical: 4,
-    },
-    heroLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-      color: colors.textMuted,
-      letterSpacing: 1.2,
-      marginBottom: 8,
-    },
-    heroValue: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 24,
-      color: colors.text,
-      letterSpacing: -0.8,
-    },
-    heroCode: {
-      marginTop: 4,
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 12,
-      color: colors.textMuted,
-      letterSpacing: 0.6,
-    },
-    heroSubtext: {
-      marginTop: 6,
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 12,
-      lineHeight: 18,
-      color: colors.textMuted,
-    },
-    chipsWrap: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 10,
-    },
-    chip: {
-      borderRadius: RADIUS.full,
-      minHeight: 42,
-      paddingHorizontal: 14,
-      paddingVertical: 10,
-      alignSelf: 'flex-start',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: colors.background + 'B8',
-      borderWidth: 1,
-      borderColor: colors.text + '10',
-    },
-    chipActive: {
-      backgroundColor: colors.primary,
-      borderColor: colors.primary,
-    },
-    chipText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 13,
-      color: colors.text,
-      textAlign: 'center',
-    },
-    chipTextActive: {
-      color: colors.background,
-    },
-  });

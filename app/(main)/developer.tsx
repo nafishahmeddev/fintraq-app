@@ -8,8 +8,6 @@ import { toErrorMessage } from '../../src/utils/errors';
 import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
 import { Header } from '../../src/components/ui/Header';
 import { useTheme } from '../../src/providers/ThemeProvider';
-import { ThemeColors } from '../../src/theme/colors';
-import { TYPOGRAPHY } from '../../src/theme/typography';
 import { usePremium } from '../../src/providers/PremiumProvider';
 import { Input } from '../../src/components/ui/Input';
 import { seedDummyData } from '../../src/utils/seed';

@@ -26,7 +26,6 @@ import { getDeviceCurrencyCode } from '../../src/constants/currency';
 import {
   ONBOARDING_STEPS,
 } from '../../src/features/onboarding/constants';
-import { createOnboardingStyles } from '../../src/features/onboarding/styles';
 import { OnboardingFormValues } from '../../src/features/onboarding/types';
 import { parseAmount, toDbColor } from '../../src/utils/format';
 import { useOnboarding } from '../../src/providers/OnboardingProvider';

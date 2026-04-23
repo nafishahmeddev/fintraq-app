@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator, View } from 'react-native';
-import { DARK_THEME } from '../theme/colors';
 
 type OnboardingContextType = {
   hasOnboarded: boolean;

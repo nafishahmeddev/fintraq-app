@@ -1,9 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { radius } from '../../theme/tokens';
+import { Box } from './Box';
+import { cn } from './Text';
 
 export type IconBoxSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type IconBoxShape = 'circle' | 'rounded' | 'square';
@@ -15,21 +14,21 @@ export interface IconBoxProps {
   backgroundColor?: string;
   iconColor?: string;
   borderColor?: string;
-  style?: ViewStyle;
+  className?: string;
 }
 
 const SIZES = {
-  xs: { container: 24, icon: 12 },
-  sm: { container: 32, icon: 14 },
-  md: { container: 40, icon: 18 },
-  lg: { container: 48, icon: 22 },
-  xl: { container: 64, icon: 28 },
+  xs: { className: 'w-6 h-6', icon: 12 },
+  sm: { className: 'w-8 h-8', icon: 14 },
+  md: { className: 'w-10 h-10', icon: 18 },
+  lg: { className: 'w-12 h-12', icon: 22 },
+  xl: { className: 'w-16 h-16', icon: 28 },
 };
 
-const SHAPE_RADIUS = {
-  circle: radius('full'),
-  rounded: radius('md'),
-  square: radius('none'),
+const SHAPES = {
+  circle: 'rounded-full',
+  rounded: 'rounded-xl',
+  square: 'rounded-none',
 };
 
 export const IconBox = React.memo(function IconBox({
@@ -39,42 +38,31 @@ export const IconBox = React.memo(function IconBox({
   backgroundColor,
   iconColor,
   borderColor,
-  style,
+  className,
 }: IconBoxProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const { isDark } = useTheme();
   const dimensions = SIZES[size];
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          width: dimensions.container,
-          height: dimensions.container,
-          borderRadius: SHAPE_RADIUS[shape],
-          backgroundColor: backgroundColor || colors.surface,
-          borderColor: borderColor || colors.border,
-        },
-        style,
-      ]}
+    <Box
+      className={cn(
+        'items-center justify-center border',
+        dimensions.className,
+        SHAPES[shape],
+        className
+      )}
+      style={{
+        backgroundColor: backgroundColor || (isDark ? '#131c13' : '#e9f5ed'), // colors.surface
+        borderColor: borderColor || (isDark ? '#1f2b1f' : '#dbead5'), // colors.border
+      }}
     >
       <Ionicons
         name={icon}
         size={dimensions.icon}
-        color={iconColor || colors.text}
+        color={iconColor || (isDark ? '#fbfff3' : '#000100')} // colors.text
       />
-    </View>
+    </Box>
   );
 });
-
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 1,
-    },
-  });
 
 export default IconBox;

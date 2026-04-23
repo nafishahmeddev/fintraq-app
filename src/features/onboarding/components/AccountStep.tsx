@@ -1,14 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { CurrencyPickerModal } from '../../../components/ui/CurrencyPickerModal';
-import { ACCOUNT_COLORS, ACCOUNT_ICONS } from '../../../constants/picker';
-import { ACCOUNT_TYPES, AccountType } from '../../../db/schema';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { TextInput } from 'react-native';
+import { CurrencyPickerModal } from '@/src/components/ui/CurrencyPickerModal';
+import { ACCOUNT_COLORS, ACCOUNT_ICONS } from '@/src/constants/picker';
+import { ACCOUNT_TYPES, AccountType } from '@/src/db/schema';
+import { useTheme } from '@/src/providers/ThemeProvider';
 import { OnboardingFormValues } from '../types';
+import { Box, HStack, VStack, Pressable, Text, cn } from '@/src/components/ui';
 
 const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
   cash: 'Cash',
@@ -49,363 +48,159 @@ export function AccountStep({
   onColorChange,
   onTypeChange,
 }: AccountStepProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const { isDark } = useTheme();
   const { control, formState: { errors } } = useFormContext<OnboardingFormValues>();
   const [showCurrencyPicker, setShowCurrencyPicker] = React.useState(false);
 
   return (
-    <View style={styles.wrapper}>
+    <VStack className="space-y-5">
+      <VStack>
+        <Text className="font-heading text-[28px] leading-8 text-text tracking-tighter mb-1.5">First Account</Text>
+        <Text className="font-regular text-[13px] leading-5 text-text-muted">
+          Where does your primary money live? You can add more accounts later.
+        </Text>
+      </VStack>
 
-      {/* Currency row */}
-      <View style={styles.qaBlock}>
-        <Text style={styles.question}>Account currency</Text>
-        <TouchableOpacity style={styles.currencyRow} onPress={() => setShowCurrencyPicker(true)} activeOpacity={0.85}>
-          <Text style={styles.currencyValue}>{accountCurrency}</Text>
-          <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-        </TouchableOpacity>
-        <View style={styles.answerLine} />
-      </View>
+      <Controller
+        control={control}
+        name="accountName"
+        rules={{ required: true }}
+        render={({ field }) => (
+          <VStack>
+            <Text className="font-semibold text-[10px] text-text-muted uppercase tracking-widest pl-1 mb-2">ACCOUNT NAME</Text>
+            <VStack className="bg-surface rounded-xl border border-border p-3">
+              <TextInput
+                className="font-semibold text-[17px] text-text px-1"
+                value={field.value}
+                onChangeText={field.onChange}
+                onBlur={field.onBlur}
+                placeholder="e.g. Main Checking"
+                placeholderTextColor={isDark ? '#b2bb8b60' : '#737a5f60'}
+                autoCapitalize="words"
+              />
+            </VStack>
+            {errors.accountName && <Text className="font-medium text-xs text-danger mt-1.5 pl-1">Name is required</Text>}
+          </VStack>
+        )}
+      />
+
+      <HStack className="space-x-4">
+        <Controller
+          control={control}
+          name="initialBalance"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <VStack className="flex-1">
+              <Text className="font-semibold text-[10px] text-text-muted uppercase tracking-widest pl-1 mb-2">INITIAL BALANCE</Text>
+              <VStack className="bg-surface rounded-xl border border-border p-3">
+                <TextInput
+                  className="font-monoBold text-[19px] text-text px-1"
+                  value={field.value}
+                  onChangeText={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder="0.00"
+                  placeholderTextColor={isDark ? '#b2bb8b60' : '#737a5f60'}
+                  keyboardType="decimal-pad"
+                />
+              </VStack>
+              {errors.initialBalance && <Text className="font-medium text-xs text-danger mt-1.5 pl-1">Balance is required</Text>}
+            </VStack>
+          )}
+        />
+
+        <VStack className="flex-1">
+          <Text className="font-semibold text-[10px] text-text-muted uppercase tracking-widest pl-1 mb-2">CURRENCY</Text>
+          <Pressable
+            className="h-[52px] bg-surface rounded-xl border border-border flex-row items-center px-4 space-x-2"
+            onPress={() => setShowCurrencyPicker(true)}
+          >
+            <Ionicons name="globe-outline" size={16} color={isDark ? '#B8D641' : '#a6c13a'} />
+            <Text className="flex-1 font-semibold text-[13px] text-text">{accountCurrency}</Text>
+            <Ionicons name="chevron-down" size={14} color={isDark ? '#b2bb8b' : '#737a5f'} />
+          </Pressable>
+        </VStack>
+      </HStack>
+
+      <VStack>
+        <Text className="font-semibold text-[10px] text-text-muted uppercase tracking-widest pl-1 mb-2">ACCOUNT TYPE</Text>
+        <Box className="flex-row flex-wrap gap-2">
+          {ACCOUNT_TYPES.map((type) => (
+            <Pressable
+              key={type}
+              className={cn(
+                "flex-row items-center h-[34px] px-3 rounded-full border space-x-1.5",
+                accountType === type ? "bg-text border-text" : "bg-surface border-border"
+              )}
+              onPress={() => onTypeChange(type)}
+            >
+              <Ionicons
+                name={ACCOUNT_TYPE_ICONS[type] as any}
+                size={14}
+                color={accountType === type ? (isDark ? '#000100' : '#F6FFF9') : (isDark ? '#b2bb8b' : '#737a5f')}
+              />
+              <Text className={cn("font-medium text-xs", accountType === type ? "text-background" : "text-text")}>
+                {ACCOUNT_TYPE_LABELS[type]}
+              </Text>
+            </Pressable>
+          ))}
+        </Box>
+      </VStack>
+
+      <VStack>
+        <Text className="font-semibold text-[10px] text-text-muted uppercase tracking-widest pl-1 mb-2">APPEARANCE</Text>
+        <VStack className="bg-surface rounded-2xl border border-border p-4 space-y-4">
+          <VStack>
+            <Text className="font-medium text-[11px] text-text-muted mb-2">Color</Text>
+            <HStack className="flex-wrap gap-2">
+              {ACCOUNT_COLORS.slice(0, 6).map((hex) => {
+                const isSelected = accountColor === hex;
+                return (
+                  <Pressable
+                    key={hex}
+                    className="w-8 h-8 rounded-full items-center justify-center"
+                    style={{ backgroundColor: hex }}
+                    onPress={() => onColorChange(hex)}
+                  >
+                    {isSelected && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
+                  </Pressable>
+                );
+              })}
+            </HStack>
+          </VStack>
+          <Box className="h-px bg-border/50 my-1" />
+          <VStack>
+            <Text className="font-medium text-[11px] text-text-muted mb-2">Icon</Text>
+            <HStack className="flex-wrap gap-2">
+              {ACCOUNT_ICONS.slice(0, 6).map((ic) => {
+                const isSelected = accountIcon === ic;
+                return (
+                  <Pressable
+                    key={ic}
+                    className={cn(
+                      "w-[34px] h-[34px] rounded-xl items-center justify-center border",
+                      isSelected ? "bg-text border-text" : "bg-surface border-border"
+                    )}
+                    onPress={() => onIconChange(ic)}
+                  >
+                    <Ionicons
+                      name={ic as any}
+                      size={16}
+                      color={isSelected ? (isDark ? '#000100' : '#F6FFF9') : (isDark ? '#fbfff3' : '#000100')}
+                    />
+                  </Pressable>
+                );
+              })}
+            </HStack>
+          </VStack>
+        </VStack>
+      </VStack>
 
       <CurrencyPickerModal
         visible={showCurrencyPicker}
         onClose={() => setShowCurrencyPicker(false)}
         value={accountCurrency}
-        onChange={(code) => { onCurrencyChange(code); setShowCurrencyPicker(false); }}
+        onChange={onCurrencyChange}
       />
-
-      {/* Q1 — account name */}
-      <View style={styles.qaBlock}>
-        <Text style={styles.question}>What should we call this account?</Text>
-        <Controller
-          control={control}
-          name="accountName"
-          rules={{ required: true }}
-          render={({ field }) => (
-            <TextInput
-              value={field.value}
-              onChangeText={field.onChange}
-              onBlur={field.onBlur}
-              placeholder="Main Wallet"
-              placeholderTextColor={colors.textMuted + '50'}
-              style={styles.answerInput}
-              autoCapitalize="words"
-              autoCorrect={false}
-              returnKeyType="next"
-            />
-          )}
-        />
-        <View style={[styles.answerLine, errors.accountName && styles.answerLineError]} />
-      </View>
-
-      {/* Q2 — holder name */}
-      <View style={styles.qaBlock}>
-        <Text style={styles.question}>{"Who's the account holder?"}</Text>
-        <Controller
-          control={control}
-          name="accountHolder"
-          rules={{ required: true }}
-          render={({ field }) => (
-            <TextInput
-              value={field.value}
-              onChangeText={field.onChange}
-              onBlur={field.onBlur}
-              placeholder="Your name"
-              placeholderTextColor={colors.textMuted + '50'}
-              style={styles.answerInput}
-              autoCapitalize="words"
-              autoCorrect={false}
-              returnKeyType="next"
-            />
-          )}
-        />
-        <View style={[styles.answerLine, errors.accountHolder && styles.answerLineError]} />
-      </View>
-
-      {/* Q3 — account number (optional) */}
-      <View style={styles.qaBlock}>
-        <Text style={styles.question}>Account number or identifier? <Text style={styles.questionHint}>(optional)</Text></Text>
-        <Controller
-          control={control}
-          name="accountNumber"
-          render={({ field }) => (
-            <TextInput
-              value={field.value}
-              onChangeText={field.onChange}
-              onBlur={field.onBlur}
-              placeholder="IBAN / Last 4 / Wallet ID"
-              placeholderTextColor={colors.textMuted + '50'}
-              style={styles.answerInput}
-              autoCorrect={false}
-              autoCapitalize="none"
-              returnKeyType="next"
-            />
-          )}
-        />
-        <View style={styles.answerLine} />
-      </View>
-
-      {/* Q3.5 — account type */}
-      <View style={styles.qaBlock}>
-        <Text style={styles.question}>Account type</Text>
-        <View style={styles.typeGrid}>
-          {ACCOUNT_TYPES.map((type) => {
-            const selected = accountType === type;
-            return (
-              <TouchableOpacity
-                key={type}
-                style={[
-                  styles.typeChip,
-                  selected && { backgroundColor: accountColor, borderColor: accountColor },
-                ]}
-                onPress={() => onTypeChange(type)}
-                activeOpacity={0.9}
-              >
-                <Ionicons
-                  name={ACCOUNT_TYPE_ICONS[type] as React.ComponentProps<typeof Ionicons>['name']}
-                  size={14}
-                  color={selected ? '#000100' : colors.text}
-                />
-                <Text style={[styles.typeLabel, { color: selected ? '#000100' : colors.text }]}>
-                  {ACCOUNT_TYPE_LABELS[type]}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </View>
-
-      {/* Q4 — opening balance */}
-      <View style={styles.qaBlock}>
-        <Text style={styles.question}>Opening balance in {accountCurrency}? <Text style={styles.questionHint}>(optional)</Text></Text>
-        <Controller
-          control={control}
-          name="openingBalance"
-          rules={{
-            validate: (v) =>
-              !v.trim() || (!isNaN(parseFloat(v)) && parseFloat(v) >= 0) || 'invalid',
-          }}
-          render={({ field }) => (
-            <TextInput
-              value={field.value}
-              onChangeText={field.onChange}
-              onBlur={field.onBlur}
-              placeholder="0.00"
-              placeholderTextColor={colors.textMuted + '50'}
-              style={[styles.answerInput, styles.answerInputAmount]}
-              keyboardType="decimal-pad"
-              returnKeyType="done"
-            />
-          )}
-        />
-        <View style={[styles.answerLine, errors.openingBalance && styles.answerLineError]} />
-      </View>
-
-      {/* Icon picker */}
-      <View style={styles.selectorSection}>
-        <Text style={styles.selectorLabel}>PICK AN ICON</Text>
-        <View style={styles.iconWrap}>
-          {ACCOUNT_ICONS.map((iconName) => {
-            const selected = accountIcon === iconName;
-            return (
-              <TouchableOpacity
-                key={iconName}
-                style={[
-                  styles.iconChip,
-                  selected && { backgroundColor: accountColor, borderColor: accountColor },
-                ]}
-                onPress={() => onIconChange(iconName)}
-                activeOpacity={0.9}
-              >
-                <Ionicons name={iconName} size={18} color={selected ? '#000100' : colors.text} />
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </View>
-
-      {/* Color picker */}
-      <View style={styles.selectorSection}>
-        <Text style={styles.selectorLabel}>PICK A COLOR</Text>
-        <View style={styles.colorWrap}>
-          {ACCOUNT_COLORS.map((swatch) => {
-            const selected = accountColor === swatch;
-            return (
-              <TouchableOpacity
-                key={swatch}
-                style={[
-                  styles.colorChip,
-                  { backgroundColor: swatch },
-                  selected && styles.colorChipActive,
-                ]}
-                onPress={() => onColorChange(swatch)}
-                activeOpacity={0.9}
-              >
-                {selected ? <Ionicons name="checkmark" size={14} color="#000100" /> : null}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </View>
-    </View>
+    </VStack>
   );
 }
-
-const createStyles = (colors: { [key: string]: string }) =>
-  StyleSheet.create({
-    wrapper: {
-      gap: 0,
-    },
-    previewCard: {
-      marginBottom: 28,
-      minHeight: 78,
-      borderRadius: RADIUS.xl,
-      padding: 14,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    previewIconWrap: {
-      width: 44,
-      height: 44,
-      borderRadius: RADIUS.md,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: 12,
-    },
-    previewCopy: {
-      flex: 1,
-      paddingRight: 10,
-    },
-    previewName: {
-      fontFamily: TYPOGRAPHY.fonts.headingRegular,
-      fontSize: 17,
-      color: colors.text,
-      letterSpacing: -0.3,
-    },
-    previewMeta: {
-      marginTop: 2,
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 12,
-      color: colors.textMuted,
-    },
-    previewBalance: {
-      fontFamily: TYPOGRAPHY.fonts.monoBold,
-      fontSize: 16,
-      color: colors.text,
-    },
-    qaBlock: {
-      paddingBottom: 22,
-    },
-    question: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 13,
-      color: colors.textMuted,
-      letterSpacing: 0.1,
-      marginBottom: 6,
-    },
-    questionHint: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 12,
-      color: colors.textMuted + 'AA',
-    },
-    answerInput: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 28,
-      lineHeight: 34,
-      color: colors.text,
-      letterSpacing: -0.7,
-      paddingHorizontal: 0,
-      paddingVertical: 4,
-    },
-    answerInputAmount: {
-      fontFamily: TYPOGRAPHY.fonts.monoBold,
-      letterSpacing: 0,
-    },
-    answerLine: {
-      height: 2,
-      borderRadius: 999,
-      backgroundColor: colors.primary + '55',
-      marginTop: 4,
-    },
-    answerLineError: {
-      backgroundColor: colors.danger + '88',
-    },
-    currencyRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: 6,
-    },
-    currencyValue: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 28,
-      lineHeight: 34,
-      color: colors.text,
-      letterSpacing: -0.7,
-    },
-    selectorSection: {
-      paddingBottom: 18,
-    },
-    selectorLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-      color: colors.textMuted,
-      letterSpacing: 1.3,
-      marginBottom: 12,
-    },
-    iconWrap: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 10,
-    },
-    iconChip: {
-      width: 46,
-      height: 46,
-      borderRadius: RADIUS.md,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: colors.background + 'B8',
-      borderWidth: 1,
-      borderColor: colors.text + '10',
-    },
-    colorWrap: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 12,
-    },
-    colorChip: {
-      width: 34,
-      height: 34,
-      borderRadius: RADIUS.md,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 2,
-      borderColor: 'transparent',
-    },
-    colorChipActive: {
-      borderColor: colors.text,
-      transform: [{ scale: 1.08 }],
-    },
-    typeGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 8,
-    },
-    typeChip: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 999,
-      borderWidth: 1,
-      borderColor: colors.text + '10',
-      backgroundColor: colors.background + 'B8',
-    },
-    typeLabel: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 12,
-    },
-  });

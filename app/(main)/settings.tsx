@@ -14,8 +14,6 @@ import { db } from '../../src/db/client';
 import { accounts, categories, payments } from '../../src/db/schema';
 import { useSettings } from '../../src/providers/SettingsProvider';
 import { useTheme } from '../../src/providers/ThemeProvider';
-import { ThemeColors } from '../../src/theme/colors';
-import { TYPOGRAPHY } from '../../src/theme/typography';
 import { usePremium } from '@/src/providers/PremiumProvider';
 import { NotificationService } from '../../src/services/notification.service';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';

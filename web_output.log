@@ -1,0 +1,88 @@
+
+> luno@1.0.2 web
+> expo start --web
+
+🔍 [expo-iap] Config values: horizonAppId=undefined, isHorizonEnabled=false, isOnsideEnabled=false
+📦 [expo-iap] Using OpenIAP from CocoaPods
+Starting project at /app
+NativeWind made the following changes to your project to support TypeScript:
+  - Created nativewind-env.d.ts
+  - Updated ./tsconfig.json to include the nativewind-env.d.ts file
+React Compiler enabled
+Starting Metro Bundler
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Web node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/expo-router/entry.js ▓▓▓▓░░░░░░░░░░░░ 25.0% ( 38/191)
+λ node_modules/expo-router/node/render.js ░░░░░░░░░░░░░░░░  4.7% ( 15/127)
+Web node_modules/expo-router/entry.js ▓▓▓▓░░░░░░░░░░░░ 25.0% (137/339)
+λ node_modules/expo-router/node/render.js ▓▓░░░░░░░░░░░░░░ 13.6% (123/333)
+Web node_modules/expo-router/entry.js ▓▓▓▓░░░░░░░░░░░░ 25.0% (189/403)
+λ node_modules/expo-router/node/render.js ▓▓░░░░░░░░░░░░░░ 15.4% (148/384)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓░░░░░░░░░░░ 37.2% (317/570)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓░░░░░░░░░░ 38.4% (333/538)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓░░░░░░░░░░░ 37.2% (366/721)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓░░░░░░░░░░ 38.4% (333/538)
+| 🔍 [expo-iap] Config values: horizonAppId=undefined, isHorizonEnabled=false, isOnsideEnabled=false
+| 📦 [expo-iap] Using OpenIAP from CocoaPods
+Web node_modules/expo-router/entry.js ▓▓▓▓▓░░░░░░░░░░░ 37.2% (415/784)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓░░░░░░░░░░ 38.4% (483/802)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓░░░░░░░░░░ 42.2% ( 642/1017)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓░░░░░░░░░░ 41.2% (539/840)
+| The exported identifier "AccountType" is not declared in Babel's scope tracker
+| as a JavaScript value binding, and "@babel/plugin-transform-typescript"
+| never encountered it as a TypeScript type declaration.
+| It will be treated as a JavaScript value.
+|
+| This problem is likely caused by another plugin injecting
+| "AccountType" without registering it in the scope tracker. If you are the author
+|  of that plugin, please use "scope.registerDeclaration(declarationPath)".
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓░░░░░░░░░ 44.0% ( 774/1345)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓░░░░░░░░░ 47.1% ( 663/1017)
+| The exported identifier "AccountType" is not declared in Babel's scope tracker
+| as a JavaScript value binding, and "@babel/plugin-transform-typescript"
+| never encountered it as a TypeScript type declaration.
+| It will be treated as a JavaScript value.
+|
+| This problem is likely caused by another plugin injecting
+| "AccountType" without registering it in the scope tracker. If you are the author
+|  of that plugin, please use "scope.registerDeclaration(declarationPath)".
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓░░░░░░░░░ 44.0% ( 961/1448)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓░░░░░░░░░ 48.7% ( 834/1377)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.8% (1339/1580)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓░░░░░░░░░ 48.7% ( 834/1377)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 73.4% (1362/1590)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 74.0% (1355/1575)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 85.7% (1579/1726)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 84.1% (1507/1643)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 90.3% (1887/1986)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 91.7% (1782/1891)
+Web Bundling failed 47847ms node_modules/expo-router/entry.js (2126 modules)
+λ Bundling failed 47859ms node_modules/expo-router/node/render.js (2010 modules)
+
+Metro error: Unable to resolve module ../../src/features/onboarding/styles from /app/app/(onboarding)/index.tsx:
+
+None of these files exist:
+  * src/features/onboarding/styles(.web.ts|.ts|.web.tsx|.tsx|.web.mjs|.mjs|.web.js|.js|.web.jsx|.jsx|.web.json|.json|.web.cjs|.cjs|.web.scss|.scss|.web.sass|.sass|.web.css|.css|.web.sql|.sql|.web.css|.css)
+  * src/features/onboarding/styles
+[0m [90m 27 |[39m   [33mONBOARDING_STEPS[39m[33m,[39m
+ [90m 28 |[39m } [36mfrom[39m [32m'../../src/features/onboarding/constants'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 29 |[39m [36mimport[39m { createOnboardingStyles } [36mfrom[39m [32m'../../src/features/onboarding/styles'[39m[33m;[39m
+ [90m    |[39m                                         [31m[1m^[22m[39m
+ [90m 30 |[39m [36mimport[39m { [33mOnboardingFormValues[39m } [36mfrom[39m [32m'../../src/features/onboarding/types'[39m[33m;[39m
+ [90m 31 |[39m [36mimport[39m { parseAmount[33m,[39m toDbColor } [36mfrom[39m [32m'../../src/utils/format'[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { useOnboarding } [36mfrom[39m [32m'../../src/providers/OnboardingProvider'[39m[33m;[39m[0m
+
+Import stack:
+
+ app/(onboarding)/index.tsx
+ | import "../../src/features/onboarding/styles"
+
+ app (require.context)
+
+
+Call Stack
+  <unknown> (app/(onboarding)/index.tsx:0)
+Error: Premature close
+    at onclose (node:internal/streams/end-of-stream:171:30)
+    at processTicksAndRejections (node:internal/process/task_queues:84:11)

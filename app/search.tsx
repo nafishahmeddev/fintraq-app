@@ -7,9 +7,6 @@ import { BlurBackground } from '@/src/components/ui/BlurBackground';
 import { SearchScreen } from '@/src/features/search/screens/SearchScreen';
 import { usePremium } from '@/src/providers/PremiumProvider';
 import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { RADIUS, SPACING } from '@/src/theme/tokens';
-import { TYPOGRAPHY } from '@/src/theme/typography';
 
 const SEARCH_FEATURES = [
   { icon: 'receipt-outline' as const, label: 'Full-text search across all transactions' },

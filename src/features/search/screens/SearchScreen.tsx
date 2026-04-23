@@ -1,38 +1,90 @@
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
-import { Header } from '@/src/components/ui/Header';
-import { MoneyText } from '@/src/components/ui/MoneyText';
-import { TransactionRow } from '@/src/components/ui/TransactionRow';
-import type { Account } from '@/src/features/accounts/api/accounts';
-import type { Category } from '@/src/features/categories/api/categories';
-import type { TransactionListItem } from '@/src/features/transactions/api/transactions';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { RADIUS, SPACING } from '@/src/theme/tokens';
-import { TYPOGRAPHY } from '@/src/theme/typography';
-import { resolveIcon } from '@/src/utils/icons';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  SectionList,
-  SectionListData,
-  SectionListRenderItemInfo,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, SectionList, SectionListData, SectionListRenderItemInfo, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BlurBackground } from '@/src/components/ui/BlurBackground';
+import { Header } from '@/src/components/ui/Header';
+import { TransactionRow } from '@/src/components/ui/TransactionRow';
+import { useTheme } from '@/src/providers/ThemeProvider';
+import { resolveIcon } from '@/src/utils/icons';
 import { useGlobalSearch } from '../hooks/useGlobalSearch';
+import { Box, HStack, VStack, Pressable, Text, cn } from '@/src/components/ui';
+
+// ─── AccountRow ──────────────────────────────────────────────────────────────
+
+type AccountRowProps = {
+  account: { id: number; name: string; type: string; balance: number; currency: string; icon: string; color: number };
+  onPress: (id: number) => void;
+  isFirst?: boolean;
+  isLast?: boolean;
+};
 
 const toHexColor = (value: number) => `#${value.toString(16).padStart(6, '0')}`;
 
+const AccountRow = React.memo(function AccountRow({ account, onPress, isFirst, isLast }: AccountRowProps) {
+  const accColor = toHexColor(account.color);
+  return (
+    <Pressable
+      className={cn(
+        "flex-row items-center py-3 px-4 space-x-3 bg-surface border-b border-border",
+        isFirst && "rounded-t-2xl",
+        isLast && "rounded-b-2xl border-b-0"
+      )}
+      onPress={() => onPress(account.id)}
+    >
+      <Box className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: accColor + '18' }}>
+        <Ionicons name={resolveIcon(account.icon, 'wallet-outline')} size={18} color={accColor} />
+      </Box>
+      <VStack className="flex-1">
+        <Text className="font-semibold text-sm text-text">{account.name}</Text>
+        <Text className="font-regular text-xs text-text-muted mt-0.5">{account.type}</Text>
+      </VStack>
+      <Ionicons name="chevron-forward" size={14} color="#737a5f" />
+    </Pressable>
+  );
+});
+
+// ─── CategoryRow ─────────────────────────────────────────────────────────────
+
+type CategoryRowProps = {
+  category: { id: number; name: string; type: string; icon: string; color: number };
+  onPress: (id: number) => void;
+  isFirst?: boolean;
+  isLast?: boolean;
+};
+
+const CategoryRow = React.memo(function CategoryRow({ category, onPress, isFirst, isLast }: CategoryRowProps) {
+  const catColor = toHexColor(category.color);
+  return (
+    <Pressable
+      className={cn(
+        "flex-row items-center py-3 px-4 space-x-3 bg-surface border-b border-border",
+        isFirst && "rounded-t-2xl",
+        isLast && "rounded-b-2xl border-b-0"
+      )}
+      onPress={() => onPress(category.id)}
+    >
+      <Box className="w-10 h-10 rounded-2xl items-center justify-center" style={{ backgroundColor: catColor + '18' }}>
+        <Ionicons name={resolveIcon(category.icon, 'pricetag-outline')} size={18} color={catColor} />
+      </Box>
+      <Text className="flex-1 font-semibold text-sm text-text">{category.name}</Text>
+      <Box className={cn("px-2 h-[22px] rounded-sm items-center justify-center", category.type === 'CR' ? 'bg-success/10' : 'bg-danger/10')}>
+        <Text className={cn("font-semibold text-[11px]", category.type === 'CR' ? 'text-success' : 'text-danger')}>
+          {category.type === 'CR' ? 'Income' : 'Expense'}
+        </Text>
+      </Box>
+      <Ionicons name="chevron-forward" size={14} color="#737a5f" />
+    </Pressable>
+  );
+});
+
+// ─── SearchScreen ─────────────────────────────────────────────────────────────
+
 type SearchItem =
-  | { kind: 'transaction'; data: TransactionListItem }
-  | { kind: 'account'; data: Account }
-  | { kind: 'category'; data: Category };
+  | { kind: 'transaction'; data: any }
+  | { kind: 'account'; data: any }
+  | { kind: 'category'; data: any };
 
 type SearchSection = {
   title: string;
@@ -40,185 +92,9 @@ type SearchSection = {
   data: SearchItem[];
 };
 
-// ─── AccountRow ──────────────────────────────────────────────────────────────
-
-const AccountRow = React.memo(function AccountRow({
-  account,
-  onPress,
-  isFirst,
-  isLast,
-}: {
-  account: Account;
-  onPress: (id: number) => void;
-  isFirst: boolean;
-  isLast: boolean;
-}) {
-  const { colors } = useTheme();
-  const accentColor = useMemo(() => toHexColor(account.color), [account.color]);
-  const handlePress = useCallback(() => onPress(account.id), [onPress, account.id]);
-
-  const containerStyle = useMemo(() => ({
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: isFirst ? RADIUS.lg : 0,
-    borderTopRightRadius: isFirst ? RADIUS.lg : 0,
-    borderBottomLeftRadius: isLast ? RADIUS.lg : 0,
-    borderBottomRightRadius: isLast ? RADIUS.lg : 0,
-    borderBottomWidth: isLast ? 0 : 1,
-    borderBottomColor: colors.text + '08',
-  }), [isFirst, isLast, colors]);
-
-  return (
-    <TouchableOpacity
-      style={[accountRowStyles.container, containerStyle]}
-      onPress={handlePress}
-      activeOpacity={0.75}
-    >
-      <View style={[accountRowStyles.iconBox, { backgroundColor: accentColor + '18' }]}>
-        <Ionicons name={resolveIcon(account.icon, 'wallet-outline')} size={18} color={accentColor} />
-      </View>
-      <View style={accountRowStyles.info}>
-        <Text style={[accountRowStyles.name, { color: colors.text }]}>{account.name}</Text>
-        <Text style={[accountRowStyles.meta, { color: colors.textMuted }]}>
-          {account.currency} · {account.accountNumber && account.accountNumber !== 'N/A'
-            ? `•••• ${account.accountNumber.slice(-4)}`
-            : 'Account'}
-        </Text>
-      </View>
-      <MoneyText
-        amount={account.balance}
-        currency={account.currency}
-        weight="bold"
-        style={accountRowStyles.balance}
-      />
-      <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
-    </TouchableOpacity>
-  );
-});
-
-const accountRowStyles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: SPACING['3'],
-    paddingHorizontal: SPACING['4'],
-    gap: SPACING['3'],
-  },
-  iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: RADIUS.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  info: {
-    flex: 1,
-    gap: SPACING['0.5'],
-  },
-  name: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 14,
-  },
-  meta: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 12,
-  },
-  balance: {
-    fontSize: 14,
-  },
-});
-
-// ─── CategoryRow ─────────────────────────────────────────────────────────────
-
-const CategoryRow = React.memo(function CategoryRow({
-  category,
-  onPress,
-  isFirst,
-  isLast,
-}: {
-  category: Category;
-  onPress: (id: number) => void;
-  isFirst: boolean;
-  isLast: boolean;
-}) {
-  const { colors } = useTheme();
-  const catColor = useMemo(() => toHexColor(category.color), [category.color]);
-  const handlePress = useCallback(() => onPress(category.id), [onPress, category.id]);
-
-  const containerStyle = useMemo(() => ({
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: isFirst ? RADIUS.lg : 0,
-    borderTopRightRadius: isFirst ? RADIUS.lg : 0,
-    borderBottomLeftRadius: isLast ? RADIUS.lg : 0,
-    borderBottomRightRadius: isLast ? RADIUS.lg : 0,
-    borderBottomWidth: isLast ? 0 : 1,
-    borderBottomColor: colors.text + '08',
-  }), [isFirst, isLast, colors]);
-
-  return (
-    <TouchableOpacity
-      style={[categoryRowStyles.container, containerStyle]}
-      onPress={handlePress}
-      activeOpacity={0.75}
-    >
-      <View style={[categoryRowStyles.iconBox, { backgroundColor: catColor + '18' }]}>
-        <Ionicons name={resolveIcon(category.icon, 'pricetag-outline')} size={18} color={catColor} />
-      </View>
-      <Text style={[categoryRowStyles.name, { color: colors.text }]}>{category.name}</Text>
-      <View style={[
-        categoryRowStyles.typeBadge,
-        { backgroundColor: (category.type === 'CR' ? colors.success : colors.danger) + '15' },
-      ]}>
-        <Text style={[
-          categoryRowStyles.typeBadgeText,
-          { color: category.type === 'CR' ? colors.success : colors.danger },
-        ]}>
-          {category.type === 'CR' ? 'Income' : 'Expense'}
-        </Text>
-      </View>
-      <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
-    </TouchableOpacity>
-  );
-});
-
-const categoryRowStyles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: SPACING['3'],
-    paddingHorizontal: SPACING['4'],
-    gap: SPACING['3'],
-  },
-  iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: RADIUS.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  name: {
-    flex: 1,
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 14,
-  },
-  typeBadge: {
-    paddingHorizontal: SPACING['2'],
-    height: 22,
-    borderRadius: RADIUS.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  typeBadgeText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 11,
-  },
-});
-
-// ─── SearchScreen ─────────────────────────────────────────────────────────────
-
 export function SearchScreen() {
-  const { colors } = useTheme();
+  const { isDark } = useTheme();
   const router = useRouter();
-  const styles = useMemo(() => createStyles(colors), [colors]);
   const inputRef = useRef<TextInput>(null);
 
   const [query, setQuery] = useState('');
@@ -283,7 +159,6 @@ export function SearchScreen() {
         return (
           <TransactionRow
             tx={item.data}
-            colors={colors}
             isFirst={isFirst}
             isLast={isLast}
             showDate
@@ -310,20 +185,20 @@ export function SearchScreen() {
         />
       );
     },
-    [colors, handleTransactionPress, handleAccountPress, handleCategoryPress],
+    [handleTransactionPress, handleAccountPress, handleCategoryPress],
   );
 
   const renderSectionHeader = useCallback(
     ({ section }: { section: SectionListData<SearchItem, SearchSection> }) => (
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionHeaderText}>{section.title}</Text>
-        <Text style={styles.sectionHeaderCount}>{section.count}</Text>
-      </View>
+      <HStack className="items-center justify-between pl-1 mb-2">
+        <Text className="font-semibold text-[9px] text-text-muted tracking-widest uppercase">{section.title}</Text>
+        <Text className="font-semibold text-[10px] text-text-muted">{section.count}</Text>
+      </HStack>
     ),
-    [styles],
+    [],
   );
 
-  const renderSectionFooter = useCallback(() => <View style={{ height: SPACING['5'] }} />, []);
+  const renderSectionFooter = useCallback(() => <Box className="h-5" />, []);
 
   const keyExtractor = useCallback((item: SearchItem) => {
     if (item.kind === 'transaction') return `tx-${item.data.id}`;
@@ -332,64 +207,61 @@ export function SearchScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       <BlurBackground />
 
-      {/* Header */}
       <Header
         title="Search"
         showBack
         rightAction={
           isFetching && isEnabled ? (
-            <ActivityIndicator size="small" color={colors.primary} />
+            <ActivityIndicator size="small" color={isDark ? '#B8D641' : '#a6c13a'} />
           ) : undefined
         }
       />
 
-      {/* Search input */}
-      <View style={styles.searchRow}>
-        <View style={styles.searchWrap}>
-          <Ionicons name="search-outline" size={18} color={colors.textMuted} />
+      <Box className="px-6 pb-4">
+        <HStack className="items-center h-[52px] rounded-xl bg-surface border border-border px-4 space-x-2">
+          <Ionicons name="search-outline" size={18} color={isDark ? '#b2bb8b' : '#737a5f'} />
           <TextInput
             ref={inputRef}
-            style={styles.searchInput}
+            className="flex-1 font-regular text-base text-text py-0"
             value={query}
             onChangeText={setQuery}
             placeholder="Transactions, accounts, categories..."
-            placeholderTextColor={colors.textMuted + '80'}
+            placeholderTextColor={isDark ? '#b2bb8b80' : '#737a5f80'}
             returnKeyType="search"
             autoCorrect={false}
             autoCapitalize="none"
           />
           {query.length > 0 && (
-            <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              <Ionicons name="close-circle" size={17} color={colors.textMuted} />
-            </TouchableOpacity>
+            <Pressable onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Ionicons name="close-circle" size={17} color={isDark ? '#b2bb8b' : '#737a5f'} />
+            </Pressable>
           )}
-        </View>
-      </View>
+        </HStack>
+      </Box>
 
-      {/* Results / States */}
       {!isEnabled ? (
-        <View style={styles.promptWrap}>
-          <View style={styles.promptIconBox}>
-            <Ionicons name="search" size={28} color={colors.textMuted} />
-          </View>
-          <Text style={styles.promptTitle}>Find anything</Text>
-          <Text style={styles.promptSubtitle}>
+        <VStack className="flex-1 items-center justify-center pb-20 space-y-3">
+          <Box className="w-[68px] h-[68px] rounded-2xl bg-surface items-center justify-center mb-1 border border-border">
+            <Ionicons name="search" size={28} color={isDark ? '#b2bb8b' : '#737a5f'} />
+          </Box>
+          <Text className="font-semibold text-lg text-text tracking-tight">Find anything</Text>
+          <Text className="font-regular text-sm text-text-muted text-center leading-5">
             Search across transactions, accounts{'\n'}and categories in one place.
           </Text>
-        </View>
+        </VStack>
       ) : noResults ? (
-        <View style={styles.promptWrap}>
-          <View style={styles.promptIconBox}>
-            <Ionicons name="file-tray-outline" size={28} color={colors.textMuted} />
-          </View>
-          <Text style={styles.promptTitle}>No results</Text>
-          <Text style={styles.promptSubtitle}>
+        <VStack className="flex-1 items-center justify-center pb-20 space-y-3">
+          <Box className="w-[68px] h-[68px] rounded-2xl bg-surface items-center justify-center mb-1 border border-border">
+            <Ionicons name="file-tray-outline" size={28} color={isDark ? '#b2bb8b' : '#737a5f'} />
+          </Box>
+          <Text className="font-semibold text-lg text-text tracking-tight">No results</Text>
+          <Text className="font-regular text-sm text-text-muted text-center leading-5">
             {`Nothing matched "${debouncedQuery}".\nTry a different term.`}
           </Text>
-        </View>
+        </VStack>
       ) : (
         <SectionList
           sections={sections}
@@ -397,7 +269,7 @@ export function SearchScreen() {
           renderItem={renderItem}
           renderSectionHeader={renderSectionHeader}
           renderSectionFooter={renderSectionFooter}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 60 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
@@ -407,89 +279,3 @@ export function SearchScreen() {
     </SafeAreaView>
   );
 }
-
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-
-    // ─── Search input ───────────────────────────────────────────────────────
-    searchRow: {
-      paddingHorizontal: SPACING['6'],
-      paddingBottom: SPACING['4'],
-    },
-    searchWrap: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      height: 52,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.surface,
-      paddingHorizontal: SPACING['4'],
-      gap: SPACING['2'],
-    },
-    searchInput: {
-      flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 16,
-      color: colors.text,
-      padding: 0,
-    },
-
-    // ─── Empty / prompt states ─────────────────────────────────────────────
-    promptWrap: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingBottom: 80,
-      gap: SPACING['3'],
-    },
-    promptIconBox: {
-      width: 68,
-      height: 68,
-      borderRadius: RADIUS['2xl'],
-      backgroundColor: colors.surface,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: SPACING['1'],
-    },
-    promptTitle: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 18,
-      color: colors.text,
-      letterSpacing: -0.3,
-    },
-    promptSubtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 14,
-      color: colors.textMuted,
-      textAlign: 'center',
-      lineHeight: 20,
-    },
-
-    // ─── Results list ───────────────────────────────────────────────────────
-    listContent: {
-      paddingHorizontal: SPACING['6'],
-      paddingBottom: 60,
-    },
-    sectionHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingLeft: SPACING['1'],
-      marginBottom: SPACING['2'],
-    },
-    sectionHeaderText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 9,
-      color: colors.textMuted,
-      letterSpacing: 1.2,
-      textTransform: 'uppercase',
-    },
-    sectionHeaderCount: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-      color: colors.textMuted,
-    },
-  });

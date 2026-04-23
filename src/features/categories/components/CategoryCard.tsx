@@ -1,10 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { resolveIcon } from '../../../utils/icons';
 import React, { useMemo, useCallback } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import {  Text, TouchableOpacity, View } from 'react-native';
 import { Category } from '../api/categories';
 
 interface CategoryCardProps {
@@ -22,7 +19,6 @@ export const CategoryCard = React.memo(function CategoryCard({
   onPress,
   onLongPress,
 }: CategoryCardProps) {
-  const styles = useMemo(() => createStyles(colors), [colors]);
   const catColor = useMemo(() =>
     item.color ? '#' + item.color.toString(16).padStart(6, '0') : colors.primary,
     [item.color, colors.primary]
@@ -77,103 +73,3 @@ export const CategoryCard = React.memo(function CategoryCard({
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  categoryCard: {
-    position: 'relative',
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: RADIUS.full,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 10,
-    overflow: 'hidden',
-    minHeight: 156,
-  },
-  categoryCardLeft: {
-    marginRight: 6,
-  },
-  categoryCardRight: {
-    marginLeft: 6,
-  },
-  cardGlow: {
-    position: 'absolute',
-    right: -24,
-    top: -24,
-    width: 88,
-    height: 88,
-    borderRadius: RADIUS.full,
-  },
-  cardTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  categoryIconBox: {
-    width: 42,
-    height: 42,
-    borderRadius: RADIUS.full,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  typeBadge: {
-    height: 22,
-    borderRadius: RADIUS.full,
-    paddingHorizontal: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  typeBadgeDanger: {
-    backgroundColor: colors.danger + '18',
-  },
-  typeBadgeSuccess: {
-    backgroundColor: colors.success + '18',
-  },
-  typeBadgeText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 9,
-    letterSpacing: 0.7,
-  },
-  typeBadgeTextDanger: {
-    color: colors.danger,
-  },
-  typeBadgeTextSuccess: {
-    color: colors.success,
-  },
-  cardMainRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  cardInfo: {
-    flex: 1,
-  },
-  categoryName: {
-    fontFamily: TYPOGRAPHY.fonts.headingRegular,
-    color: colors.text,
-    fontSize: 20,
-    letterSpacing: -0.5,
-    lineHeight: 23,
-  },
-  categorySubtext: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
-    fontSize: 11,
-    marginTop: 6,
-  },
-  cardFooter: {
-    marginTop: 'auto',
-    paddingTop: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  cardFooterText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 10,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    color: colors.textMuted,
-  },
-});

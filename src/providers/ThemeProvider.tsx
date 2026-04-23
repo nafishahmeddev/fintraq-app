@@ -1,15 +1,13 @@
-import React, { createContext, useContext, useMemo } from 'react';
-import { useColorScheme } from 'react-native';
-import { LIGHT_THEME, DARK_THEME, ThemeColors } from '../theme/colors';
+import { useColorScheme } from 'nativewind';
+import React, { createContext, useContext, useEffect, useMemo } from 'react';
+import { useColorScheme as useRNColorScheme } from 'react-native';
 import { useSettings } from './SettingsProvider';
 
 type ThemeContextType = {
-  colors: ThemeColors;
   isDark: boolean;
 };
 
 const ThemeContext = createContext<ThemeContextType>({
-  colors: DARK_THEME,
   isDark: true,
 });
 
@@ -17,15 +15,18 @@ export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = React.memo(function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { profile } = useSettings();
-  const systemColorScheme = useColorScheme();
+  const systemColorScheme = useRNColorScheme();
+  const { setColorScheme } = useColorScheme();
 
   const isDark = profile.theme === 'system'
     ? systemColorScheme === 'dark'
     : profile.theme === 'dark';
 
-  const colors = useMemo(() => isDark ? DARK_THEME : LIGHT_THEME, [isDark]);
+  useEffect(() => {
+    setColorScheme(isDark ? 'dark' : 'light');
+  }, [isDark, setColorScheme]);
 
-  const contextValue = useMemo(() => ({ colors, isDark }), [colors, isDark]);
+  const contextValue = useMemo(() => ({ isDark }), [isDark]);
 
   return (
     <ThemeContext.Provider value={contextValue}>

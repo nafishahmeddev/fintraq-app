@@ -1,11 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView,  Text, View } from 'react-native';
 import { PremiumGuard } from '../../../components/ui/PremiumGuard';
 import { usePremium } from '../../../providers/PremiumProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { useDashboardInsights } from '../hooks/dashboard';
 import { InsightCard } from './InsightCard';
 import { SectionHeader } from './SectionHeader';
@@ -74,57 +72,3 @@ export function InsightsSection({ currency }: InsightsSectionProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: 4,
-    marginBottom: 20,
-  },
-  premiumContainer: {
-    borderRadius: RADIUS.full,
-    overflow: 'hidden',
-    marginHorizontal: 0, // Default to 0 for pro scrolling context
-  },
-  scrollContent: {
-    paddingRight: 0,
-    gap: 0, 
-  },
-  placeholderCard: {
-    height: 110,
-    marginHorizontal: 24,
-    borderRadius: RADIUS.full,
-    backgroundColor: 'rgba(0,0,0,0.03)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 12,
-  },
-  loadingCircle: {
-     width: 20,
-     height: 20,
-     borderRadius: RADIUS.full,
-     borderWidth: 2,
-     borderColor: 'rgba(0,0,0,0.1)',
-     borderStyle: 'dashed',
-  },
-  loadingText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 9,
-    letterSpacing: 0.5,
-  },
-  emptyCard: {
-    height: 110,
-    marginHorizontal: 24,
-    borderRadius: RADIUS.full,
-    borderWidth: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-  },
-  emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 11,
-    textAlign: 'center',
-    lineHeight: 16,
-    maxWidth: '80%',
-  },
-});

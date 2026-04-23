@@ -7,8 +7,6 @@ import { BlurBackground } from '../../../src/components/ui/BlurBackground';
 import { ReportHeader } from '../../../src/features/reports/components/ReportHeader';
 import { StreakBadge } from '../../../src/features/reports/components/StreakBadge';
 import { useTheme } from '../../../src/providers/ThemeProvider';
-import { ThemeColors } from '../../../src/theme/colors';
-import { TYPOGRAPHY } from '../../../src/theme/typography';
 
 /**
  * ReportsHub: Re-aligned with the core Editorial Brutalist design.

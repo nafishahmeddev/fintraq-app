@@ -9,8 +9,6 @@ import { ReportHeader } from '../../../src/features/reports/components/ReportHea
 import { useWeeklyReport } from '../../../src/features/reports/hooks/useReports';
 import { useSettings } from '../../../src/providers/SettingsProvider';
 import { useTheme } from '../../../src/providers/ThemeProvider';
-import { ThemeColors } from '../../../src/theme/colors';
-import { TYPOGRAPHY } from '../../../src/theme/typography';
 import { MoneyText } from '../../../src/components/ui/MoneyText';
 import { PremiumGuard } from '../../../src/components/ui/PremiumGuard';
 

@@ -1,8 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import {  Text, TouchableOpacity, View } from 'react-native';
 import type { Account } from '../../accounts/api/accounts';
 
 type Props = {
@@ -22,7 +20,6 @@ const resolveIconName = (raw: string | null | undefined): keyof typeof Ionicons.
 const toHexColor = (value: number) => `#${value.toString(16).padStart(6, '0')}`;
 
 export const TransactionAccountPicker = ({ accounts, selectedId, onSelect, onAdd, colors, label = 'ACCOUNT' }: Props) => {
-  const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
     <View style={styles.container}>
@@ -74,54 +71,3 @@ export const TransactionAccountPicker = ({ accounts, selectedId, onSelect, onAdd
   );
 };
 
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    container: {
-      paddingVertical: 12,
-      paddingHorizontal: 24,
-    },
-    label: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-      letterSpacing: 1.5,
-      marginBottom: 12,
-    },
-    grid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 8,
-    },
-    pill: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      paddingHorizontal: 12,
-      height: 36,
-      borderRadius: 999,
-      borderWidth: 1,
-    },
-    addPill: {
-      borderStyle: 'dashed',
-      borderColor: colors.border,
-      backgroundColor: colors.surface + '60',
-    },
-    addIconCircle: {
-      width: 20,
-      height: 20,
-      borderRadius: 999,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderStyle: 'dashed',
-    },
-    name: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 13,
-    },
-    addName: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 13,
-      color: colors.textMuted,
-    },
-  });

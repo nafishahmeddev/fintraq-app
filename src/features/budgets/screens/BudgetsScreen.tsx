@@ -1,16 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList,  Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Header } from '../../../components/ui/Header';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { formatCurrency } from '../../../utils/format';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { useBudgets, useBudgetsProgress, useDeleteBudget } from '../api/budgets';
@@ -19,7 +16,6 @@ import { budgets } from '../../../db/schema';
 export const BudgetsScreen = () => {
   const { colors } = useTheme();
   const { profile } = useSettings();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
   const router = useRouter();
   
   const { data: budgetsData, isLoading: loadingBudgets } = useBudgets();
@@ -179,157 +175,3 @@ export const BudgetsScreen = () => {
   );
 };
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  listContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 100,
-    gap: 12,
-  },
-  card: {
-    borderRadius: RADIUS['2xl'],
-    backgroundColor: colors.surface,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 20,
-  },
-  cardInfo: {
-    flex: 1,
-  },
-  cardName: {
-    fontFamily: TYPOGRAPHY.fonts.heading,
-    fontSize: 22,
-    color: colors.text,
-    marginBottom: 2,
-    letterSpacing: -0.5,
-  },
-  cardMeta: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 10,
-    color: colors.textMuted,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
-  cardRight: {
-    alignItems: 'flex-end',
-  },
-  cardAmount: {
-    fontFamily: TYPOGRAPHY.fonts.monoBold,
-    fontSize: 20,
-    letterSpacing: -0.5,
-    color: colors.text,
-  },
-  cardSubtitle: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 12,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  progressSection: {},
-  progressRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  progressLabel: {
-    fontFamily: TYPOGRAPHY.fonts.medium,
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-  progressBar: {
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.textMuted + '20',
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 64,
-    height: 64,
-    borderRadius: RADIUS.full,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  emptyContainer: {
-    paddingVertical: 60,
-    alignItems: 'center',
-  },
-  emptyTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
-    fontSize: 20,
-    marginTop: 16,
-    letterSpacing: -0.4,
-  },
-  emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
-    fontSize: 14,
-    marginTop: 6,
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  emptyBtn: {
-    height: 44,
-    borderRadius: RADIUS.full,
-    paddingHorizontal: 20,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyBtnText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 14,
-    color: colors.text,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  rollingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: colors.primary + '20',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: RADIUS.xs,
-  },
-  rollingBadgeText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 9,
-    color: colors.primary,
-    textTransform: 'uppercase',
-  },
-  adjustmentText: {
-    fontFamily: TYPOGRAPHY.fonts.medium,
-    fontSize: 10,
-    marginTop: 8,
-    textAlign: 'right',
-  },
-});

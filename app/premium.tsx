@@ -2,21 +2,20 @@ import { Header } from '@/src/components/ui/Header';
 import { FEATURES, SKU_LIFETIME } from '@/src/constants/iap';
 import { usePremium } from '@/src/providers/PremiumProvider';
 import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { TYPOGRAPHY } from '@/src/theme/typography';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Alert, Platform, ScrollView, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Box, HStack, VStack, Pressable, Text, cn } from '@/src/components/ui';
 
-/**
- * PremiumScreen: Consolidates conversion and detailed information.
- * Refined to match the 'Settings' pattern for a cohesive app experience.
- */
+let BlurView: any = null;
+if (Platform.OS !== 'web') {
+  BlurView = require('@sbaiahmed1/react-native-blur').BlurView;
+}
+
 export default function PremiumScreen() {
-  const { colors, isDark } = useTheme();
+  const { isDark } = useTheme();
   const { products, purchasePremium, restorePurchase, isPremium, isLoading } = usePremium();
   const router = useRouter();
   const { width: screenWidth } = useWindowDimensions();
@@ -25,8 +24,6 @@ export default function PremiumScreen() {
   const lifetimeProduct = useMemo(() => {
     return products.find(p => p.id === SKU_LIFETIME);
   }, [products]);
-
-  const styles = useMemo(() => createStyles(colors, screenWidth), [colors, screenWidth]);
 
   const handlePurchase = useCallback(async () => {
     setIsProcessing(true);
@@ -42,303 +39,169 @@ export default function PremiumScreen() {
 
   if (isPremium && !isProcessing) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-          <View style={[styles.bgCircle, { top: -100, left: -100, width: 500, height: 500, backgroundColor: colors.primary, opacity: 0.15 }]} />
-          <View style={[styles.bgCircle, { bottom: -150, right: -150, width: 600, height: 600, backgroundColor: colors.primary, opacity: 0.1 }]} />
+      <View className="flex-1 bg-background">
+        <View className="absolute inset-0" pointerEvents="none">
+          <View className="absolute rounded-full" style={{ top: -100, left: -100, width: 500, height: 500, backgroundColor: isDark ? '#B8D641' : '#a6c13a', opacity: 0.15 }} />
+          <View className="absolute rounded-full" style={{ bottom: -150, right: -150, width: 600, height: 600, backgroundColor: isDark ? '#B8D641' : '#a6c13a', opacity: 0.1 }} />
         </View>
-        <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
+        {BlurView && <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} className="absolute inset-0" />}
 
-        <SafeAreaView style={styles.successWrapper}>
-          <View style={styles.proContent}>
-            <View style={styles.proBadge}>
-              <Ionicons name="sparkles" size={32} color={colors.primary} />
-            </View>
+        <SafeAreaView className="flex-1 justify-center px-8">
+          <VStack className="items-center mb-16">
+            <Box className="w-20 h-20 rounded-[32px] bg-primary/20 items-center justify-center mb-8 border border-primary/30">
+              <Ionicons name="sparkles" size={32} color={isDark ? '#B8D641' : '#a6c13a'} />
+            </Box>
 
-            <View style={styles.proHero}>
-              <Text style={styles.proKicker}>Lifetime access</Text>
-              <Text style={styles.proHeading}>Luno Pro{"\n"}Unlocked.</Text>
-            </View>
+            <VStack className="items-center space-y-3 mb-10">
+              <Text className="font-semibold text-xs tracking-widest uppercase text-primary">Lifetime access</Text>
+              <Text className="font-heading text-[44px] leading-[48px] tracking-tighter text-text text-center">Luno Pro{"\n"}Unlocked.</Text>
+            </VStack>
 
-            <View style={styles.proStatusRow}>
-              <View style={styles.statusPill}>
-                <View style={[styles.statusDot, { backgroundColor: colors.primary }]} />
-                <Text style={styles.statusText}>Forever member</Text>
-              </View>
-            </View>
+            <HStack className="mb-6">
+              <HStack className="items-center px-4 h-9 rounded-full bg-surface border border-border space-x-2">
+                <Box className="w-2 h-2 rounded-full bg-primary" />
+                <Text className="font-semibold text-[13px] text-text">Forever member</Text>
+              </HStack>
+            </HStack>
 
-            <Text style={styles.proDescription}>
+            <Text className="font-regular text-[15px] leading-6 text-text-muted text-center max-w-[280px]">
               You have permanent, unrestricted access to the complete professional suite. All current and future features are yours.
             </Text>
-          </View>
+          </VStack>
 
-          <View style={styles.proActions}>
-            <TouchableOpacity
-              style={styles.actionBtn}
+          <Box className="items-center">
+            <Pressable
+              className="flex-row items-center h-14 px-8 rounded-full bg-text space-x-3"
               onPress={() => router.back()}
-              activeOpacity={0.85}
             >
-              <Text style={styles.actionBtnText}>Dashboard</Text>
-              <Ionicons name="arrow-forward" size={18} color={colors.background} />
-            </TouchableOpacity>
-          </View>
+              <Text className="font-semibold text-base text-background">Dashboard</Text>
+              <Ionicons name="arrow-forward" size={18} color={isDark ? '#000100' : '#F6FFF9'} />
+            </Pressable>
+          </Box>
         </SafeAreaView>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       {/* ── Immersive Background ── */}
-      <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-        <View style={[styles.bgCircle, { top: -60, left: -60, width: 340, height: 340, backgroundColor: colors.primary, opacity: 0.72 }]} />
-        <View style={[styles.bgCircle, { top: 180, right: -110, width: 440, height: 440, backgroundColor: colors.primaryDark, opacity: 0.52 }]} />
-        <View style={[styles.bgCircle, { bottom: -110, left: 40, width: 380, height: 380, backgroundColor: colors.primary, opacity: 0.6 }]} />
+      <View className="absolute inset-0" pointerEvents="none">
+        <View className="absolute rounded-full" style={{ top: -60, left: -60, width: 340, height: 340, backgroundColor: isDark ? '#B8D641' : '#a6c13a', opacity: 0.72 }} />
+        <View className="absolute rounded-full" style={{ top: 180, right: -110, width: 440, height: 440, backgroundColor: isDark ? '#a0c119' : '#8caa14', opacity: 0.52 }} />
+        <View className="absolute rounded-full" style={{ bottom: -110, left: 40, width: 380, height: 380, backgroundColor: isDark ? '#B8D641' : '#a6c13a', opacity: 0.6 }} />
       </View>
-      <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
-      {Platform.OS === 'android' && (
-        <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]} pointerEvents="none" />
+      {BlurView && <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} className="absolute inset-0" />}
+      {(Platform.OS === 'android' || Platform.OS === 'web') && (
+        <View className="absolute inset-0 bg-background/60" pointerEvents="none" />
       )}
 
-      {/* ── Header ── */}
       <Header title="Luno Pro" showBack />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
 
-        {/* ── Editorial Hero ── */}
-        <View style={styles.heroSection}>
-          <Text style={styles.heroKicker}>One-time upgrade</Text>
-          <Text style={styles.heroTitle}>Unlock peak financial clarity.</Text>
-          <Text style={styles.heroSubtitle}>No subscriptions. One payment for permanent access to all professional tools.</Text>
-        </View>
+        <VStack className="px-6 py-6 space-y-4">
+          <Text className="font-semibold text-[10px] tracking-widest text-text-muted uppercase">One-time upgrade</Text>
+          <Text className="font-heading text-[40px] leading-[44px] text-text tracking-tighter">Unlock peak financial clarity.</Text>
+          <Text className="font-regular text-[15px] leading-6 text-text-muted max-w-[300px]">No subscriptions. One payment for permanent access to all professional tools.</Text>
+        </VStack>
 
-        {/* ── Main Offer Card (Primary CTA) ── */}
-        <View style={styles.offerSection}>
-          <View style={styles.lifetimeCard}>
-            <View style={styles.cardHeader}>
-              <View>
-                <Text style={styles.cardTitle}>Lifetime Access</Text>
-                <Text style={styles.cardSubtitle}>Forever Pro License</Text>
-              </View>
-              <View style={styles.cardBadge}>
-                <Text style={styles.cardBadgeText}>Best Value</Text>
-              </View>
-            </View>
+        <VStack className="px-6 mb-8">
+          <VStack className="bg-surface rounded-3xl border border-border p-6 shadow-2xl">
+            <HStack className="justify-between items-start mb-6">
+              <VStack>
+                <Text className="font-heading text-[22px] tracking-tight text-text leading-7">Lifetime Access</Text>
+                <Text className="font-medium text-[13px] text-text-muted mt-1">Forever Pro License</Text>
+              </VStack>
+              <Box className="px-2.5 h-[22px] rounded-sm bg-primary/20 items-center justify-center">
+                <Text className="font-semibold text-[9px] tracking-widest uppercase text-primary">Best Value</Text>
+              </Box>
+            </HStack>
 
-            <View style={styles.priceContainer}>
+            <VStack className="mb-6">
               {lifetimeProduct ? (
                 <>
-                  <View style={styles.priceRow}>
+                  <HStack className="items-end space-x-2">
                     {lifetimeProduct.originalPrice && (
-                      <Text style={styles.originalPrice}>{lifetimeProduct.originalPrice}</Text>
+                      <Text className="font-semibold text-lg text-text-muted line-through mb-1.5">{lifetimeProduct.originalPrice}</Text>
                     )}
-                    <Text style={styles.priceValue}>{lifetimeProduct.displayPrice}</Text>
-                  </View>
-                  <Text style={styles.priceSuffix}>One-time only</Text>
+                    <Text className="font-monoBold text-[40px] leading-[44px] tracking-tighter text-text">{lifetimeProduct.displayPrice}</Text>
+                  </HStack>
+                  <Text className="font-semibold text-[13px] text-text-muted tracking-wide mt-2">One-time only</Text>
                 </>
               ) : isLoading ? (
-                <ActivityIndicator color={colors.primary} />
+                <ActivityIndicator color={isDark ? '#B8D641' : '#a6c13a'} />
               ) : (
-                <Text style={styles.priceError}>Pricing unavailable</Text>
+                <Text className="font-medium text-sm text-danger">Pricing unavailable</Text>
               )}
-            </View>
+            </VStack>
 
-            <View style={styles.cardDivider} />
+            <Box className="h-px bg-border mb-6" />
 
-            <View style={styles.trustInfo}>
-              <View style={styles.trustRow}>
-                <Ionicons name="shield-checkmark" size={14} color={colors.success} />
-                <Text style={styles.trustText}>Permanent Device Account License</Text>
-              </View>
-              <View style={styles.trustRow}>
-                <Ionicons name="cloud-done" size={14} color={colors.success} />
-                <Text style={styles.trustText}>All future tool updates included</Text>
-              </View>
-            </View>
-          </View>
-        </View>
+            <VStack className="space-y-3">
+              <HStack className="items-center space-x-3">
+                <Ionicons name="shield-checkmark" size={14} color={isDark ? '#6BD498' : '#43B875'} />
+                <Text className="font-medium text-[13px] text-text">Permanent Device Account License</Text>
+              </HStack>
+              <HStack className="items-center space-x-3">
+                <Ionicons name="cloud-done" size={14} color={isDark ? '#6BD498' : '#43B875'} />
+                <Text className="font-medium text-[13px] text-text">All future tool updates included</Text>
+              </HStack>
+            </VStack>
+          </VStack>
+        </VStack>
 
-        {/* ── Detailed Features (Settings Pattern) ── */}
-        <View style={styles.featuresSection}>
-          <Text style={styles.sectionLabel}>Pro Capabilities</Text>
-          <View style={styles.settingsCard}>
+        <VStack className="px-6 mb-8 space-y-4">
+          <Text className="font-semibold text-[10px] tracking-widest text-text-muted uppercase pl-1">Pro Capabilities</Text>
+          <VStack className="bg-surface rounded-2xl border border-border overflow-hidden">
             {FEATURES.map((feature, index) => (
-              <View key={index} style={[styles.settingsRow, index === FEATURES.length - 1 && { borderBottomWidth: 0 }]}>
-                <View style={[styles.iconBox, { backgroundColor: colors.background, borderColor: colors.border }]}>
-                  <Ionicons name={feature.icon} size={18} color={colors.text} />
-                </View>
-                <View style={styles.textDetails}>
-                  <Text style={styles.rowTitle}>{feature.title}</Text>
-                  <Text style={styles.rowSubtitle} numberOfLines={1}>{feature.description}</Text>
-                </View>
-                <View style={styles.rowRightSide}>
-                  <Ionicons name="sparkles" size={14} color={colors.primary} />
-                </View>
-              </View>
+              <HStack key={index} className={cn("p-4 items-center space-x-3.5", index !== FEATURES.length - 1 && "border-b border-border")}>
+                <Box className="w-10 h-10 rounded-xl bg-background border border-border items-center justify-center">
+                  <Ionicons name={feature.icon as any} size={18} color={isDark ? '#fbfff3' : '#000100'} />
+                </Box>
+                <VStack className="flex-1">
+                  <Text className="font-semibold text-[15px] text-text mb-0.5">{feature.title}</Text>
+                  <Text className="font-regular text-[13px] text-text-muted" numberOfLines={1}>{feature.description}</Text>
+                </VStack>
+                <Ionicons name="sparkles" size={14} color={isDark ? '#B8D641' : '#a6c13a'} />
+              </HStack>
             ))}
-          </View>
-        </View>
+          </VStack>
+        </VStack>
 
-        {/* ── Error State ── */}
-        <View style={styles.brandingBox}>
-          <Text style={styles.brandingText}>Luno / Pro System</Text>
-        </View>
+        <Box className="items-center py-6 mb-12">
+          <Text className="font-semibold text-[10px] tracking-widest text-text-muted/50 uppercase">Luno / Pro System</Text>
+        </Box>
       </ScrollView>
 
-      {/* ── Action Footer ── */}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.buyBtn}
+      <VStack className="absolute bottom-0 left-0 right-0 px-6 pb-9 pt-4 bg-background border-t border-border">
+        <Pressable
+          className={cn(
+            "h-[56px] rounded-full bg-text items-center justify-center mb-4",
+            (isProcessing || isPremium || !lifetimeProduct) && "opacity-60"
+          )}
           onPress={handlePurchase}
           disabled={isProcessing || isPremium || !lifetimeProduct}
-          activeOpacity={0.85}
         >
           {isProcessing ? (
-            <ActivityIndicator color={colors.background} />
+            <ActivityIndicator color={isDark ? '#000100' : '#F6FFF9'} />
           ) : (
-            <Text style={styles.buyBtnText}>
+            <Text className="font-semibold text-base text-background tracking-wide">
               {isPremium ? 'Pro Member' : `Upgrade forever`}
             </Text>
           )}
-        </TouchableOpacity>
+        </Pressable>
 
-        <View style={styles.legalRows}>
-          <TouchableOpacity onPress={handleRestore} disabled={isProcessing}>
-            <Text style={styles.legalLink}>Restore purchase</Text>
-          </TouchableOpacity>
-          <View style={styles.legalSeparator} />
-          <TouchableOpacity onPress={() => Alert.alert("Terms", "Luno Pro is a one-time purchase tied to your store account.")}>
-            <Text style={styles.legalLink}>Terms</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+        <HStack className="justify-center items-center space-x-4">
+          <Pressable onPress={handleRestore} disabled={isProcessing}>
+            <Text className="font-semibold text-xs text-text-muted">Restore purchase</Text>
+          </Pressable>
+          <Box className="w-1 h-1 rounded-full bg-text-muted/30" />
+          <Pressable onPress={() => Alert.alert("Terms", "Luno Pro is a one-time purchase tied to your store account.")}>
+            <Text className="font-semibold text-xs text-text-muted">Terms</Text>
+          </Pressable>
+        </HStack>
+      </VStack>
     </SafeAreaView>
   );
 }
-
-const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  bgCircle: { position: 'absolute', borderRadius: 999 },
-  scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
-
-  heroSection: { marginTop: 20, marginBottom: 24 },
-  heroKicker: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.primary, letterSpacing: 2.5, marginBottom: 8 },
-  heroTitle: { fontFamily: TYPOGRAPHY.fonts.headingRegular, fontSize: 40, lineHeight: 44, color: colors.text, letterSpacing: -2, marginBottom: 4 },
-  heroSubtitle: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 14, color: colors.textMuted, lineHeight: 22, maxWidth: '85%' },
-
-  offerSection: { marginBottom: 28 },
-  lifetimeCard: {
-    backgroundColor: colors.surface + '80',
-    borderRadius: 24,
-    padding: 22,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    position: 'relative',
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  cardTitle: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 18, color: colors.text, letterSpacing: 0.5 },
-  cardSubtitle: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 12, color: colors.textMuted, marginTop: 1 },
-  cardBadge: { backgroundColor: colors.primary, paddingHorizontal: 9, height: 20, borderRadius: 10, justifyContent: 'center' },
-  cardBadgeText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 8, color: colors.background, letterSpacing: 1 },
-
-  priceContainer: { marginBottom: 18 },
-  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
-  originalPrice: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 18, color: colors.textMuted, textDecorationLine: 'line-through', opacity: 0.6 },
-  priceValue: { fontFamily: TYPOGRAPHY.fonts.monoBold, fontSize: 44, color: colors.text, letterSpacing: -1.5 },
-  priceSuffix: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 13, color: colors.textMuted, opacity: 0.8 },
-  priceError: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 14, color: colors.danger },
-
-  cardDivider: { height: 1, backgroundColor: colors.border, marginBottom: 14, opacity: 0.5 },
-  trustInfo: { gap: 8 },
-  trustRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-  trustText: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 11, color: colors.success, letterSpacing: 0.1 },
-
-  sectionLabel: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.textMuted, letterSpacing: 2, marginBottom: 14, opacity: 0.8 },
-
-  /* ── Settings-like Feature Styles ── */
-  featuresSection: { marginBottom: 32 },
-  settingsCard: {
-    borderRadius: 20,
-    backgroundColor: colors.surface + '80',
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  settingsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  iconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    marginRight: 14,
-  },
-  textDetails: {
-    flex: 1,
-  },
-  rowTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 16,
-    color: colors.text,
-  },
-  rowSubtitle: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 12,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  rowRightSide: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-
-  brandingBox: { alignItems: 'center', marginTop: 10, marginBottom: 0 },
-  brandingText: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 10, color: colors.text + '20', letterSpacing: 3 },
-
-  footer: { padding: 24, paddingBottom: Platform.OS === 'ios' ? 40 : 32, backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.primary + '10' },
-  buyBtn: { backgroundColor: colors.primary, height: 60, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
-  buyBtnText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 16, color: colors.background, letterSpacing: 0.5 },
-  legalRows: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16 },
-  legalLink: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 10, color: colors.textMuted, letterSpacing: 1.5 },
-  legalSeparator: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.primary + '20' },
-
-  successWrapper: { flex: 1, padding: 32, justifyContent: 'space-between' },
-  proContent: { flex: 1, justifyContent: 'center' },
-  proBadge: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.primary + '20', justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
-  proHero: { marginBottom: 24 },
-  proKicker: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 11, color: colors.primary, letterSpacing: 3, marginBottom: 8 },
-  proHeading: { fontFamily: TYPOGRAPHY.fonts.heading, fontSize: 56, lineHeight: 60, color: colors.text, letterSpacing: -3 },
-
-  proStatusRow: { flexDirection: 'row', marginBottom: 32 },
-  statusPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.primary + '30'
-  },
-  statusDot: { width: 6, height: 6, borderRadius: 3 },
-  statusText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.text, letterSpacing: 1 },
-
-  proDescription: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 16, color: colors.textMuted, lineHeight: 26, maxWidth: '90%' },
-  proActions: { gap: 16, marginBottom: 12 },
-  actionBtn: { height: 68, backgroundColor: colors.text, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16 },
-  actionBtnText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 15, color: colors.background, letterSpacing: 1 },
-});

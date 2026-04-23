@@ -1,22 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
-  TouchableOpacity,
-  View,
 } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { RADIUS, SPACING } from '../../theme/tokens';
-import { TYPOGRAPHY } from '../../theme/typography';
 import { resolveIcon } from '../../utils/icons';
+import { Box, HStack, VStack } from './Stack';
+import { Pressable } from './Pressable';
+import { Text, cn } from './Text';
 
 export const ICON_GROUPS = {
   'Finance & Money': [
@@ -143,8 +139,7 @@ export const IconPickerDialog = React.memo(function IconPickerDialog({
   onSelect,
   title = 'Select icon',
 }: Props) {
-  const { colors, isDark } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { isDark } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredGroups = useMemo(() => {
@@ -176,205 +171,95 @@ export const IconPickerDialog = React.memo(function IconPickerDialog({
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.overlay}
+        className="flex-1 bg-black/55 justify-end"
       >
-        <TouchableOpacity style={styles.backdrop} onPress={handleClose} activeOpacity={1} />
+        <Pressable className="flex-1" onPress={handleClose} />
 
-        <View style={styles.sheet}>
-          <BlurView
-            blurAmount={Platform.OS === 'ios' ? 80 : 96}
-            blurType={isDark ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFillObject}
-          />
-          {Platform.OS === 'android' && (
-            <View
-              pointerEvents="none"
-              style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]}
-            />
-          )}
+        <VStack className="h-[82%] bg-background rounded-t-[28px] border-t border-border overflow-hidden">
 
-          <View style={styles.handle} />
+          <Box className="self-center w-10 h-1 rounded-full mt-2.5 bg-text-muted/30" />
 
-          <View style={styles.header}>
-            <Text style={styles.title}>{title}</Text>
-            <TouchableOpacity onPress={handleClose} style={styles.closeBtn} activeOpacity={0.7}>
-              <Ionicons name="close" size={16} color={colors.text} />
-            </TouchableOpacity>
-          </View>
+          <HStack className="px-6 pt-3.5 pb-2.5 items-center justify-between">
+            <Text className="font-heading text-[28px] text-text tracking-tight">
+              {title}
+            </Text>
+            <Pressable
+              onPress={handleClose}
+              className="w-9 h-9 rounded-full bg-surface border border-border justify-center items-center"
+            >
+              <Ionicons name="close" size={16} color={isDark ? '#fbfff3' : '#000100'} />
+            </Pressable>
+          </HStack>
 
-          <View style={styles.searchWrap}>
-            <Ionicons name="search-outline" size={16} color={colors.textMuted} />
+          <HStack className="items-center mx-6 mb-2.5 h-11 rounded-full bg-surface px-3 space-x-2">
+            <Ionicons name="search-outline" size={16} color={isDark ? '#b2bb8b' : '#737a5f'} />
             <TextInput
-              style={styles.searchInput}
+              className="flex-1 font-regular text-sm text-text py-0"
               value={searchQuery}
               onChangeText={setSearchQuery}
               placeholder="Search icons..."
-              placeholderTextColor={colors.textMuted}
+              placeholderTextColor={isDark ? '#b2bb8b' : '#737a5f'}
               autoCapitalize="none"
               autoCorrect={false}
             />
             {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={handleClearSearch} activeOpacity={0.8}>
-                <Ionicons name="close-circle" size={16} color={colors.textMuted} />
-              </TouchableOpacity>
+              <Pressable onPress={handleClearSearch}>
+                <Ionicons name="close-circle" size={16} color={isDark ? '#b2bb8b' : '#737a5f'} />
+              </Pressable>
             )}
-          </View>
+          </HStack>
 
           <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
+            className="flex-1"
+            contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 24 }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
             {Object.entries(filteredGroups).map(([groupName, icons]) => (
-              <View key={groupName} style={styles.groupSection}>
-                <Text style={styles.groupTitle}>{groupName}</Text>
-                <View style={styles.iconGrid}>
+              <VStack key={groupName} className="mb-5">
+                <Text className="font-semibold text-[10px] text-text-muted tracking-widest uppercase mb-2.5">
+                  {groupName}
+                </Text>
+                <Box className="flex-row flex-wrap gap-2">
                   {icons.map((icon: string) => {
                     const isSelected = selectedIcon === icon;
                     return (
-                      <TouchableOpacity
+                      <Pressable
                         key={icon}
-                        style={[styles.iconCell, isSelected && styles.iconCellSelected]}
+                        className={cn(
+                          "w-12 h-12 rounded-full justify-center items-center",
+                          isSelected ? "bg-primary" : "bg-surface"
+                        )}
                         onPress={() => handleSelect(icon)}
-                        activeOpacity={0.8}
                       >
                         <Ionicons
                           name={resolveIcon(icon, 'grid-outline')}
                           size={20}
-                          color={isSelected ? colors.background : colors.text}
+                          color={isSelected
+                            ? (isDark ? '#000100' : '#F6FFF9') // background
+                            : (isDark ? '#fbfff3' : '#000100') // text
+                          }
                         />
-                      </TouchableOpacity>
+                      </Pressable>
                     );
                   })}
-                </View>
-              </View>
+                </Box>
+              </VStack>
             ))}
 
             {Object.keys(filteredGroups).length === 0 && (
-              <View style={styles.emptyState}>
-                <Ionicons name="search-outline" size={40} color={colors.textMuted} />
-                <Text style={styles.emptyText}>No icons found</Text>
-              </View>
+              <VStack className="items-center py-12 space-y-3">
+                <Ionicons name="search-outline" size={40} color={isDark ? '#b2bb8b' : '#737a5f'} />
+                <Text className="font-medium text-sm text-text-muted">
+                  No icons found
+                </Text>
+              </VStack>
             )}
           </ScrollView>
-        </View>
+        </VStack>
       </KeyboardAvoidingView>
     </Modal>
   );
 });
 
 IconPickerDialog.displayName = 'IconPickerDialog';
-
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    overlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.55)',
-      justifyContent: 'flex-end',
-    },
-    backdrop: {
-      flex: 1,
-    },
-    sheet: {
-      height: '82%',
-      borderTopLeftRadius: RADIUS['3xl'],
-      borderTopRightRadius: RADIUS['3xl'],
-      borderTopWidth: 1,
-      borderColor: colors.border,
-      overflow: 'hidden',
-      backgroundColor: 'transparent',
-    },
-    handle: {
-      alignSelf: 'center',
-      width: 42,
-      height: 4,
-      borderRadius: 999,
-      marginTop: SPACING['2.5'],
-      backgroundColor: colors.textMuted + '55',
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['3.5'],
-      paddingBottom: SPACING['2.5'],
-    },
-    title: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 28,
-      color: colors.text,
-      letterSpacing: -0.8,
-    },
-    closeBtn: {
-      width: 38,
-      height: 38,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    searchWrap: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginHorizontal: SPACING['6'],
-      marginBottom: SPACING['2.5'],
-      height: 44,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      paddingHorizontal: SPACING['3'],
-      gap: SPACING['2'],
-    },
-    searchInput: {
-      flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 14,
-      color: colors.text,
-      padding: 0,
-    },
-    scrollView: {
-      flex: 1,
-    },
-    scrollContent: {
-      paddingHorizontal: SPACING['6'],
-      paddingBottom: SPACING['6'],
-    },
-    groupSection: {
-      marginBottom: SPACING['5'],
-    },
-    groupTitle: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-      color: colors.textMuted,
-      letterSpacing: 1.2,
-      textTransform: 'uppercase',
-      marginBottom: SPACING['2.5'],
-    },
-    iconGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: SPACING['2'],
-    },
-    iconCell: {
-      width: 48,
-      height: 48,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    iconCellSelected: {
-      backgroundColor: colors.primary,
-    },
-    emptyState: {
-      alignItems: 'center',
-      paddingVertical: SPACING['12'],
-      gap: SPACING['3'],
-    },
-    emptyText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 14,
-      color: colors.textMuted,
-    },
-  });

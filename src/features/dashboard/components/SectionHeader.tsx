@@ -1,7 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {  Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { TYPOGRAPHY } from '../../../theme/typography';
 
 type SectionHeaderProps = {
   title: string;
@@ -11,7 +10,6 @@ type SectionHeaderProps = {
 
 export function SectionHeader({ title, rightText, onPressRight }: SectionHeaderProps) {
   const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
 
   return (
     <View style={styles.wrap}>
@@ -29,24 +27,3 @@ export function SectionHeader({ title, rightText, onPressRight }: SectionHeaderP
   );
 }
 
-const createStyles = (colors: { [key: string]: string }) =>
-  StyleSheet.create({
-    wrap: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 24,
-      marginBottom: 12,
-    },
-    title: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      color: colors.textMuted,
-      fontSize: 10,
-      letterSpacing: 1.5,
-    },
-    right: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      color: colors.primary,
-      fontSize: 12,
-    },
-  });

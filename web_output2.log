@@ -1,0 +1,13 @@
+
+> luno@1.0.2 web
+> expo start --web
+
+🔍 [expo-iap] Config values: horizonAppId=undefined, isHorizonEnabled=false, isOnsideEnabled=false
+📦 [expo-iap] Using OpenIAP from CocoaPods
+Starting project at /app
+› Port 8081 is running this app in another window
+  /app (pid 727485)
+Input is required, but 'npx expo' is in non-interactive mode.
+Required input:
+> Use port 8082 instead?
+› Skipping dev server

@@ -1,7 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import {  Text, TouchableOpacity, View } from 'react-native';
 import { TransactionType } from '../../../types';
 
 type Props = {
@@ -63,24 +61,3 @@ export const TransactionTypePicker = ({ value, onChange, colors, disabled, allow
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 8,
-    flexDirection: 'row',
-    gap: 10,
-  },
-  pill: {
-    paddingHorizontal: 16,
-    height: 36,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
-  pillText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 13,
-  },
-});

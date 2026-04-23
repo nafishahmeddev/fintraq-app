@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useMemo } from 'react';
-import { Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback } from 'react';
+import { Modal, StyleSheet } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { RADIUS } from '../../theme/tokens';
-import { TYPOGRAPHY } from '../../theme/typography';
+import { Box, HStack, VStack } from './Stack';
+import { Pressable } from './Pressable';
+import { Text, cn } from './Text';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -35,8 +35,7 @@ export const OptionsDialog = React.memo(function OptionsDialog({
   options,
   closeLabel = 'Close',
 }: OptionsDialogProps) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { isDark } = useTheme();
 
   const handleOptionPress = useCallback((option: OptionsDialogOption) => {
     if (option.closeOnPress !== false) {
@@ -54,159 +53,73 @@ export const OptionsDialog = React.memo(function OptionsDialog({
       statusBarTranslucent
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <TouchableOpacity style={StyleSheet.absoluteFillObject} activeOpacity={1} onPress={onClose} />
+      <Box className="flex-1 bg-black/50 justify-end px-6 pb-10">
+        <Pressable style={StyleSheet.absoluteFillObject} onPress={onClose} />
 
-        <View style={styles.card}>
-          <Text style={styles.title}>{title}</Text>
-          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+        <VStack className="rounded-2xl bg-background border border-border p-5">
+          <Text className="font-headingRegular text-2xl text-text tracking-tight">
+            {title}
+          </Text>
+          {subtitle ? (
+            <Text className="font-regular text-xs text-text-muted mt-1 mb-4">
+              {subtitle}
+            </Text>
+          ) : <Box className="mb-4" />}
 
-          <View style={styles.optionsWrap}>
+          <VStack className="rounded-full overflow-hidden">
             {options.map((option) => {
               const selected = !!option.selected;
               const iconColor = selected
-                ? colors.background
+                ? (isDark ? '#000100' : '#F6FFF9') // background
                 : option.destructive
-                  ? colors.danger
-                  : colors.textMuted;
+                  ? (isDark ? '#EF4444' : '#DC2626') // danger
+                  : (isDark ? '#b2bb8b' : '#737a5f'); // textMuted
 
               return (
-                <TouchableOpacity
+                <Pressable
                   key={option.key}
-                  style={[
-                    styles.optionRow,
-                    selected && styles.optionRowActive,
-                    option.destructive && !selected && styles.optionRowDestructive,
-                  ]}
-                  activeOpacity={0.9}
+                  className={cn(
+                    "h-12 rounded-full mb-2 bg-surface border px-3 flex-row items-center",
+                    selected ? "bg-text border-text" : "border-border",
+                    option.destructive && !selected && "border-danger/30 bg-danger/10"
+                  )}
                   onPress={() => handleOptionPress(option)}
                 >
-                  {option.icon ? (
-                    <View style={[styles.optionIconWrap, selected && styles.optionIconWrapActive]}>
+                  {option.icon && (
+                    <Box className={cn(
+                      "w-[26px] h-[26px] rounded-full justify-center items-center mr-2.5",
+                      selected ? "bg-background/40" : "bg-background"
+                    )}>
                       <Ionicons name={option.icon} size={16} color={iconColor} />
-                    </View>
-                  ) : null}
+                    </Box>
+                  )}
 
                   <Text
-                    style={[
-                      styles.optionText,
-                      selected && styles.optionTextActive,
-                      option.destructive && !selected && styles.optionTextDestructive,
-                    ]}
+                    className={cn(
+                      "flex-1 font-semibold text-[13px] text-text",
+                      selected && "text-background",
+                      option.destructive && !selected && "text-danger"
+                    )}
                   >
                     {option.label}
                   </Text>
 
-                  {selected ? <Ionicons name="checkmark" size={16} color={colors.background} /> : null}
-                </TouchableOpacity>
+                  {selected && <Ionicons name="checkmark" size={16} color={isDark ? '#000100' : '#F6FFF9'} />}
+                </Pressable>
               );
             })}
-          </View>
+          </VStack>
 
-          <TouchableOpacity style={styles.closeButton} onPress={onClose} activeOpacity={0.9}>
-            <Text style={styles.closeButtonText}>{closeLabel}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+          <Pressable
+            className="mt-2 h-11 rounded-full border border-primary/20 bg-surface justify-center items-center"
+            onPress={onClose}
+          >
+            <Text className="font-semibold text-sm text-text">
+              {closeLabel}
+            </Text>
+          </Pressable>
+        </VStack>
+      </Box>
     </Modal>
   );
 });
-
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    overlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.52)',
-      justifyContent: 'flex-end',
-      paddingHorizontal: 24,
-      paddingBottom: 42,
-    },
-    card: {
-      alignSelf: 'stretch',
-      borderRadius: RADIUS['2xl'],
-      backgroundColor: Platform.OS === 'ios' ? colors.background + 'F2' : colors.background,
-      borderWidth: 1,
-      borderColor: colors.text + '18',
-      padding: 18,
-      shadowColor: '#000000',
-      shadowOpacity: 0.22,
-      shadowRadius: 24,
-      shadowOffset: { width: 0, height: 10 },
-      elevation: 10,
-    },
-    title: {
-      fontFamily: TYPOGRAPHY.fonts.headingRegular,
-      fontSize: 24,
-      color: colors.text,
-      letterSpacing: -0.6,
-    },
-    subtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 12,
-      color: colors.textMuted,
-      marginTop: 4,
-      marginBottom: 16,
-    },
-    optionsWrap: {
-      borderRadius: RADIUS.full,
-      overflow: 'hidden',
-    },
-    optionRow: {
-      height: 48,
-      borderRadius: 999,
-      marginBottom: 8,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.text + '10',
-      paddingHorizontal: 10,
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    optionRowActive: {
-      backgroundColor: colors.text,
-      borderColor: colors.text,
-    },
-    optionRowDestructive: {
-      borderColor: colors.danger + '35',
-      backgroundColor: colors.danger + '10',
-    },
-    optionIconWrap: {
-      width: 26,
-      height: 26,
-      borderRadius: 999,
-      backgroundColor: colors.background + 'CC',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginRight: 10,
-    },
-    optionIconWrapActive: {
-      backgroundColor: colors.background + '66',
-    },
-    optionText: {
-      flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 13,
-      color: colors.text,
-    },
-    optionTextActive: {
-      color: colors.background,
-    },
-    optionTextDestructive: {
-      color: colors.danger,
-    },
-    closeButton: {
-      marginTop: 8,
-      height: 44,
-      borderRadius: 999,
-      borderWidth: 1,
-      borderColor: colors.primary + '22',
-      backgroundColor: colors.surface,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    closeButtonText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 14,
-      color: colors.text,
-    },
-  });

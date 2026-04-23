@@ -7,7 +7,7 @@ import {
   Modal,
   Platform,
   ScrollView,
-  StyleSheet,
+
   Text,
   TextInput,
   TouchableOpacity,
@@ -17,9 +17,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CurrencyPickerModal } from '../../../components/ui/CurrencyPickerModal';
 import { ACCOUNT_COLORS, ACCOUNT_ICONS } from '../../../constants/picker';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { parseAmount, toDbColor } from '../../../utils/format';
 import { resolveIcon, IoniconName } from '../../../utils/icons';
 import { Account, AccountType, ACCOUNT_TYPES } from '../api/accounts';
@@ -59,7 +56,6 @@ export type AccountFormModalProps = {
 export function AccountFormModal({ visible, onClose, account }: AccountFormModalProps) {
   const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
   const isEditing = !!account;
   const ModalWrapper = Platform.OS === 'ios' ? KeyboardAvoidingView : View;
 
@@ -141,7 +137,7 @@ export function AccountFormModal({ visible, onClose, account }: AccountFormModal
         <TouchableOpacity style={styles.backdrop} onPress={onClose} activeOpacity={1} />
 
         <View style={styles.sheet}>
-          <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+          <View className="absolute inset-0" pointerEvents="none">
             <View style={[styles.glow, { top: -70, left: -70, width: 330, height: 330, backgroundColor: colors.primary + '2E' }]} />
             <View style={[styles.glow, { top: 260, right: -140, width: 480, height: 480, backgroundColor: colors.text + '0E' }]} />
             <View style={[styles.glow, { bottom: -90, left: 40, width: 320, height: 320, backgroundColor: colors.primary + '1C' }]} />
@@ -150,13 +146,13 @@ export function AccountFormModal({ visible, onClose, account }: AccountFormModal
           <BlurView
             blurAmount={Platform.OS === 'ios' ? 80 : 96}
             blurType={isDark ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFillObject}
+            className="absolute inset-0"
           />
 
           {Platform.OS === 'android' && (
             <View
               pointerEvents="none"
-              style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]}
+              className="absolute inset-0" style={[ { backgroundColor: colors.background + '60' }]}
             />
           )}
 
@@ -379,219 +375,3 @@ export function AccountFormModal({ visible, onClose, account }: AccountFormModal
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    overlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.55)',
-      justifyContent: 'flex-end',
-    },
-    backdrop: {
-      flex: 1,
-    },
-    sheet: {
-      height: '86%',
-      borderTopLeftRadius: RADIUS.full,
-      borderTopRightRadius: RADIUS.full,
-      borderTopWidth: 1,
-      borderColor: colors.border,
-      overflow: 'hidden',
-      backgroundColor: 'transparent',
-    },
-    glow: {
-      position: 'absolute',
-      borderRadius: RADIUS.full,
-    },
-    handle: {
-      alignSelf: 'center',
-      width: 40,
-      height: 3,
-      borderRadius: 999,
-      marginTop: 12,
-      marginBottom: 8,
-      backgroundColor: colors.textMuted + '44',
-    },
-    header: {
-      paddingHorizontal: 24,
-      paddingTop: 6,
-      paddingBottom: 12,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-    },
-    title: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 30,
-      color: colors.text,
-      letterSpacing: -1,
-    },
-    subtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 12,
-      color: colors.textMuted,
-      marginTop: 3,
-    },
-    closeBtn: {
-      width: 38,
-      height: 38,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    content: {
-      paddingHorizontal: 24,
-      paddingTop: 10,
-      paddingBottom: 20,
-    },
-    scroll: {
-      flex: 1,
-    },
-    section: {
-      paddingBottom: 22,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-      marginBottom: 22,
-    },
-    sectionLast: {
-      borderBottomWidth: 0,
-      marginBottom: 0,
-      paddingBottom: 0,
-    },
-    label: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 13,
-      color: colors.textMuted,
-      letterSpacing: 0.1,
-      marginBottom: 6,
-    },
-    labelSpaced: {
-      marginTop: 16,
-    },
-    answerInput: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 28,
-      lineHeight: 34,
-      color: colors.text,
-      letterSpacing: -0.7,
-      paddingHorizontal: 0,
-      paddingVertical: 4,
-    },
-    answerInputAmount: {
-      fontFamily: TYPOGRAPHY.fonts.monoBold,
-      letterSpacing: 0,
-    },
-    answerLine: {
-      height: 2,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.primary + '55',
-      marginTop: 4,
-    },
-    answerLineError: {
-      backgroundColor: colors.danger + '88',
-    },
-    currencyRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: 6,
-    },
-    currencyValue: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 28,
-      lineHeight: 34,
-      color: colors.text,
-      letterSpacing: -0.7,
-    },
-    iconGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 10,
-    },
-    colorGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 12,
-    },
-    colorCell: {
-      width: 34,
-      height: 34,
-      borderRadius: RADIUS.full,
-      borderWidth: 2,
-      borderColor: 'transparent',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    colorCellActive: {
-      borderColor: colors.text,
-      transform: [{ scale: 1.08 }],
-    },
-    iconCell: {
-      width: 46,
-      height: 46,
-      borderRadius: RADIUS.full,
-      borderWidth: 1,
-      borderColor: colors.text + '10',
-      backgroundColor: colors.background + 'B8',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    iconCellActive: {},
-    typeGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 8,
-      marginTop: 8,
-    },
-    typeCell: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: RADIUS.full,
-      borderWidth: 1,
-      borderColor: colors.text + '10',
-      backgroundColor: colors.background + 'B8',
-    },
-    typeCellActive: {
-      borderColor: 'transparent',
-    },
-    typeLabel: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 12,
-    },
-    footer: {
-      paddingHorizontal: 24,
-      paddingTop: 10,
-      paddingBottom: Platform.OS === 'ios' ? 36 : 22,
-      backgroundColor: colors.background + 'F2',
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-    primaryBtn: {
-      height: 56,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.primary,
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      shadowColor: colors.primary,
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.25,
-      shadowRadius: 12,
-      elevation: 5,
-    },
-    primaryBtnDisabled: {
-      opacity: 0.45,
-    },
-    primaryBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 14,
-      color: '#FFFFFF',
-      letterSpacing: 0.3,
-      marginRight: 10,
-    },
-  });

@@ -1,57 +1,50 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, TextProps } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { TYPOGRAPHY } from '../../theme/typography';
+import { TextProps as RNTextProps } from 'react-native';
 import { TransactionType } from '../../types';
 import { formatCurrency } from '../../utils/format';
+import { Text, cn } from './Text';
 
-interface MoneyTextProps extends TextProps {
+interface MoneyTextProps extends RNTextProps {
   amount: number;
   currency?: string;
   type?: TransactionType | 'NONE';
-  weight?: 'regular' | 'medium' | 'semibold' | 'bold';
+  className?: string;
 }
 
 export const MoneyText = React.memo(function MoneyText({
   amount,
   currency,
   type = 'NONE',
-  weight = 'bold',
-  style,
+  className,
   ...props
 }: MoneyTextProps) {
-  const { colors } = useTheme();
 
-  const { prefix, color, formattedAmount, fontFamily } = useMemo(() => {
+  const { prefix, colorClass, formattedAmount } = useMemo(() => {
     const isCustomSign = type === 'CR' || type === 'DR';
     const valToFormat = isCustomSign ? Math.abs(amount) : amount;
     const formatted = formatCurrency(valToFormat, currency);
 
     let p = '';
-    let c = colors.text;
+    let c = 'text-text';
 
     if (type === 'CR') {
       p = '+';
-      c = colors.success;
+      c = 'text-success';
     } else if (type === 'DR') {
       p = '-';
-      c = colors.danger;
+      c = 'text-danger';
     }
 
-    const ff = weight === 'regular' || weight === 'medium'
-      ? TYPOGRAPHY.fonts.monoRegular
-      : TYPOGRAPHY.fonts.monoBold;
-
-    return { prefix: p, color: c, formattedAmount: formatted, fontFamily: ff };
-  }, [amount, currency, type, weight, colors.text, colors.success, colors.danger]);
+    return { prefix: p, colorClass: c, formattedAmount: formatted };
+  }, [amount, currency, type]);
 
   return (
     <Text
-      style={[
-        styles.base,
-        { color, fontFamily },
-        style
-      ]}
+      className={cn(
+        "font-monoBold text-base flex-shrink",
+        colorClass,
+        className
+      )}
       numberOfLines={1}
       adjustsFontSizeToFit
       minimumFontScale={0.72}
@@ -61,11 +54,4 @@ export const MoneyText = React.memo(function MoneyText({
       {prefix}{formattedAmount}
     </Text>
   );
-});
-
-const styles = StyleSheet.create({
-  base: {
-    fontSize: TYPOGRAPHY.sizes.md,
-    flexShrink: 1,
-  }
 });

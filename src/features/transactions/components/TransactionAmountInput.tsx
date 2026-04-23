@@ -1,7 +1,5 @@
 import React, { useCallback } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import {  Text, TextInput, View } from 'react-native';
 
 type Props = {
   value: string;
@@ -44,30 +42,3 @@ export const TransactionAmountInput = ({ value, onChange, currency, colors }: Pr
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-  },
-  label: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 10,
-    letterSpacing: 1.5,
-    marginBottom: 8,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 12,
-  },
-  currency: {
-    fontSize: 24,
-    fontFamily: TYPOGRAPHY.fonts.medium,
-  },
-  input: {
-    flex: 1,
-    fontSize: 48,
-    fontFamily: TYPOGRAPHY.fonts.bold,
-    letterSpacing: -1,
-  },
-});
