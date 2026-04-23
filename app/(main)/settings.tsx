@@ -193,6 +193,25 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionLabel}>FEATURES</Text>
+          <View style={styles.card}>
+            <PreferenceRow
+              icon="sync-outline"
+              title="Recurring"
+              subtitle="Manage automatic transactions"
+              onPress={() => router.push('/recurring')}
+            />
+            <PreferenceRow
+              icon="pie-chart-outline"
+              title="Budgets"
+              subtitle="Track your spending limits"
+              onPress={() => router.push('/budgets')}
+              isLast
+            />
+          </View>
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionLabel}>ACCOUNT</Text>
           <View style={styles.card}>
             <PreferenceRow

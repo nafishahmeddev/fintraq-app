@@ -9,6 +9,7 @@ type Props = {
   onChange: (value: TransactionType) => void;
   colors: ThemeColors;
   disabled?: boolean;
+  allowedTypes?: TransactionType[];
 };
 
 const TYPE_CONFIG: Record<TransactionType, { label: string; colorKey: keyof ThemeColors }> = {
@@ -17,7 +18,9 @@ const TYPE_CONFIG: Record<TransactionType, { label: string; colorKey: keyof Them
   TRANSFER: { label: 'Transfer', colorKey: 'primary' },
 };
 
-export const TransactionTypePicker = ({ value, onChange, colors, disabled }: Props) => {
+export const TransactionTypePicker = ({ value, onChange, colors, disabled, allowedTypes }: Props) => {
+  const typesToRender = allowedTypes || (Object.keys(TYPE_CONFIG) as TransactionType[]);
+
   if (disabled) {
     // Show only the selected type as a static display
     const config = TYPE_CONFIG[value];
@@ -34,7 +37,7 @@ export const TransactionTypePicker = ({ value, onChange, colors, disabled }: Pro
 
   return (
     <View style={styles.container}>
-      {(Object.keys(TYPE_CONFIG) as TransactionType[]).map((type) => {
+      {typesToRender.map((type) => {
         const config = TYPE_CONFIG[type];
         const isSelected = value === type;
         const activeColor = colors[config.colorKey];

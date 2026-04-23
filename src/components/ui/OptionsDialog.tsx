@@ -123,7 +123,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     card: {
       alignSelf: 'stretch',
-      borderRadius: RADIUS.full,
+      borderRadius: RADIUS['2xl'],
       backgroundColor: Platform.OS === 'ios' ? colors.background + 'F2' : colors.background,
       borderWidth: 1,
       borderColor: colors.text + '18',

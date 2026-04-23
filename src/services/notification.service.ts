@@ -73,38 +73,42 @@ export const NotificationService = {
    * @param timeStr "HH:mm" format (e.g., "20:00")
    */
   async scheduleDailyReminder(timeStr: string) {
-    // 1. Clear existing reminders to prevent duplication
-    await this.cancelAllReminders();
+    try {
+      // 1. Clear existing reminders to prevent duplication
+      await this.cancelAllReminders();
 
-    // 2. Parse the time string
-    const [hours, minutes] = timeStr.split(':').map(Number);
+      // 2. Parse the time string
+      const [hours, minutes] = timeStr.split(':').map(Number);
 
-    if (isNaN(hours) || isNaN(minutes)) {
-      console.warn('[NotificationService] Invalid time format provided:', timeStr);
-      return;
+      if (isNaN(hours) || isNaN(minutes)) {
+        console.warn('[NotificationService] Invalid time format provided:', timeStr);
+        return;
+      }
+
+      // 3. Pick a random message from the pool
+      const randomIndex = Math.floor(Math.random() * REMINDER_POOL.length);
+      const message = REMINDER_POOL[randomIndex];
+
+      // 4. Schedule the new daily notification
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: message.title,
+          body: message.body,
+          sound: true,
+          priority: Notifications.AndroidNotificationPriority.HIGH,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
+          hour: hours,
+          minute: minutes,
+        },
+        identifier: 'daily_reminder',
+      });
+
+      console.log(`[NotificationService] Daily reminder scheduled for ${timeStr}`);
+    } catch (error) {
+      console.error('[NotificationService] Failed to schedule daily reminder:', error);
     }
-
-    // 3. Pick a random message from the pool
-    const randomIndex = Math.floor(Math.random() * REMINDER_POOL.length);
-    const message = REMINDER_POOL[randomIndex];
-
-    // 4. Schedule the new daily notification
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: message.title,
-        body: message.body,
-        sound: true,
-        priority: Notifications.AndroidNotificationPriority.HIGH,
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        hour: hours,
-        minute: minutes,
-      },
-      identifier: 'daily_reminder',
-    });
-
-    console.log(`[NotificationService] Daily reminder scheduled for ${timeStr}`);
   },
 
   /**
@@ -127,10 +131,9 @@ export const NotificationService = {
         priority: Notifications.AndroidNotificationPriority.HIGH,
       },
       trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
         hour: hours,
         minute: minutes,
-        repeats: true,
       },
       identifier: 'daily_reminder',
     });
@@ -161,5 +164,67 @@ export const NotificationService = {
    */
   async cancelAllReminders() {
     await Notifications.cancelAllScheduledNotificationsAsync();
+  },
+
+  /**
+   * scheduleRecurringReminder: Schedules a notification for an upcoming recurring transaction.
+   * Also schedules a pre-due reminder if reminderDays > 0.
+   */
+  async scheduleRecurringReminder(rtId: number, name: string, amount: string, nextDateStr: string, reminderDays: number = 0) {
+    try {
+      const nextDate = new Date(nextDateStr);
+      const now = new Date();
+
+      // 1. Schedule the main notification for the due date
+      if (nextDate > now) {
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: `Upcoming: ${name} 💸`,
+            body: `Your recurring payment of ${amount} is due today.`,
+            sound: true,
+            data: { rtId },
+            priority: Notifications.AndroidNotificationPriority.HIGH,
+          },
+          trigger: { 
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date: nextDate.getTime() 
+          },
+          identifier: `recurring_${rtId}`,
+        });
+      }
+
+      // 2. Schedule the pre-due reminder if configured
+      if (reminderDays > 0) {
+        const reminderDate = new Date(nextDate);
+        reminderDate.setDate(reminderDate.getDate() - reminderDays);
+
+        if (reminderDate > now) {
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: `Reminder: ${name} is due soon ⏳`,
+              body: `Your payment of ${amount} is due in ${reminderDays} days.`,
+              sound: true,
+              data: { rtId },
+              priority: Notifications.AndroidNotificationPriority.HIGH,
+            },
+            trigger: { 
+              type: Notifications.SchedulableTriggerInputTypes.DATE,
+              date: reminderDate.getTime() 
+            },
+            identifier: `recurring_reminder_${rtId}`,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('[NotificationService] Failed to schedule recurring reminder:', error);
+    }
+  },
+
+  /**
+   * cancelRecurringReminder: Cancels a specific recurring reminder.
+   */
+  async cancelRecurringReminder(rtId: number) {
+    await Notifications.cancelScheduledNotificationAsync(`recurring_${rtId}`);
+    await Notifications.cancelScheduledNotificationAsync(`recurring_reminder_${rtId}`);
   },
 };

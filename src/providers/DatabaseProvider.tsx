@@ -4,6 +4,7 @@ import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { db } from '../db/client';
 import migrations from '../../drizzle/migrations';
 import { runAllSeeders } from '../db/seeders';
+import { syncRecurringTransactions } from '../features/recurring/services/syncRecurring';
 
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
   const { success, error } = useMigrations(db, migrations);
@@ -13,6 +14,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     if (success && !seedingComplete) {
       // Run seeders after migrations complete
       runAllSeeders()
+        .then(() => syncRecurringTransactions())
         .then(() => setSeedingComplete(true))
         .catch((err) => {
           console.error('[DatabaseProvider] Seeding failed:', err);

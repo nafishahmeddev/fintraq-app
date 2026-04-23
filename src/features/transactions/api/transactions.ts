@@ -164,18 +164,7 @@ export const getTransactions = async (limit: number = 10, filters: TransactionFi
 
 export const getTransactionById = async (id: number): Promise<Payment | null> => {
   const [payment] = await db
-    .select({
-      id: payments.id,
-      accountId: payments.accountId,
-      toAccountId: payments.toAccountId,
-      categoryId: payments.categoryId,
-      amount: payments.amount,
-      type: payments.type,
-      datetime: payments.datetime,
-      note: payments.note,
-      createdAt: payments.createdAt,
-      updatedAt: payments.updatedAt,
-    })
+    .select()
     .from(payments)
     .where(eq(payments.id, id))
     .limit(1);

@@ -32,6 +32,8 @@ import { TransactionAmountInput } from '../components/TransactionAmountInput';
 import { TransactionTypePicker } from '../components/TransactionTypePicker';
 import { TransactionAccountPicker } from '../components/TransactionAccountPicker';
 import { TransactionCategoryPicker } from '../components/TransactionCategoryPicker';
+import { TransactionBudgetPicker } from '../components/TransactionBudgetPicker';
+import { useBudgets } from '../../budgets/api/budgets';
 import { format } from 'date-fns';
 import { TransactionType } from '../../../types';
 
@@ -56,12 +58,15 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
 
   const accountsQuery = useAccounts();
   const categoriesQuery = useCategories();
+  const budgetsQuery = useBudgets();
   const transactionByIdQuery = useTransactionById(isEditMode ? transactionId ?? null : null);
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
 
   const accounts = React.useMemo(() => accountsQuery.data ?? [], [accountsQuery.data]);
   const categories = React.useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
+  const budgetsList = React.useMemo(() => budgetsQuery.data ?? [], [budgetsQuery.data]);
+  const manualBudgets = React.useMemo(() => budgetsList.filter(b => b.mode === 'MANUAL'), [budgetsList]);
   const editingTransaction = React.useMemo(() => {
     if (!isEditMode) return null;
     return transactionByIdQuery.data ?? null;
@@ -71,6 +76,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
   const [selectedAccountId, setSelectedAccountId] = React.useState<number | null>(null);
   const [selectedToAccountId, setSelectedToAccountId] = React.useState<number | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = React.useState<number | null>(null);
+  const [selectedBudgetId, setSelectedBudgetId] = React.useState<number | null>(null);
   const [transactionDateTime, setTransactionDateTime] = React.useState<Date>(() => new Date());
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [showTimePicker, setShowTimePicker] = React.useState(false);
@@ -83,6 +89,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
     setSelectedAccountId(editingTransaction.accountId);
     setSelectedToAccountId(editingTransaction.toAccountId ?? null);
     setSelectedCategoryId(editingTransaction.categoryId ?? null);
+    setSelectedBudgetId(editingTransaction.budgetId ?? null);
     setTransactionDateTime(new Date(editingTransaction.datetime));
     setAmountInput(String(editingTransaction.amount));
     setNote(editingTransaction.note ?? '');
@@ -237,6 +244,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
       accountId: selectedAccountId,
       toAccountId: type === 'TRANSFER' ? selectedToAccountId : null,
       categoryId: selectedCategoryId,
+      budgetId: type === 'DR' ? selectedBudgetId : null,
       amount: amountValue,
       type,
       datetime: transactionDateTime.toISOString(),
@@ -271,6 +279,22 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
       <Header title={isEditMode ? 'Edit Entry' : 'New Entry'} subtitle="Record flow with precision" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <View style={{ marginTop: 24, marginBottom: 16 }}>
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>NOTE</Text>
+            <View style={styles.noteContainer}>
+              <TextInput
+                style={styles.noteInput}
+                value={note}
+                onChangeText={setNote}
+                placeholder="Optional context"
+                placeholderTextColor={colors.textMuted + '80'}
+                multiline
+              />
+            </View>
+          </View>
+        </View>
+
         <TransactionTypePicker value={type} onChange={setType} colors={colors} disabled={isEditMode} />
 
         <TransactionAmountInput
@@ -324,6 +348,15 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
             colors={colors}
           />
 
+          {type === 'DR' && manualBudgets.length > 0 && (
+            <TransactionBudgetPicker
+              budgetsList={manualBudgets}
+              selectedId={selectedBudgetId}
+              onSelect={setSelectedBudgetId}
+              colors={colors}
+            />
+          )}
+
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>DATE & TIME</Text>
             <View style={styles.dateTimeRow}>
@@ -344,20 +377,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           {showTimePicker && (
             <DateTimePicker value={transactionDateTime} mode="time" display="default" onChange={onTimePicked} />
           )}
-
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>NOTE</Text>
-            <View style={styles.noteContainer}>
-              <TextInput
-                style={styles.noteInput}
-                value={note}
-                onChangeText={setNote}
-                placeholder="Optional context"
-                placeholderTextColor={colors.textMuted + '80'}
-                multiline
-              />
-            </View>
-          </View>
         </View>
       </ScrollView>
 

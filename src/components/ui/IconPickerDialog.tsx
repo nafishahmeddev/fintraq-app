@@ -278,8 +278,8 @@ const createStyles = (colors: ThemeColors) =>
     },
     sheet: {
       height: '82%',
-      borderTopLeftRadius: RADIUS.full,
-      borderTopRightRadius: RADIUS.full,
+      borderTopLeftRadius: RADIUS['3xl'],
+      borderTopRightRadius: RADIUS['3xl'],
       borderTopWidth: 1,
       borderColor: colors.border,
       overflow: 'hidden',
