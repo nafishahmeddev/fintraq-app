@@ -165,7 +165,7 @@
 - [x] Place search and saved places
 - [x] Transaction history by location
 - [x] Frequent places suggestions
-- [ ] Location-based insights ("You spend most at...")
+- [x] Location-based insights ("You spend most at...")
 - [x] **Free tier**: Up to 5 saved places, basic location tag
 - [x] **Premium**: Unlimited places + insights
 

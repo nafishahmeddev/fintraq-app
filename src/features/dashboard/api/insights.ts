@@ -1,6 +1,6 @@
 import { and, eq, sql } from 'drizzle-orm';
 import { db } from '../../../db/client';
-import { accounts, payments } from '../../../db/schema';
+import { accounts, payments, places } from '../../../db/schema';
 import { getDaysAgoLocal, getStartOfMonthLocal } from '../../../utils/date';
 import { InsightStatus, InsightTrend, TransactionType } from '../../../types';
 import { IoniconName } from '../../../utils/icons';
@@ -138,6 +138,38 @@ export const getDashboardInsights = async (currency: string): Promise<DashboardI
         text: topCategory[0].name,
         subtitle: 'Highest expense last 30 days',
         icon: 'flame-outline',
+      });
+    }
+    
+    // 4. Top Place Insight
+    const topPlace = await db
+      .select({
+        name: places.name,
+        total: sql<number>`SUM(${payments.amount})`,
+      })
+      .from(payments)
+      .innerJoin(accounts, eq(payments.accountId, accounts.id))
+      .innerJoin(places, eq(payments.placeId, places.id))
+      .where(
+        and(
+          eq(accounts.currency, currency),
+          eq(payments.type, 'DR' as TransactionType),
+          sql`date(${payments.datetime}) >= ${getDaysAgoLocal(30)}`
+        )
+      )
+      .groupBy(payments.placeId)
+      .orderBy(sql`SUM(${payments.amount}) DESC`)
+      .limit(1);
+
+    if (topPlace && topPlace[0]) {
+      insights.push({
+        id: 'top-place',
+        type: 'info' as InsightStatus,
+        title: 'Hotspot',
+        valueType: 'text',
+        text: topPlace[0].name,
+        subtitle: 'Favorite spot last 30 days',
+        icon: 'location-outline',
       });
     }
 
