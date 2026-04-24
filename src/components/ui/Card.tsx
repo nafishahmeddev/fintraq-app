@@ -1,6 +1,6 @@
-import { BlurView } from '@sbaiahmed1/react-native-blur';
+
 import React, { useMemo } from 'react';
-import { StyleSheet, View, ViewStyle, Platform } from 'react-native';
+import { Platform, StyleSheet, View, ViewStyle } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
 import { ThemeColors } from '../../theme/colors';
 import { COMPONENT_SIZES, shadow, ShadowToken } from '../../theme/tokens';
@@ -29,8 +29,8 @@ type CardProps = {
  * - filled: Solid surface background
  * - outlined: Border only, transparent background
  */
-export const Card = React.memo(function Card({ 
-  children, 
+export const Card = React.memo(function Card({
+  children,
   style,
   size = 'md',
   variant = 'default',
@@ -78,13 +78,6 @@ export const Card = React.memo(function Card({
         style,
       ]}
     >
-      {variant === 'default' && (
-        <BlurView
-          blurAmount={Platform.OS === 'ios' ? 25 : 0}
-          blurType={isDark ? "dark" : "light"}
-          style={blurStyle}
-        />
-      )}
       <View style={styles.content}>
         {children}
       </View>

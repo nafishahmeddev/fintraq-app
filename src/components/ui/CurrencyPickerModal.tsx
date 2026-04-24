@@ -1,16 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
-    FlatList,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { CURRENCIES } from '../../constants/currency';
 import { useTheme } from '../../providers/ThemeProvider';
@@ -98,22 +97,7 @@ export const CurrencyPickerModal = React.memo(function CurrencyPickerModal({
         <TouchableOpacity style={styles.backdrop} onPress={handleClose} activeOpacity={1} />
 
         <View style={styles.sheet}>
-          <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-            <View style={[styles.glow, { top: -60, left: -60, width: 280, height: 280, backgroundColor: colors.primary + '28' }]} />
-            <View style={[styles.glow, { bottom: -60, right: -80, width: 360, height: 360, backgroundColor: colors.text + '0A' }]} />
-          </View>
 
-          <BlurView
-            blurAmount={Platform.OS === 'ios' ? 80 : 96}
-            blurType={isDark ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFillObject}
-          />
-          {Platform.OS === 'android' && (
-            <View
-              pointerEvents="none"
-              style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]}
-            />
-          )}
 
           <View style={styles.handle} />
 

@@ -1,11 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
-import React, { useMemo, useCallback } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
 import { ThemeColors } from '../../theme/colors';
+import { COMPONENT_SIZES, ShadowToken, shadow, spacing } from '../../theme/tokens';
 import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, COMPONENT_SIZES, ShadowToken, shadow } from '../../theme/tokens';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'success' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -114,36 +113,26 @@ export const Button = React.memo(function Button({
       disabled={disabled || isLoading}
       activeOpacity={0.75}
     >
-      {(variant === 'secondary' || variant === 'outline') && (
-        <BlurView
-          blurAmount={Platform.OS === 'ios' ? 20 : 0}
-          blurType={isDark ? "dark" : "light"}
-          style={[StyleSheet.absoluteFillObject, { 
-            backgroundColor: Platform.OS === 'android' ? colors.surface : 'transparent',
-            borderRadius: sizeConfig.borderRadius,
-          }]}
-        />
-      )}
-      
+
       {icon && !isLoading && (
-        <Ionicons 
-          name={icon} 
-          size={size === 'sm' ? 16 : size === 'lg' ? 24 : 20} 
-          color={textColor} 
+        <Ionicons
+          name={icon}
+          size={size === 'sm' ? 16 : size === 'lg' ? 24 : 20}
+          color={textColor}
           style={{ marginRight: spacing('2') }}
         />
       )}
-      
+
       {isLoading ? (
         <ActivityIndicator color={textColor} size="small" />
       ) : (
-        <Text 
+        <Text
           style={[
-            styles.text, 
-            { 
-              color: textColor, 
+            styles.text,
+            {
+              color: textColor,
               fontSize: sizeConfig.fontSize,
-            }, 
+            },
             textStyle
           ]}
         >

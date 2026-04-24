@@ -1,28 +1,27 @@
 import { Ionicons } from '@expo/vector-icons';
-import { resolveIcon } from '../../../utils/icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CATEGORY_COLORS, CATEGORY_ICONS } from '../../../constants/picker';
+import { CategoryType } from '../../../db/schema';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
 import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
+import { resolveIcon } from '../../../utils/icons';
 import { Category } from '../api/categories';
 import { useCreateCategory, useUpdateCategory } from '../hooks/categories';
-import { CategoryType } from '../../../db/schema';
 
 type CategoryFormValues = {
   name: string;
@@ -106,25 +105,6 @@ export function CategoryFormModal({ visible, onClose, category }: CategoryFormMo
         <TouchableOpacity style={styles.backdrop} onPress={onClose} activeOpacity={1} />
 
         <View style={styles.sheet}>
-          <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-            <View style={[styles.glow, { top: -70, left: -70, width: 330, height: 330, backgroundColor: colors.primary + '2E' }]} />
-            <View style={[styles.glow, { top: 260, right: -140, width: 480, height: 480, backgroundColor: colors.text + '0E' }]} />
-            <View style={[styles.glow, { bottom: -90, left: 40, width: 320, height: 320, backgroundColor: colors.primary + '1C' }]} />
-          </View>
-
-          <BlurView
-            blurAmount={Platform.OS === 'ios' ? 80 : 96}
-            blurType={isDark ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFillObject}
-          />
-
-          {Platform.OS === 'android' && (
-            <View
-              pointerEvents="none"
-              style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]}
-            />
-          )}
-
           <View style={styles.handle} />
 
           <View style={styles.header}>

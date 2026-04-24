@@ -1,7 +1,6 @@
 // UI Components Library
 export { AlertModal } from './AlertModal';
 export { Badge } from './Badge';
-export { Box, HStack, VStack } from './Box';
 export { Button } from './Button';
 export { Card } from './Card';
 export { Chip } from './Chip';

@@ -5,7 +5,6 @@ import { useTheme } from '@/src/providers/ThemeProvider';
 import { ThemeColors } from '@/src/theme/colors';
 import { TYPOGRAPHY } from '@/src/theme/typography';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
@@ -43,12 +42,6 @@ export default function PremiumScreen() {
   if (isPremium && !isProcessing) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-          <View style={[styles.bgCircle, { top: -100, left: -100, width: 500, height: 500, backgroundColor: colors.primary, opacity: 0.15 }]} />
-          <View style={[styles.bgCircle, { bottom: -150, right: -150, width: 600, height: 600, backgroundColor: colors.primary, opacity: 0.1 }]} />
-        </View>
-        <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
-
         <SafeAreaView style={styles.successWrapper}>
           <View style={styles.proContent}>
             <View style={styles.proBadge}>
@@ -89,16 +82,7 @@ export default function PremiumScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* ── Immersive Background ── */}
-      <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-        <View style={[styles.bgCircle, { top: -60, left: -60, width: 340, height: 340, backgroundColor: colors.primary, opacity: 0.72 }]} />
-        <View style={[styles.bgCircle, { top: 180, right: -110, width: 440, height: 440, backgroundColor: colors.primaryDark, opacity: 0.52 }]} />
-        <View style={[styles.bgCircle, { bottom: -110, left: 40, width: 380, height: 380, backgroundColor: colors.primary, opacity: 0.6 }]} />
-      </View>
-      <BlurView blurAmount={Platform.OS === 'ios' ? 80 : 95} blurType={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFillObject} />
-      {Platform.OS === 'android' && (
-        <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]} pointerEvents="none" />
-      )}
+
 
       {/* ── Header ── */}
       <Header title="Luno Pro" showBack />
@@ -218,7 +202,6 @@ export default function PremiumScreen() {
 
 const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  bgCircle: { position: 'absolute', borderRadius: 999 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
 
   heroSection: { marginTop: 20, marginBottom: 24 },

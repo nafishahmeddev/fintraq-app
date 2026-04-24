@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@sbaiahmed1/react-native-blur';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -181,17 +180,7 @@ export const IconPickerDialog = React.memo(function IconPickerDialog({
         <TouchableOpacity style={styles.backdrop} onPress={handleClose} activeOpacity={1} />
 
         <View style={styles.sheet}>
-          <BlurView
-            blurAmount={Platform.OS === 'ios' ? 80 : 96}
-            blurType={isDark ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFillObject}
-          />
-          {Platform.OS === 'android' && (
-            <View
-              pointerEvents="none"
-              style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.background + '60' }]}
-            />
-          )}
+
 
           <View style={styles.handle} />
 
