@@ -15,7 +15,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { Header } from '../../../components/ui/Header';
 import { ACCOUNT_COLORS } from '../../../constants/picker';
 import { BudgetMode, BudgetPeriod, BudgetScope } from '../../../db/schema';
@@ -211,7 +210,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
       <Header title={isEditMode ? 'Edit Budget' : 'New Budget'} subtitle="Set your spending limit" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">

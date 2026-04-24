@@ -1,3 +1,14 @@
+import { CurrencyPickerModal } from '@/src/components/ui/CurrencyPickerModal';
+import { Header } from '@/src/components/ui/Header';
+import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
+import { ACCOUNT_COLORS } from '@/src/constants/picker';
+import { ACCOUNT_TYPES, AccountType } from '@/src/db/schema';
+import { useCreateAccount } from '@/src/features/accounts/hooks/accounts';
+import { useTheme } from '@/src/providers/ThemeProvider';
+import { ThemeColors } from '@/src/theme/colors';
+import { TYPOGRAPHY } from '@/src/theme/typography';
+import { parseAmount, toDbColor } from '@/src/utils/format';
+import { resolveIcon } from '@/src/utils/icons';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
@@ -12,18 +23,6 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
-import { CurrencyPickerModal } from '@/src/components/ui/CurrencyPickerModal';
-import { Header } from '@/src/components/ui/Header';
-import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
-import { ACCOUNT_COLORS } from '@/src/constants/picker';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { TYPOGRAPHY } from '@/src/theme/typography';
-import { parseAmount, toDbColor } from '@/src/utils/format';
-import { resolveIcon } from '@/src/utils/icons';
-import { AccountType, ACCOUNT_TYPES } from '@/src/db/schema';
-import { useCreateAccount } from '@/src/features/accounts/hooks/accounts';
 
 type AccountFormValues = {
   name: string;
@@ -95,7 +94,7 @@ export default function AccountCreatePage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
       <Header title="New Account" subtitle="Configure where your money lives" showBack />
 
       <ScrollView

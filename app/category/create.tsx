@@ -1,3 +1,13 @@
+import { Header } from '@/src/components/ui/Header';
+import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
+import { CATEGORY_COLORS } from '@/src/constants/picker';
+import { CategoryType } from '@/src/db/schema';
+import { useCreateCategory } from '@/src/features/categories/hooks/categories';
+import { useTheme } from '@/src/providers/ThemeProvider';
+import { ThemeColors } from '@/src/theme/colors';
+import { TYPOGRAPHY } from '@/src/theme/typography';
+import { toDbColor } from '@/src/utils/format';
+import { resolveIcon } from '@/src/utils/icons';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
@@ -12,17 +22,6 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
-import { Header } from '@/src/components/ui/Header';
-import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
-import { CATEGORY_COLORS } from '@/src/constants/picker';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { TYPOGRAPHY } from '@/src/theme/typography';
-import { toDbColor } from '@/src/utils/format';
-import { resolveIcon } from '@/src/utils/icons';
-import { CategoryType } from '@/src/db/schema';
-import { useCreateCategory } from '@/src/features/categories/hooks/categories';
 
 type CategoryFormValues = {
   name: string;
@@ -72,7 +71,7 @@ export default function CategoryCreatePage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
       <Header title="New Category" subtitle="Organize your transactions" showBack />
 
       <ScrollView

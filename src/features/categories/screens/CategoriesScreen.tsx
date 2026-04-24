@@ -2,19 +2,18 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Header } from '../../../components/ui/Header';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { CategoryType } from '../../../db/schema';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { Category } from '../api/categories';
 import { CategoryCard } from '../components/CategoryCard';
 import { CategoryFormModal } from '../components/CategoryFormModal';
 import { CategoryTypeSelector } from '../components/CategoryTypeSelector';
-import { RADIUS } from '../../../theme/tokens';
 import { useCategories, useDeleteCategory } from '../hooks/categories';
 
 export const CategoriesScreen = () => {
@@ -81,7 +80,7 @@ export const CategoriesScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
 
       <Header title="Categories" subtitle="Organize your spending" showBack />
 

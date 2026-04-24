@@ -1,4 +1,3 @@
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
 import { Header } from '@/src/components/ui/Header';
 import { MoneyText } from '@/src/components/ui/MoneyText';
 import { TransactionRow } from '@/src/components/ui/TransactionRow';
@@ -333,7 +332,7 @@ export function SearchScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
 
       {/* Header */}
       <Header

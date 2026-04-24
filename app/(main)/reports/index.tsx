@@ -3,7 +3,6 @@ import { Href, useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../src/components/ui/BlurBackground';
 import { ReportHeader } from '../../../src/features/reports/components/ReportHeader';
 import { StreakBadge } from '../../../src/features/reports/components/StreakBadge';
 import { useTheme } from '../../../src/providers/ThemeProvider';
@@ -41,9 +40,9 @@ export default function ReportsHub() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
       <ReportHeader title="Reports" subtitle="Reflect & Adjust" />
-      
+
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>YOUR ACTIVITY</Text>
@@ -89,10 +88,10 @@ export default function ReportsHub() {
         </View>
 
         <View style={styles.philosophySection}>
-            <Text style={styles.philosophyText}>
-              LUNO / CORE PHILOSOPHY{"\n"}
-              <Text style={{ opacity: 0.4 }}>TRACKING FREQUENCY PREDICTS SUCCESS.</Text>
-            </Text>
+          <Text style={styles.philosophyText}>
+            LUNO / CORE PHILOSOPHY{"\n"}
+            <Text style={{ opacity: 0.4 }}>TRACKING FREQUENCY PREDICTS SUCCESS.</Text>
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>

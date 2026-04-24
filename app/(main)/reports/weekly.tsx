@@ -1,9 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
 import { resolveIcon } from '@/src/utils/icons';
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../src/components/ui/BlurBackground';
+import { MoneyText } from '../../../src/components/ui/MoneyText';
+import { PremiumGuard } from '../../../src/components/ui/PremiumGuard';
 import { MetricCard } from '../../../src/features/reports/components/MetricCard';
 import { ReportHeader } from '../../../src/features/reports/components/ReportHeader';
 import { useWeeklyReport } from '../../../src/features/reports/hooks/useReports';
@@ -11,8 +12,6 @@ import { useSettings } from '../../../src/providers/SettingsProvider';
 import { useTheme } from '../../../src/providers/ThemeProvider';
 import { ThemeColors } from '../../../src/theme/colors';
 import { TYPOGRAPHY } from '../../../src/theme/typography';
-import { MoneyText } from '../../../src/components/ui/MoneyText';
-import { PremiumGuard } from '../../../src/components/ui/PremiumGuard';
 
 /**
  * WeeklyReport: Re-aligned with the Editorial Hero pattern.
@@ -36,10 +35,10 @@ export default function WeeklyReport() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
-      <ReportHeader 
-        title="Weekly Journal" 
-        subtitle={report.periodLabel} 
+
+      <ReportHeader
+        title="Weekly Journal"
+        subtitle={report.periodLabel}
       />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -51,28 +50,28 @@ export default function WeeklyReport() {
               {report.savingsRate >= 20 ? 'Optimal Flow.' : 'Tight Margins.'}
             </Text>
             <Text style={styles.heroSubtitle}>
-              Your net position for this window is <MoneyText amount={Math.abs(report.netPosition)} currency={profile.defaultCurrency} style={styles.inlineMoney} />. 
+              Your net position for this window is <MoneyText amount={Math.abs(report.netPosition)} currency={profile.defaultCurrency} style={styles.inlineMoney} />.
               {report.savingsRate >= 20 ? ' Excellent discipline.' : ' Caution is advised.'}
             </Text>
           </View>
 
           {/* ── Core Metrics ── */}
           <View style={styles.metricGrid}>
-            <MetricCard 
-              label="EXPENSE" 
-              value={report.totalExpense} 
-              currency={profile.defaultCurrency} 
+            <MetricCard
+              label="EXPENSE"
+              value={report.totalExpense}
+              currency={profile.defaultCurrency}
               trendMode="low_is_good"
               changeValue={report.comparison?.expenseChange}
             />
-            <MetricCard 
-              label="SAVINGS RATE" 
-              value={report.savingsRate} 
-              currency={profile.defaultCurrency} 
+            <MetricCard
+              label="SAVINGS RATE"
+              value={report.savingsRate}
+              currency={profile.defaultCurrency}
               isAmount={false}
               suffix="%"
               trendMode="high_is_good"
-              changeValue={report.comparison?.incomeChange} 
+              changeValue={report.comparison?.incomeChange}
             />
           </View>
 
@@ -90,7 +89,7 @@ export default function WeeklyReport() {
                     <View style={styles.catText}>
                       <Text style={styles.catName}>{cat.name}</Text>
                       <View style={styles.progressContainer}>
-                         <View style={[styles.progressFill, { width: `${cat.percentage}%`, backgroundColor: cat.color }]} />
+                        <View style={[styles.progressFill, { width: `${cat.percentage}%`, backgroundColor: cat.color }]} />
                       </View>
                     </View>
                     <MoneyText amount={cat.amount} currency={profile.defaultCurrency} style={styles.catAmount} weight="semibold" />

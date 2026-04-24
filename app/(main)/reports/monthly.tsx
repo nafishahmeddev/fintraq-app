@@ -1,9 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
 import { resolveIcon } from '@/src/utils/icons';
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../src/components/ui/BlurBackground';
+import { MoneyText } from '../../../src/components/ui/MoneyText';
+import { PremiumGuard } from '../../../src/components/ui/PremiumGuard';
 import { MetricCard } from '../../../src/features/reports/components/MetricCard';
 import { ReportHeader } from '../../../src/features/reports/components/ReportHeader';
 import { useMonthlyReport } from '../../../src/features/reports/hooks/useReports';
@@ -11,8 +12,6 @@ import { useSettings } from '../../../src/providers/SettingsProvider';
 import { useTheme } from '../../../src/providers/ThemeProvider';
 import { ThemeColors } from '../../../src/theme/colors';
 import { TYPOGRAPHY } from '../../../src/theme/typography';
-import { MoneyText } from '../../../src/components/ui/MoneyText';
-import { PremiumGuard } from '../../../src/components/ui/PremiumGuard';
 
 /**
  * MonthlyReport: Re-aligned with the Editorial Hero pattern.
@@ -38,10 +37,10 @@ export default function MonthlyReport() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
-      <ReportHeader 
-        title="Monthly Ledger" 
-        subtitle={report.periodLabel} 
+
+      <ReportHeader
+        title="Monthly Ledger"
+        subtitle={report.periodLabel}
       />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -53,38 +52,38 @@ export default function MonthlyReport() {
               {isHealthy ? 'Solid Accumulation.' : 'Increased Burn.'}
             </Text>
             <Text style={styles.heroSubtitle}>
-              Financial state for {report.periodLabel.toLowerCase()} shows a {report.savingsRate.toFixed(1)}% savings rate. 
+              Financial state for {report.periodLabel.toLowerCase()} shows a {report.savingsRate.toFixed(1)}% savings rate.
               {isHealthy ? ' You are building wealth efficiently.' : ' Monitor your discretionary sectors closely.'}
             </Text>
           </View>
 
           {/* ── Core Month Metrics ── */}
           <View style={styles.metricGrid}>
-            <MetricCard 
-              label="REVENUE" 
-              value={report.totalIncome} 
-              currency={profile.defaultCurrency} 
+            <MetricCard
+              label="REVENUE"
+              value={report.totalIncome}
+              currency={profile.defaultCurrency}
               trendMode="high_is_good"
             />
-            <MetricCard 
-              label="EXPENSE" 
-              value={report.totalExpense} 
-              currency={profile.defaultCurrency} 
+            <MetricCard
+              label="EXPENSE"
+              value={report.totalExpense}
+              currency={profile.defaultCurrency}
               trendMode="low_is_good"
             />
           </View>
 
           <View style={[styles.metricGrid, { marginTop: 12 }]}>
-            <MetricCard 
-              label="NET POSITION" 
-              value={report.netPosition} 
-              currency={profile.defaultCurrency} 
+            <MetricCard
+              label="NET POSITION"
+              value={report.netPosition}
+              currency={profile.defaultCurrency}
               trendMode="high_is_good"
             />
-            <MetricCard 
-              label="SAVINGS RATE" 
-              value={report.savingsRate} 
-              currency={profile.defaultCurrency} 
+            <MetricCard
+              label="SAVINGS RATE"
+              value={report.savingsRate}
+              currency={profile.defaultCurrency}
               isAmount={false}
               suffix="%"
               trendMode="high_is_good"
@@ -105,7 +104,7 @@ export default function MonthlyReport() {
                     <View style={styles.catText}>
                       <Text style={styles.catName}>{cat.name}</Text>
                       <View style={styles.progressContainer}>
-                         <View style={[styles.progressFill, { width: `${cat.percentage}%`, backgroundColor: cat.color }]} />
+                        <View style={[styles.progressFill, { width: `${cat.percentage}%`, backgroundColor: cat.color }]} />
                       </View>
                     </View>
                     <MoneyText amount={cat.amount} currency={profile.defaultCurrency} style={styles.catAmount} weight="semibold" />

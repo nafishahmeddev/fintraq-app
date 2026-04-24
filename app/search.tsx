@@ -1,15 +1,14 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
 import { SearchScreen } from '@/src/features/search/screens/SearchScreen';
 import { usePremium } from '@/src/providers/PremiumProvider';
 import { useTheme } from '@/src/providers/ThemeProvider';
 import { ThemeColors } from '@/src/theme/colors';
 import { RADIUS, SPACING } from '@/src/theme/tokens';
 import { TYPOGRAPHY } from '@/src/theme/typography';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SEARCH_FEATURES = [
   { icon: 'receipt-outline' as const, label: 'Full-text search across all transactions' },
@@ -24,7 +23,7 @@ function SearchGate() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
 
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} activeOpacity={0.75}>
         <Ionicons name="arrow-back" size={20} color={colors.text} />

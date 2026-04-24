@@ -1,4 +1,13 @@
+import { ConfirmDialog } from '@/src/components/ui/ConfirmDialog';
+import { Header } from '@/src/components/ui/Header';
+import { OptionsDialog } from '@/src/components/ui/OptionsDialog';
+import { PremiumGuard } from '@/src/components/ui/PremiumGuard';
+import { useTheme } from '@/src/providers/ThemeProvider';
+import { ThemeColors } from '@/src/theme/colors';
+import { RADIUS, SPACING } from '@/src/theme/tokens';
+import { TYPOGRAPHY } from '@/src/theme/typography';
 import { Ionicons } from '@expo/vector-icons';
+import { File } from 'expo-file-system';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
@@ -12,16 +21,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
-import { ConfirmDialog } from '@/src/components/ui/ConfirmDialog';
-import { Header } from '@/src/components/ui/Header';
-import { OptionsDialog } from '@/src/components/ui/OptionsDialog';
-import { PremiumGuard } from '@/src/components/ui/PremiumGuard';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { RADIUS, SPACING } from '@/src/theme/tokens';
-import { TYPOGRAPHY } from '@/src/theme/typography';
-import { File } from 'expo-file-system';
 import { BackupService } from '../api/backup.service';
 
 export function BackupScreen() {
@@ -62,9 +61,9 @@ export function BackupScreen() {
 
   const handleSaveToFolder = useCallback(async () => {
     if (!exportedData) return;
-    
+
     setShowExportOptions(false);
-    
+
     try {
       await BackupService.saveToFolder(exportedData.content, exportedData.filename);
     } catch (error) {
@@ -79,9 +78,9 @@ export function BackupScreen() {
 
   const handleShare = useCallback(async () => {
     if (!exportedData) return;
-    
+
     setShowExportOptions(false);
-    
+
     try {
       await BackupService.shareFile(exportedData.content, exportedData.filename);
     } catch (error) {
@@ -98,7 +97,7 @@ export function BackupScreen() {
     try {
       setIsImporting(true);
       const file = await BackupService.pickBackupFile();
-      
+
       if (!file) {
         setIsImporting(false);
         return;
@@ -124,10 +123,10 @@ export function BackupScreen() {
     try {
       setIsImporting(true);
       setShowRestoreDialog(false);
-      
+
       const data = await BackupService.readBackupFile(selectedBackupFile);
       await BackupService.restoreBackup(data);
-      
+
       Alert.alert(
         'Restore Complete',
         'Your data has been restored successfully. The app will now reload.',
@@ -163,7 +162,7 @@ export function BackupScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
 
       <Header title="Backup & Restore" subtitle="Data management" showBack />
 
@@ -236,8 +235,8 @@ export function BackupScreen() {
               <View style={styles.infoRow}>
                 <Ionicons name="folder-open-outline" size={16} color={colors.textMuted} />
                 <Text style={styles.infoText}>
-                  {Platform.OS === 'ios' 
-                    ? 'Save to Files app or Share to other apps' 
+                  {Platform.OS === 'ios'
+                    ? 'Save to Files app or Share to other apps'
                     : 'Save to any folder or Share to apps'}
                 </Text>
               </View>
@@ -296,12 +295,12 @@ export function BackupScreen() {
         message={
           backupSummary
             ? `This backup contains:\n\n` +
-              `• ${backupSummary.accountsCount} account${backupSummary.accountsCount !== 1 ? 's' : ''}\n` +
-              `• ${backupSummary.categoriesCount} categor${backupSummary.categoriesCount !== 1 ? 'ies' : 'y'}\n` +
-              `• ${backupSummary.transactionsCount} transaction${backupSummary.transactionsCount !== 1 ? 's' : ''}\n` +
-              `• ${backupSummary.hasProfile ? 'Settings & profile' : 'No settings'}\n\n` +
-              `Exported: ${formatDate(backupSummary.exportedAt)}\n\n` +
-              `Your current data will be replaced.`
+            `• ${backupSummary.accountsCount} account${backupSummary.accountsCount !== 1 ? 's' : ''}\n` +
+            `• ${backupSummary.categoriesCount} categor${backupSummary.categoriesCount !== 1 ? 'ies' : 'y'}\n` +
+            `• ${backupSummary.transactionsCount} transaction${backupSummary.transactionsCount !== 1 ? 's' : ''}\n` +
+            `• ${backupSummary.hasProfile ? 'Settings & profile' : 'No settings'}\n\n` +
+            `Exported: ${formatDate(backupSummary.exportedAt)}\n\n` +
+            `Your current data will be replaced.`
             : 'Are you sure you want to restore this backup?'
         }
         onConfirm={handleConfirmRestore}

@@ -1,3 +1,11 @@
+import { Header } from '@/src/components/ui/Header';
+import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
+import { CATEGORY_COLORS } from '@/src/constants/picker';
+import { useTheme } from '@/src/providers/ThemeProvider';
+import { ThemeColors } from '@/src/theme/colors';
+import { TYPOGRAPHY } from '@/src/theme/typography';
+import { toDbColor } from '@/src/utils/format';
+import { resolveIcon } from '@/src/utils/icons';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -13,15 +21,6 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
-import { Header } from '@/src/components/ui/Header';
-import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
-import { CATEGORY_COLORS } from '@/src/constants/picker';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { TYPOGRAPHY } from '@/src/theme/typography';
-import { toDbColor } from '@/src/utils/format';
-import { resolveIcon } from '@/src/utils/icons';
 
 import { useCategoryById, useUpdateCategory } from '@/src/features/categories/hooks/categories';
 
@@ -34,7 +33,7 @@ export default function CategoryEditPage() {
   const { colors } = useTheme();
   const router = useRouter();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  
+
   const categoryId = parseInt(id, 10);
   const { data: category, isLoading } = useCategoryById(categoryId);
   const { mutateAsync: updateCategory, isPending } = useUpdateCategory();
@@ -82,7 +81,7 @@ export default function CategoryEditPage() {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <BlurBackground />
+
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -92,7 +91,7 @@ export default function CategoryEditPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
       <Header title="Edit Category" subtitle="Update your category details" showBack />
 
       <ScrollView

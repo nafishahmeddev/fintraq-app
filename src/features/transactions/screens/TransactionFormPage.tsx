@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import {
@@ -14,28 +15,26 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { Header } from '../../../components/ui/Header';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
 import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
+import { TransactionType } from '../../../types';
 import { useAccounts } from '../../accounts/hooks/accounts';
+import { useBudgets } from '../../budgets/api/budgets';
 import { useCategories } from '../../categories/hooks/categories';
+import { TransactionAccountPicker } from '../components/TransactionAccountPicker';
+import { TransactionAmountInput } from '../components/TransactionAmountInput';
+import { TransactionBudgetPicker } from '../components/TransactionBudgetPicker';
+import { TransactionCategoryPicker } from '../components/TransactionCategoryPicker';
+import { TransactionTypePicker } from '../components/TransactionTypePicker';
 import {
   useCreateTransaction,
   useTransactionById,
   useUpdateTransaction,
 } from '../hooks/transactions';
-import { TransactionAmountInput } from '../components/TransactionAmountInput';
-import { TransactionTypePicker } from '../components/TransactionTypePicker';
-import { TransactionAccountPicker } from '../components/TransactionAccountPicker';
-import { TransactionCategoryPicker } from '../components/TransactionCategoryPicker';
-import { TransactionBudgetPicker } from '../components/TransactionBudgetPicker';
-import { useBudgets } from '../../budgets/api/budgets';
-import { format } from 'date-fns';
-import { TransactionType } from '../../../types';
 
 type Props = {
   mode: 'create' | 'edit';
@@ -248,8 +247,8 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
       amount: amountValue,
       type,
       datetime: transactionDateTime.toISOString(),
-      note: note.trim() || (type === 'TRANSFER' 
-        ? `Transfer to ${selectedToAccount?.name ?? 'account'}` 
+      note: note.trim() || (type === 'TRANSFER'
+        ? `Transfer to ${selectedToAccount?.name ?? 'account'}`
         : selectedCategory?.name ?? 'Transaction'),
     };
 
@@ -275,7 +274,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
       <Header title={isEditMode ? 'Edit Entry' : 'New Entry'} subtitle="Record flow with precision" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">

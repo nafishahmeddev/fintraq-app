@@ -15,7 +15,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { Header } from '../../../components/ui/Header';
 import { IconPickerDialog } from '../../../components/ui/IconPickerDialog';
 import { ACCOUNT_COLORS } from '../../../constants/picker';
@@ -275,7 +274,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
       <Header title={isEditMode ? 'Edit Recurring' : 'New Recurring'} subtitle="Automate your flow" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">

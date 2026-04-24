@@ -8,7 +8,6 @@ import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Badge,
-  BlurBackground,
   Card,
   ConfirmDialog,
   HStack,
@@ -307,7 +306,7 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
       <Header title="Recurring" subtitle="Manage automatic entries" showBack />
 
       <View style={styles.tabBar}>

@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Header } from '../../../components/ui/Header';
 import { KPICard } from '../../../components/ui/KPICard';
@@ -235,7 +234,7 @@ export function TransactionsScreen() {
     }
     return initial;
   });
-  
+
   const [showAdvancedFilterSheet, setShowAdvancedFilterSheet] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [pendingDeleteTx, setPendingDeleteTx] = useState<TransactionListItem | null>(null);
@@ -254,12 +253,12 @@ export function TransactionsScreen() {
   // Apply client-side filtering for advanced features
   const transactions = useMemo(() => {
     const allTransactions = txQuery.data?.pages.flat() ?? [];
-    
+
     // If no advanced filtering needed, return all
     if (!AdvancedFilterService.requiresClientSideFiltering(advancedFilters)) {
       return allTransactions;
     }
-    
+
     return allTransactions.filter((transaction) => {
       // Date range filter
       if (advancedFilters.dateRange) {
@@ -268,26 +267,26 @@ export function TransactionsScreen() {
         startDate.setHours(0, 0, 0, 0);
         const endDate = new Date(advancedFilters.dateRange.endDate);
         endDate.setHours(23, 59, 59, 999);
-        
+
         if (txDate < startDate || txDate > endDate) {
           return false;
         }
       }
-      
+
       // Multi-select type filter
       if (advancedFilters.types && advancedFilters.types.length > 0) {
         if (!advancedFilters.types.includes(transaction.type)) {
           return false;
         }
       }
-      
+
       // Multi-select account filter
       if (advancedFilters.accountIds && advancedFilters.accountIds.length > 0) {
         if (!advancedFilters.accountIds.includes(transaction.accountId)) {
           return false;
         }
       }
-      
+
       // Multi-select category filter
       if (advancedFilters.categoryIds && advancedFilters.categoryIds.length > 0) {
         if (!transaction.categoryId || !advancedFilters.categoryIds.includes(transaction.categoryId)) {
@@ -317,16 +316,16 @@ export function TransactionsScreen() {
           return false;
         }
       }
-      
+
       return true;
     }).sort((a, b) => {
       // Sort by selected criteria
       if (advancedFilters.sortBy === 'amount') {
-        return advancedFilters.sortOrder === 'asc' 
-          ? a.amount - b.amount 
+        return advancedFilters.sortOrder === 'asc'
+          ? a.amount - b.amount
           : b.amount - a.amount;
       }
-      
+
       // Default sort by date
       const dateA = new Date(a.datetime).getTime();
       const dateB = new Date(b.datetime).getTime();
@@ -354,18 +353,18 @@ export function TransactionsScreen() {
   // Calculate KPI totals from filtered transactions
   const kpiTotalsByCurrency = useMemo(() => {
     const map: Record<string, { income: number; expense: number }> = {};
-    
+
     transactions.forEach((tx) => {
       const currency = tx.account.currency;
       if (!map[currency]) map[currency] = { income: 0, expense: 0 };
-      
+
       if (tx.type === 'CR') {
         map[currency].income += tx.amount;
       } else {
         map[currency].expense += tx.amount;
       }
     });
-    
+
     return map;
   }, [transactions]);
 
@@ -427,7 +426,7 @@ export function TransactionsScreen() {
   );
 
   // Stable key extractor - prevents unnecessary re-renders
-  const keyExtractor = React.useCallback((item: TransactionListItem) => 
+  const keyExtractor = React.useCallback((item: TransactionListItem) =>
     item.id.toString(), []
   );
 
@@ -435,29 +434,29 @@ export function TransactionsScreen() {
 
   const renderSectionHeader = React.useCallback(
     ({ section: { title, data } }: { section: SectionListData<TransactionListItem, TxSection> }) => {
-    const dayTotal = data.reduce<DayTotals>(
-      (acc, tx) => {
-        if (tx.type === 'CR') acc.in += tx.amount;
-        else acc.out += tx.amount;
-        return acc;
-      },
-      { in: 0, out: 0 },
-    );
-    return (
-      <View style={styles.dayHeaderRow}>
-        <Text style={styles.dayTitle}>{title}</Text>
-        <View style={styles.dayTotals}>
-          {dayTotal.in > 0 && (
-            <MoneyText amount={dayTotal.in} type="CR" style={styles.dayTotalValue} />
-          )}
-          {dayTotal.out > 0 && (
-            <MoneyText amount={dayTotal.out} type="DR" style={styles.dayTotalValue} />
-          )}
+      const dayTotal = data.reduce<DayTotals>(
+        (acc, tx) => {
+          if (tx.type === 'CR') acc.in += tx.amount;
+          else acc.out += tx.amount;
+          return acc;
+        },
+        { in: 0, out: 0 },
+      );
+      return (
+        <View style={styles.dayHeaderRow}>
+          <Text style={styles.dayTitle}>{title}</Text>
+          <View style={styles.dayTotals}>
+            {dayTotal.in > 0 && (
+              <MoneyText amount={dayTotal.in} type="CR" style={styles.dayTotalValue} />
+            )}
+            {dayTotal.out > 0 && (
+              <MoneyText amount={dayTotal.out} type="DR" style={styles.dayTotalValue} />
+            )}
+          </View>
         </View>
-      </View>
-    );
-  },
-  [styles]);
+      );
+    },
+    [styles]);
 
 
   const renderSectionFooter = React.useCallback(() => <View style={{ height: 24 }} />, []);
@@ -472,7 +471,7 @@ export function TransactionsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
 
       <Header
         title="Transactions"

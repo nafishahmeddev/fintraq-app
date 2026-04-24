@@ -1,6 +1,15 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Header } from '@/src/components/ui/Header';
+import { OptionsDialog } from '@/src/components/ui/OptionsDialog';
+import { PremiumGuard } from '@/src/components/ui/PremiumGuard';
+import { useAccounts } from '@/src/features/accounts/hooks/accounts';
+import { useTheme } from '@/src/providers/ThemeProvider';
+import { ThemeColors } from '@/src/theme/colors';
+import { RADIUS } from '@/src/theme/tokens';
+import { TYPOGRAPHY } from '@/src/theme/typography';
 import { resolveIcon } from '@/src/utils/icons';
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -11,18 +20,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
-import { Header } from '@/src/components/ui/Header';
-import { OptionsDialog } from '@/src/components/ui/OptionsDialog';
-import { PremiumGuard } from '@/src/components/ui/PremiumGuard';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { RADIUS } from '@/src/theme/tokens';
-import { TYPOGRAPHY } from '@/src/theme/typography';
 import { CsvExportService, ExportDateRange } from '../api/csv-export.service';
-import { useAccounts } from '@/src/features/accounts/hooks/accounts';
 
 export function ExportScreen() {
   const { colors } = useTheme();
@@ -121,9 +120,9 @@ export function ExportScreen() {
 
   const handleSaveToFolder = useCallback(async () => {
     if (!exportedData) return;
-    
+
     setShowExportOptions(false);
-    
+
     try {
       await CsvExportService.saveToFolder(exportedData.content, exportedData.filename);
     } catch (error) {
@@ -138,9 +137,9 @@ export function ExportScreen() {
 
   const handleShare = useCallback(async () => {
     if (!exportedData) return;
-    
+
     setShowExportOptions(false);
-    
+
     try {
       await CsvExportService.shareFile(exportedData.content, exportedData.filename);
     } catch (error) {
@@ -157,7 +156,7 @@ export function ExportScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
 
       <Header title="Export CSV" subtitle="Download your data" showBack />
 

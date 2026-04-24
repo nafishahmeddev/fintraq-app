@@ -1,12 +1,13 @@
-import { Ionicons } from '@expo/vector-icons';
+import { usePremium } from '@/src/providers/PremiumProvider';
 import { IoniconName } from '@/src/utils/icons';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import Constants from 'expo-constants';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Alert, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../src/components/ui/BlurBackground';
 import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
 import { Header } from '../../src/components/ui/Header';
 import { OptionsDialog } from '../../src/components/ui/OptionsDialog';
@@ -14,11 +15,9 @@ import { db } from '../../src/db/client';
 import { accounts, categories, payments } from '../../src/db/schema';
 import { useSettings } from '../../src/providers/SettingsProvider';
 import { useTheme } from '../../src/providers/ThemeProvider';
+import { NotificationService } from '../../src/services/notification.service';
 import { ThemeColors } from '../../src/theme/colors';
 import { TYPOGRAPHY } from '../../src/theme/typography';
-import { usePremium } from '@/src/providers/PremiumProvider';
-import { NotificationService } from '../../src/services/notification.service';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
 export default function SettingsScreen() {
   const { colors } = useTheme();
@@ -70,19 +69,19 @@ export default function SettingsScreen() {
 
   const handleToggleReminders = async () => {
     const nextState = !profile.reminderEnabled;
-    
+
     if (nextState) {
       // If turning on, we must ensure permissions
       const granted = await NotificationService.requestPermissions();
       if (!granted) {
         Alert.alert(
-          "Permission Required", 
+          "Permission Required",
           "Luno needs notification access to send reminders. Please enable this in your device settings."
         );
         return;
       }
     }
-    
+
     await updateProfile({ reminderEnabled: nextState });
   };
 
@@ -144,7 +143,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
 
       <Header title="Settings" subtitle="System preferences" showBack />
 
@@ -183,7 +182,7 @@ export default function SettingsScreen() {
               value={isPremium ? "ACTIVE" : "FREE"}
               subtitle={
                 isPremium ? "Enjoying full access to all features" :
-                "Unlock advanced analytics & insights"
+                  "Unlock advanced analytics & insights"
               }
               onPress={() => router.push('/premium')}
               color={isPremium ? colors.primary : undefined}
@@ -251,7 +250,7 @@ export default function SettingsScreen() {
           const [h, m] = profile.reminderTime.split(':').map(Number);
           const date = new Date();
           date.setHours(h, m, 0, 0);
-          
+
           return (
             <DateTimePicker
               value={date}
@@ -314,10 +313,10 @@ export default function SettingsScreen() {
             <Text style={styles.footerBrand}>LUNO / CORE</Text>
           </TouchableOpacity>
           <Text style={styles.footerCopy}>ALL DATA IS ENCRYPTED AND STORED LOCALLY BY DEFAULT.</Text>
-          
+
           {devClickCount > 0 && (
-            <TouchableOpacity 
-              style={{ marginTop: 20, padding: 10 }} 
+            <TouchableOpacity
+              style={{ marginTop: 20, padding: 10 }}
               onPress={async () => {
                 await resetPremium();
                 Alert.alert("Premium Reset", "Account downgraded to Free.");

@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../src/components/ui/BlurBackground';
 import { Header } from '../../src/components/ui/Header';
 import { MoneyText } from '../../src/components/ui/MoneyText';
 import { PremiumGuard } from '../../src/components/ui/PremiumGuard';
@@ -313,8 +312,8 @@ const StatsScreen = React.memo(function StatsScreen() {
       const accentColor = transaction.category?.color
         ? `#${transaction.category.color.toString(16).padStart(6, '0')}`
         : isTransfer ? colors.primary : colors.textMuted;
-      const iconName = isTransfer 
-        ? 'swap-horizontal-outline' 
+      const iconName = isTransfer
+        ? 'swap-horizontal-outline'
         : (transaction.category?.icon as keyof typeof Ionicons.glyphMap) || 'pricetag-outline';
       const categoryName = transaction.category?.name || (isTransfer ? 'Transfer' : 'Transaction');
       return (
@@ -353,7 +352,7 @@ const StatsScreen = React.memo(function StatsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
 
       <Header title="Stats" subtitle="Your financial insights" showBack />
 

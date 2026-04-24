@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import { File } from 'expo-file-system';
 import { useRouter } from 'expo-router';
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
   Alert,
@@ -12,29 +13,27 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../src/components/ui/BlurBackground';
 import { Button } from '../../src/components/ui/Button';
 import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
+import { getDeviceCurrencyCode } from '../../src/constants/currency';
 import { ACCOUNT_COLORS, ACCOUNT_ICONS } from '../../src/constants/picker';
-import { useCreateAccount } from '../../src/features/accounts/hooks/accounts';
 import { AccountType } from '../../src/db/schema';
+import { useCreateAccount } from '../../src/features/accounts/hooks/accounts';
+import { BackupService } from '../../src/features/backup/api/backup.service';
 import { useCreateCategory } from '../../src/features/categories/hooks/categories';
 import { AccountStep } from '../../src/features/onboarding/components/AccountStep';
 import { ProfileStep } from '../../src/features/onboarding/components/ProfileStep';
 import { WelcomeStep } from '../../src/features/onboarding/components/WelcomeStep';
-import { getDeviceCurrencyCode } from '../../src/constants/currency';
 import {
   ONBOARDING_STEPS,
 } from '../../src/features/onboarding/constants';
 import { createOnboardingStyles } from '../../src/features/onboarding/styles';
 import { OnboardingFormValues } from '../../src/features/onboarding/types';
-import { parseAmount, toDbColor } from '../../src/utils/format';
 import { useOnboarding } from '../../src/providers/OnboardingProvider';
 import { useSettings } from '../../src/providers/SettingsProvider';
 import { useTheme } from '../../src/providers/ThemeProvider';
-import { BackupService } from '../../src/features/backup/api/backup.service';
-import { File } from 'expo-file-system';
 import { NotificationService } from '../../src/services/notification.service';
+import { parseAmount, toDbColor } from '../../src/utils/format';
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -89,7 +88,7 @@ export default function OnboardingScreen() {
     try {
       setIsImporting(true);
       const file = await BackupService.pickBackupFile();
-      
+
       if (!file) {
         setIsImporting(false);
         return;
@@ -178,65 +177,65 @@ export default function OnboardingScreen() {
   const seedCategories = async () => {
     const defaults: { name: string; icon: string; color: number; type: 'CR' | 'DR' }[] = [
       // ── Income ──────────────────────────────────────────────────────
-      { name: 'Salary',        icon: 'cash-outline',          color: toDbColor('#6BD498'), type: 'CR' },
-      { name: 'Freelance',     icon: 'sparkles-outline',      color: toDbColor('#B8D641'), type: 'CR' },
-      { name: 'Sales',         icon: 'cart-outline',          color: toDbColor('#FCD34D'), type: 'CR' },
-      { name: 'Dividends',     icon: 'trending-up-outline',   color: toDbColor('#63A4FF'), type: 'CR' },
-      { name: 'Interests',     icon: 'add-circle-outline',    color: toDbColor('#A78BFA'), type: 'CR' },
-      { name: 'Gifts',         icon: 'gift-outline',          color: toDbColor('#F9A8D4'), type: 'CR' },
-      { name: 'Refunds',       icon: 'refresh-outline',       color: toDbColor('#6EE7B7'), type: 'CR' },
-      { name: 'Other Income',  icon: 'wallet-outline',        color: toDbColor('#94A3B8'), type: 'CR' },
+      { name: 'Salary', icon: 'cash-outline', color: toDbColor('#6BD498'), type: 'CR' },
+      { name: 'Freelance', icon: 'sparkles-outline', color: toDbColor('#B8D641'), type: 'CR' },
+      { name: 'Sales', icon: 'cart-outline', color: toDbColor('#FCD34D'), type: 'CR' },
+      { name: 'Dividends', icon: 'trending-up-outline', color: toDbColor('#63A4FF'), type: 'CR' },
+      { name: 'Interests', icon: 'add-circle-outline', color: toDbColor('#A78BFA'), type: 'CR' },
+      { name: 'Gifts', icon: 'gift-outline', color: toDbColor('#F9A8D4'), type: 'CR' },
+      { name: 'Refunds', icon: 'refresh-outline', color: toDbColor('#6EE7B7'), type: 'CR' },
+      { name: 'Other Income', icon: 'wallet-outline', color: toDbColor('#94A3B8'), type: 'CR' },
 
       // ── Housing & Utilities ──────────────────────────────────────────
-      { name: 'Rent',          icon: 'business-outline',      color: toDbColor('#FF8A65'), type: 'DR' },
-      { name: 'Mortgage',      icon: 'home-outline',          color: toDbColor('#F87171'), type: 'DR' },
-      { name: 'Electricity',   icon: 'flash-outline',         color: toDbColor('#FBBF24'), type: 'DR' },
-      { name: 'Water',         icon: 'water-outline',         color: toDbColor('#60A5FA'), type: 'DR' },
-      { name: 'Internet',      icon: 'wifi-outline',          color: toDbColor('#818CF8'), type: 'DR' },
-      { name: 'Phone',         icon: 'phone-portrait-outline',color: toDbColor('#A5B4FC'), type: 'DR' },
-      { name: 'Maintenance',   icon: 'build-outline',         color: toDbColor('#9CA3AF'), type: 'DR' },
+      { name: 'Rent', icon: 'business-outline', color: toDbColor('#FF8A65'), type: 'DR' },
+      { name: 'Mortgage', icon: 'home-outline', color: toDbColor('#F87171'), type: 'DR' },
+      { name: 'Electricity', icon: 'flash-outline', color: toDbColor('#FBBF24'), type: 'DR' },
+      { name: 'Water', icon: 'water-outline', color: toDbColor('#60A5FA'), type: 'DR' },
+      { name: 'Internet', icon: 'wifi-outline', color: toDbColor('#818CF8'), type: 'DR' },
+      { name: 'Phone', icon: 'phone-portrait-outline', color: toDbColor('#A5B4FC'), type: 'DR' },
+      { name: 'Maintenance', icon: 'build-outline', color: toDbColor('#9CA3AF'), type: 'DR' },
 
       // ── Food & Drink ────────────────────────────────────────────────
-      { name: 'Groceries',     icon: 'basket-outline',        color: toDbColor('#F5C451'), type: 'DR' },
-      { name: 'Dining Out',    icon: 'restaurant-outline',    color: toDbColor('#FB923C'), type: 'DR' },
-      { name: 'Delivery',      icon: 'bicycle-outline',      color: toDbColor('#F87171'), type: 'DR' },
-      { name: 'Coffee',        icon: 'cafe-outline',          color: toDbColor('#C4A35A'), type: 'DR' },
-      { name: 'Drinks',        icon: 'wine-outline',          color: toDbColor('#C084FC'), type: 'DR' },
+      { name: 'Groceries', icon: 'basket-outline', color: toDbColor('#F5C451'), type: 'DR' },
+      { name: 'Dining Out', icon: 'restaurant-outline', color: toDbColor('#FB923C'), type: 'DR' },
+      { name: 'Delivery', icon: 'bicycle-outline', color: toDbColor('#F87171'), type: 'DR' },
+      { name: 'Coffee', icon: 'cafe-outline', color: toDbColor('#C4A35A'), type: 'DR' },
+      { name: 'Drinks', icon: 'wine-outline', color: toDbColor('#C084FC'), type: 'DR' },
 
       // ── Transport ───────────────────────────────────────────────────
-      { name: 'Fuel',          icon: 'speedometer-outline',   color: toDbColor('#FB923C'), type: 'DR' },
-      { name: 'Car Payment',   icon: 'car-outline',           color: toDbColor('#63A4FF'), type: 'DR' },
-      { name: 'Public Transit',icon: 'bus-outline',           color: toDbColor('#38BDF8'), type: 'DR' },
-      { name: 'Ride Share',    icon: 'car-sport-outline',     color: toDbColor('#34D399'), type: 'DR' },
-      { name: 'Parking',       icon: 'locate-outline',        color: toDbColor('#94A3B8'), type: 'DR' },
+      { name: 'Fuel', icon: 'speedometer-outline', color: toDbColor('#FB923C'), type: 'DR' },
+      { name: 'Car Payment', icon: 'car-outline', color: toDbColor('#63A4FF'), type: 'DR' },
+      { name: 'Public Transit', icon: 'bus-outline', color: toDbColor('#38BDF8'), type: 'DR' },
+      { name: 'Ride Share', icon: 'car-sport-outline', color: toDbColor('#34D399'), type: 'DR' },
+      { name: 'Parking', icon: 'locate-outline', color: toDbColor('#94A3B8'), type: 'DR' },
 
       // ── Health & Wellness ───────────────────────────────────────────
-      { name: 'Health',        icon: 'medkit-outline',        color: toDbColor('#F87171'), type: 'DR' },
-      { name: 'Pharmacy',      icon: 'bandage-outline',       color: toDbColor('#6EE7B7'), type: 'DR' },
-      { name: 'Gym',           icon: 'barbell-outline',       color: toDbColor('#4ADE80'), type: 'DR' },
-      { name: 'Personal Care', icon: 'cut-outline',           color: toDbColor('#F9A8D4'), type: 'DR' },
+      { name: 'Health', icon: 'medkit-outline', color: toDbColor('#F87171'), type: 'DR' },
+      { name: 'Pharmacy', icon: 'bandage-outline', color: toDbColor('#6EE7B7'), type: 'DR' },
+      { name: 'Gym', icon: 'barbell-outline', color: toDbColor('#4ADE80'), type: 'DR' },
+      { name: 'Personal Care', icon: 'cut-outline', color: toDbColor('#F9A8D4'), type: 'DR' },
 
       // ── Lifestyle & Fun ──────────────────────────────────────────────
-      { name: 'Shopping',      icon: 'bag-outline',           color: toDbColor('#F472B6'), type: 'DR' },
-      { name: 'Electronics',   icon: 'hardware-chip-outline', color: toDbColor('#818CF8'), type: 'DR' },
-      { name: 'Subscrip.',     icon: 'repeat-outline',        color: toDbColor('#C084FC'), type: 'DR' },
-      { name: 'Entertainment', icon: 'film-outline',          color: toDbColor('#FCA5A5'), type: 'DR' },
-      { name: 'Travel',        icon: 'airplane-outline',      color: toDbColor('#38BDF8'), type: 'DR' },
-      { name: 'Games',         icon: 'game-controller-outline', color: toDbColor('#7C3AED'), type: 'DR' },
-      { name: 'Books',         icon: 'book-outline',          color: toDbColor('#D97706'), type: 'DR' },
+      { name: 'Shopping', icon: 'bag-outline', color: toDbColor('#F472B6'), type: 'DR' },
+      { name: 'Electronics', icon: 'hardware-chip-outline', color: toDbColor('#818CF8'), type: 'DR' },
+      { name: 'Subscrip.', icon: 'repeat-outline', color: toDbColor('#C084FC'), type: 'DR' },
+      { name: 'Entertainment', icon: 'film-outline', color: toDbColor('#FCA5A5'), type: 'DR' },
+      { name: 'Travel', icon: 'airplane-outline', color: toDbColor('#38BDF8'), type: 'DR' },
+      { name: 'Games', icon: 'game-controller-outline', color: toDbColor('#7C3AED'), type: 'DR' },
+      { name: 'Books', icon: 'book-outline', color: toDbColor('#D97706'), type: 'DR' },
 
       // ── Family & Education ──────────────────────────────────────────
-      { name: 'Education',     icon: 'school-outline',        color: toDbColor('#0EA5E9'), type: 'DR' },
-      { name: 'Kids',          icon: 'happy-outline',         color: toDbColor('#FCD34D'), type: 'DR' },
-      { name: 'Pets',          icon: 'paw-outline',           color: toDbColor('#A3E635'), type: 'DR' },
-      { name: 'Gifts given',   icon: 'heart-outline',         color: toDbColor('#FB7185'), type: 'DR' },
+      { name: 'Education', icon: 'school-outline', color: toDbColor('#0EA5E9'), type: 'DR' },
+      { name: 'Kids', icon: 'happy-outline', color: toDbColor('#FCD34D'), type: 'DR' },
+      { name: 'Pets', icon: 'paw-outline', color: toDbColor('#A3E635'), type: 'DR' },
+      { name: 'Gifts given', icon: 'heart-outline', color: toDbColor('#FB7185'), type: 'DR' },
 
       // ── Finance & Taxes ─────────────────────────────────────────────
-      { name: 'Loan/EMI',      icon: 'card-outline',          color: toDbColor('#EF4444'), type: 'DR' },
-      { name: 'Taxes',         icon: 'document-text-outline', color: toDbColor('#6B7280'), type: 'DR' },
-      { name: 'Insurance',     icon: 'shield-checkmark-outline', color: toDbColor('#4B5563'), type: 'DR' },
-      { name: 'Fees',          icon: 'receipt-outline',       color: toDbColor('#94A3B8'), type: 'DR' },
-      { name: 'Other',         icon: 'ellipsis-horizontal-outline', color: toDbColor('#cbd5e1'), type: 'DR' },
+      { name: 'Loan/EMI', icon: 'card-outline', color: toDbColor('#EF4444'), type: 'DR' },
+      { name: 'Taxes', icon: 'document-text-outline', color: toDbColor('#6B7280'), type: 'DR' },
+      { name: 'Insurance', icon: 'shield-checkmark-outline', color: toDbColor('#4B5563'), type: 'DR' },
+      { name: 'Fees', icon: 'receipt-outline', color: toDbColor('#94A3B8'), type: 'DR' },
+      { name: 'Other', icon: 'ellipsis-horizontal-outline', color: toDbColor('#cbd5e1'), type: 'DR' },
     ];
 
     for (const category of defaults) {
@@ -315,53 +314,51 @@ export default function OnboardingScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground androidOverlayOpacity="76" />
-
       <FormProvider {...methods}>
         <KeyboardAvoidingView style={styles.keyboardWrap} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.header}>
-          <View style={styles.headerTopRow}>
-            {stepIndex > 0 ? (
-              <TouchableOpacity style={styles.headerBackButton} onPress={() => setStepIndex((current) => current - 1)} activeOpacity={0.9}>
-                <Ionicons name="chevron-back" size={18} color={colors.text} />
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.headerBackPlaceholder} />
-            )}
+          <View style={styles.header}>
+            <View style={styles.headerTopRow}>
+              {stepIndex > 0 ? (
+                <TouchableOpacity style={styles.headerBackButton} onPress={() => setStepIndex((current) => current - 1)} activeOpacity={0.9}>
+                  <Ionicons name="chevron-back" size={18} color={colors.text} />
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.headerBackPlaceholder} />
+              )}
 
-            <Text style={styles.brand}>LUNO.</Text>
+              <Text style={styles.brand}>LUNO.</Text>
 
-            <View style={styles.stepPill}>
-              <Text style={styles.stepPillText}>{stepIndex + 1}/{ONBOARDING_STEPS.length}</Text>
+              <View style={styles.stepPill}>
+                <Text style={styles.stepPillText}>{stepIndex + 1}/{ONBOARDING_STEPS.length}</Text>
+              </View>
+            </View>
+
+            <View style={styles.progressTrack}>
+              {ONBOARDING_STEPS.map((step, index) => (
+                <View key={step.id} style={[styles.progressDot, index <= stepIndex && styles.progressDotActive]} />
+              ))}
             </View>
           </View>
 
-          <View style={styles.progressTrack}>
-            {ONBOARDING_STEPS.map((step, index) => (
-              <View key={step.id} style={[styles.progressDot, index <= stepIndex && styles.progressDotActive]} />
-            ))}
+          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+            <View style={styles.stepMeta}>
+              <Text style={styles.eyebrow}>{currentStep.eyebrow}</Text>
+              <Text style={styles.stepTitle}>{currentStep.title}</Text>
+              <Text style={styles.stepSubtitle}>{currentStep.subtitle}</Text>
+            </View>
+
+            <View style={styles.contentCard}>{renderStepContent()}</View>
+          </ScrollView>
+
+          <View style={styles.footer}>
+            <Button
+              title={stepIndex === ONBOARDING_STEPS.length - 1 ? 'Launch Luno' : 'Continue'}
+              onPress={handleContinue}
+              size="lg"
+              isLoading={isPending}
+              style={styles.primaryAction}
+            />
           </View>
-        </View>
-
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-          <View style={styles.stepMeta}>
-            <Text style={styles.eyebrow}>{currentStep.eyebrow}</Text>
-            <Text style={styles.stepTitle}>{currentStep.title}</Text>
-            <Text style={styles.stepSubtitle}>{currentStep.subtitle}</Text>
-          </View>
-
-          <View style={styles.contentCard}>{renderStepContent()}</View>
-        </ScrollView>
-
-        <View style={styles.footer}>
-          <Button
-            title={stepIndex === ONBOARDING_STEPS.length - 1 ? 'Launch Luno' : 'Continue'}
-            onPress={handleContinue}
-            size="lg"
-            isLoading={isPending}
-            style={styles.primaryAction}
-          />
-        </View>
         </KeyboardAvoidingView>
       </FormProvider>
 
@@ -378,18 +375,18 @@ export default function OnboardingScreen() {
         message={
           backupSummary
             ? `This backup contains:\n\n` +
-              `• ${backupSummary.accountsCount} account${backupSummary.accountsCount !== 1 ? 's' : ''}\n` +
-              `• ${backupSummary.categoriesCount} categor${backupSummary.categoriesCount !== 1 ? 'ies' : 'y'}\n` +
-              `• ${backupSummary.transactionsCount} transaction${backupSummary.transactionsCount !== 1 ? 's' : ''}\n` +
-              `• ${backupSummary.hasProfile ? 'Settings & profile' : 'No settings'}\n\n` +
-              `Exported: ${new Date(backupSummary.exportedAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}\n\n` +
-              `This will replace any existing data.`
+            `• ${backupSummary.accountsCount} account${backupSummary.accountsCount !== 1 ? 's' : ''}\n` +
+            `• ${backupSummary.categoriesCount} categor${backupSummary.categoriesCount !== 1 ? 'ies' : 'y'}\n` +
+            `• ${backupSummary.transactionsCount} transaction${backupSummary.transactionsCount !== 1 ? 's' : ''}\n` +
+            `• ${backupSummary.hasProfile ? 'Settings & profile' : 'No settings'}\n\n` +
+            `Exported: ${new Date(backupSummary.exportedAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}\n\n` +
+            `This will replace any existing data.`
             : 'Are you sure you want to restore this backup?'
         }
         onConfirm={handleConfirmRestore}

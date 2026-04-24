@@ -3,25 +3,24 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '../../../components/ui/BlurBackground';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Header } from '../../../components/ui/Header';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
+import { budgets } from '../../../db/schema';
+import { useSettings } from '../../../providers/SettingsProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
 import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { formatCurrency } from '../../../utils/format';
-import { useSettings } from '../../../providers/SettingsProvider';
 import { useBudgets, useBudgetsProgress, useDeleteBudget } from '../api/budgets';
-import { budgets } from '../../../db/schema';
 
 export const BudgetsScreen = () => {
   const { colors } = useTheme();
   const { profile } = useSettings();
   const styles = React.useMemo(() => createStyles(colors), [colors]);
   const router = useRouter();
-  
+
   const { data: budgetsData, isLoading: loadingBudgets } = useBudgets();
   const { data: progressData, isLoading: loadingProgress } = useBudgetsProgress();
   const { mutate: deleteBudget } = useDeleteBudget();
@@ -61,7 +60,7 @@ export const BudgetsScreen = () => {
     const remaining = progress?.remaining || Math.max(0, total - spent);
     const percentage = Math.min(progress?.percentage || 0, 100);
     const adjustment = progress?.adjustment || 0;
-    
+
     // Determine status color
     const isExceeded = percentage >= 100;
     const isWarning = percentage >= 80 && !isExceeded;
@@ -122,7 +121,7 @@ export const BudgetsScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
       <Header title="Budgets" subtitle="Track spending limits" showBack />
 
       {(loadingBudgets || loadingProgress) ? (

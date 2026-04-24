@@ -1,3 +1,14 @@
+import { CurrencyPickerModal } from '@/src/components/ui/CurrencyPickerModal';
+import { Header } from '@/src/components/ui/Header';
+import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
+import { ACCOUNT_COLORS } from '@/src/constants/picker';
+import { ACCOUNT_TYPES, AccountType } from '@/src/db/schema';
+import { useAccountById, useUpdateAccount } from '@/src/features/accounts/hooks/accounts';
+import { useTheme } from '@/src/providers/ThemeProvider';
+import { ThemeColors } from '@/src/theme/colors';
+import { TYPOGRAPHY } from '@/src/theme/typography';
+import { toDbColor } from '@/src/utils/format';
+import { resolveIcon } from '@/src/utils/icons';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -13,18 +24,6 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurBackground } from '@/src/components/ui/BlurBackground';
-import { CurrencyPickerModal } from '@/src/components/ui/CurrencyPickerModal';
-import { Header } from '@/src/components/ui/Header';
-import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
-import { ACCOUNT_COLORS } from '@/src/constants/picker';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { TYPOGRAPHY } from '@/src/theme/typography';
-import { toDbColor } from '@/src/utils/format';
-import { resolveIcon } from '@/src/utils/icons';
-import { AccountType, ACCOUNT_TYPES } from '@/src/db/schema';
-import { useAccountById, useUpdateAccount } from '@/src/features/accounts/hooks/accounts';
 
 type AccountFormValues = {
   name: string;
@@ -55,7 +54,7 @@ export default function AccountEditPage() {
   const { colors } = useTheme();
   const router = useRouter();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  
+
   const accountId = parseInt(id, 10);
   const { data: account, isLoading } = useAccountById(accountId);
   const { mutateAsync: updateAccount, isPending } = useUpdateAccount();
@@ -115,7 +114,7 @@ export default function AccountEditPage() {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <BlurBackground />
+
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -125,7 +124,7 @@ export default function AccountEditPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BlurBackground />
+
       <Header title="Edit Account" subtitle="Update your account details" showBack />
 
       <ScrollView

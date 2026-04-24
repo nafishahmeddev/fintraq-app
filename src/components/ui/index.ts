@@ -1,6 +1,7 @@
 // UI Components Library
 export { AlertModal } from './AlertModal';
-export { BlurBackground } from './BlurBackground';
+export { Badge } from './Badge';
+export { Box, HStack, VStack } from './Box';
 export { Button } from './Button';
 export { Card } from './Card';
 export { Chip } from './Chip';
@@ -21,5 +22,4 @@ export { PremiumGuard } from './PremiumGuard';
 export { SectionLabel } from './SectionLabel';
 export { TransactionRow } from './TransactionRow';
 export { Typography } from './Typography';
-export { Badge } from './Badge';
-export { Box, HStack, VStack } from './Box';
+
