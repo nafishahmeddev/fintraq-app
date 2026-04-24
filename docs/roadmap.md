@@ -60,7 +60,6 @@
 
 ## 💎 Phase 5 — Power Features (Completed)
 
-- [x] Export data (CSV) - Date range, account/category filters, cross-platform save
 - [x] Advanced filters (multi-select, deep filtering) - Multi-select accounts/categories, date range, amount range, search
 - [x] Global search across transactions - Full-text search, dedicated results screen, deep-linking to filtered results
 
@@ -159,13 +158,7 @@
 
 ---
 
-## 📎 Phase 10 — Attachments & Location (In Progress)
-
-### Bills & Receipts
-- [ ] Cloud sync for attachments (optional)
-- [ ] Export attachments with transactions
-- [ ] **Free tier**: Up to 10 attachments total
-- [ ] **Premium**: Unlimited attachments + cloud sync
+## 📍 Phase 10 — Location Tracking (Completed)
 
 ### Location Tracking
 - [x] Attach places/locations to transactions
@@ -191,22 +184,30 @@
 - [ ] PDF report generation
 - [ ] Custom report builder
 - [ ] Scheduled reports (weekly/monthly email)
-- [ ] Data export with visual charts
 - [ ] Cross-account analytics
 - [ ] Category trend analysis
 - [ ] **Premium**: Full reporting suite
 
 ---
 
-## ☁️ Phase 12 — Backup & Cloud Sync (Premium)
+## ☁️ Phase 12 — Data Portability & Cloud Sync (Premium)
 
-### Data Security
+### Bills & Receipts
+- [ ] Attach photos/PDFs to transactions
+- [ ] Camera capture for receipts
+- [ ] Gallery upload support
+- [ ] Cloud sync for attachments
+- [ ] **Free tier**: Up to 10 attachments total
+- [ ] **Premium**: Unlimited attachments + cloud sync
+
+### Export & Import
+- [ ] Export data (CSV) - Date range, filters, cross-platform save
+- [ ] Data export with visual charts (PDF/Images)
 - [ ] Backup & restore (local) - JSON export/import, onboarding restore option
 - [ ] Automated cloud backup (iCloud/Google Drive)
 - [ ] Cross-device data synchronization
-- [ ] Encrypted backup files
-- [ ] **Free tier**: Manual local backups
-- [ ] **Premium**: Automated cloud sync + unlimited backups
+- [ ] **Free tier**: Manual local backups + CSV export
+- [ ] **Premium**: Automated cloud sync + PDF reports + unlimited backups
 
 ---
 
