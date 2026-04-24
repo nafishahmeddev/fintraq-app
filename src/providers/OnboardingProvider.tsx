@@ -47,8 +47,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: DARK_THEME.background }}>
-        <ActivityIndicator size="large" color={DARK_THEME.primary} />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000100' }}>
+        <ActivityIndicator size="large" color="#B8D641" />
       </View>
     );
   }
