@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import {
   ActivityIndicator,
@@ -19,7 +19,7 @@ import { Header } from '../../../components/ui/Header';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
+import { RADIUS, spacing } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { TransactionType } from '../../../types';
 import { useAccounts } from '../../accounts/hooks/accounts';
@@ -29,7 +29,11 @@ import { TransactionAccountPicker } from '../components/TransactionAccountPicker
 import { TransactionAmountInput } from '../components/TransactionAmountInput';
 import { TransactionBudgetPicker } from '../components/TransactionBudgetPicker';
 import { TransactionCategoryPicker } from '../components/TransactionCategoryPicker';
+import { TransactionGoalPicker } from '../components/TransactionGoalPicker';
+import { TransactionLoanPicker } from '../components/TransactionLoanPicker';
 import { TransactionTypePicker } from '../components/TransactionTypePicker';
+import { useGoalById } from '../../goals/api/goals';
+import { useLoanById } from '../../loans/api/loans';
 import {
   useCreateTransaction,
   useTransactionById,
@@ -49,6 +53,7 @@ const parseAmount = (raw: string): number => {
 
 export function TransactionFormPage({ mode, transactionId }: Props) {
   const router = useRouter();
+  const params = useLocalSearchParams<{ goalId?: string; loanId?: string }>();
   const isEditMode = mode === 'edit';
 
   const { colors } = useTheme();
@@ -61,6 +66,9 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
   const transactionByIdQuery = useTransactionById(isEditMode ? transactionId ?? null : null);
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
+  
+  const { data: paramGoal } = useGoalById(params.goalId ? parseInt(params.goalId, 10) : null);
+  const { data: paramLoan } = useLoanById(params.loanId ? parseInt(params.loanId, 10) : null);
 
   const accounts = React.useMemo(() => accountsQuery.data ?? [], [accountsQuery.data]);
   const categories = React.useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
@@ -76,6 +84,12 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
   const [selectedToAccountId, setSelectedToAccountId] = React.useState<number | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = React.useState<number | null>(null);
   const [selectedBudgetId, setSelectedBudgetId] = React.useState<number | null>(null);
+  const [selectedGoalId, setSelectedGoalId] = React.useState<number | null>(() => 
+    params.goalId ? parseInt(params.goalId, 10) : null
+  );
+  const [selectedLoanId, setSelectedLoanId] = React.useState<number | null>(() => 
+    params.loanId ? parseInt(params.loanId, 10) : null
+  );
   const [transactionDateTime, setTransactionDateTime] = React.useState<Date>(() => new Date());
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [showTimePicker, setShowTimePicker] = React.useState(false);
@@ -92,7 +106,20 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
     setTransactionDateTime(new Date(editingTransaction.datetime));
     setAmountInput(String(editingTransaction.amount));
     setNote(editingTransaction.note ?? '');
+    setSelectedGoalId(editingTransaction.goalId ?? null);
+    setSelectedLoanId(editingTransaction.loanId ?? null);
   }, [isEditMode, editingTransaction]);
+
+  // Auto-select account from Goal/Loan param
+  React.useEffect(() => {
+    if (!isEditMode) {
+      if (paramGoal?.accountId) {
+        setSelectedAccountId(paramGoal.accountId);
+      } else if (paramLoan?.accountId) {
+        setSelectedAccountId(paramLoan.accountId);
+      }
+    }
+  }, [paramGoal, paramLoan, isEditMode]);
 
   const filteredCategories = React.useMemo(
     () => categories.filter((category) => category.type === type),
@@ -250,6 +277,8 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
       note: note.trim() || (type === 'TRANSFER'
         ? `Transfer to ${selectedToAccount?.name ?? 'account'}`
         : selectedCategory?.name ?? 'Transaction'),
+      goalId: selectedGoalId,
+      loanId: selectedLoanId,
     };
 
     try {
@@ -355,6 +384,22 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
               colors={colors}
             />
           )}
+
+          <TransactionGoalPicker 
+            selectedId={selectedGoalId} 
+            onSelect={setSelectedGoalId} 
+            colors={colors} 
+            accountId={selectedAccountId}
+            type={type}
+          />
+
+          <TransactionLoanPicker 
+            selectedId={selectedLoanId} 
+            onSelect={setSelectedLoanId} 
+            colors={colors} 
+            accountId={selectedAccountId}
+            type={type}
+          />
 
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>DATE & TIME</Text>

@@ -12,6 +12,9 @@ export type TransactionFilters = {
   type?: TransactionType;
   accountId?: number;
   categoryId?: number;
+  budgetId?: number;
+  goalId?: number;
+  loanId?: number;
 };
 
 export type TransactionListItem = {
@@ -50,6 +53,9 @@ const buildWhere = (filters: TransactionFilters): SQL | undefined => {
   if (filters.type) conditions.push(eq(payments.type, filters.type));
   if (filters.accountId != null) conditions.push(eq(payments.accountId, filters.accountId));
   if (filters.categoryId != null) conditions.push(eq(payments.categoryId, filters.categoryId));
+  if (filters.budgetId != null) conditions.push(eq(payments.budgetId, filters.budgetId));
+  if (filters.goalId != null) conditions.push(eq(payments.goalId, filters.goalId));
+  if (filters.loanId != null) conditions.push(eq(payments.loanId, filters.loanId));
   return conditions.length > 0 ? and(...conditions) : undefined;
 };
 

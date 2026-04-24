@@ -50,6 +50,8 @@ export const payments = sqliteTable('payments', {
   categoryId: integer('category_id').references(() => categories.id, { onDelete: 'cascade' }),
   recurringId: integer('recurring_id').references(() => recurringTransactions.id, { onDelete: 'set null' }),
   budgetId: integer('budget_id').references(() => budgets.id, { onDelete: 'set null' }),
+  goalId: integer('goal_id').references(() => goals.id, { onDelete: 'set null' }),
+  loanId: integer('loan_id').references(() => loans.id, { onDelete: 'set null' }),
   amount: real('amount').notNull(),
   type: text('type', { enum: TRANSACTION_TYPES }).notNull(),
   datetime: text('datetime').notNull(),
@@ -60,6 +62,8 @@ export const payments = sqliteTable('payments', {
   accountIdIdx: index('payments_account_id_idx').on(table.accountId),
   toAccountIdIdx: index('payments_to_account_id_idx').on(table.toAccountId),
   categoryIdIdx: index('payments_category_id_idx').on(table.categoryId),
+  goalIdIdx: index('payments_goal_id_idx').on(table.goalId),
+  loanIdIdx: index('payments_loan_id_idx').on(table.loanId),
   datetimeIdx: index('payments_datetime_idx').on(table.datetime),
 }));
 
@@ -83,6 +87,14 @@ export const paymentsRelations = relations(payments, ({ one }) => ({
   budget: one(budgets, {
     fields: [payments.budgetId],
     references: [budgets.id],
+  }),
+  goal: one(goals, {
+    fields: [payments.goalId],
+    references: [goals.id],
+  }),
+  loan: one(loans, {
+    fields: [payments.loanId],
+    references: [loans.id],
   }),
 }));
 
@@ -163,5 +175,61 @@ export const budgets = sqliteTable('budgets', {
 });
 
 export const budgetsRelations = relations(budgets, ({ many }) => ({
+  payments: many(payments),
+}));
+
+export const GOAL_STATUS = ['ACTIVE', 'REACHED', 'PAUSED'] as const;
+export type GoalStatus = typeof GOAL_STATUS[number];
+
+export const goals = sqliteTable('goals', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  targetAmount: real('target_amount').notNull(),
+  currentAmount: real('current_amount').notNull().default(0),
+  startDate: text('start_date'),
+  endDate: text('end_date'),
+  accountId: integer('account_id').references(() => accounts.id, { onDelete: 'set null' }),
+  icon: text('icon').notNull().default('flag'),
+  color: integer('color').notNull(),
+  status: text('status', { enum: GOAL_STATUS }).notNull().default('ACTIVE'),
+  createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+  updatedAt: text('updated_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+export const goalsRelations = relations(goals, ({ one, many }) => ({
+  account: one(accounts, {
+    fields: [goals.accountId],
+    references: [accounts.id],
+  }),
+  payments: many(payments),
+}));
+
+export const LOAN_TYPES = ['LEND', 'BORROW'] as const;
+export type LoanType = typeof LOAN_TYPES[number];
+
+export const LOAN_STATUS = ['ACTIVE', 'PAID', 'OVERDUE'] as const;
+export type LoanStatus = typeof LOAN_STATUS[number];
+
+export const loans = sqliteTable('loans', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  totalAmount: real('total_amount').notNull(),
+  remainingAmount: real('remaining_amount').notNull(),
+  type: text('type', { enum: LOAN_TYPES }).notNull(),
+  startDate: text('start_date'),
+  endDate: text('end_date'),
+  accountId: integer('account_id').references(() => accounts.id, { onDelete: 'set null' }),
+  icon: text('icon').notNull().default('cash'),
+  color: integer('color').notNull(),
+  status: text('status', { enum: LOAN_STATUS }).notNull().default('ACTIVE'),
+  createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+  updatedAt: text('updated_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+export const loansRelations = relations(loans, ({ one, many }) => ({
+  account: one(accounts, {
+    fields: [loans.accountId],
+    references: [accounts.id],
+  }),
   payments: many(payments),
 }));

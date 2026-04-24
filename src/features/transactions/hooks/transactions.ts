@@ -61,6 +61,8 @@ export const useCreateTransaction = () => {
       queryClient.invalidateQueries({ queryKey: TRANSACTIONS_KEYS.all });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['goalsProgress'] });
+      queryClient.invalidateQueries({ queryKey: ['loansProgress'] });
     },
   });
 };
@@ -73,6 +75,8 @@ export const useDeleteTransaction = () => {
       queryClient.invalidateQueries({ queryKey: TRANSACTIONS_KEYS.all });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['goalsProgress'] });
+      queryClient.invalidateQueries({ queryKey: ['loansProgress'] });
     },
   });
 };
@@ -84,9 +88,11 @@ export const useUpdateTransaction = () => {
       api.updateTransaction(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: TRANSACTIONS_KEYS.all });
-      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_KEYS.detail(id) });
+      queryClient.invalidateQueries({ queryKey: ['detail', id] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['goalsProgress'] });
+      queryClient.invalidateQueries({ queryKey: ['loansProgress'] });
     },
   });
 };

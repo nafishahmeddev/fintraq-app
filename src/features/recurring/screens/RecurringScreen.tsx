@@ -10,13 +10,11 @@ import {
   Badge,
   Card,
   ConfirmDialog,
-  HStack,
   Header,
   IconBox,
   OptionsDialog,
   OptionsDialogOption,
   Typography,
-  VStack
 } from '../../../components/ui';
 import { db } from '../../../db/client';
 import { RecurringEndCondition, RecurringFrequency, RecurringIntervalUnit, payments, recurringTransactions as recurringTransactionsTable } from '../../../db/schema';
@@ -227,19 +225,19 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
           }}
           onPress={() => router.push(`/recurring/edit/${item.id}`)}
         >
-          <VStack gap="3">
-            <HStack gap="3" align="center">
+          <View style={styles.vStackGap3}>
+            <View style={styles.hStackGap3AlignCenter}>
               <IconBox
                 icon={resolveIcon(item.icon, 'sync-outline')}
                 iconColor={color}
                 backgroundColor={color + '20'}
                 size="md"
               />
-              <VStack flex={1} gap="1">
+              <View style={styles.vStackFlex1Gap1}>
                 <Typography variant="body" weight="semibold" numberOfLines={1}>
                   {item.name}
                 </Typography>
-                <HStack gap="2" align="center">
+                <View style={styles.hStackGap2AlignCenter}>
                   <Badge
                     label={item.category?.name || 'Uncategorized'}
                     variant="default"
@@ -248,8 +246,8 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
                   <Typography variant="bodySm" color={colors.textMuted}>
                     {getFrequencyText()}
                   </Typography>
-                </HStack>
-              </VStack>
+                  </View>
+                </View>
               <Typography
                 variant="mono"
                 weight="bold"
@@ -257,10 +255,10 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
               >
                 {item.type === 'CR' ? '+' : '-'}{formatCurrency(item.amount, item.account?.currency || 'USD')}
               </Typography>
-            </HStack>
+            </View>
 
-            <HStack justify="space-between" align="center" pt="2" style={styles.cardFooter}>
-              <HStack gap="1.5">
+            <View style={[styles.hStackGap1_5AlignCenter, styles.cardFooter]}>
+              <View style={styles.hStackGap1_5AlignCenter}>
                 <Ionicons name="time-outline" size={12} color={colors.textMuted} />
                 <Typography variant="label">
                   {isDue ? 'DUE DATE:' : 'NEXT RUN:'}
@@ -271,7 +269,7 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
                 >
                   {formattedNextDate}
                 </Typography>
-              </HStack>
+              </View>
 
               {item.isPaused && (
                 <Badge
@@ -280,8 +278,8 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
                   style={{ borderStyle: 'dashed' }}
                 />
               )}
-            </HStack>
-          </VStack>
+            </View>
+          </View>
         </TouchableOpacity>
 
         {selectedTab === 'DUE' && (
@@ -410,6 +408,8 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     opacity: 0.6,
   },
   cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingTop: spacing('2'),
     borderTopWidth: 1,
     borderTopColor: colors.border,
@@ -522,5 +522,40 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     fontFamily: TYPOGRAPHY.fonts.bold,
     fontSize: 14,
     color: colors.primary,
+  },
+  vStackGap3: {
+    gap: spacing('3'),
+  },
+  hStackGap3AlignCenter: {
+    flexDirection: 'row',
+    gap: spacing('3'),
+    alignItems: 'center',
+  },
+  vStackFlex1Gap1: {
+    flex: 1,
+    gap: spacing('1'),
+  },
+  hStackGap2AlignCenter: {
+    flexDirection: 'row',
+    gap: spacing('2'),
+    alignItems: 'center',
+  },
+  hStackGap4AlignCenter: {
+    flexDirection: 'row',
+    gap: spacing('4'),
+    alignItems: 'center',
+  },
+  vStackGap1: {
+    gap: spacing('1'),
+  },
+  vStackFlex1AlignEndGap1: {
+    flex: 1,
+    alignItems: 'flex-end',
+    gap: spacing('1'),
+  },
+  hStackGap1_5AlignCenter: {
+    flexDirection: 'row',
+    gap: spacing('1.5'),
+    alignItems: 'center',
   },
 });

@@ -1,14 +1,16 @@
 import { eq, sql, and, desc, sum } from 'drizzle-orm';
 import { db } from '../../../db/client';
-import { accounts, categories, payments } from '../../../db/schema';
+import { accounts, categories, payments, loans } from '../../../db/schema';
 
 export type DashboardStats = {
   income: number;
   expense: number;
+  totalSaved: number;
+  totalDebt: number;
 };
 
 export const getDashboardStats = async (currency: string): Promise<DashboardStats> => {
-  const [result] = await db
+  const statsQuery = db
     .select({
       income: sql<number>`SUM(CASE WHEN ${payments.type} = 'CR' THEN ${payments.amount} ELSE 0 END)`,
       expense: sql<number>`SUM(CASE WHEN ${payments.type} = 'DR' THEN ${payments.amount} ELSE 0 END)`,
@@ -17,9 +19,36 @@ export const getDashboardStats = async (currency: string): Promise<DashboardStat
     .innerJoin(accounts, eq(payments.accountId, accounts.id))
     .where(eq(accounts.currency, currency));
 
+  const goalsQuery = db
+    .select({
+      total: sql<number>`SUM(${payments.amount})`
+    })
+    .from(payments)
+    .where(sql`${payments.goalId} IS NOT NULL`);
+
+  const [statsResult, goalsResult, allLoans] = await Promise.all([
+    statsQuery,
+    goalsQuery,
+    db.select().from(loans)
+  ]);
+
+  let totalDebt = 0;
+  for (const loan of allLoans) {
+    const repaymentType = loan.type === 'BORROW' ? 'DR' : 'CR';
+    const [repaymentResult] = await db
+      .select({ paid: sql<number>`SUM(${payments.amount})` })
+      .from(payments)
+      .where(and(eq(payments.loanId, loan.id), eq(payments.type, repaymentType)));
+    
+    const paid = repaymentResult?.paid || 0;
+    totalDebt += Math.max(0, loan.totalAmount - paid);
+  }
+
   return {
-    income: result?.income ?? 0,
-    expense: result?.expense ?? 0,
+    income: statsResult[0]?.income ?? 0,
+    expense: statsResult[0]?.expense ?? 0,
+    totalSaved: goalsResult[0]?.total ?? 0,
+    totalDebt: totalDebt,
   };
 };
 

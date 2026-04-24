@@ -270,9 +270,9 @@ const contextValue = useMemo(() => ({
 
 ## Current Phase
 
-**Phase 6 (Done)**: Core Enhancements - Account Types, Transfer Transactions, Page-based Forms.
+**Phase 8 (Done)**: Goals & Loans - Tracking, progress visualization, freemium limits.
 
-**Phase 7 (Next)**: Recurring & Budgeting (Freemium).
+**Phase 9 (Next)**: Person Linking (Freemium).
 
 **See `docs/roadmap.md` for full feature roadmap and phase details.**
 

@@ -1,1 +1,0 @@
-ALTER TABLE `budgets` ADD `color` integer DEFAULT 0 NOT NULL;

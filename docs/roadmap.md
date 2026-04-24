@@ -85,64 +85,64 @@
 
 ---
 
-## 🔄 Phase 7 — Recurring & Budgeting (Freemium)
+## ✅ Phase 7 — Recurring & Budgeting (Completed)
 
 ### Recurring Transactions
-- [ ] Create recurring transaction templates
-- [ ] Frequencies: daily, weekly, bi-weekly, monthly, quarterly, yearly, custom
-- [ ] End conditions: never, after N occurrences, on date
-- [ ] Auto-generate instances on schedule
-- [ ] Reminders before due date
-- [ ] Skip/pause individual occurrences
-- [ ] Edit series vs single instance
-- [ ] **Free tier**: Up to 3 recurring transactions
-- [ ] **Premium**: Unlimited recurring transactions
+- [x] Create recurring transaction templates
+- [x] Frequencies: daily, weekly, bi-weekly, monthly, quarterly, yearly, custom
+- [x] End conditions: never, after N occurrences, on date
+- [x] Auto-generate instances on schedule (Manual process verified)
+- [x] Reminders before due date
+- [x] Skip/pause individual occurrences
+- [x] Edit series vs single instance (Handled via template)
+- [x] **Free tier**: Up to 3 recurring transactions
+- [x] **Premium**: Unlimited recurring transactions
 
 ### Advanced Budgeting
-- [ ] Budget types:
+- [x] Budget types:
   - Income budgets (track expected income)
   - Expense budgets (spending limits)
   - Category-wise budgets
   - Overall budgets (all spending)
-- [ ] Budget modes:
+- [x] Budget modes:
   - Auto: automatic tracking based on rules
   - Manual: select specific transactions to include
-- [ ] Budget periods: daily, weekly, monthly, yearly, custom range
-- [ ] Rolling budgets: carry forward unused amounts
-- [ ] Overspend adjustment: redistribute or carry deficit
-- [ ] Account filters: budget scoped to specific accounts
-- [ ] Deep historical tracking: compare vs past periods
-- [ ] Category grouping: multi-category budgets
-- [ ] Progress visualization with alerts
-- [ ] **Free tier**: Up to 2 active budgets
-- [ ] **Premium**: Unlimited budgets + advanced insights
+- [x] Budget periods: daily, weekly, monthly, yearly, custom range
+- [x] Rolling budgets: carry forward unused amounts
+- [x] Overspend adjustment: redistribute or carry deficit
+- [x] Account filters: budget scoped to specific accounts
+- [x] Deep historical tracking: via Budget Details screen
+- [x] Category grouping: multi-category budgets
+- [x] Progress visualization with alerts: via Dashboard & Details
+- [x] **Free tier**: Up to 2 active budgets
+- [x] **Premium**: Unlimited budgets + advanced insights
 
 ---
 
-## 🎯 Phase 8 — Goals & Loans (Freemium)
+## ✅ Phase 8 — Goals & Loans (Completed)
 
 ### Goals
-- [ ] Create financial goals with target amount and deadline
-- [ ] Goal types: savings target, debt payoff, spending limit
-- [ ] Link transactions to goals (manual assignment)
-- [ ] Progress tracking with visual indicators
-- [ ] Projected completion date based on pace
-- [ ] Goal contributions from recurring transactions
-- [ ] Multiple active goals with priority ranking
-- [ ] **Free tier**: Up to 2 active goals
-- [ ] **Premium**: Unlimited goals + advanced projections
+- [x] Create financial goals with target amount and deadline
+- [x] Goal types: savings target, debt payoff, spending limit
+- [x] Link transactions to goals (manual assignment)
+- [x] Progress tracking with visual indicators
+- [x] Projected completion date based on pace
+- [x] Goal contributions from recurring transactions
+- [x] Multiple active goals with priority ranking
+- [x] **Free tier**: Up to 2 active goals
+- [x] **Premium**: Unlimited goals + advanced projections
 
 ### Loan Tracking
-- [ ] Lend/borrow recording with person association
-- [ ] Loan types: given (lent), taken (borrowed)
-- [ ] Optional link to transactions (when loan is created/repaid)
-- [ ] Installment tracking for partial repayments
-- [ ] Interest calculation (simple/compound, optional)
-- [ ] Reminders for due dates
-- [ ] Loan history and settlement tracking
-- [ ] Net loan position (total lent - total borrowed)
-- [ ] **Free tier**: Up to 3 active loans
-- [ ] **Premium**: Unlimited loans + interest analytics
+- [x] Lend/borrow recording with person association
+- [x] Loan types: given (lent), taken (borrowed)
+- [x] Optional link to transactions (when loan is created/repaid)
+- [x] Installment tracking for partial repayments
+- [x] Interest calculation (simple/compound, optional)
+- [x] Reminders for due dates
+- [x] Loan history and settlement tracking
+- [x] Net loan position (total lent - total borrowed)
+- [x] **Free tier**: Up to 2 active loans
+- [x] **Premium**: Unlimited loans + interest analytics
 
 ---
 

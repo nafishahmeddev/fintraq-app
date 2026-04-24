@@ -1,1 +1,0 @@
-ALTER TABLE `recurring_transactions` ADD `reminder_days` integer DEFAULT 0 NOT NULL;

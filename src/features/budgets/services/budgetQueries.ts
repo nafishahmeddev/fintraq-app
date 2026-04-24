@@ -5,6 +5,7 @@ import { startOfDay, startOfWeek, startOfMonth, startOfYear, endOfDay, endOfWeek
 
 export type BudgetProgress = {
   budgetId: number;
+  name: string;
   spent: number;
   total: number;
   baseAmount: number;
@@ -137,6 +138,7 @@ export async function getBudgetProgress(budgetId: number): Promise<BudgetProgres
 
   return {
     budgetId: budgetRecord.id,
+    name: budgetRecord.name,
     spent: totalSpent,
     total: adjustedTotal,
     baseAmount: budgetRecord.amount,

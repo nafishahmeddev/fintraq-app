@@ -1,1 +1,0 @@
-ALTER TABLE `budgets` ADD `account_ids` text;

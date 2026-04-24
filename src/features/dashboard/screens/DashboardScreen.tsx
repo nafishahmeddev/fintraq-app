@@ -21,6 +21,9 @@ import { useAccounts, useDeleteAccount } from '../../accounts/hooks/accounts';
 import { StreakBadge } from '../../reports/components/StreakBadge';
 import { useTransactions } from '../../transactions/hooks/transactions';
 import { InsightsSection } from '../components/InsightsSection';
+import { BudgetSummaryCard } from '../components/BudgetSummaryCard';
+import { GoalsSummaryCard } from '../components/GoalsSummaryCard';
+import { LoansSummaryCard } from '../components/LoansSummaryCard';
 import { SectionHeader } from '../components/SectionHeader';
 import { TopExpenseCategoriesCard } from '../components/TopExpenseCategoriesCard';
 import { useDashboardStats, useTopExpenseCategories } from '../hooks/dashboard';
@@ -81,7 +84,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
 
   // Get stats from the optimized SQL hook
   const { data: statsQueryData } = useDashboardStats(selectedCurrency);
-  const totals = React.useMemo(() => statsQueryData ?? { income: 0, expense: 0 }, [statsQueryData]);
+  const totals = React.useMemo(() => statsQueryData ?? { income: 0, expense: 0, totalSaved: 0, totalDebt: 0 }, [statsQueryData]);
 
   // Get top categories from the optimized SQL hook
   const { data: topCategoriesData } = useTopExpenseCategories(selectedCurrency);
@@ -281,8 +284,59 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
           </View>
         </View>
 
+        {/* ── KPI Grid ── */}
+        <View style={styles.kpiGrid}>
+          <TouchableOpacity 
+            style={styles.kpiCard} 
+            onPress={() => router.push('/goals')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.kpiHeader}>
+              <View style={[styles.kpiIcon, { backgroundColor: colors.primary + '15' }]}>
+                <Ionicons name="sparkles-outline" size={16} color={colors.primary} />
+              </View>
+              <Text style={styles.kpiLabel}>SAVED</Text>
+            </View>
+            <MoneyText 
+              amount={totals.totalSaved || 0} 
+              currency={selectedCurrency} 
+              style={styles.kpiValue} 
+              weight="bold" 
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.kpiCard} 
+            onPress={() => router.push('/loans')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.kpiHeader}>
+              <View style={[styles.kpiIcon, { backgroundColor: colors.danger + '15' }]}>
+                <Ionicons name="alert-circle-outline" size={16} color={colors.danger} />
+              </View>
+              <Text style={styles.kpiLabel}>DEBT</Text>
+            </View>
+            <MoneyText 
+              amount={totals.totalDebt || 0} 
+              currency={selectedCurrency} 
+              style={styles.kpiValue} 
+              weight="bold" 
+              type="DR"
+            />
+          </TouchableOpacity>
+        </View>
+
         {/* ── Insights Layer (Pro Only) ── */}
         <InsightsSection currency={selectedCurrency} />
+
+        {/* ── Budget Summary ── */}
+        <BudgetSummaryCard />
+
+        {/* ── Goals Summary ── */}
+        <GoalsSummaryCard />
+
+        {/* ── Loans Summary ── */}
+        <LoansSummaryCard />
 
         {/* ── Quick actions ── */}
         <View style={styles.quickActions}>
@@ -578,6 +632,42 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   flowBarExpense: {
     borderRadius: 999,
     backgroundColor: colors.danger,
+  },
+  kpiGrid: {
+    flexDirection: 'row',
+    marginHorizontal: 24,
+    marginBottom: 24,
+    gap: 12,
+  },
+  kpiCard: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderRadius: radius('lg'),
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 12,
+  },
+  kpiHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  kpiIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: radius('md'),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  kpiLabel: {
+    fontFamily: TYPOGRAPHY.fonts.semibold,
+    color: colors.textMuted,
+    fontSize: 10,
+    letterSpacing: 1,
+  },
+  kpiValue: {
+    fontSize: 18,
   },
 
   /* ── Quick actions ── */
