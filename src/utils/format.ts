@@ -21,6 +21,13 @@ export const toDbColor = (value: string): number => {
 };
 
 /**
+ * Converts a numeric color value back to a hex string for UI display.
+ */
+export const fromDbColor = (value: number): string => {
+  return `#${value.toString(16).padStart(6, '0')}`;
+};
+
+/**
  * Formats a numeric amount into a currency string using the Intl library.
  * If no currency code is provided, it formats the number as a localized decimal.
  */

@@ -24,6 +24,8 @@ import { InsightsSection } from '../components/InsightsSection';
 import { BudgetSummaryCard } from '../components/BudgetSummaryCard';
 import { GoalsSummaryCard } from '../components/GoalsSummaryCard';
 import { LoansSummaryCard } from '../components/LoansSummaryCard';
+import { PeopleSummaryCard } from '../components/PeopleSummaryCard';
+import { PlacesSummaryCard } from '../components/PlacesSummaryCard';
 import { SectionHeader } from '../components/SectionHeader';
 import { TopExpenseCategoriesCard } from '../components/TopExpenseCategoriesCard';
 import { useDashboardStats, useTopExpenseCategories } from '../hooks/dashboard';
@@ -337,6 +339,12 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
 
         {/* ── Loans Summary ── */}
         <LoansSummaryCard />
+
+        {/* ── People Summary ── */}
+        <PeopleSummaryCard />
+
+        {/* ── Places Summary ── */}
+        <PlacesSummaryCard />
 
         {/* ── Quick actions ── */}
         <View style={styles.quickActions}>

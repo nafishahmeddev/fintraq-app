@@ -52,6 +52,8 @@ export const payments = sqliteTable('payments', {
   budgetId: integer('budget_id').references(() => budgets.id, { onDelete: 'set null' }),
   goalId: integer('goal_id').references(() => goals.id, { onDelete: 'set null' }),
   loanId: integer('loan_id').references(() => loans.id, { onDelete: 'set null' }),
+  personId: integer('person_id').references(() => people.id, { onDelete: 'set null' }),
+  placeId: integer('place_id').references(() => places.id, { onDelete: 'set null' }),
   amount: real('amount').notNull(),
   type: text('type', { enum: TRANSACTION_TYPES }).notNull(),
   datetime: text('datetime').notNull(),
@@ -64,6 +66,8 @@ export const payments = sqliteTable('payments', {
   categoryIdIdx: index('payments_category_id_idx').on(table.categoryId),
   goalIdIdx: index('payments_goal_id_idx').on(table.goalId),
   loanIdIdx: index('payments_loan_id_idx').on(table.loanId),
+  personIdIdx: index('payments_person_id_idx').on(table.personId),
+  placeIdIdx: index('payments_place_id_idx').on(table.placeId),
   datetimeIdx: index('payments_datetime_idx').on(table.datetime),
 }));
 
@@ -95,6 +99,14 @@ export const paymentsRelations = relations(payments, ({ one }) => ({
   loan: one(loans, {
     fields: [payments.loanId],
     references: [loans.id],
+  }),
+  person: one(people, {
+    fields: [payments.personId],
+    references: [people.id],
+  }),
+  place: one(places, {
+    fields: [payments.placeId],
+    references: [places.id],
   }),
 }));
 
@@ -204,6 +216,23 @@ export const goalsRelations = relations(goals, ({ one, many }) => ({
   payments: many(payments),
 }));
 
+export const people = sqliteTable('people', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  email: text('email'),
+  phone: text('phone'),
+  icon: text('icon').notNull().default('person'),
+  color: integer('color').notNull(),
+  createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+  updatedAt: text('updated_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+
+export const peopleRelations = relations(people, ({ many }) => ({
+  payments: many(payments),
+  loans: many(loans),
+}));
+
 export const LOAN_TYPES = ['LEND', 'BORROW'] as const;
 export type LoanType = typeof LOAN_TYPES[number];
 
@@ -219,6 +248,7 @@ export const loans = sqliteTable('loans', {
   startDate: text('start_date'),
   endDate: text('end_date'),
   accountId: integer('account_id').references(() => accounts.id, { onDelete: 'set null' }),
+  personId: integer('person_id').references(() => people.id, { onDelete: 'set null' }),
   icon: text('icon').notNull().default('cash'),
   color: integer('color').notNull(),
   status: text('status', { enum: LOAN_STATUS }).notNull().default('ACTIVE'),
@@ -231,5 +261,23 @@ export const loansRelations = relations(loans, ({ one, many }) => ({
     fields: [loans.accountId],
     references: [accounts.id],
   }),
+  payments: many(payments),
+  person: one(people, {
+    fields: [loans.personId],
+    references: [people.id],
+  }),
+}));
+
+export const places = sqliteTable('places', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  description: text('description'),
+  icon: text('icon').notNull().default('location'),
+  color: integer('color').notNull(),
+  createdAt: text('created_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+  updatedAt: text('updated_at').notNull().default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+export const placesRelations = relations(places, ({ many }) => ({
   payments: many(payments),
 }));

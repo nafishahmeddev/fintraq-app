@@ -39,16 +39,28 @@ CREATE TABLE `loans` (
 	`total_amount` real NOT NULL,
 	`remaining_amount` real NOT NULL,
 	`type` text NOT NULL,
-	`currency` text NOT NULL,
 	`start_date` text,
 	`end_date` text,
 	`account_id` integer,
+	`person_id` integer,
 	`icon` text DEFAULT 'cash' NOT NULL,
 	`color` integer NOT NULL,
 	`status` text DEFAULT 'ACTIVE' NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	FOREIGN KEY (`account_id`) REFERENCES `accounts`(`id`) ON UPDATE no action ON DELETE set null
+	FOREIGN KEY (`account_id`) REFERENCES `accounts`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`person_id`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE set null
+);
+--> statement-breakpoint
+CREATE TABLE `people` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text NOT NULL,
+	`email` text,
+	`phone` text,
+	`icon` text DEFAULT 'person' NOT NULL,
+	`color` integer NOT NULL,
+	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
+	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `recurring_transactions` (
@@ -108,6 +120,7 @@ CREATE TABLE `__new_payments` (
 	`budget_id` integer,
 	`goal_id` integer,
 	`loan_id` integer,
+	`person_id` integer,
 	`amount` real NOT NULL,
 	`type` text NOT NULL,
 	`datetime` text NOT NULL,
@@ -120,10 +133,11 @@ CREATE TABLE `__new_payments` (
 	FOREIGN KEY (`recurring_id`) REFERENCES `recurring_transactions`(`id`) ON UPDATE no action ON DELETE set null,
 	FOREIGN KEY (`budget_id`) REFERENCES `budgets`(`id`) ON UPDATE no action ON DELETE set null,
 	FOREIGN KEY (`goal_id`) REFERENCES `goals`(`id`) ON UPDATE no action ON DELETE set null,
-	FOREIGN KEY (`loan_id`) REFERENCES `loans`(`id`) ON UPDATE no action ON DELETE set null
+	FOREIGN KEY (`loan_id`) REFERENCES `loans`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`person_id`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
-INSERT INTO `__new_payments`("id", "account_id", "to_account_id", "category_id", "recurring_id", "budget_id", "goal_id", "loan_id", "amount", "type", "datetime", "note", "created_at", "updated_at") SELECT "id", "account_id", "to_account_id", "category_id", "recurring_id", "budget_id", "goal_id", "loan_id", "amount", "type", "datetime", "note", "created_at", "updated_at" FROM `payments`;--> statement-breakpoint
+INSERT INTO `__new_payments`("id", "account_id", "to_account_id", "category_id", "recurring_id", "budget_id", "goal_id", "loan_id", "person_id", "amount", "type", "datetime", "note", "created_at", "updated_at") SELECT "id", "account_id", "to_account_id", "category_id", "recurring_id", "budget_id", "goal_id", "loan_id", "person_id", "amount", "type", "datetime", "note", "created_at", "updated_at" FROM `payments`;--> statement-breakpoint
 DROP TABLE `payments`;--> statement-breakpoint
 ALTER TABLE `__new_payments` RENAME TO `payments`;--> statement-breakpoint
 CREATE INDEX `payments_account_id_idx` ON `payments` (`account_id`);--> statement-breakpoint

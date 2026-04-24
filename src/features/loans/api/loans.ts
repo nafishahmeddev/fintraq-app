@@ -4,6 +4,9 @@ import { accounts, loans } from '../../../db/schema';
 import { eq } from 'drizzle-orm';
 import { getAllLoansProgress, getLoanProgressById } from '../services/loanQueries';
 
+export type Loan = typeof loans.$inferSelect;
+export type LoanWithAccount = Loan & { account: typeof accounts.$inferSelect | null };
+
 export function useLoansProgress() {
   return useQuery({
     queryKey: ['loansProgress'],
@@ -24,16 +27,20 @@ export function useLoanProgress(id: number | null) {
   });
 }
 
-export function useLoans() {
-  return useQuery({
-    queryKey: ['loans'],
+export function useLoans(personId?: number | null) {
+  return useQuery<LoanWithAccount[]>({
+    queryKey: ['loans', { personId }],
     queryFn: async () => {
-      const results = await db.select({
+      const baseQuery = db.select({
         loan: loans,
         account: accounts,
       })
       .from(loans)
       .leftJoin(accounts, eq(loans.accountId, accounts.id));
+
+      const results = await (personId 
+        ? baseQuery.where(eq(loans.personId, personId))
+        : baseQuery);
       
       return results.map(r => ({
         ...r.loan,
@@ -44,7 +51,7 @@ export function useLoans() {
 }
 
 export function useLoanById(id: number | null) {
-  return useQuery({
+  return useQuery<LoanWithAccount | null>({
     queryKey: ['loans', id],
     queryFn: async () => {
       if (!id) return null;
@@ -57,7 +64,8 @@ export function useLoanById(id: number | null) {
       .where(eq(loans.id, id))
       .limit(1);
       
-      if (!results[0]) return null;
+      if (results.length === 0) return null;
+      
       return {
         ...results[0].loan,
         account: results[0].account,

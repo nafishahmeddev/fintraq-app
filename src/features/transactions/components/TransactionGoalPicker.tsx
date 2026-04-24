@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
 import { ThemeColors } from '../../../theme/colors';
 import { TYPOGRAPHY } from '../../../theme/typography';
-import { RADIUS, spacing } from '../../../theme/tokens';
+import { RADIUS } from '../../../theme/tokens';
 import { useGoals } from '../../goals/api/goals';
 import { TransactionType } from '../../../db/schema';
 

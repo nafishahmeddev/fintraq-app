@@ -195,6 +195,12 @@ export default function SettingsScreen() {
           <Text style={styles.sectionLabel}>FEATURES</Text>
           <View style={styles.card}>
             <PreferenceRow
+              icon="people-outline"
+              title="People"
+              subtitle="Manage contacts & relationships"
+              onPress={() => router.push('/people')}
+            />
+            <PreferenceRow
               icon="sync-outline"
               title="Recurring"
               subtitle="Manage automatic transactions"

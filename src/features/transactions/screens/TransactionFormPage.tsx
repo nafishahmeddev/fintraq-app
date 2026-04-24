@@ -19,7 +19,7 @@ import { Header } from '../../../components/ui/Header';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { ThemeColors } from '../../../theme/colors';
-import { RADIUS, spacing } from '../../../theme/tokens';
+import { RADIUS } from '../../../theme/tokens';
 import { TYPOGRAPHY } from '../../../theme/typography';
 import { TransactionType } from '../../../types';
 import { useAccounts } from '../../accounts/hooks/accounts';
@@ -32,8 +32,10 @@ import { TransactionCategoryPicker } from '../components/TransactionCategoryPick
 import { TransactionGoalPicker } from '../components/TransactionGoalPicker';
 import { TransactionLoanPicker } from '../components/TransactionLoanPicker';
 import { TransactionTypePicker } from '../components/TransactionTypePicker';
+import { PersonPickerDialog } from '../../../components/ui/PersonPickerDialog';
 import { useGoalById } from '../../goals/api/goals';
 import { useLoanById } from '../../loans/api/loans';
+import { PlacePickerDialog } from '../../../components/ui/PlacePickerDialog';
 import {
   useCreateTransaction,
   useTransactionById,
@@ -90,9 +92,13 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
   const [selectedLoanId, setSelectedLoanId] = React.useState<number | null>(() => 
     params.loanId ? parseInt(params.loanId, 10) : null
   );
+  const [selectedPersonId, setSelectedPersonId] = React.useState<number | null>(null);
+  const [selectedPlaceId, setSelectedPlaceId] = React.useState<number | null>(null);
   const [transactionDateTime, setTransactionDateTime] = React.useState<Date>(() => new Date());
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [showTimePicker, setShowTimePicker] = React.useState(false);
+  const [showPersonPicker, setShowPersonPicker] = React.useState(false);
+  const [showPlacePicker, setShowPlacePicker] = React.useState(false);
   const [amountInput, setAmountInput] = React.useState('');
   const [note, setNote] = React.useState('');
 
@@ -108,6 +114,8 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
     setNote(editingTransaction.note ?? '');
     setSelectedGoalId(editingTransaction.goalId ?? null);
     setSelectedLoanId(editingTransaction.loanId ?? null);
+    setSelectedPersonId(editingTransaction.personId ?? null);
+    setSelectedPlaceId(editingTransaction.placeId ?? null);
   }, [isEditMode, editingTransaction]);
 
   // Auto-select account from Goal/Loan param
@@ -279,6 +287,8 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
         : selectedCategory?.name ?? 'Transaction'),
       goalId: selectedGoalId,
       loanId: selectedLoanId,
+      personId: selectedPersonId,
+      placeId: selectedPlaceId,
     };
 
     try {
@@ -402,6 +412,34 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           />
 
           <View style={styles.section}>
+            <Text style={styles.sectionLabel}>PERSON (OPTIONAL)</Text>
+            <TouchableOpacity 
+              style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: 16 }]} 
+              onPress={() => setShowPersonPicker(true)}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Ionicons name="person-outline" size={18} color={colors.primary} />
+                <Text style={styles.dateTimeText}>{selectedPersonId ? 'Selected' : 'Link person'}</Text>
+              </View>
+              <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>PLACE (OPTIONAL)</Text>
+            <TouchableOpacity 
+              style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: 16 }]} 
+              onPress={() => setShowPlacePicker(true)}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Ionicons name="location-outline" size={18} color={colors.primary} />
+                <Text style={styles.dateTimeText}>{selectedPlaceId ? 'Selected' : 'Link place'}</Text>
+              </View>
+              <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
             <Text style={styles.sectionLabel}>DATE & TIME</Text>
             <View style={styles.dateTimeRow}>
               <TouchableOpacity style={styles.dateTimeBtn} onPress={() => setShowDatePicker(true)}>
@@ -437,6 +475,22 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           )}
         </TouchableOpacity>
       </View>
+      
+      <PersonPickerDialog
+        visible={showPersonPicker}
+        onClose={() => setShowPersonPicker(false)}
+        selectedId={selectedPersonId}
+        onSelect={setSelectedPersonId}
+        onAddPerson={() => router.push('/people/create')}
+      />
+
+      <PlacePickerDialog
+        visible={showPlacePicker}
+        onClose={() => setShowPlacePicker(false)}
+        selectedId={selectedPlaceId}
+        onSelect={setSelectedPlaceId}
+        onAddPlace={() => router.push('/places/create')}
+      />
 
     </SafeAreaView>
   );

@@ -21,4 +21,4 @@ export { PremiumGuard } from './PremiumGuard';
 export { SectionLabel } from './SectionLabel';
 export { TransactionRow } from './TransactionRow';
 export { Typography } from './Typography';
-
+export { PersonPickerDialog } from './PersonPickerDialog';

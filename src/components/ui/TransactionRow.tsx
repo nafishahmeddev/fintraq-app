@@ -7,6 +7,7 @@ import { RADIUS, spacing } from '../../theme/tokens';
 import { TYPOGRAPHY } from '../../theme/typography';
 import { TransactionType } from '../../types';
 import { MoneyText } from './MoneyText';
+import { fromDbColor } from '../../utils/format';
 
 type TransactionData = {
   id: number;
@@ -26,6 +27,14 @@ type TransactionData = {
     icon: string;
     color: number;
   } | null;
+  person?: {
+    id: number;
+    name: string;
+  } | null;
+  place?: {
+    id: number;
+    name: string;
+  } | null;
 };
 
 type Props = {
@@ -37,7 +46,6 @@ type Props = {
   showDate?: boolean;
 };
 
-const toHexColor = (value: number) => `#${value.toString(16).padStart(6, '0')}`;
 
 /**
  * TransactionRow - Editorial Brutalist Design
@@ -62,7 +70,7 @@ export const TransactionRow = React.memo(function TransactionRow({
   const categoryColor = useMemo(() => {
     if (isTransfer) return colors.primary;
     if (!tx.category) return colors.textMuted;
-    return toHexColor(tx.category.color);
+    return fromDbColor(tx.category.color);
   }, [tx.category, isTransfer, colors.primary, colors.textMuted]);
 
   const iconName: keyof typeof Ionicons.glyphMap = useMemo(() => {
@@ -121,7 +129,7 @@ export const TransactionRow = React.memo(function TransactionRow({
           >
             {isTransfer
               ? `Transfer to ${tx.toAccount?.name ?? 'account'} · ${tx.account.name}`
-              : `${categoryName} · ${tx.account.name}`
+              : `${categoryName} · ${tx.account.name}${tx.person ? ` · ${tx.person.name}` : ''}${tx.place ? ` · ${tx.place.name}` : ''}`
             }
           </Text>
         </View>

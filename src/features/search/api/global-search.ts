@@ -1,6 +1,6 @@
 import { desc, eq, inArray, like, or } from 'drizzle-orm';
 import { db } from '@/src/db/client';
-import { accounts, categories, payments } from '@/src/db/schema';
+import { accounts, categories, payments, people, places } from '@/src/db/schema';
 import type { Account } from '@/src/features/accounts/api/accounts';
 import type { Category } from '@/src/features/categories/api/categories';
 import type { TransactionListItem } from '@/src/features/transactions/api/transactions';
@@ -43,15 +43,32 @@ const searchTransactions = async (
         icon: categories.icon,
         color: categories.color,
       },
+      person: {
+        id: people.id,
+        name: people.name,
+        icon: people.icon,
+        color: people.color,
+      },
+      personId: payments.personId,
+      place: {
+        id: places.id,
+        name: places.name,
+        icon: places.icon,
+        color: places.color,
+      },
+      placeId: payments.placeId,
     })
     .from(payments)
     .innerJoin(accounts, eq(payments.accountId, accounts.id))
     .leftJoin(categories, eq(payments.categoryId, categories.id))
+    .leftJoin(people, eq(payments.personId, people.id))
+    .leftJoin(places, eq(payments.placeId, places.id))
     .where(
       or(
         like(payments.note, q),
         like(accounts.name, q),
         like(categories.name, q),
+        like(places.name, q),
       ),
     )
     .orderBy(desc(payments.datetime))
@@ -74,7 +91,9 @@ const searchTransactions = async (
     ...row,
     toAccount: row.toAccountId ? toAccountMap.get(row.toAccountId) ?? null : null,
     category: row.category?.id ? row.category : null,
-  }));
+    person: row.person?.id ? row.person : null,
+    place: row.place?.id ? row.place : null,
+  })) as TransactionListItem[];
 };
 
 const searchAccounts = async (query: string): Promise<Account[]> => {

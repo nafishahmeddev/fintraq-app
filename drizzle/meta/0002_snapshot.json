@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "9a2de711-007e-4d36-9e0c-9c407f022a9f",
-  "prevId": "07300698-d71b-4710-9e67-c891968a139b",
+  "id": "0f996133-5a28-4923-9540-91f0b20745a6",
+  "prevId": "9a2de711-007e-4d36-9e0c-9c407f022a9f",
   "tables": {
     "accounts": {
       "name": "accounts",
@@ -632,6 +632,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "place_id": {
+          "name": "place_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "amount": {
           "name": "amount",
           "type": "real",
@@ -710,6 +717,20 @@
           "name": "payments_loan_id_idx",
           "columns": [
             "loan_id"
+          ],
+          "isUnique": false
+        },
+        "payments_person_id_idx": {
+          "name": "payments_person_id_idx",
+          "columns": [
+            "person_id"
+          ],
+          "isUnique": false
+        },
+        "payments_place_id_idx": {
+          "name": "payments_place_id_idx",
+          "columns": [
+            "place_id"
           ],
           "isUnique": false
         },
@@ -825,6 +846,19 @@
           ],
           "onDelete": "set null",
           "onUpdate": "no action"
+        },
+        "payments_place_id_places_id_fk": {
+          "name": "payments_place_id_places_id_fk",
+          "tableFrom": "payments",
+          "tableTo": "places",
+          "columnsFrom": [
+            "place_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -869,6 +903,68 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'person'"
+        },
+        "color": {
+          "name": "color",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(CURRENT_TIMESTAMP)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(CURRENT_TIMESTAMP)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "places": {
+      "name": "places",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "icon": {
+          "name": "icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'location'"
         },
         "color": {
           "name": "color",

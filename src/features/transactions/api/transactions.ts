@@ -1,6 +1,6 @@
 import { SQL, and, count, desc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../../../db/client';
-import { accounts, categories, payments, TransactionType } from '../../../db/schema';
+import { accounts, categories, payments, people, places, TransactionType } from '../../../db/schema';
 
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = typeof payments.$inferInsert;
@@ -15,6 +15,8 @@ export type TransactionFilters = {
   budgetId?: number;
   goalId?: number;
   loanId?: number;
+  personId?: number;
+  placeId?: number;
 };
 
 export type TransactionListItem = {
@@ -46,6 +48,18 @@ export type TransactionListItem = {
     icon: string;
     color: number;
   } | null;
+  person: {
+    id: number;
+    name: string;
+    icon: string;
+    color: number;
+  } | null;
+  place: {
+    id: number;
+    name: string;
+    icon: string;
+    color: number;
+  } | null;
 };
 
 const buildWhere = (filters: TransactionFilters): SQL | undefined => {
@@ -56,6 +70,8 @@ const buildWhere = (filters: TransactionFilters): SQL | undefined => {
   if (filters.budgetId != null) conditions.push(eq(payments.budgetId, filters.budgetId));
   if (filters.goalId != null) conditions.push(eq(payments.goalId, filters.goalId));
   if (filters.loanId != null) conditions.push(eq(payments.loanId, filters.loanId));
+  if (filters.personId != null) conditions.push(eq(payments.personId, filters.personId));
+  if (filters.placeId != null) conditions.push(eq(payments.placeId, filters.placeId));
   return conditions.length > 0 ? and(...conditions) : undefined;
 };
 
@@ -75,6 +91,8 @@ export const getTransactionsPaged = async (
       type: payments.type,
       datetime: payments.datetime,
       note: payments.note,
+      personId: payments.personId,
+      placeId: payments.placeId,
       createdAt: payments.createdAt,
       updatedAt: payments.updatedAt,
       account: {
@@ -98,11 +116,20 @@ export const getTransactionsPaged = async (
  * Helper to batch fetch related accounts and categories for transactions
  * Avoids N+1 query issues by fetching all related data in parallel
  */
-const fetchRelatedData = async (rows: ({ toAccountId: number | null; categoryId: number | null } & Record<string, unknown>)[]): Promise<TransactionListItem[]> => {
+type RawTransactionRow = Omit<TransactionListItem, 'toAccount' | 'category' | 'person' | 'place'> & {
+  toAccountId: number | null;
+  categoryId: number | null;
+  personId: number | null;
+  placeId: number | null;
+};
+
+const fetchRelatedData = async (rows: RawTransactionRow[]): Promise<TransactionListItem[]> => {
   const toAccountIds = [...new Set(rows.map(r => r.toAccountId).filter(Boolean))];
   const categoryIds = [...new Set(rows.map(r => r.categoryId).filter(Boolean))];
+  const personIds = [...new Set(rows.map(r => r.personId).filter(Boolean))];
+  const placeIds = [...new Set(rows.map(r => r.placeId).filter(Boolean))];
 
-  const [toAccounts, allCategories] = await Promise.all([
+  const [toAccounts, allCategories, allPeople, allPlaces] = await Promise.all([
     toAccountIds.length > 0
       ? db.select({
           id: accounts.id,
@@ -119,15 +146,35 @@ const fetchRelatedData = async (rows: ({ toAccountId: number | null; categoryId:
           color: categories.color,
         }).from(categories).where(inArray(categories.id, categoryIds as number[]))
       : Promise.resolve([]),
+    personIds.length > 0
+      ? db.select({
+          id: people.id,
+          name: people.name,
+          icon: people.icon,
+          color: people.color,
+        }).from(people).where(inArray(people.id, personIds as number[]))
+      : Promise.resolve([]),
+    placeIds.length > 0
+      ? db.select({
+          id: places.id,
+          name: places.name,
+          icon: places.icon,
+          color: places.color,
+        }).from(places).where(inArray(places.id, placeIds as number[]))
+      : Promise.resolve([]),
   ]);
 
   const toAccountMap = new Map(toAccounts.map(a => [a.id, a]));
   const categoryMap = new Map(allCategories.map(c => [c.id, c]));
+  const personMap = new Map(allPeople.map(p => [p.id, p]));
+  const placeMap = new Map(allPlaces.map(p => [p.id, p]));
 
   return rows.map(row => ({
     ...row,
     toAccount: row.toAccountId ? toAccountMap.get(row.toAccountId) ?? null : null,
     category: row.categoryId ? categoryMap.get(row.categoryId) ?? null : null,
+    person: row.personId ? personMap.get(row.personId) ?? null : null,
+    place: row.placeId ? placeMap.get(row.placeId) ?? null : null,
   })) as TransactionListItem[];
 };
 
@@ -150,6 +197,8 @@ export const getTransactions = async (limit: number = 10, filters: TransactionFi
       type: payments.type,
       datetime: payments.datetime,
       note: payments.note,
+      personId: payments.personId,
+      placeId: payments.placeId,
       createdAt: payments.createdAt,
       updatedAt: payments.updatedAt,
       account: {

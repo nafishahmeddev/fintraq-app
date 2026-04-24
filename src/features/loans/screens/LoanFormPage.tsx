@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, Input, Button, IconPickerDialog, Typography } from '../../../components/ui';
+import { Header, Input, Button, IconPickerDialog, PersonPickerDialog, Typography } from '../../../components/ui';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { ThemeColors } from '../../../theme/colors';
@@ -52,11 +52,13 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
   const [colorHex, setColorHex] = useState<string>(CATEGORY_COLORS[20]);
   const [iconKey, setIconKey] = useState('cash-outline');
   const [status, setStatus] = useState<LoanStatus>('ACTIVE');
+  const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
 
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showAccountPicker, setShowAccountPicker] = useState(false);
+  const [showPersonPicker, setShowPersonPicker] = useState(false);
 
   useEffect(() => {
     if (isEditMode && editingLoan) {
@@ -66,6 +68,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
       setStartDate(editingLoan.startDate ? new Date(editingLoan.startDate) : new Date());
       setEndDate(editingLoan.endDate ? new Date(editingLoan.endDate) : null);
       setAccountId(editingLoan.accountId);
+      setSelectedPersonId(editingLoan.personId);
       // Currency will be updated by accounts list or setAccountId effect
       setIconKey(editingLoan.icon + '-outline');
       setStatus(editingLoan.status);
@@ -86,6 +89,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
       startDate: startDate.toISOString(),
       endDate: endDate?.toISOString() || null,
       accountId,
+      personId: selectedPersonId,
       icon: iconKey.replace('-outline', ''),
       color: toDbColor(colorHex),
       status,
@@ -101,7 +105,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
     } catch (error) {
       Alert.alert('Error', 'Failed to save loan. Please try again.');
     }
-  }, [name, totalAmount, loanType, startDate, endDate, accountId, iconKey, colorHex, status, isEditMode, loanId, createLoan, updateLoan, router]);
+  }, [name, totalAmount, loanType, startDate, endDate, accountId, selectedPersonId, iconKey, colorHex, status, isEditMode, loanId, createLoan, updateLoan, router]);
 
   const onStartDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowStartDatePicker(Platform.OS === 'ios');
@@ -244,6 +248,23 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
         </View>
 
         <View style={styles.section}>
+          <Typography variant="label">Person (Optional)</Typography>
+          <TouchableOpacity 
+            style={styles.pickerBtn} 
+            onPress={() => setShowPersonPicker(true)}
+            activeOpacity={0.7}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing('3'), flex: 1 }}>
+              <Ionicons name="person-outline" size={20} color={colors.primary} />
+              <Typography variant="body" weight="bold" color={selectedPersonId ? colors.text : colors.textMuted}>
+                {selectedPersonId ? 'Linked person' : 'Link person'}
+              </Typography>
+            </View>
+            <Ionicons name="chevron-down" size={16} color={colors.textMuted} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.section}>
           <Typography variant="label">Appearance</Typography>
           <View style={styles.visualsRow}>
             <TouchableOpacity 
@@ -334,6 +355,14 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
         selectedIcon={iconKey}
         onSelect={setIconKey}
         title="Loan Icon"
+      />
+
+      <PersonPickerDialog
+        visible={showPersonPicker}
+        onClose={() => setShowPersonPicker(false)}
+        selectedId={selectedPersonId}
+        onSelect={setSelectedPersonId}
+        onAddPerson={() => router.push('/people/create')}
       />
     </SafeAreaView>
   );

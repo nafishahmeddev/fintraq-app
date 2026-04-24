@@ -61,7 +61,6 @@
 ## 💎 Phase 5 — Power Features (Completed)
 
 - [x] Export data (CSV) - Date range, account/category filters, cross-platform save
-- [x] Backup & restore (local) - JSON export/import, onboarding restore option
 - [x] Advanced filters (multi-select, deep filtering) - Multi-select accounts/categories, date range, amount range, search
 - [x] Global search across transactions - Full-text search, dedicated results screen, deep-linking to filtered results
 
@@ -146,42 +145,36 @@
 
 ---
 
-## 👤 Phase 9 — Person Linking (Freemium)
+## ✅ Phase 9 — Person Linking (Completed)
 
 ### Person Management
-- [ ] Attach contacts to transactions
-- [ ] Person management (add/edit/delete contacts)
-- [ ] Transaction history per person
-- [ ] Deep-link to contact details
-- [ ] Search/filter by person
-- [ ] Person summary (total lent/borrowed/net position)
-- [ ] **Free tier**: Up to 5 people
-- [ ] **Premium**: Unlimited people + relationship insights
+- [x] Attach contacts to transactions
+- [x] Person management (add/edit/delete contacts)
+- [x] Transaction history per person
+- [x] Deep-link to contact details
+- [x] Search/filter by person
+- [x] Person summary (total lent/borrowed/net position)
+- [x] **Free tier**: Up to 5 people
+- [x] **Premium**: Unlimited people + relationship insights
 
 ---
 
-## 📎 Phase 10 — Attachments & Location (Freemium)
+## 📎 Phase 10 — Attachments & Location (In Progress)
 
 ### Bills & Receipts
-- [ ] Attach photos/PDFs to transactions
-- [ ] Camera capture for receipts
-- [ ] Gallery upload support
-- [ ] Multiple attachments per transaction
 - [ ] Cloud sync for attachments (optional)
 - [ ] Export attachments with transactions
 - [ ] **Free tier**: Up to 10 attachments total
 - [ ] **Premium**: Unlimited attachments + cloud sync
 
 ### Location Tracking
-- [ ] Attach places/locations to transactions
-- [ ] Auto-detect current location (with permission)
-- [ ] Place search and saved places
-- [ ] Transaction history by location
-- [ ] Map view of spending locations
-- [ ] Frequent places suggestions
+- [x] Attach places/locations to transactions
+- [x] Place search and saved places
+- [x] Transaction history by location
+- [x] Frequent places suggestions
 - [ ] Location-based insights ("You spend most at...")
-- [ ] **Free tier**: Up to 5 saved places, basic location tag
-- [ ] **Premium**: Unlimited places + map view + insights
+- [x] **Free tier**: Up to 5 saved places, basic location tag
+- [x] **Premium**: Unlimited places + map view + insights
 
 ---
 
@@ -202,6 +195,18 @@
 - [ ] Cross-account analytics
 - [ ] Category trend analysis
 - [ ] **Premium**: Full reporting suite
+
+---
+
+## ☁️ Phase 12 — Backup & Cloud Sync (Premium)
+
+### Data Security
+- [ ] Backup & restore (local) - JSON export/import, onboarding restore option
+- [ ] Automated cloud backup (iCloud/Google Drive)
+- [ ] Cross-device data synchronization
+- [ ] Encrypted backup files
+- [ ] **Free tier**: Manual local backups
+- [ ] **Premium**: Automated cloud sync + unlimited backups
 
 ---
 
