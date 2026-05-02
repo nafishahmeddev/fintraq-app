@@ -2,10 +2,7 @@ import { ConfirmDialog } from '@/src/components/ui/ConfirmDialog';
 import { Header } from '@/src/components/ui/Header';
 import { OptionsDialog } from '@/src/components/ui/OptionsDialog';
 import { PremiumGuard } from '@/src/components/ui/PremiumGuard';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { RADIUS, SPACING } from '@/src/theme/tokens';
-import { TYPOGRAPHY } from '@/src/theme/typography';
+import { Theme, useTheme } from '@/src/providers/ThemeProvider';
 import { Ionicons } from '@expo/vector-icons';
 import { File } from 'expo-file-system';
 import { useRouter } from 'expo-router';
@@ -24,9 +21,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BackupService } from '../api/backup.service';
 
 export function BackupScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -163,7 +161,6 @@ export function BackupScreen() {
   return (
     <SafeAreaView style={styles.container}>
 
-
       <Header title="Backup & Restore" subtitle="Data management" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -172,14 +169,14 @@ export function BackupScreen() {
             <View style={styles.heroIconContainer}>
               <Ionicons name="shield-checkmark" size={32} color={colors.primary} />
             </View>
-            <Text style={styles.heroTitle}>Protect Your Data</Text>
+            <Text style={styles.heroTitle}>Protect your data</Text>
             <Text style={styles.heroSubtitle}>
               Create backups of your financial data. Save to device storage or share to cloud storage for safekeeping.
             </Text>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>BACKUP OPTIONS</Text>
+            <Text style={styles.sectionLabel}>Backup options</Text>
             <View style={styles.card}>
               <TouchableOpacity
                 style={styles.actionRow}
@@ -195,7 +192,7 @@ export function BackupScreen() {
                   )}
                 </View>
                 <View style={styles.actionTextContainer}>
-                  <Text style={styles.actionTitle}>Export Data</Text>
+                  <Text style={styles.actionTitle}>Export data</Text>
                   <Text style={styles.actionSubtitle}>Create a backup file</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
@@ -217,7 +214,7 @@ export function BackupScreen() {
                   )}
                 </View>
                 <View style={styles.actionTextContainer}>
-                  <Text style={styles.actionTitle}>Restore Data</Text>
+                  <Text style={styles.actionTitle}>Restore data</Text>
                   <Text style={styles.actionSubtitle}>Import from a backup file</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
@@ -226,7 +223,7 @@ export function BackupScreen() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>INFORMATION</Text>
+            <Text style={styles.sectionLabel}>Information</Text>
             <View style={styles.infoCard}>
               <View style={styles.infoRow}>
                 <Ionicons name="document-text-outline" size={16} color={colors.textMuted} />
@@ -236,8 +233,8 @@ export function BackupScreen() {
                 <Ionicons name="folder-open-outline" size={16} color={colors.textMuted} />
                 <Text style={styles.infoText}>
                   {Platform.OS === 'ios'
-                    ? 'Save to Files app or Share to other apps'
-                    : 'Save to any folder or Share to apps'}
+                    ? 'Save to Files app or share to other apps'
+                    : 'Save to any folder or share to apps'}
                 </Text>
               </View>
               <View style={styles.infoRow}>
@@ -267,14 +264,14 @@ export function BackupScreen() {
         options={[
           {
             key: 'save',
-            label: Platform.OS === 'ios' ? 'Save to Files' : 'Save to Folder',
+            label: Platform.OS === 'ios' ? 'Save to Files' : 'Save to folder',
             icon: 'folder-outline',
             selected: false,
             onPress: handleSaveToFolder,
           },
           {
             key: 'share',
-            label: 'Share to Apps',
+            label: 'Share to apps',
             icon: 'share-outline',
             selected: false,
             onPress: handleShare,
@@ -309,132 +306,133 @@ export function BackupScreen() {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     content: {
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['3'],
-      paddingBottom: SPACING['9'],
+      paddingHorizontal: 24,
+      paddingTop: 12,
+      paddingBottom: 48,
     },
     heroCard: {
-      backgroundColor: colors.surface,
-      borderRadius: RADIUS.xl,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.xl,
       borderWidth: 1,
-      borderColor: colors.border,
-      padding: SPACING['6'],
+      borderColor: theme.colors.border,
+      padding: 24,
       alignItems: 'center',
-      marginBottom: SPACING['7'],
+      marginBottom: 32,
     },
     heroIconContainer: {
       width: 64,
       height: 64,
-      borderRadius: RADIUS['2xl'],
-      backgroundColor: colors.primary + '15',
+      borderRadius: theme.radius['2xl'],
+      backgroundColor: theme.colors.primary + '15',
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: SPACING['4'],
+      marginBottom: 16,
     },
     heroTitle: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: theme.fontFamilies.heading,
       fontSize: 20,
-      color: colors.text,
-      marginBottom: SPACING['2'],
+      color: theme.colors.text,
+      marginBottom: 8,
     },
     heroSubtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       textAlign: 'center',
       lineHeight: 20,
     },
     section: {
-      marginBottom: SPACING['6'],
+      marginBottom: 24,
     },
     sectionLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 10,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       letterSpacing: 2,
-      marginBottom: SPACING['3'],
-      paddingLeft: SPACING['1'],
+      marginBottom: 12,
+      paddingLeft: 4,
+      textTransform: 'uppercase',
     },
     card: {
-      backgroundColor: colors.surface,
-      borderRadius: RADIUS.xl,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.xl,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       overflow: 'hidden',
     },
     actionRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      padding: SPACING['4'],
+      padding: 16,
     },
     iconBox: {
       width: 44,
       height: 44,
-      borderRadius: RADIUS.md,
+      borderRadius: theme.radius.md,
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight: SPACING['3.5'],
+      marginRight: 14,
     },
     actionTextContainer: {
       flex: 1,
     },
     actionTitle: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 16,
-      color: colors.text,
-      marginBottom: SPACING['0.5'],
+      color: theme.colors.text,
+      marginBottom: 2,
     },
     actionSubtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 13,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
     divider: {
       height: 1,
-      backgroundColor: colors.border,
+      backgroundColor: theme.colors.border,
       marginLeft: 74,
     },
     infoCard: {
-      backgroundColor: colors.surface,
-      borderRadius: RADIUS.xl,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.xl,
       borderWidth: 1,
-      borderColor: colors.border,
-      padding: SPACING['4'],
-      gap: SPACING['3'],
+      borderColor: theme.colors.border,
+      padding: 16,
+      gap: 12,
     },
     infoRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: SPACING['3'],
+      gap: 12,
     },
     infoText: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
     warningCard: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      gap: SPACING['3'],
-      backgroundColor: colors.danger + '10',
-      borderRadius: RADIUS.lg,
+      gap: 12,
+      backgroundColor: theme.colors.danger + '10',
+      borderRadius: theme.radius.lg,
       borderWidth: 1,
-      borderColor: colors.danger + '25',
-      padding: SPACING['4'],
-      marginTop: SPACING['2'],
+      borderColor: theme.colors.danger + '25',
+      padding: 16,
+      marginTop: 8,
     },
     warningText: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 13,
-      color: colors.danger,
+      color: theme.colors.danger,
       lineHeight: 18,
     },
   });

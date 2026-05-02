@@ -3,9 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useMemo, useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { usePremium } from '@/src/providers/PremiumProvider';
-import { useTheme } from '../../providers/ThemeProvider';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, radius } from '../../theme/tokens';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 interface PremiumGuardProps {
   children: React.ReactNode;
@@ -21,9 +19,6 @@ interface PremiumGuardProps {
  * - small: 56px min height, 12px padding, 12px radius (md)
  * - medium: 76px min height, 16px padding, 16px radius (lg)
  * - large: 90px min height, 20px padding, 20px radius (xl)
- * 
- * Icon box: 44px (md), 32px (sm)
- * Action badge: 12px radius (md), 8px (sm)
  */
 export const PremiumGuard = React.memo(function PremiumGuard({
   children,
@@ -32,58 +27,34 @@ export const PremiumGuard = React.memo(function PremiumGuard({
   containerStyle
 }: PremiumGuardProps) {
   const { isPremium } = usePremium();
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const router = useRouter();
 
   const handlePress = useCallback(() => {
     router.push('/premium');
   }, [router]);
 
-  const { isSmall, containerStyles, iconBoxStyles, iconSize, actionBadgeStyles, actionTextLabel } = useMemo(() => {
-    const small = size === 'small';
-    const medium = size === 'medium';
-    
-    // Size-specific values
-    const padding = small ? spacing('3') : medium ? spacing('4') : spacing('5');
-    const borderRadius = small ? radius('md') : medium ? radius('lg') : radius('xl');
-    const minHeight = small ? 56 : medium ? 76 : 90;
+  const config = useMemo(() => {
+    const isSmall = size === 'small';
+    const isMedium = size === 'medium';
     
     return {
-      isSmall: small,
-      containerStyles: [
-        styles.container,
-        { 
-          backgroundColor: colors.surface, 
-          borderColor: colors.border,
-          padding,
-          borderRadius,
-          minHeight,
-        },
-        containerStyle
-      ],
-      iconBoxStyles: [
-        styles.iconBox,
-        { 
-          backgroundColor: colors.background, 
-          borderColor: colors.border,
-          width: small ? 32 : 44,
-          height: small ? 32 : 44,
-          borderRadius: small ? radius('sm') : radius('md'),
-        },
-      ],
-      iconSize: small ? 14 : 18,
-      actionBadgeStyles: [
-        styles.actionBadge,
-        { 
-          backgroundColor: colors.text,
-          paddingHorizontal: small ? spacing('2.5') : spacing('3.5'),
-          paddingVertical: small ? spacing('1.5') : spacing('2.5'),
-          borderRadius: small ? radius('sm') : radius('md'),
-        },
-      ],
-      actionTextLabel: small ? 'Pro' : 'Unlock'
+      isSmall,
+      padding: isSmall ? theme.spacing[12] : isMedium ? theme.spacing[16] : theme.spacing[20],
+      borderRadius: isSmall ? theme.radius.md : isMedium ? theme.radius.lg : theme.radius.xl,
+      minHeight: isSmall ? 56 : isMedium ? 76 : 90,
+      iconBoxSize: isSmall ? 32 : 44,
+      iconBoxRadius: isSmall ? theme.radius.sm : theme.radius.md,
+      iconSize: isSmall ? 14 : 18,
+      badgePaddingH: isSmall ? 10 : 14,
+      badgePaddingV: isSmall ? 6 : 10,
+      badgeRadius: isSmall ? theme.radius.sm : theme.radius.md,
+      actionTextLabel: isSmall ? 'Pro' : 'Unlock'
     };
-  }, [size, colors.surface, colors.border, colors.background, colors.text, containerStyle]);
+  }, [size, theme.spacing, theme.radius]);
+
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   if (isPremium) {
     return <>{children}</>;
@@ -93,13 +64,23 @@ export const PremiumGuard = React.memo(function PremiumGuard({
     <TouchableOpacity
       activeOpacity={0.75}
       onPress={handlePress}
-      style={containerStyles}
+      style={[
+        styles.container,
+        { 
+          backgroundColor: colors.surface, 
+          borderColor: colors.border,
+          padding: config.padding,
+          borderRadius: config.borderRadius,
+          minHeight: config.minHeight,
+        },
+        containerStyle
+      ]}
     >
       {/* Background Accent & Watermark */}
       <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.primary, opacity: 0.02 }]} />
       <Ionicons
         name="sparkles"
-        size={isSmall ? 60 : 120}
+        size={config.isSmall ? 60 : 120}
         color={colors.primary}
         style={[styles.watermark, { opacity: 0.05 }]}
         pointerEvents="none"
@@ -107,35 +88,54 @@ export const PremiumGuard = React.memo(function PremiumGuard({
 
       <View style={styles.content}>
         <View style={styles.headerRow}>
-
-          <View style={iconBoxStyles}>
-             <Ionicons name="lock-closed" size={iconSize} color={colors.text} />
+          <View style={[
+            styles.iconBox,
+            { 
+              backgroundColor: colors.background, 
+              borderColor: colors.border,
+              width: config.iconBoxSize,
+              height: config.iconBoxSize,
+              borderRadius: config.iconBoxRadius,
+            },
+          ]}>
+             <Ionicons name="lock-closed" size={config.iconSize} color={colors.text} />
           </View>
 
           <View style={styles.textDetails}>
-             <Text style={[styles.title, { color: colors.text }, isSmall && styles.titleSmall]}>
+             <Text style={[
+               styles.title, 
+               { color: colors.text }, 
+               config.isSmall && styles.titleSmall
+             ]}>
                {label}
              </Text>
-             {!isSmall && (
+             {!config.isSmall && (
                <Text style={[styles.subtitle, { color: colors.textMuted }]}>
                  Premium member exclusive
                </Text>
              )}
           </View>
 
-          <View style={actionBadgeStyles}>
+          <View style={[
+            styles.actionBadge,
+            { 
+              backgroundColor: colors.text,
+              paddingHorizontal: config.badgePaddingH,
+              paddingVertical: config.badgePaddingV,
+              borderRadius: config.badgeRadius,
+            },
+          ]}>
              <Text style={[styles.actionText, { color: colors.background }]}>
-               {actionTextLabel}
+               {config.actionTextLabel}
              </Text>
           </View>
-
         </View>
       </View>
     </TouchableOpacity>
   );
 });
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     borderWidth: 1,
     overflow: 'hidden',
@@ -143,8 +143,8 @@ const styles = StyleSheet.create({
   },
   watermark: {
     position: 'absolute',
-    right: -spacing('5'),
-    bottom: -spacing('8'),
+    right: -20,
+    bottom: -32,
     transform: [{ rotate: '-15deg' }],
   },
   content: {
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('3.5'),
+    gap: 14,
   },
   iconBox: {
     justifyContent: 'center',
@@ -165,16 +165,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
     fontSize: 14,
-    marginBottom: spacing('1'),
+    marginBottom: 4,
   },
   titleSmall: {
     fontSize: 11,
     marginBottom: 0,
   },
   subtitle: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     fontSize: 12,
   },
   actionBadge: {
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionText: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
     fontSize: 10,
     letterSpacing: 1,
   },

@@ -13,10 +13,7 @@ import {
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Account } from '@/src/features/accounts/api/accounts';
 import { Category } from '@/src/features/categories/api/categories';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { RADIUS, SHADOWS, SPACING } from '@/src/theme/tokens';
-import { TYPOGRAPHY } from '@/src/theme/typography';
+import { Theme, useTheme } from '@/src/providers/ThemeProvider';
 import { resolveIcon } from '@/src/utils/icons';
 import { AdvancedFilters, DEFAULT_ADVANCED_FILTERS } from '../api/advanced-filters.service';
 
@@ -43,8 +40,9 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
   categories,
   resultCount,
 }: AdvancedFilterSheetProps) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const [localFilters, setLocalFilters] = useState<AdvancedFilters>(filters);
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -207,7 +205,7 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
           >
             {/* TYPE */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>TYPE</Text>
+              <Text style={styles.sectionLabel}>Type</Text>
               <View style={styles.typeRow}>
                 {(['CR', 'DR'] as const).map((type) => {
                   const isSelected = localFilters.types?.includes(type) || false;
@@ -248,7 +246,7 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
 
             {/* DATE RANGE */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>DATE RANGE</Text>
+              <Text style={styles.sectionLabel}>Date range</Text>
               <View style={styles.card}>
                 {localFilters.dateRange ? (
                   <View style={styles.dateActiveRow}>
@@ -257,7 +255,7 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
                       onPress={() => setShowStartDatePicker(true)}
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.dateFieldLabel}>FROM</Text>
+                      <Text style={styles.dateFieldLabel}>From</Text>
                       <Text style={styles.dateFieldValue}>
                         {formatDate(localFilters.dateRange.startDate)}
                       </Text>
@@ -268,7 +266,7 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
                       onPress={() => setShowEndDatePicker(true)}
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.dateFieldLabel}>TO</Text>
+                      <Text style={styles.dateFieldLabel}>To</Text>
                       <Text style={styles.dateFieldValue}>
                         {formatDate(localFilters.dateRange.endDate)}
                       </Text>
@@ -303,11 +301,11 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
 
             {/* AMOUNT RANGE */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>AMOUNT RANGE</Text>
+              <Text style={styles.sectionLabel}>Amount range</Text>
               <View style={styles.card}>
                 <View style={styles.amountRow}>
                   <View style={styles.amountField}>
-                    <Text style={styles.amountFieldLabel}>MIN</Text>
+                    <Text style={styles.amountFieldLabel}>Min</Text>
                     <TextInput
                       style={styles.amountInput}
                       value={minAmount}
@@ -320,7 +318,7 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
                   </View>
                   <View style={styles.amountFieldSep} />
                   <View style={styles.amountField}>
-                    <Text style={styles.amountFieldLabel}>MAX</Text>
+                    <Text style={styles.amountFieldLabel}>Max</Text>
                     <TextInput
                       style={styles.amountInput}
                       value={maxAmount}
@@ -338,7 +336,7 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
             {/* ACCOUNTS */}
             {accounts.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionLabel}>ACCOUNTS</Text>
+                <Text style={styles.sectionLabel}>Accounts</Text>
                 <View style={styles.card}>
                   {accounts.map((account, index) => {
                     const isSelected = localFilters.accountIds?.includes(account.id) || false;
@@ -383,7 +381,7 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
             {/* CATEGORIES */}
             {categories.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionLabel}>CATEGORIES</Text>
+                <Text style={styles.sectionLabel}>Categories</Text>
                 <View style={styles.chipGrid}>
                   {categories.map((category) => {
                     const isSelected = localFilters.categoryIds?.includes(category.id) || false;
@@ -421,7 +419,7 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
 
             {/* SORT */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>SORT</Text>
+              <Text style={styles.sectionLabel}>Sort</Text>
               <View style={styles.card}>
                 <View style={styles.sortRow}>
                   <Text style={styles.sortRowLabel}>Sort by</Text>
@@ -511,7 +509,7 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
   );
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
@@ -519,22 +517,22 @@ const createStyles = (colors: ThemeColors) =>
       justifyContent: 'flex-end',
     },
     sheet: {
-      backgroundColor: Platform.OS === 'ios' ? colors.background + 'F5' : colors.background,
-      borderTopLeftRadius: RADIUS['2xl'],
-      borderTopRightRadius: RADIUS['2xl'],
+      backgroundColor: Platform.OS === 'ios' ? theme.colors.background + 'F5' : theme.colors.background,
+      borderTopLeftRadius: theme.radius['2xl'],
+      borderTopRightRadius: theme.radius['2xl'],
       borderWidth: 1,
-      borderColor: colors.text + '15',
+      borderColor: theme.colors.text + '15',
       borderBottomWidth: 0,
       maxHeight: '88%',
-      ...SHADOWS.lg,
+      ...theme.shadow.lg,
     },
     handle: {
       width: 36,
       height: 4,
-      borderRadius: RADIUS.xs,
-      backgroundColor: colors.text + '20',
+      borderRadius: theme.radius.xs,
+      backgroundColor: theme.colors.text + '20',
       alignSelf: 'center',
-      marginTop: SPACING['2.5'],
+      marginTop: 10,
     },
 
     // ─── Header ─────────────────────────────────────────────────────────────
@@ -542,142 +540,141 @@ const createStyles = (colors: ThemeColors) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['4'],
-      paddingBottom: SPACING['2'],
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      paddingBottom: 8,
     },
     headerLeft: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: SPACING['2'],
+      gap: 8,
     },
     title: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: theme.fontFamilies.heading,
       fontSize: 28,
-      color: colors.text,
+      color: theme.colors.text,
       letterSpacing: -1,
     },
     countBadge: {
       minWidth: 22,
       height: 22,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.primary,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: SPACING['1'],
+      paddingHorizontal: 4,
     },
     countBadgeText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 11,
-      color: colors.background,
+      color: theme.colors.background,
     },
     resetBtn: {
       height: 30,
-      paddingHorizontal: SPACING['3'],
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.danger + '12',
+      paddingHorizontal: 12,
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.danger + '12',
       alignItems: 'center',
       justifyContent: 'center',
     },
     resetBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 12,
-      color: colors.danger,
+      color: theme.colors.danger,
     },
     closeIconBtn: {
       width: 30,
       height: 30,
-      borderRadius: RADIUS.sm,
-      backgroundColor: colors.text + '08',
+      borderRadius: theme.radius.sm,
+      backgroundColor: theme.colors.text + '08',
       alignItems: 'center',
       justifyContent: 'center',
     },
 
     // ─── Search ──────────────────────────────────────────────────────────────
     searchRow: {
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['2'],
-      paddingBottom: SPACING['3'],
+      paddingHorizontal: 24,
+      paddingTop: 8,
+      paddingBottom: 12,
     },
     searchWrap: {
       flexDirection: 'row',
       alignItems: 'center',
       height: 44,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.surface,
-      paddingHorizontal: SPACING['3'],
-      gap: SPACING['2'],
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: 12,
+      gap: 8,
     },
     searchInput: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
-      color: colors.text,
+      color: theme.colors.text,
       padding: 0,
     },
 
     // ─── Scroll body ─────────────────────────────────────────────────────────
     scrollContent: {
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['1'],
+      paddingHorizontal: 24,
+      paddingTop: 4,
     },
     section: {
-      marginBottom: SPACING['5'],
+      marginBottom: 20,
     },
     sectionLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 9,
-      color: colors.textMuted,
-      letterSpacing: 1.2,
-      textTransform: 'uppercase',
-      marginBottom: SPACING['2'],
-      paddingLeft: SPACING['1'],
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 11,
+      color: theme.colors.textMuted,
+      letterSpacing: 0.5,
+      marginBottom: 8,
+      paddingLeft: 4,
     },
 
     // ─── Shared card surface ─────────────────────────────────────────────────
     card: {
-      backgroundColor: colors.surface,
-      borderRadius: RADIUS.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.lg,
       overflow: 'hidden',
     },
 
     // ─── Type ────────────────────────────────────────────────────────────────
     typeRow: {
       flexDirection: 'row',
-      gap: SPACING['2'],
+      gap: 8,
     },
     typeCard: {
       flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
       height: 60,
-      borderRadius: RADIUS.lg,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.surface,
       overflow: 'hidden',
     },
     typeAccentBar: {
       width: 3,
       alignSelf: 'stretch',
-      marginVertical: SPACING['3'],
-      marginLeft: SPACING['1.5'],
-      borderRadius: RADIUS.full,
+      marginVertical: 12,
+      marginLeft: 6,
+      borderRadius: theme.radius.full,
     },
     typeBody: {
       flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: SPACING['3'],
-      gap: SPACING['2'],
+      paddingHorizontal: 12,
+      gap: 8,
     },
     typeIconBox: {
       width: 32,
       height: 32,
-      borderRadius: RADIUS.sm,
+      borderRadius: theme.radius.sm,
       alignItems: 'center',
       justifyContent: 'center',
     },
     typeLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 14,
     },
 
@@ -685,41 +682,40 @@ const createStyles = (colors: ThemeColors) =>
     dateActiveRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: SPACING['4'],
-      paddingVertical: SPACING['3'],
+      paddingHorizontal: 16,
+      paddingVertical: 12,
     },
     dateField: {
       flex: 1,
-      paddingVertical: SPACING['1'],
+      paddingVertical: 4,
     },
     dateFieldLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 8,
-      color: colors.textMuted,
-      letterSpacing: 1.2,
-      textTransform: 'uppercase',
-      marginBottom: SPACING['0.5'],
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 10,
+      color: theme.colors.textMuted,
+      letterSpacing: 0.5,
+      marginBottom: 2,
     },
     dateFieldValue: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 15,
-      color: colors.text,
+      color: theme.colors.text,
       letterSpacing: -0.3,
     },
     dateFieldSep: {
       width: 1,
       height: 36,
-      backgroundColor: colors.text + '10',
-      marginHorizontal: SPACING['3'],
+      backgroundColor: theme.colors.text + '10',
+      marginHorizontal: 12,
     },
     dateClearBtn: {
       width: 26,
       height: 26,
-      borderRadius: RADIUS.sm,
-      backgroundColor: colors.text + '10',
+      borderRadius: theme.radius.sm,
+      backgroundColor: theme.colors.text + '10',
       alignItems: 'center',
       justifyContent: 'center',
-      marginLeft: SPACING['2'],
+      marginLeft: 8,
     },
     dateInactiveRow: {
       flexDirection: 'row',
@@ -730,18 +726,18 @@ const createStyles = (colors: ThemeColors) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: SPACING['2'],
-      paddingVertical: SPACING['4'],
+      gap: 8,
+      paddingVertical: 16,
     },
     datePickerInternalSep: {
       width: 1,
       height: 24,
-      backgroundColor: colors.text + '10',
+      backgroundColor: theme.colors.text + '10',
     },
     datePickerBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 14,
-      color: colors.primary,
+      color: theme.colors.primary,
     },
 
     // ─── Amount range ────────────────────────────────────────────────────────
@@ -751,91 +747,90 @@ const createStyles = (colors: ThemeColors) =>
     },
     amountField: {
       flex: 1,
-      paddingHorizontal: SPACING['4'],
-      paddingVertical: SPACING['3'],
-      gap: SPACING['1'],
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      gap: 4,
     },
     amountFieldLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 8,
-      color: colors.textMuted,
-      letterSpacing: 1.2,
-      textTransform: 'uppercase',
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 10,
+      color: theme.colors.textMuted,
+      letterSpacing: 0.5,
     },
     amountInput: {
-      fontFamily: TYPOGRAPHY.fonts.bold,
+      fontFamily: theme.fontFamilies.sansBold,
       fontSize: 22,
-      color: colors.text,
+      color: theme.colors.text,
       letterSpacing: -0.5,
       padding: 0,
     },
     amountFieldSep: {
       width: 1,
-      backgroundColor: colors.text + '10',
-      marginVertical: SPACING['3'],
+      backgroundColor: theme.colors.text + '10',
+      marginVertical: 12,
     },
 
     // ─── Account / Category list rows ─────────────────────────────────────
     listRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: SPACING['4'],
-      paddingVertical: SPACING['3'],
-      gap: SPACING['3'],
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      gap: 12,
     },
     listRowDivider: {
       borderBottomWidth: 1,
-      borderBottomColor: colors.text + '08',
+      borderBottomColor: theme.colors.text + '08',
     },
     listRowActive: {
-      backgroundColor: colors.text + '05',
+      backgroundColor: theme.colors.text + '05',
     },
     listIconBox: {
       width: 34,
       height: 34,
-      borderRadius: RADIUS.sm,
+      borderRadius: theme.radius.sm,
       alignItems: 'center',
       justifyContent: 'center',
     },
     listRowLabel: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 14,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
     checkbox: {
       width: 20,
       height: 20,
-      borderRadius: RADIUS.xs,
+      borderRadius: theme.radius.xs,
       borderWidth: 1.5,
-      borderColor: colors.text + '20',
+      borderColor: theme.colors.text + '20',
       alignItems: 'center',
       justifyContent: 'center',
     },
     checkboxActive: {
-      backgroundColor: colors.text,
-      borderColor: colors.text,
+      backgroundColor: theme.colors.text,
+      borderColor: theme.colors.text,
     },
 
     // ─── Category chips ──────────────────────────────────────────────────────
     chipGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: SPACING['2'],
+      gap: 8,
     },
     chip: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: SPACING['3'],
+      paddingHorizontal: 12,
       height: 34,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.surface,
-      gap: SPACING['1'],
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.surface,
+      gap: 4,
     },
     chipText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 13,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
 
     // ─── Sort ────────────────────────────────────────────────────────────────
@@ -843,42 +838,42 @@ const createStyles = (colors: ThemeColors) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: SPACING['4'],
-      paddingVertical: SPACING['3'],
+      paddingHorizontal: 16,
+      paddingVertical: 12,
     },
     sortRowSep: {
       height: 1,
-      backgroundColor: colors.text + '08',
-      marginHorizontal: SPACING['4'],
+      backgroundColor: theme.colors.text + '08',
+      marginHorizontal: 16,
     },
     sortRowLabel: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 13,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
     sortToggleGroup: {
       flexDirection: 'row',
-      gap: SPACING['1.5'],
+      gap: 6,
     },
     sortToggle: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: SPACING['1'],
-      paddingHorizontal: SPACING['3'],
+      gap: 4,
+      paddingHorizontal: 12,
       height: 30,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.text + '08',
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.text + '08',
     },
     sortToggleActive: {
-      backgroundColor: colors.text,
+      backgroundColor: theme.colors.text,
     },
     sortToggleText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 12,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
     sortToggleTextActive: {
-      color: colors.background,
+      color: theme.colors.background,
     },
 
     // ─── Footer ──────────────────────────────────────────────────────────────
@@ -887,23 +882,23 @@ const createStyles = (colors: ThemeColors) =>
       bottom: 0,
       left: 0,
       right: 0,
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['4'],
-      paddingBottom: SPACING['9'],
-      backgroundColor: colors.background,
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      paddingBottom: 36,
+      backgroundColor: theme.colors.background,
       borderTopWidth: 1,
-      borderTopColor: colors.text + '08',
+      borderTopColor: theme.colors.text + '08',
     },
     applyBtn: {
       height: 52,
-      borderRadius: RADIUS.lg,
-      backgroundColor: colors.text,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.text,
       alignItems: 'center',
       justifyContent: 'center',
     },
     applyBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 15,
-      color: colors.background,
+      color: theme.colors.background,
     },
   });

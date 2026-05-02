@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, TextProps, TextStyle } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 type TypographyVariant = 
   | 'h1' 
@@ -17,7 +15,7 @@ type TypographyVariant =
 type TypographyProps = TextProps & {
   variant?: TypographyVariant;
   color?: string;
-  weight?: keyof typeof TYPOGRAPHY.weights;
+  weight?: keyof Theme['fontFamilies'];
   align?: TextStyle['textAlign'];
 };
 
@@ -34,71 +32,71 @@ export const Typography = React.memo(function Typography({
   children,
   ...props
 }: TypographyProps) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors, fontFamilies, fontSizes } = theme;
 
   const variantStyle = useMemo(() => {
     switch (variant) {
       case 'h1':
         return {
-          fontSize: TYPOGRAPHY.sizes.xxxl,
-          fontFamily: TYPOGRAPHY.fonts.heading,
-          lineHeight: TYPOGRAPHY.sizes.xxxl * 1.1,
+          fontSize: fontSizes['3xl'],
+          fontFamily: fontFamilies.sansBold,
+          lineHeight: fontSizes['3xl'] * 1.1,
           letterSpacing: -1,
         };
       case 'h2':
         return {
-          fontSize: TYPOGRAPHY.sizes.xxl,
-          fontFamily: TYPOGRAPHY.fonts.semibold,
-          lineHeight: TYPOGRAPHY.sizes.xxl * 1.2,
+          fontSize: fontSizes['2xl'],
+          fontFamily: fontFamilies.sansSemiBold,
+          lineHeight: fontSizes['2xl'] * 1.2,
           letterSpacing: -0.6,
         };
       case 'h3':
         return {
-          fontSize: TYPOGRAPHY.sizes.xl,
-          fontFamily: TYPOGRAPHY.fonts.semibold,
-          lineHeight: TYPOGRAPHY.sizes.xl * 1.2,
+          fontSize: fontSizes.xl,
+          fontFamily: fontFamilies.sansSemiBold,
+          lineHeight: fontSizes.xl * 1.2,
           letterSpacing: -0.4,
         };
       case 'body':
         return {
-          fontSize: TYPOGRAPHY.sizes.md,
-          fontFamily: TYPOGRAPHY.fonts.regular,
-          lineHeight: TYPOGRAPHY.sizes.md * 1.5,
+          fontSize: fontSizes.md,
+          fontFamily: fontFamilies.sans,
+          lineHeight: fontSizes.md * 1.5,
         };
       case 'bodySm':
         return {
-          fontSize: TYPOGRAPHY.sizes.sm,
-          fontFamily: TYPOGRAPHY.fonts.regular,
-          lineHeight: TYPOGRAPHY.sizes.sm * 1.5,
+          fontSize: fontSizes.sm,
+          fontFamily: fontFamilies.sans,
+          lineHeight: fontSizes.sm * 1.5,
         };
       case 'label':
         return {
-          fontSize: TYPOGRAPHY.sizes.xs,
-          fontFamily: TYPOGRAPHY.fonts.medium,
+          fontSize: fontSizes.xs,
+          fontFamily: fontFamilies.sansSemiBold,
           color: colors.textMuted,
           textTransform: 'uppercase' as const,
           letterSpacing: 0.5,
         };
       case 'mono':
         return {
-          fontSize: TYPOGRAPHY.sizes.md,
-          fontFamily: TYPOGRAPHY.fonts.monoRegular,
+          fontSize: fontSizes.md,
+          fontFamily: fontFamilies.mono,
         };
       case 'monoSm':
         return {
-          fontSize: TYPOGRAPHY.sizes.sm,
-          fontFamily: TYPOGRAPHY.fonts.monoRegular,
+          fontSize: fontSizes.sm,
+          fontFamily: fontFamilies.mono,
         };
       default:
         return {};
     }
-  }, [variant, colors.textMuted]);
+  }, [variant, colors.textMuted, fontFamilies, fontSizes]);
 
   const customStyle: TextStyle = {
     color: color || colors.text,
     textAlign: align,
-    fontFamily: weight ? TYPOGRAPHY.fonts[weight as keyof typeof TYPOGRAPHY.fonts] : undefined,
+    fontFamily: weight ? fontFamilies[weight] : undefined,
   };
 
   return (
@@ -109,8 +107,4 @@ export const Typography = React.memo(function Typography({
       {children}
     </Text>
   );
-});
-
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  // Base styles if any
 });

@@ -17,10 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../../../components/ui/Header';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { TransactionType } from '../../../types';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useBudgets } from '../../budgets/api/budgets';
@@ -58,9 +55,10 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
   const params = useLocalSearchParams<{ goalId?: string; loanId?: string }>();
   const isEditMode = mode === 'edit';
 
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   const accountsQuery = useAccounts();
   const categoriesQuery = useCategories();
@@ -313,7 +311,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-
       <Header title={isEditMode ? 'Edit Entry' : 'New Entry'} subtitle="Record flow with precision" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
@@ -333,13 +330,12 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           </View>
         </View>
 
-        <TransactionTypePicker value={type} onChange={setType} colors={colors} disabled={isEditMode} />
+        <TransactionTypePicker value={type} onChange={setType} disabled={isEditMode} />
 
         <TransactionAmountInput
           value={amountInput}
           onChange={setAmountInput}
           currency={selectedAccount?.currency ?? profile.defaultCurrency}
-          colors={colors}
         />
 
         <View style={styles.formBody}>
@@ -348,7 +344,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
             selectedId={selectedAccountId}
             onSelect={setSelectedAccountId}
             onAdd={() => router.push('/account/create')}
-            colors={colors}
             label={type === 'TRANSFER' ? 'From Account' : 'Account'}
           />
 
@@ -360,14 +355,13 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
                   selectedId={selectedToAccountId}
                   onSelect={setSelectedToAccountId}
                   onAdd={() => router.push('/account/create')}
-                  colors={colors}
                   label="To Account"
                 />
               ) : (
                 <View style={styles.section}>
                   <Text style={styles.sectionLabel}>TO ACCOUNT</Text>
-                  <View style={[styles.disabledCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                    <Text style={[styles.disabledText, { color: colors.textMuted }]}>
+                  <View style={styles.disabledCard}>
+                    <Text style={styles.disabledText}>
                       {!selectedAccount
                         ? 'Select source account first'
                         : 'No accounts with same currency available'}
@@ -383,7 +377,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
             selectedId={selectedCategoryId}
             onSelect={setSelectedCategoryId}
             onAdd={() => router.push('/category/create')}
-            colors={colors}
           />
 
           {type === 'DR' && manualBudgets.length > 0 && (
@@ -391,14 +384,12 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
               budgetsList={manualBudgets}
               selectedId={selectedBudgetId}
               onSelect={setSelectedBudgetId}
-              colors={colors}
             />
           )}
 
           <TransactionGoalPicker 
             selectedId={selectedGoalId} 
             onSelect={setSelectedGoalId} 
-            colors={colors} 
             accountId={selectedAccountId}
             type={type}
           />
@@ -406,7 +397,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           <TransactionLoanPicker 
             selectedId={selectedLoanId} 
             onSelect={setSelectedLoanId} 
-            colors={colors} 
             accountId={selectedAccountId}
             type={type}
           />
@@ -416,9 +406,10 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
             <TouchableOpacity 
               style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: 16 }]} 
               onPress={() => setShowPersonPicker(true)}
+              activeOpacity={0.7}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Ionicons name="person-outline" size={18} color={colors.primary} />
+                <Ionicons name="person-outline" size={18} color={colors.primaryDark} />
                 <Text style={styles.dateTimeText}>{selectedPersonId ? 'Selected' : 'Link person'}</Text>
               </View>
               <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
@@ -430,9 +421,10 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
             <TouchableOpacity 
               style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: 16 }]} 
               onPress={() => setShowPlacePicker(true)}
+              activeOpacity={0.7}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Ionicons name="location-outline" size={18} color={colors.primary} />
+                <Ionicons name="location-outline" size={18} color={colors.primaryDark} />
                 <Text style={styles.dateTimeText}>{selectedPlaceId ? 'Selected' : 'Link place'}</Text>
               </View>
               <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
@@ -442,12 +434,12 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>DATE & TIME</Text>
             <View style={styles.dateTimeRow}>
-              <TouchableOpacity style={styles.dateTimeBtn} onPress={() => setShowDatePicker(true)}>
-                <Ionicons name="calendar-outline" size={18} color={colors.primary} />
+              <TouchableOpacity style={styles.dateTimeBtn} onPress={() => setShowDatePicker(true)} activeOpacity={0.7}>
+                <Ionicons name="calendar-outline" size={18} color={colors.primaryDark} />
                 <Text style={styles.dateTimeText}>{formattedDate}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.dateTimeBtn} onPress={() => setShowTimePicker(true)}>
-                <Ionicons name="time-outline" size={18} color={colors.primary} />
+              <TouchableOpacity style={styles.dateTimeBtn} onPress={() => setShowTimePicker(true)} activeOpacity={0.7}>
+                <Ionicons name="time-outline" size={18} color={colors.primaryDark} />
                 <Text style={styles.dateTimeText}>{formattedTime}</Text>
               </TouchableOpacity>
             </View>
@@ -467,6 +459,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           style={[styles.saveBtn, !canSubmit && styles.saveBtnDisabled]}
           onPress={handleSave}
           disabled={!canSubmit}
+          activeOpacity={0.9}
         >
           {isSubmitting ? (
             <ActivityIndicator size="small" color={colors.background} />
@@ -491,74 +484,73 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
         onSelect={setSelectedPlaceId}
         onAddPlace={() => router.push('/places/create')}
       />
-
     </SafeAreaView>
   );
 }
 
-
-
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     loadingWrap: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     content: {
-      paddingBottom: 120,
+      paddingBottom: 140,
     },
     formBody: {
-      gap: 16,
+      gap: theme.spacing[16],
     },
     section: {
       paddingHorizontal: 24,
-      gap: 12,
+      gap: theme.spacing[12],
     },
     sectionLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 10,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       letterSpacing: 1.5,
     },
     dateTimeRow: {
       flexDirection: 'row',
-      gap: 12,
+      gap: theme.spacing[12],
     },
     dateTimeBtn: {
       flex: 1,
-      height: 48,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
+      height: 52,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.card,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 8,
+      gap: theme.spacing[8],
+      ...theme.shadow.xs,
     },
     dateTimeText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 13,
-      color: colors.text,
+      color: theme.colors.text,
     },
     noteContainer: {
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.card,
       borderWidth: 1,
-      borderColor: colors.border,
-      padding: 12,
-      minHeight: 100,
+      borderColor: theme.colors.border,
+      padding: theme.spacing[16],
+      minHeight: 120,
+      ...theme.shadow.xs,
     },
     noteInput: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 15,
-      color: colors.text,
+      color: theme.colors.text,
       textAlignVertical: 'top',
     },
     footer: {
@@ -569,51 +561,33 @@ const createStyles = (colors: ThemeColors) =>
     },
     saveBtn: {
       height: 56,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.text,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.text,
       alignItems: 'center',
       justifyContent: 'center',
+      ...theme.shadow.md,
     },
     saveBtnDisabled: {
       opacity: 0.5,
     },
     saveBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansBold,
       fontSize: 16,
-      color: colors.background,
+      color: theme.colors.background,
     },
     disabledCard: {
-      height: 56,
-      borderRadius: RADIUS.full,
+      height: 52,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.card,
       borderWidth: 1,
+      borderColor: theme.colors.border,
       alignItems: 'center',
       justifyContent: 'center',
+      borderStyle: 'dashed',
     },
     disabledText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 14,
-    },
-    accountList: {
-      gap: 8,
-    },
-    accountCard: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-      padding: 12,
-      borderRadius: RADIUS.full,
-      borderWidth: 1,
-    },
-    accountIconBox: {
-      width: 36,
-      height: 36,
-      borderRadius: RADIUS.full,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    accountName: {
-      flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.medium,
-      fontSize: 15,
+      color: theme.colors.textMuted,
     },
   });

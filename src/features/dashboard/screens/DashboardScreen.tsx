@@ -12,15 +12,11 @@ import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { TransactionRow } from '../../../components/ui/TransactionRow';
 import { DEFAULT_CURRENCY } from '../../../constants/currency';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { radius } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import type { Account } from '../../accounts/api/accounts';
 import { useAccounts, useDeleteAccount } from '../../accounts/hooks/accounts';
 import { StreakBadge } from '../../reports/components/StreakBadge';
 import { useTransactions } from '../../transactions/hooks/transactions';
-import { InsightsSection } from '../components/InsightsSection';
 import { BudgetSummaryCard } from '../components/BudgetSummaryCard';
 import { GoalsSummaryCard } from '../components/GoalsSummaryCard';
 import { LoansSummaryCard } from '../components/LoansSummaryCard';
@@ -49,11 +45,12 @@ const resolveIconName = (raw: string | null | undefined, fallback: IoniconName):
 };
 
 export const DashboardScreen = React.memo(function DashboardScreen() {
-  const { colors, isDark } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { isPremium } = usePremium();
   const { profile } = useSettings();
   const { width: screenWidth } = useWindowDimensions();
-  const styles = React.useMemo(() => createStyles(colors, screenWidth), [colors, screenWidth]);
+  const styles = React.useMemo(() => createStyles(theme, screenWidth), [theme, screenWidth]);
   const router = useRouter();
 
   const { data: transactions, isLoading: txLoading } = useTransactions(6);
@@ -261,7 +258,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
             amount={balancesByCurrency[selectedCurrency] || 0}
             currency={selectedCurrency}
             style={styles.heroBalance}
-            weight="bold"
+            weight="sansBold"
           />
 
           {/* Income / Expense split bar */}
@@ -269,13 +266,13 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
             <View style={styles.splitItem}>
               <View style={[styles.splitDot, { backgroundColor: colors.success }]} />
               <Text style={styles.splitLabel}>IN</Text>
-              <MoneyText amount={totals.income} currency={selectedCurrency} type="CR" weight="bold" style={styles.splitValue} />
+              <MoneyText amount={totals.income} currency={selectedCurrency} type="CR" weight="sansBold" style={styles.splitValue} />
             </View>
             <View style={styles.splitDivider} />
             <View style={styles.splitItem}>
               <View style={[styles.splitDot, { backgroundColor: colors.danger }]} />
               <Text style={styles.splitLabel}>OUT</Text>
-              <MoneyText amount={totals.expense} currency={selectedCurrency} type="DR" weight="bold" style={styles.splitValue} />
+              <MoneyText amount={totals.expense} currency={selectedCurrency} type="DR" weight="sansBold" style={styles.splitValue} />
             </View>
           </View>
 
@@ -288,8 +285,8 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
 
         {/* ── KPI Grid ── */}
         <View style={styles.kpiGrid}>
-          <TouchableOpacity 
-            style={styles.kpiCard} 
+          <TouchableOpacity
+            style={styles.kpiCard}
             onPress={() => router.push('/goals')}
             activeOpacity={0.8}
           >
@@ -299,16 +296,16 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
               </View>
               <Text style={styles.kpiLabel}>SAVED</Text>
             </View>
-            <MoneyText 
-              amount={totals.totalSaved || 0} 
-              currency={selectedCurrency} 
-              style={styles.kpiValue} 
-              weight="bold" 
+            <MoneyText
+              amount={totals.totalSaved || 0}
+              currency={selectedCurrency}
+              style={styles.kpiValue}
+              weight="sansBold"
             />
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.kpiCard} 
+          <TouchableOpacity
+            style={styles.kpiCard}
             onPress={() => router.push('/loans')}
             activeOpacity={0.8}
           >
@@ -318,18 +315,16 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
               </View>
               <Text style={styles.kpiLabel}>DEBT</Text>
             </View>
-            <MoneyText 
-              amount={totals.totalDebt || 0} 
-              currency={selectedCurrency} 
-              style={styles.kpiValue} 
-              weight="bold" 
+            <MoneyText
+              amount={totals.totalDebt || 0}
+              currency={selectedCurrency}
+              style={styles.kpiValue}
+              weight="sansBold"
               type="DR"
             />
           </TouchableOpacity>
         </View>
 
-        {/* ── Insights Layer (Pro Only) ── */}
-        <InsightsSection currency={selectedCurrency} />
 
         {/* ── Budget Summary ── */}
         <BudgetSummaryCard />
@@ -403,7 +398,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
                   </View>
 
                   <Text style={styles.accountBalanceLabel}>AVAILABLE</Text>
-                  <MoneyText amount={acc.balance} currency={acc.currency} style={styles.accountCardBalance} weight="bold" />
+                  <MoneyText amount={acc.balance} currency={acc.currency} style={styles.accountCardBalance} weight="sansBold" />
 
                   <View style={styles.accountCardStats}>
                     <View style={styles.accountCardStatCol}>
@@ -456,7 +451,6 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
                 <TransactionRow
                   key={tx.id}
                   tx={tx}
-                  colors={colors}
                   isFirst={idx === 0}
                   isLast={isLast}
                   showDate
@@ -502,420 +496,376 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
     </SafeAreaView>
   );
 });
-
-const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    overflow: 'hidden',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.background,
-  },
-  content: {
-    paddingBottom: 110,
-  },
-
-  /* ── Header actions ── */
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 999,
-    backgroundColor: colors.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-    position: 'relative',
-  },
-  proDot: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-
-  /* ── Hero balance card ── */
-  heroCard: {
-    marginHorizontal: 24,
-    marginBottom: 16,
-    borderRadius: radius('xl'),
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 20,
-    overflow: 'hidden',
-  },
-  currencyTabsRow: {
-    flexDirection: 'row',
-    gap: 4,
-    marginBottom: 16,
-  },
-  currencyTab: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: colors.background + 'AA',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  currencyTabActive: {
-    backgroundColor: colors.text,
-    borderColor: colors.text,
-  },
-  currencyTabText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
-    fontSize: 11,
-    letterSpacing: 0.4,
-  },
-  currencyTabTextActive: {
-    color: colors.background,
-  },
-  heroBadge: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
-    fontSize: 10,
-    letterSpacing: 1.5,
-    marginBottom: 6,
-  },
-  heroBalance: {
-    fontSize: 42,
-    lineHeight: 46,
-    letterSpacing: -1.5,
-    marginBottom: 20,
-  },
-  splitRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  splitItem: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-  },
-  splitDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-  },
-  splitLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
-    fontSize: 10,
-    letterSpacing: 1.2,
-  },
-  splitValue: {
-    fontSize: 13,
-  },
-  splitDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: colors.border,
-    marginHorizontal: 14,
-  },
-  flowBar: {
-    flexDirection: 'row',
-    height: 4,
-    borderRadius: 999,
-    overflow: 'hidden',
-    gap: 2,
-  },
-  flowBarIncome: {
-    borderRadius: 999,
-    backgroundColor: colors.success,
-  },
-  flowBarExpense: {
-    borderRadius: 999,
-    backgroundColor: colors.danger,
-  },
-  kpiGrid: {
-    flexDirection: 'row',
-    marginHorizontal: 24,
-    marginBottom: 24,
-    gap: 12,
-  },
-  kpiCard: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: radius('lg'),
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 12,
-  },
-  kpiHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  kpiIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: radius('md'),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  kpiLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
-    fontSize: 10,
-    letterSpacing: 1,
-  },
-  kpiValue: {
-    fontSize: 18,
-  },
-
-  /* ── Quick actions ── */
-  quickActions: {
-    flexDirection: 'row',
-    marginHorizontal: 24,
-    marginBottom: 24,
-    gap: 10,
-  },
-  quickActionPrimary: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    height: 48,
-    borderRadius: 999,
-    backgroundColor: colors.text,
-  },
-  quickActionPrimaryText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.background,
-    fontSize: 14,
-  },
-  quickActionSecondary: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    height: 48,
-    borderRadius: 999,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  quickActionSecondaryText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
-    fontSize: 14,
-  },
-
-  /* ── Accounts carousel ── */
-  accountsScroll: {
-    paddingLeft: 24,
-    marginBottom: 24,
-  },
-  accountsScrollContent: {
-    paddingRight: 32,
-    gap: 12,
-  },
-  accountCard: {
-    width: screenWidth * 0.7,
-    minHeight: 160,
-    borderRadius: radius('xl'),
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-  },
-  accountPlaceholderCard: {
-    width: screenWidth * 0.7,
-    minHeight: 160,
-    borderRadius: radius('xl'),
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderStyle: 'dashed',
-    overflow: 'hidden',
-  },
-  accountPlaceholderInner: {
-    flex: 1,
-    minHeight: 157,
-    padding: 18,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-  },
-  accountPlaceholderIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: radius('md'),
-    backgroundColor: colors.background + '88',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 14,
-  },
-  accountPlaceholderTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
-    fontSize: 16,
-    marginBottom: 6,
-  },
-  accountPlaceholderText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
-    fontSize: 12,
-    lineHeight: 18,
-    maxWidth: 180,
-  },
-  accountAccentBar: {
-    height: 3,
-    width: '100%',
-  },
-  accountCardInner: {
-    padding: 14,
-  },
-  accountCardTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-    gap: 10,
-  },
-  accountCardLead: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  accountIconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: radius('md'),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  accountCardMeta: {
-    flex: 1,
-  },
-  accountCardName: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
-    fontSize: 14,
-  },
-  accountCardHint: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
-    fontSize: 11,
-    marginTop: 2,
-  },
-  accountCurrencyBadge: {
-    height: 24,
-    minWidth: 48,
-    paddingHorizontal: 8,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background + '80',
-  },
-  accountCurrencyText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 10,
-    letterSpacing: 0.8,
-  },
-  accountBalanceLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 9,
-    color: colors.textMuted,
-    letterSpacing: 1.2,
-    marginBottom: 6,
-  },
-  accountCardBalance: {
-    fontSize: 22,
-    lineHeight: 25,
-    marginBottom: 12,
-  },
-  accountCardStats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  accountCardStatCol: {
-    flex: 1,
-    gap: 4,
-  },
-  accountCardStatLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 8,
-    color: colors.textMuted,
-    letterSpacing: 1,
-  },
-  accountCardStatValue: {
-    fontSize: 11,
-  },
-  accountCardStatDivider: {
-    width: 1,
-    height: 20,
-    backgroundColor: colors.border,
-    marginHorizontal: 12,
-  },
-
-  /* ── Recent activity ── */
-  activityCard: {
-    marginHorizontal: 24,
-    borderRadius: radius('2xl'),
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-  },
-  emptyActivity: {
-    paddingVertical: 32,
-    alignItems: 'center',
-    gap: 8,
-  },
-  emptyActivityText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  emptyActivityAction: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    height: 30,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    backgroundColor: colors.primary,
-    marginTop: 4,
-  },
-  emptyActivityActionText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 11,
-    color: colors.background,
-  },
-
-  /* ── FAB ── */
-  fab: {
-    position: 'absolute',
-    bottom: 30,
-    right: 30,
-    width: 60,
-    height: 60,
-    borderRadius: 999,
-    backgroundColor: colors.text,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-});
+const createStyles = (theme: Theme, screenWidth: number) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background,
+    },
+    content: {
+      paddingBottom: 100,
+    },
+    headerActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing[8],
+    },
+    // Hero Balance Card
+    heroCard: {
+      marginHorizontal: theme.layout.screenPadding,
+      marginTop: theme.spacing[16],
+      marginBottom: theme.spacing[24],
+      padding: theme.spacing[24],
+      borderRadius: theme.radius.xl,
+      backgroundColor: theme.colors.card,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      ...theme.shadow.sm,
+    },
+    currencyTabsRow: {
+      flexDirection: 'row',
+      gap: theme.spacing[8],
+      marginBottom: theme.spacing[20],
+    },
+    currencyTab: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.background,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    currencyTabActive: {
+      backgroundColor: theme.colors.text,
+      borderColor: theme.colors.text,
+    },
+    currencyTabText: {
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 10,
+      color: theme.colors.textMuted,
+    },
+    currencyTabTextActive: {
+      color: theme.colors.background,
+    },
+    heroBadge: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 10,
+      color: theme.colors.textMuted,
+      letterSpacing: 1.5,
+    },
+    heroBalance: {
+      fontSize: 36,
+      letterSpacing: -1,
+      marginBottom: theme.spacing[24],
+    },
+    splitRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing[16],
+      marginBottom: theme.spacing[16],
+    },
+    splitItem: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing[8],
+    },
+    splitDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    splitLabel: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 10,
+      color: theme.colors.textMuted,
+    },
+    splitValue: {
+      fontSize: 14,
+    },
+    splitDivider: {
+      width: 1,
+      height: 16,
+      backgroundColor: theme.colors.border,
+    },
+    flowBar: {
+      height: 6,
+      backgroundColor: theme.colors.background,
+      borderRadius: theme.radius.full,
+      flexDirection: 'row',
+      overflow: 'hidden',
+    },
+    flowBarIncome: {
+      height: '100%',
+      backgroundColor: theme.colors.success,
+    },
+    flowBarExpense: {
+      height: '100%',
+      backgroundColor: theme.colors.danger,
+    },
+    // KPI Grid
+    kpiGrid: {
+      flexDirection: 'row',
+      paddingHorizontal: theme.layout.screenPadding,
+      gap: theme.spacing[12],
+      marginBottom: theme.spacing[32],
+    },
+    kpiCard: {
+      flex: 1,
+      padding: theme.spacing[16],
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.card,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      ...theme.shadow.xs,
+    },
+    kpiHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing[8],
+      marginBottom: theme.spacing[12],
+    },
+    kpiIcon: {
+      width: 28,
+      height: 28,
+      borderRadius: theme.radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    kpiLabel: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 9,
+      color: theme.colors.textMuted,
+      letterSpacing: 1,
+    },
+    kpiValue: {
+      fontSize: 18,
+    },
+    // Quick Actions
+    quickActions: {
+      flexDirection: 'row',
+      paddingHorizontal: theme.layout.screenPadding,
+      gap: theme.spacing[12],
+      marginBottom: theme.spacing[32],
+    },
+    quickActionPrimary: {
+      flex: 1.2,
+      height: 48,
+      backgroundColor: theme.colors.text,
+      borderRadius: theme.radius.lg,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: theme.spacing[8],
+      ...theme.shadow.sm,
+    },
+    quickActionPrimaryText: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 13,
+      color: theme.colors.background,
+    },
+    quickActionSecondary: {
+      flex: 1,
+      height: 48,
+      backgroundColor: theme.colors.card,
+      borderRadius: theme.radius.lg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: theme.spacing[8],
+    },
+    quickActionSecondaryText: {
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 13,
+      color: theme.colors.text,
+    },
+    // Accounts
+    accountsScroll: {
+      marginBottom: theme.spacing[32],
+    },
+    accountsScrollContent: {
+      paddingHorizontal: theme.layout.screenPadding,
+      paddingRight: theme.layout.screenPadding - theme.spacing[12],
+      gap: theme.spacing[12],
+    },
+    accountCard: {
+      width: screenWidth * 0.75,
+      padding: theme.spacing[20],
+      borderRadius: theme.radius.xl,
+      backgroundColor: theme.colors.card,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      ...theme.shadow.sm,
+    },
+    accountCardInner: {
+      gap: theme.spacing[16],
+    },
+    accountCardTop: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+    },
+    accountCardLead: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing[12],
+    },
+    accountIconBox: {
+      width: 40,
+      height: 40,
+      borderRadius: theme.radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    accountCardMeta: {
+      flex: 1,
+      gap: 2,
+    },
+    accountCardName: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: theme.fontSizes.md,
+      color: theme.colors.text,
+    },
+    accountCardHint: {
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 10,
+      color: theme.colors.textMuted,
+    },
+    accountCurrencyBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: theme.radius.sm,
+      backgroundColor: theme.colors.background,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    accountCurrencyText: {
+      fontFamily: theme.fontFamilies.monoBold,
+      fontSize: 10,
+    },
+    accountBalanceLabel: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 9,
+      color: theme.colors.textMuted,
+      letterSpacing: 1,
+    },
+    accountCardBalance: {
+      fontSize: 28,
+      letterSpacing: -0.5,
+    },
+    accountCardStats: {
+      flexDirection: 'row',
+      gap: theme.spacing[16],
+      paddingTop: theme.spacing[16],
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.border + '50',
+    },
+    accountCardStatCol: {
+      flex: 1,
+      gap: 2,
+    },
+    accountCardStatLabel: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 8,
+      color: theme.colors.textMuted,
+      letterSpacing: 0.5,
+    },
+    accountCardStatValue: {
+      fontSize: 13,
+    },
+    accountCardStatDivider: {
+      width: 1,
+      height: '100%',
+      backgroundColor: theme.colors.border + '50',
+    },
+    accountPlaceholderCard: {
+      width: screenWidth * 0.75,
+      height: '100%',
+      borderRadius: theme.radius.xl,
+      backgroundColor: theme.colors.card,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderStyle: 'dashed',
+      justifyContent: 'center',
+      padding: theme.spacing[24],
+    },
+    accountPlaceholderInner: {
+      alignItems: 'center',
+      gap: theme.spacing[12],
+    },
+    accountPlaceholderIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    accountPlaceholderTitle: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: theme.fontSizes.md,
+      color: theme.colors.text,
+    },
+    accountPlaceholderText: {
+      fontFamily: theme.fontFamilies.sans,
+      fontSize: 12,
+      color: theme.colors.textMuted,
+      textAlign: 'center',
+    },
+    activityCard: {
+      marginHorizontal: theme.layout.screenPadding,
+      marginBottom: theme.spacing[24],
+    },
+    emptyActivity: {
+      padding: theme.spacing[32],
+      alignItems: 'center',
+      gap: theme.spacing[12],
+      backgroundColor: theme.colors.card,
+      borderRadius: theme.radius.xl,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderStyle: 'dashed',
+    },
+    emptyActivityText: {
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 13,
+      color: theme.colors.textMuted,
+    },
+    emptyActivityAction: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing[8],
+      paddingHorizontal: theme.spacing[16],
+      height: 36,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.text,
+    },
+    emptyActivityActionText: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 12,
+      color: theme.colors.background,
+    },
+    fab: {
+      position: 'absolute',
+      bottom: 34,
+      right: theme.layout.screenPadding,
+      width: 60,
+      height: 60,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.text,
+      alignItems: 'center',
+      justifyContent: 'center',
+      ...theme.shadow.lg,
+    },
+  });

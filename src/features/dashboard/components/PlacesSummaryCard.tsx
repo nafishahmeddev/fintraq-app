@@ -1,19 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Text } from 'react-native';
 import { usePlaces, Place } from '../../places/api/places';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { radius, spacing, LAYOUT } from '../../../theme/tokens';
-import { Typography } from '../../../components/ui';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { SectionHeader } from './SectionHeader';
 import { fromDbColor } from '../../../utils/format';
 
 export const PlacesSummaryCard = React.memo(function PlacesSummaryCard() {
-  const { colors } = useTheme();
+  const theme = useTheme();
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   const { data: places, isLoading } = usePlaces();
 
@@ -42,12 +39,12 @@ export const PlacesSummaryCard = React.memo(function PlacesSummaryCard() {
               onPress={() => router.push(`/places/details/${place.id}`)}
               activeOpacity={0.7}
             >
-              <View style={[styles.avatar, { backgroundColor: fromDbColor(place.color) + '20' }]}>
-                <Ionicons name={(place.icon as any) || 'location'} size={24} color={fromDbColor(place.color)} />
+              <View style={[styles.avatar, { backgroundColor: fromDbColor(place.color) + '15' }]}>
+                <Ionicons name={(place.icon as any) || 'location-outline'} size={24} color={fromDbColor(place.color)} />
               </View>
-              <Typography variant="label" numberOfLines={1} style={styles.name}>
+              <Text style={styles.name} numberOfLines={1}>
                 {place.name}
-              </Typography>
+              </Text>
             </TouchableOpacity>
           ))}
           
@@ -56,10 +53,10 @@ export const PlacesSummaryCard = React.memo(function PlacesSummaryCard() {
             onPress={() => router.push('/places/create')}
             activeOpacity={0.7}
           >
-            <View style={[styles.addIcon, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <Ionicons name="add" size={24} color={colors.textMuted} />
+            <View style={styles.addIcon}>
+              <Ionicons name="add" size={24} color={theme.colors.textMuted} />
             </View>
-            <Typography variant="label" color={colors.textMuted}>Add</Typography>
+            <Text style={styles.addText}>Add</Text>
           </TouchableOpacity>
         </ScrollView>
       ) : (
@@ -68,41 +65,45 @@ export const PlacesSummaryCard = React.memo(function PlacesSummaryCard() {
           onPress={() => router.push('/places/create')}
           activeOpacity={0.7}
         >
-          <Typography variant="bodySm" color={colors.textMuted} align="center">
+          <Text style={styles.emptyText}>
             Track spending by location. Add your frequent places.
-          </Typography>
-          <Typography variant="bodySm" color={colors.primary} weight="bold" style={{ marginTop: spacing('2') }}>
+          </Text>
+          <Text style={styles.emptyAction}>
             + Add Place
-          </Typography>
+          </Text>
         </TouchableOpacity>
       )}
     </View>
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
-    marginBottom: spacing('6'),
+    marginBottom: theme.spacing[24],
   },
   scrollContent: {
-    paddingLeft: LAYOUT.screenPadding,
-    paddingRight: LAYOUT.screenPadding - spacing('4'),
-    gap: spacing('4'),
+    paddingLeft: theme.layout.screenPadding,
+    paddingRight: theme.layout.screenPadding - theme.spacing[16],
+    gap: theme.spacing[16],
   },
   placeItem: {
     alignItems: 'center',
     width: 64,
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: radius('full'),
+    width: 60,
+    height: 60,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing('2'),
+    marginBottom: theme.spacing[8],
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   name: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 10,
+    color: theme.colors.text,
     textAlign: 'center',
   },
   addBtn: {
@@ -110,24 +111,45 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     width: 64,
   },
   addIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: radius('full'),
+    width: 60,
+    height: 60,
+    borderRadius: theme.radius.full,
     borderWidth: 1,
+    borderColor: theme.colors.border,
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing('2'),
+    marginBottom: theme.spacing[8],
+    backgroundColor: theme.colors.card,
+  },
+  addText: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 10,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
   },
   emptyCard: {
-    marginHorizontal: LAYOUT.screenPadding,
-    padding: spacing('6'),
-    borderRadius: radius('xl'),
-    backgroundColor: colors.surface,
+    marginHorizontal: theme.layout.screenPadding,
+    padding: theme.spacing[24],
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.card,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  emptyText: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: theme.fontSizes.sm,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  emptyAction: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.sm,
+    color: theme.colors.primaryDark,
+    marginTop: theme.spacing[12],
   },
 });

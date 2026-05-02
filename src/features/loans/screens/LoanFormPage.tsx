@@ -14,11 +14,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header, Input, Button, IconPickerDialog, PersonPickerDialog, Typography } from '../../../components/ui';
-import { useTheme } from '../../../providers/ThemeProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { spacing, LAYOUT, radius } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { CATEGORY_COLORS } from '../../../constants/picker';
 import { toDbColor, parseAmount } from '../../../utils/format';
 import { useCreateLoan, useUpdateLoan, useLoanById } from '../api/loans';
@@ -32,9 +29,10 @@ type Props = {
 
 export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: Props) {
   const router = useRouter();
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const isEditMode = mode === 'edit';
   const { data: editingLoan, isLoading: loadingLoan } = useLoanById(isEditMode ? loanId ?? null : null);
@@ -57,7 +55,6 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
-  const [showAccountPicker, setShowAccountPicker] = useState(false);
   const [showPersonPicker, setShowPersonPicker] = useState(false);
 
   useEffect(() => {
@@ -69,7 +66,6 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
       setEndDate(editingLoan.endDate ? new Date(editingLoan.endDate) : null);
       setAccountId(editingLoan.accountId);
       setSelectedPersonId(editingLoan.personId);
-      // Currency will be updated by accounts list or setAccountId effect
       setIconKey(editingLoan.icon + '-outline');
       setStatus(editingLoan.status);
     }
@@ -134,7 +130,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
   return (
     <SafeAreaView style={styles.container}>
       <Header 
-        title={isEditMode ? 'Edit Loan' : 'New Loan'} 
+        title={isEditMode ? 'Edit loan' : 'New loan'} 
         subtitle={isEditMode ? 'Update debt details' : 'Track money lent or borrowed'} 
         showBack 
       />
@@ -145,7 +141,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.section}>
-          <Typography variant="label">Loan Name</Typography>
+          <Typography variant="label">Loan name</Typography>
           <Input
             value={name}
             onChangeText={setName}
@@ -155,7 +151,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
         </View>
 
         <View style={styles.section}>
-          <Typography variant="label">Total Amount</Typography>
+          <Typography variant="label">Total amount</Typography>
           <View style={styles.amountContainer}>
             <Typography variant="h3" color={colors.textMuted}>{currency}</Typography>
             <Input
@@ -169,7 +165,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
         </View>
 
         <View style={styles.section}>
-          <Typography variant="label">Loan Type</Typography>
+          <Typography variant="label">Loan type</Typography>
           <View style={styles.typeRow}>
             {(['BORROW', 'LEND'] as LoanType[]).map((t) => (
               <TouchableOpacity
@@ -192,14 +188,14 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
         </View>
 
         <View style={styles.section}>
-          <Typography variant="label">Linked Account</Typography>
+          <Typography variant="label">Linked account</Typography>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.accountsRow}>
             {accountsList?.map((account) => (
               <TouchableOpacity
                 key={account.id}
                 style={[
                   styles.accountChip,
-                  accountId === account.id && { backgroundColor: colors.primary, borderColor: colors.primary }
+                  accountId === account.id && { backgroundColor: colors.text, borderColor: colors.text }
                 ]}
                 onPress={() => {
                   setAccountId(account.id);
@@ -219,7 +215,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
 
         <View style={styles.row}>
           <View style={[styles.section, { flex: 1 }]}>
-            <Typography variant="label">Start Date</Typography>
+            <Typography variant="label">Start date</Typography>
             <TouchableOpacity 
               style={styles.pickerBtn} 
               onPress={() => setShowStartDatePicker(true)}
@@ -233,7 +229,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
           </View>
 
           <View style={[styles.section, { flex: 1 }]}>
-            <Typography variant="label">End Date</Typography>
+            <Typography variant="label">End date</Typography>
             <TouchableOpacity 
               style={styles.pickerBtn} 
               onPress={() => setShowEndDatePicker(true)}
@@ -248,15 +244,15 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
         </View>
 
         <View style={styles.section}>
-          <Typography variant="label">Person (Optional)</Typography>
+          <Typography variant="label">Person (optional)</Typography>
           <TouchableOpacity 
             style={styles.pickerBtn} 
             onPress={() => setShowPersonPicker(true)}
             activeOpacity={0.7}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing('3'), flex: 1 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
               <Ionicons name="person-outline" size={20} color={colors.primary} />
-              <Typography variant="body" weight="bold" color={selectedPersonId ? colors.text : colors.textMuted}>
+              <Typography variant="body" weight="sansBold" color={selectedPersonId ? colors.text : colors.textMuted}>
                 {selectedPersonId ? 'Linked person' : 'Link person'}
               </Typography>
             </View>
@@ -272,7 +268,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
               onPress={() => setShowIconPicker(true)}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconBox, { backgroundColor: colorHex + '20' }]}>
+              <View style={[styles.iconBox, { backgroundColor: colorHex + '15' }]}>
                 <Ionicons name={iconKey as any} size={24} color={colorHex} />
               </View>
               <Typography variant="bodySm">Icon</Typography>
@@ -303,7 +299,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
                   key={s}
                   style={[
                     styles.statusChip,
-                    status === s && { backgroundColor: colors.primary, borderColor: colors.primary }
+                    status === s && { backgroundColor: colors.text, borderColor: colors.text }
                   ]}
                   onPress={() => setStatus(s)}
                 >
@@ -322,7 +318,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
 
       <View style={styles.footer}>
         <Button
-          title={isEditMode ? 'Update Loan' : 'Create Loan'}
+          title={isEditMode ? 'Update loan' : 'Create loan'}
           onPress={handleSave}
           isLoading={isSubmitting}
           shadow="none"
@@ -348,13 +344,12 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
         />
       )}
 
-
       <IconPickerDialog
         visible={showIconPicker}
         onClose={() => setShowIconPicker(false)}
         selectedIcon={iconKey}
         onSelect={setIconKey}
-        title="Loan Icon"
+        title="Loan icon"
       />
 
       <PersonPickerDialog
@@ -368,10 +363,10 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   center: {
     flex: 1,
@@ -379,116 +374,114 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
   },
   content: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
-    paddingBottom: spacing('12'),
-    gap: spacing('6'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 48,
+    gap: 24,
   },
   section: {
-    gap: spacing('2'),
+    gap: 8,
   },
   row: {
     flexDirection: 'row',
-    gap: spacing('4'),
+    gap: 16,
   },
   amountContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('3'),
+    gap: 12,
   },
   amountInput: {
     flex: 1,
     fontSize: 28,
-    fontFamily: TYPOGRAPHY.fonts.bold,
-  },
-  rateInput: {
-    fontSize: 24,
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
   },
   typeRow: {
     flexDirection: 'row',
-    gap: spacing('2'),
+    gap: 8,
   },
   typeChip: {
     flex: 1,
     height: 48,
-    borderRadius: radius('md'),
+    borderRadius: theme.radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: theme.colors.surface,
   },
   pickerBtn: {
     height: 56,
-    borderRadius: radius('lg'),
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing('4'),
-    gap: spacing('3'),
-    backgroundColor: colors.surface,
+    paddingHorizontal: 16,
+    gap: 12,
+    backgroundColor: theme.colors.surface,
   },
   visualsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('6'),
-    padding: spacing('4'),
-    backgroundColor: colors.surface,
-    borderRadius: radius('lg'),
+    gap: 24,
+    padding: 16,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
   },
   iconBtn: {
     alignItems: 'center',
-    gap: spacing('2'),
+    gap: 8,
   },
   iconBox: {
     width: 56,
     height: 56,
-    borderRadius: radius('md'),
+    borderRadius: theme.radius.md,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   colorGrid: {
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing('2'),
+    gap: 8,
   },
   colorCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 32,
+    height: 32,
+    borderRadius: theme.radius.full,
   },
   statusRow: {
     flexDirection: 'row',
-    gap: spacing('2'),
+    gap: 8,
   },
   statusChip: {
-    paddingHorizontal: spacing('4'),
-    paddingVertical: spacing('2'),
-    borderRadius: radius('full'),
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
   },
   accountsRow: {
-    paddingVertical: spacing('2'),
+    paddingVertical: 8,
   },
   accountChip: {
-    paddingHorizontal: spacing('4'),
-    paddingVertical: spacing('2'),
-    borderRadius: radius('full'),
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
-    marginRight: spacing('2'),
-    backgroundColor: colors.surface,
+    borderColor: theme.colors.border,
+    marginRight: 8,
+    backgroundColor: theme.colors.surface,
   },
   footer: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingBottom: spacing('6'),
-    paddingTop: spacing('2'),
-    backgroundColor: colors.background,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    paddingTop: 8,
+    backgroundColor: theme.colors.background,
   },
 });

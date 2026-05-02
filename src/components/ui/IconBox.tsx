@@ -1,9 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { radius } from '../../theme/tokens';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 export type IconBoxSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type IconBoxShape = 'circle' | 'rounded' | 'square';
@@ -18,20 +16,6 @@ export interface IconBoxProps {
   style?: ViewStyle;
 }
 
-const SIZES = {
-  xs: { container: 24, icon: 12 },
-  sm: { container: 32, icon: 14 },
-  md: { container: 40, icon: 18 },
-  lg: { container: 48, icon: 22 },
-  xl: { container: 64, icon: 28 },
-};
-
-const SHAPE_RADIUS = {
-  circle: radius('full'),
-  rounded: radius('md'),
-  square: radius('none'),
-};
-
 export const IconBox = React.memo(function IconBox({
   icon,
   size = 'md',
@@ -41,9 +25,29 @@ export const IconBox = React.memo(function IconBox({
   borderColor,
   style,
 }: IconBoxProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
-  const dimensions = SIZES[size];
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
+  const dimensions = React.useMemo(() => {
+    switch (size) {
+      case 'xs': return { container: 24, icon: 12 };
+      case 'sm': return { container: 32, icon: 14 };
+      case 'lg': return { container: 48, icon: 22 };
+      case 'xl': return { container: 64, icon: 28 };
+      case 'md':
+      default: return { container: 40, icon: 18 };
+    }
+  }, [size]);
+
+  const borderRadius = React.useMemo(() => {
+    switch (shape) {
+      case 'circle': return theme.radius.full;
+      case 'square': return 0;
+      case 'rounded':
+      default: return theme.radius.md;
+    }
+  }, [shape, theme.radius]);
 
   return (
     <View
@@ -52,7 +56,7 @@ export const IconBox = React.memo(function IconBox({
         {
           width: dimensions.container,
           height: dimensions.container,
-          borderRadius: SHAPE_RADIUS[shape],
+          borderRadius: borderRadius,
           backgroundColor: backgroundColor || colors.surface,
           borderColor: borderColor || colors.border,
         },
@@ -68,7 +72,7 @@ export const IconBox = React.memo(function IconBox({
   );
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       alignItems: 'center',

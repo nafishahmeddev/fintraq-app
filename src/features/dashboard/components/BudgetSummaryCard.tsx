@@ -1,20 +1,17 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import { useBudgetsProgress } from '../../budgets/api/budgets';
-import { useTheme } from '../../../providers/ThemeProvider';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { radius, spacing, LAYOUT } from '../../../theme/tokens';
-import { Typography, Card } from '../../../components/ui';
 import { SectionHeader } from './SectionHeader';
 import { formatCurrency } from '../../../utils/format';
 
 export const BudgetSummaryCard = React.memo(function BudgetSummaryCard() {
-  const { colors } = useTheme();
+  const theme = useTheme();
   const { profile } = useSettings();
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   const { data: progressData, isLoading } = useBudgetsProgress();
 
@@ -35,11 +32,11 @@ export const BudgetSummaryCard = React.memo(function BudgetSummaryCard() {
         onPressRight={() => router.push('/budgets')} 
       />
 
-      <Card variant="outlined" size="lg" shadow="none" style={styles.card}>
+      <View style={styles.card}>
         {topBudgets.map((budget, index) => {
           const isExceeded = budget.percentage >= 100;
           const isWarning = budget.percentage >= 80 && !isExceeded;
-          const statusColor = isExceeded ? colors.danger : isWarning ? colors.warning : colors.primary;
+          const statusColor = isExceeded ? theme.colors.danger : isWarning ? theme.colors.warning : theme.colors.primary;
 
           return (
             <View
@@ -52,14 +49,14 @@ export const BudgetSummaryCard = React.memo(function BudgetSummaryCard() {
               >
                 <View style={styles.budgetHeader}>
                   <View style={styles.budgetInfo}>
-                    <Typography variant="body" weight="semibold" numberOfLines={1}>
+                    <Text style={styles.budgetName} numberOfLines={1}>
                       {budget.name}
-                    </Typography>
+                    </Text>
                   </View>
-                  <Typography variant="mono" weight="semibold">
+                  <Text style={styles.budgetAmount}>
                     {formatCurrency(budget.remaining, profile.defaultCurrency)}{' '}
-                    <Typography variant="label" color={colors.textMuted}>left</Typography>
-                  </Typography>
+                    <Text style={styles.amountLabel}>left</Text>
+                  </Text>
                 </View>
 
                 <View style={styles.progressBar}>
@@ -77,46 +74,66 @@ export const BudgetSummaryCard = React.memo(function BudgetSummaryCard() {
             </View>
           );
         })}
-      </Card>
+      </View>
     </View>
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
-    marginBottom: spacing('6'),
+    marginBottom: theme.spacing[24],
   },
   card: {
-    marginHorizontal: LAYOUT.screenPadding,
-    padding: spacing('4'),
+    marginHorizontal: theme.layout.screenPadding,
+    padding: theme.spacing[16],
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.card,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    ...theme.shadow.xs,
   },
   budgetItem: {
-    paddingVertical: spacing('1'),
+    paddingVertical: theme.spacing[4],
   },
   borderBottom: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: theme.colors.border,
     borderStyle: 'dashed',
-    marginBottom: spacing('4'),
-    paddingBottom: spacing('4'),
+    marginBottom: theme.spacing[12],
+    paddingBottom: theme.spacing[12],
   },
   budgetHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing('2.5'),
+    marginBottom: theme.spacing[12],
   },
   budgetInfo: {
     flex: 1,
   },
+  budgetName: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+  },
+  budgetAmount: {
+    fontFamily: theme.fontFamilies.monoBold,
+    fontSize: theme.fontSizes.sm,
+    color: theme.colors.text,
+  },
+  amountLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 10,
+    color: theme.colors.textMuted,
+  },
   progressBar: {
-    height: 4,
-    backgroundColor: colors.border + '40',
-    borderRadius: radius('full'),
+    height: 6,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.full,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: radius('full'),
+    borderRadius: theme.radius.full,
   },
 });

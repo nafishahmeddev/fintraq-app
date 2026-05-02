@@ -1,8 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 export type IconButtonProps = {
   icon: keyof typeof Ionicons.glyphMap;
@@ -29,8 +28,9 @@ export const IconButton = React.memo(function IconButton({
   style,
   badge = false,
 }: IconButtonProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const dimensions = SIZES[size];
 
   const getBackgroundColor = () => {
@@ -66,6 +66,7 @@ export const IconButton = React.memo(function IconButton({
           width: dimensions.container,
           height: dimensions.container,
           backgroundColor: getBackgroundColor(),
+          borderColor: variant === 'ghost' ? 'transparent' : colors.border,
         },
         style,
       ]}
@@ -76,14 +77,13 @@ export const IconButton = React.memo(function IconButton({
   );
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
-      borderRadius: 999,
+      borderRadius: theme.radius.full,
       justifyContent: 'center',
       alignItems: 'center',
       borderWidth: 1,
-      borderColor: colors.border,
     },
     badge: {
       position: 'absolute',
@@ -91,7 +91,7 @@ const createStyles = (colors: ThemeColors) =>
       right: 6,
       width: 6,
       height: 6,
-      borderRadius: 3,
-      backgroundColor: colors.primary,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary,
     },
   });

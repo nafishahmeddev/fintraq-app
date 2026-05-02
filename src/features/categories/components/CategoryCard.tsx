@@ -2,15 +2,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { resolveIcon } from '../../../utils/icons';
 import React, { useMemo, useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { Category } from '../api/categories';
 
 interface CategoryCardProps {
   item: Category;
   index: number;
-  colors: ThemeColors;
+  theme: Theme;
   onPress: (item: Category) => void;
   onLongPress: (item: Category) => void;
 }
@@ -18,11 +16,13 @@ interface CategoryCardProps {
 export const CategoryCard = React.memo(function CategoryCard({
   item,
   index,
-  colors,
+  theme,
   onPress,
   onLongPress,
 }: CategoryCardProps) {
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  
   const catColor = useMemo(() =>
     item.color ? '#' + item.color.toString(16).padStart(6, '0') : colors.primary,
     [item.color, colors.primary]
@@ -49,15 +49,15 @@ export const CategoryCard = React.memo(function CategoryCard({
       delayLongPress={280}
       activeOpacity={0.92}
     >
-      <View style={[styles.cardGlow, { backgroundColor: catColor + '30' }]} />
+      <View style={[styles.cardGlow, { backgroundColor: catColor + '15' }]} />
 
       <View style={styles.cardTopRow}>
-        <View style={[styles.categoryIconBox, { backgroundColor: catColor + '22' }]}>
+        <View style={[styles.categoryIconBox, { backgroundColor: catColor + '15' }]}>
           <Ionicons name={resolveIcon(item.icon, 'grid-outline')} size={20} color={catColor} />
         </View>
         <View style={[styles.typeBadge, item.type === 'DR' ? styles.typeBadgeDanger : styles.typeBadgeSuccess]}>
           <Text style={[styles.typeBadgeText, item.type === 'DR' ? styles.typeBadgeTextDanger : styles.typeBadgeTextSuccess]}>
-            {item.type === 'DR' ? 'EXPENSE' : 'INCOME'}
+            {item.type === 'DR' ? 'Expense' : 'Income'}
           </Text>
         </View>
       </View>
@@ -77,16 +77,16 @@ export const CategoryCard = React.memo(function CategoryCard({
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   categoryCard: {
     position: 'relative',
     flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: RADIUS.full,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.xl,
     padding: 14,
     borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 10,
+    borderColor: theme.colors.border,
+    marginBottom: 12,
     overflow: 'hidden',
     minHeight: 156,
   },
@@ -102,7 +102,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     top: -24,
     width: 88,
     height: 88,
-    borderRadius: RADIUS.full,
+    borderRadius: theme.radius.full,
   },
   cardTopRow: {
     flexDirection: 'row',
@@ -113,33 +113,35 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   categoryIconBox: {
     width: 42,
     height: 42,
-    borderRadius: RADIUS.full,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   typeBadge: {
     height: 22,
-    borderRadius: RADIUS.full,
+    borderRadius: theme.radius.full,
     paddingHorizontal: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
   typeBadgeDanger: {
-    backgroundColor: colors.danger + '18',
+    backgroundColor: theme.colors.danger + '15',
   },
   typeBadgeSuccess: {
-    backgroundColor: colors.success + '18',
+    backgroundColor: theme.colors.success + '15',
   },
   typeBadgeText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansBold,
     fontSize: 9,
-    letterSpacing: 0.7,
+    letterSpacing: 0.5,
   },
   typeBadgeTextDanger: {
-    color: colors.danger,
+    color: theme.colors.danger,
   },
   typeBadgeTextSuccess: {
-    color: colors.success,
+    color: theme.colors.success,
   },
   cardMainRow: {
     flexDirection: 'row',
@@ -150,17 +152,17 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     flex: 1,
   },
   categoryName: {
-    fontFamily: TYPOGRAPHY.fonts.headingRegular,
-    color: colors.text,
-    fontSize: 20,
+    fontFamily: theme.fontFamilies.sansBold,
+    color: theme.colors.text,
+    fontSize: 18,
     letterSpacing: -0.5,
-    lineHeight: 23,
+    lineHeight: 22,
   },
   categorySubtext: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sans,
+    color: theme.colors.textMuted,
     fontSize: 11,
-    marginTop: 6,
+    marginTop: 4,
   },
   cardFooter: {
     marginTop: 'auto',
@@ -170,10 +172,9 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
   },
   cardFooterText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 10,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    color: colors.textMuted,
+    letterSpacing: 0.2,
+    color: theme.colors.textMuted,
   },
 });

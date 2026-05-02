@@ -1,22 +1,23 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import { useLoansProgress } from '../../loans/api/loans';
-import { useTheme } from '../../../providers/ThemeProvider';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { radius, spacing, LAYOUT } from '../../../theme/tokens';
-import { Typography, Card } from '../../../components/ui';
 import { SectionHeader } from './SectionHeader';
 import { formatCurrency } from '../../../utils/format';
 
 export const LoansSummaryCard = React.memo(function LoansSummaryCard() {
-  const { colors } = useTheme();
+  const theme = useTheme();
   const { profile } = useSettings();
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   const { data: progressData, isLoading } = useLoansProgress();
+
+  if (isLoading) {
+    return null;
+  }
 
   const hasLoans = progressData && progressData.length > 0;
 
@@ -29,11 +30,11 @@ export const LoansSummaryCard = React.memo(function LoansSummaryCard() {
       />
 
       {hasLoans ? (
-        <Card variant="outlined" size="lg" shadow="none" style={styles.card}>
+        <View style={styles.card}>
           {([...progressData]
             .sort((a, b) => b.remaining - a.remaining)
             .slice(0, 2)).map((loan, index, arr) => {
-            const statusColor = loan.type === 'BORROW' ? colors.danger : colors.success;
+            const statusColor = loan.type === 'BORROW' ? theme.colors.danger : theme.colors.success;
 
             return (
               <View
@@ -46,15 +47,15 @@ export const LoansSummaryCard = React.memo(function LoansSummaryCard() {
                 >
                   <View style={styles.loanHeader}>
                     <View style={styles.loanInfo}>
-                      <Typography variant="body" weight="semibold" numberOfLines={1}>
+                      <Text style={styles.loanName} numberOfLines={1}>
                         {loan.name}
-                      </Typography>
-                      <Typography variant="label" color={statusColor} style={{ fontSize: 9 }}>{loan.type}</Typography>
+                      </Text>
+                      <Text style={[styles.loanType, { color: statusColor }]}>{loan.type}</Text>
                     </View>
-                    <Typography variant="mono" weight="semibold">
+                    <Text style={styles.loanAmount}>
                       {formatCurrency(loan.remaining, profile.defaultCurrency)}{' '}
-                      <Typography variant="label" color={colors.textMuted}>left</Typography>
-                    </Typography>
+                      <Text style={styles.amountLabel}>left</Text>
+                    </Text>
                   </View>
 
                   <View style={styles.progressBar}>
@@ -72,71 +73,111 @@ export const LoansSummaryCard = React.memo(function LoansSummaryCard() {
               </View>
             );
           })}
-        </Card>
+        </View>
       ) : (
         <TouchableOpacity 
           style={styles.emptyCard} 
           onPress={() => router.push('/loans/create')}
           activeOpacity={0.7}
         >
-          <Typography variant="bodySm" color={colors.textMuted} align="center">
+          <Text style={styles.emptyText}>
             Keep track of money you owe or are owed by others.
-          </Typography>
-          <Typography variant="bodySm" color={colors.primary} weight="bold" style={{ marginTop: spacing('2') }}>
+          </Text>
+          <Text style={styles.emptyAction}>
             + Create Loan
-          </Typography>
+          </Text>
         </TouchableOpacity>
       )}
     </View>
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
-    marginBottom: spacing('6'),
+    marginBottom: theme.spacing[24],
   },
   card: {
-    marginHorizontal: LAYOUT.screenPadding,
-    padding: spacing('4'),
+    marginHorizontal: theme.layout.screenPadding,
+    padding: theme.spacing[16],
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.card,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    ...theme.shadow.xs,
   },
   loanItem: {
-    paddingVertical: spacing('1'),
+    paddingVertical: theme.spacing[4],
   },
   borderBottom: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: theme.colors.border,
     borderStyle: 'dashed',
-    marginBottom: spacing('4'),
-    paddingBottom: spacing('4'),
+    marginBottom: theme.spacing[12],
+    paddingBottom: theme.spacing[12],
   },
   loanHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing('2.5'),
+    marginBottom: theme.spacing[12],
   },
   loanInfo: {
     flex: 1,
   },
+  loanName: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+  },
+  loanType: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 9,
+    letterSpacing: 1,
+    marginTop: 2,
+    textTransform: 'uppercase',
+  },
+  loanAmount: {
+    fontFamily: theme.fontFamilies.monoBold,
+    fontSize: theme.fontSizes.sm,
+    color: theme.colors.text,
+  },
+  amountLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 10,
+    color: theme.colors.textMuted,
+  },
   progressBar: {
-    height: 4,
-    backgroundColor: colors.border + '40',
-    borderRadius: radius('full'),
+    height: 6,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.full,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: radius('full'),
+    borderRadius: theme.radius.full,
   },
   emptyCard: {
-    marginHorizontal: LAYOUT.screenPadding,
-    padding: spacing('6'),
-    borderRadius: radius('xl'),
-    backgroundColor: colors.surface,
+    marginHorizontal: theme.layout.screenPadding,
+    padding: theme.spacing[24],
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.card,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  emptyText: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: theme.fontSizes.sm,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  emptyAction: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.sm,
+    color: theme.colors.primaryDark,
+    marginTop: theme.spacing[12],
   },
 });

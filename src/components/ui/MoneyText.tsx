@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, TextProps } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { TYPOGRAPHY } from '../../theme/typography';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 import { TransactionType } from '../../types';
 import { formatCurrency } from '../../utils/format';
 
@@ -9,18 +8,20 @@ interface MoneyTextProps extends TextProps {
   amount: number;
   currency?: string;
   type?: TransactionType | 'NONE';
-  weight?: 'regular' | 'medium' | 'semibold' | 'bold';
+  weight?: keyof Theme['fontFamilies'];
 }
 
 export const MoneyText = React.memo(function MoneyText({
   amount,
   currency,
   type = 'NONE',
-  weight = 'bold',
+  weight = 'monoBold',
   style,
   ...props
 }: MoneyTextProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const { prefix, color, formattedAmount, fontFamily } = useMemo(() => {
     const isCustomSign = type === 'CR' || type === 'DR';
@@ -28,22 +29,21 @@ export const MoneyText = React.memo(function MoneyText({
     const formatted = formatCurrency(valToFormat, currency);
 
     let p = '';
-    let c = colors.text;
+    let c = theme.colors.text;
 
     if (type === 'CR') {
       p = '+';
-      c = colors.success;
+      c = theme.colors.success;
     } else if (type === 'DR') {
       p = '-';
-      c = colors.danger;
+      c = theme.colors.danger;
     }
 
-    const ff = weight === 'regular' || weight === 'medium'
-      ? TYPOGRAPHY.fonts.monoRegular
-      : TYPOGRAPHY.fonts.monoBold;
+    const isBold = weight.toLowerCase().includes('bold') || weight === 'heading';
+    const ff = isBold ? theme.fontFamilies.monoBold : theme.fontFamilies.mono;
 
     return { prefix: p, color: c, formattedAmount: formatted, fontFamily: ff };
-  }, [amount, currency, type, weight, colors.text, colors.success, colors.danger]);
+  }, [type, amount, currency, weight, theme]);
 
   return (
     <Text
@@ -63,9 +63,10 @@ export const MoneyText = React.memo(function MoneyText({
   );
 });
 
-const styles = StyleSheet.create({
+const createStyles = ({ fontSizes, fontFamilies }: Theme) => StyleSheet.create({
   base: {
-    fontSize: TYPOGRAPHY.sizes.md,
+    fontSize: fontSizes.md,
     flexShrink: 1,
+    fontFamily: fontFamilies.mono
   }
 });

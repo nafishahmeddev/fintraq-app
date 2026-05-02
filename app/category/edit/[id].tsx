@@ -1,9 +1,7 @@
 import { Header } from '@/src/components/ui/Header';
 import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
 import { CATEGORY_COLORS } from '@/src/constants/picker';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { TYPOGRAPHY } from '@/src/theme/typography';
+import { Theme, useTheme } from '@/src/providers/ThemeProvider';
 import { toDbColor } from '@/src/utils/format';
 import { resolveIcon } from '@/src/utils/icons';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,9 +28,10 @@ type CategoryFormValues = {
 
 export default function CategoryEditPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const router = useRouter();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const categoryId = parseInt(id, 10);
   const { data: category, isLoading } = useCategoryById(categoryId);
@@ -81,7 +80,6 @@ export default function CategoryEditPage() {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -91,8 +89,7 @@ export default function CategoryEditPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-
-      <Header title="Edit Category" subtitle="Update your category details" showBack />
+      <Header title="Edit category" subtitle="Update your category details" showBack />
 
       <ScrollView
         style={styles.scroll}
@@ -131,10 +128,10 @@ export default function CategoryEditPage() {
             onPress={() => setShowIconPicker(true)}
             activeOpacity={0.85}
           >
-            <View style={[styles.iconPreviewBox, { backgroundColor: colorHex + '20' }]}>
+            <View style={[styles.iconPreviewBox, { backgroundColor: colorHex + '15' }]}>
               <Ionicons name={resolveIcon(iconKey, 'pricetag-outline')} size={24} color={colorHex} />
             </View>
-            <Text style={styles.iconSelectorText}>{iconKey.replace('-outline', '').replace('-', ' ')}</Text>
+            <Text style={styles.iconSelectorText}>{iconKey.replace('-outline', '').replace(/-/g, ' ')}</Text>
             <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
           </TouchableOpacity>
           <View style={styles.answerLine} />
@@ -154,7 +151,7 @@ export default function CategoryEditPage() {
                   colorHex === item && styles.colorCellActive,
                 ]}
               >
-                {colorHex === item ? <Ionicons name="checkmark" size={14} color="#000100" /> : null}
+                {colorHex === item ? <Ionicons name="checkmark" size={14} color="#000" /> : null}
               </TouchableOpacity>
             ))}
           </View>
@@ -168,7 +165,7 @@ export default function CategoryEditPage() {
           onPress={handleSave}
           disabled={!isValid || isPending}
         >
-          <Text style={styles.primaryBtnText}>Save Category</Text>
+          <Text style={styles.primaryBtnText}>Save category</Text>
           <Ionicons name="arrow-forward" size={16} color="#FFF" />
         </TouchableOpacity>
       </View>
@@ -178,17 +175,17 @@ export default function CategoryEditPage() {
         onClose={() => setShowIconPicker(false)}
         selectedIcon={iconKey}
         onSelect={setIconKey}
-        title="Select Category Icon"
+        title="Select category icon"
       />
     </SafeAreaView>
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     loadingContainer: {
       flex: 1,
@@ -206,7 +203,7 @@ const createStyles = (colors: ThemeColors) =>
     section: {
       paddingBottom: 22,
       borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      borderBottomColor: theme.colors.border,
       marginBottom: 22,
     },
     sectionLast: {
@@ -215,29 +212,29 @@ const createStyles = (colors: ThemeColors) =>
       paddingBottom: 0,
     },
     label: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 13,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       letterSpacing: 0.1,
       marginBottom: 6,
     },
     answerInput: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: theme.fontFamilies.sansBold,
       fontSize: 28,
       lineHeight: 34,
-      color: colors.text,
+      color: theme.colors.text,
       letterSpacing: -0.7,
       paddingHorizontal: 0,
       paddingVertical: 4,
     },
     answerLine: {
       height: 2,
-      borderRadius: 999,
-      backgroundColor: colors.primary + '55',
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary + '30',
       marginTop: 4,
     },
     answerLineError: {
-      backgroundColor: colors.danger + '88',
+      backgroundColor: theme.colors.danger + '50',
     },
     iconSelector: {
       flexDirection: 'row',
@@ -248,33 +245,35 @@ const createStyles = (colors: ThemeColors) =>
     iconPreviewBox: {
       width: 44,
       height: 44,
-      borderRadius: 12,
+      borderRadius: theme.radius.md,
       justifyContent: 'center',
       alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     iconSelectorText: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: theme.fontFamilies.sansBold,
       fontSize: 20,
-      color: colors.text,
+      color: theme.colors.text,
       textTransform: 'capitalize',
     },
     colorGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 8,
+      gap: 12,
     },
     colorCell: {
-      width: 34,
-      height: 34,
-      borderRadius: 17,
+      width: 38,
+      height: 38,
+      borderRadius: theme.radius.full,
       borderWidth: 2,
       borderColor: 'transparent',
       justifyContent: 'center',
       alignItems: 'center',
     },
     colorCellActive: {
-      borderColor: colors.text,
+      borderColor: theme.colors.text,
       transform: [{ scale: 1.08 }],
     },
     footer: {
@@ -285,23 +284,18 @@ const createStyles = (colors: ThemeColors) =>
     },
     primaryBtn: {
       height: 56,
-      borderRadius: 16,
-      backgroundColor: colors.primary,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.primary,
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
-      shadowColor: colors.primary,
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.25,
-      shadowRadius: 12,
-      elevation: 5,
     },
     primaryBtnDisabled: {
       opacity: 0.45,
     },
     primaryBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 14,
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 16,
       color: '#FFFFFF',
       letterSpacing: 0.3,
       marginRight: 10,

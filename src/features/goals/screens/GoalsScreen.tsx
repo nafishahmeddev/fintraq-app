@@ -3,21 +3,20 @@ import { useRouter } from 'expo-router';
 import React, { useState, useMemo, useCallback } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, Card, Typography, MoneyText, OptionsDialog, ConfirmDialog, EmptyState, PremiumGuard } from '../../../components/ui';
-import { useTheme } from '../../../providers/ThemeProvider';
+import { Header, Card, Typography, MoneyText, OptionsDialog, ConfirmDialog, EmptyState } from '../../../components/ui';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { usePremium } from '../../../providers/PremiumProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { radius, spacing, LAYOUT } from '../../../theme/tokens';
 import { useGoals, useGoalsProgress, useDeleteGoal } from '../api/goals';
 import { GoalProgress } from '../services/goalQueries';
 
 export const GoalsScreen = React.memo(function GoalsScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
   const { isPremium, showAlert } = usePremium();
   const router = useRouter();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const { data: goals, isLoading: loadingGoals } = useGoals();
   const { data: progressData, isLoading: loadingProgress } = useGoalsProgress();
@@ -30,12 +29,12 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
   const handleCreate = useCallback(() => {
     if (!isPremium && (goals?.length || 0) >= 2) {
       showAlert({
-        title: 'Limit Reached',
+        title: 'Limit reached',
         message: 'Free users can track up to 2 goals. Upgrade to Pro for unlimited targets!',
         type: 'warning',
         buttons: [
           { text: 'Maybe later', style: 'cancel' },
-          { text: 'Upgrade Now', onPress: () => router.push('/premium') }
+          { text: 'Upgrade now', onPress: () => router.push('/premium') }
         ]
       });
       return;
@@ -103,7 +102,7 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
               <MoneyText 
                 amount={item.remaining} 
                 currency={profile.defaultCurrency} 
-                weight="bold" 
+                weight="sansBold" 
                 style={styles.remainingAmount}
               />
               <Typography variant="label" color={colors.textMuted}>left</Typography>
@@ -115,7 +114,7 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
               <Typography variant="bodySm" color={colors.textMuted}>
                 Saved {profile.defaultCurrency} {item.current.toLocaleString()} of {item.target.toLocaleString()}
               </Typography>
-              <Typography variant="monoSm" weight="bold">{Math.round(item.percentage)}%</Typography>
+              <Typography variant="monoSm" weight="sansBold">{Math.round(item.percentage)}%</Typography>
             </View>
             <View style={styles.progressBar}>
               <View 
@@ -157,6 +156,7 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
           keyExtractor={(item) => item.goalId.toString()}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <EmptyState
               title="No goals yet"
@@ -172,7 +172,7 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
       <OptionsDialog
         visible={showOptions}
         onClose={() => setShowOptions(false)}
-        title="Goal Options"
+        title="Goal options"
         subtitle={selectedGoal?.name}
         options={options}
       />
@@ -180,7 +180,7 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
       <ConfirmDialog
         visible={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
-        title="Delete Goal"
+        title="Delete goal"
         message={`Are you sure you want to delete "${selectedGoal?.name}"? Linked transactions will remain but won't be associated with this goal.`}
         confirmLabel="Delete"
         destructive
@@ -193,10 +193,10 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   center: {
     flex: 1,
@@ -204,26 +204,26 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
   },
   headerBtn: {
-    padding: spacing('2'),
+    padding: 8,
   },
   listContent: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
-    paddingBottom: spacing('10'),
-    gap: spacing('4'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 40,
+    gap: 16,
   },
   card: {
-    padding: spacing('5'),
+    padding: 20,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: spacing('5'),
+    marginBottom: 20,
   },
   cardInfo: {
     flex: 1,
-    gap: spacing('1'),
+    gap: 4,
   },
   cardRight: {
     alignItems: 'flex-end',
@@ -232,7 +232,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     fontSize: 20,
   },
   progressSection: {
-    gap: spacing('2'),
+    gap: 8,
   },
   progressInfo: {
     flexDirection: 'row',
@@ -241,12 +241,12 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   progressBar: {
     height: 6,
-    backgroundColor: colors.border + '40',
-    borderRadius: radius('full'),
+    backgroundColor: theme.colors.border + '40',
+    borderRadius: theme.radius.full,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: radius('full'),
+    borderRadius: theme.radius.full,
   },
 });

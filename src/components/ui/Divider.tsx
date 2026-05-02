@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 export interface DividerProps {
   inset?: boolean;
@@ -14,14 +13,15 @@ export interface DividerProps {
 
 export const Divider = React.memo(function Divider({
   inset = false,
-  insetSize = 74,
+  insetSize = 72,
   color,
   opacity = 0.5,
   vertical = false,
   style,
 }: DividerProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   if (vertical) {
     return (
@@ -53,7 +53,7 @@ export const Divider = React.memo(function Divider({
   );
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     horizontal: {
       height: 1,

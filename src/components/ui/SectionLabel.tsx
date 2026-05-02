@@ -1,9 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing } from '../../theme/tokens';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 export type SectionLabelSize = 'sm' | 'md' | 'lg';
 
@@ -16,35 +13,41 @@ export interface SectionLabelProps {
   rightElement?: React.ReactNode;
 }
 
-const SIZES = {
-  sm: {
-    fontSize: 9,
-    letterSpacing: 1.2,
-    marginBottom: spacing('2'),
-  },
-  md: {
-    fontSize: 10,
-    letterSpacing: 1.5,
-    marginBottom: spacing('3'),
-  },
-  lg: {
-    fontSize: 11,
-    letterSpacing: 1.8,
-    marginBottom: spacing('4'),
-  },
-};
-
 export const SectionLabel = React.memo(function SectionLabel({
   text,
   size = 'md',
-  uppercase = true,
+  uppercase = false,
   letterSpacing,
   style,
   rightElement,
 }: SectionLabelProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
-  const dimensions = SIZES[size];
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
+  const dimensions = React.useMemo(() => {
+    switch (size) {
+      case 'sm':
+        return {
+          fontSize: 10,
+          letterSpacing: 0.5,
+          marginBottom: 8,
+        };
+      case 'lg':
+        return {
+          fontSize: 14,
+          letterSpacing: -0.2,
+          marginBottom: 16,
+        };
+      case 'md':
+      default:
+        return {
+          fontSize: 12,
+          letterSpacing: 0,
+          marginBottom: 12,
+        };
+    }
+  }, [size]);
 
   return (
     <View style={[styles.container, style]}>
@@ -66,7 +69,7 @@ export const SectionLabel = React.memo(function SectionLabel({
   );
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flexDirection: 'row',
@@ -74,7 +77,7 @@ const createStyles = (colors: ThemeColors) =>
       justifyContent: 'space-between',
     },
     label: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansBold,
     },
   });
 

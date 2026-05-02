@@ -4,11 +4,8 @@ import React, { useMemo, useCallback } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header, Card, Typography, MoneyText, SectionLabel, TransactionRow, EmptyState, IconButton, Divider } from '../../../components/ui';
-import { useTheme } from '../../../providers/ThemeProvider';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { radius, spacing, LAYOUT } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { usePlaceById, usePlaceSummary } from '../api/places';
 import { useTransactions } from '../../transactions/hooks/transactions';
 import { fromDbColor } from '../../../utils/format';
@@ -16,10 +13,11 @@ import { fromDbColor } from '../../../utils/format';
 export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const placeId = parseInt(id, 10);
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
   const router = useRouter();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const { data: place, isLoading: loadingPlace } = usePlaceById(placeId);
   const { data: summary, isLoading: loadingSummary } = usePlaceSummary(placeId);
@@ -52,11 +50,11 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
             />
           </View>
 
-          <Divider style={{ marginVertical: spacing('4') }} />
+          <Divider style={{ marginVertical: 16 }} />
 
           <View style={styles.statsGrid}>
             <View style={styles.statBox}>
-              <Typography variant="bodySm" color={colors.textMuted}>Total Spent</Typography>
+              <Typography variant="bodySm" color={colors.textMuted}>Total spent</Typography>
               <MoneyText 
                 amount={summary.totalSpent} 
                 currency={profile.defaultCurrency} 
@@ -66,7 +64,7 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
               <Typography variant="bodySm" color={colors.textMuted}>Entries</Typography>
-              <Typography variant="h3" weight="bold">
+              <Typography variant="h3" weight="sansBold">
                 {summary.transactionCount}
               </Typography>
             </View>
@@ -74,7 +72,7 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
         </Card>
 
         <View style={styles.section}>
-          <SectionLabel text="Recent Transactions" />
+          <SectionLabel text="Recent transactions" />
         </View>
       </View>
     );
@@ -83,10 +81,9 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
   const renderItem = useCallback(({ item }: { item: any }) => (
     <TransactionRow 
       tx={item} 
-      colors={colors} 
       onPress={(tx) => router.push(`/transactions/edit/${tx.id}`)}
     />
-  ), [colors, router]);
+  ), [theme, router]);
 
   const keyExtractor = useCallback((item: any) => item.id.toString(), []);
 
@@ -103,7 +100,7 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
       <SafeAreaView style={styles.container}>
         <Header title="Place not found" showBack />
         <EmptyState 
-          title="Not Found" 
+          title="Not found" 
           subtitle="This place could not be found." 
           icon="alert-circle-outline"
         />
@@ -113,7 +110,7 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Place Details" showBack />
+      <Header title="Place details" showBack />
       <FlatList
         data={transactions}
         keyExtractor={keyExtractor}
@@ -139,10 +136,10 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   center: {
     flex: 1,
@@ -150,26 +147,26 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
   },
   listContent: {
-    paddingBottom: spacing('10'),
+    paddingBottom: 40,
   },
   headerContent: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
-    gap: spacing('6'),
-    marginBottom: spacing('4'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    gap: 24,
+    marginBottom: 16,
   },
   heroCard: {
-    padding: spacing('5'),
+    padding: 20,
   },
   heroTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('4'),
+    gap: 16,
   },
   avatar: {
     width: 56,
     height: 56,
-    borderRadius: radius('full'),
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -180,23 +177,23 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   statsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: spacing('2'),
+    gap: 8,
   },
   statBox: {
     flex: 1,
-    gap: spacing('1'),
+    gap: 4,
   },
   statDivider: {
     width: 1,
     height: '60%',
-    backgroundColor: colors.border,
+    backgroundColor: theme.colors.border,
     alignSelf: 'center',
   },
   statAmount: {
     fontSize: 16,
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
   },
   section: {
-    gap: spacing('3'),
+    gap: 12,
   },
 });

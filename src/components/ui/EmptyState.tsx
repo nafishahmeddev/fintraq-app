@@ -1,10 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, radius } from '../../theme/tokens';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 export type EmptyStateSize = 'sm' | 'md' | 'lg';
 
@@ -18,30 +15,6 @@ export interface EmptyStateProps {
   style?: ViewStyle;
 }
 
-const SIZES = {
-  sm: {
-    iconBox: 48,
-    iconSize: 24,
-    titleSize: 16,
-    subtitleSize: 13,
-    paddingVertical: spacing('8'),
-  },
-  md: {
-    iconBox: 68,
-    iconSize: 32,
-    titleSize: 18,
-    subtitleSize: 14,
-    paddingVertical: spacing('12'),
-  },
-  lg: {
-    iconBox: 80,
-    iconSize: 40,
-    titleSize: 20,
-    subtitleSize: 15,
-    paddingVertical: spacing('10'),
-  },
-};
-
 export const EmptyState = React.memo(function EmptyState({
   icon,
   title,
@@ -51,9 +24,39 @@ export const EmptyState = React.memo(function EmptyState({
   size = 'md',
   style,
 }: EmptyStateProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
-  const dimensions = SIZES[size];
+  const theme = useTheme();
+  const { colors, fontSizes } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
+  const dimensions = useMemo(() => {
+    switch (size) {
+      case 'sm':
+        return {
+          iconBox: 48,
+          iconSize: 24,
+          titleSize: fontSizes.md,
+          subtitleSize: fontSizes.sm,
+          paddingVertical: theme.spacing[32],
+        };
+      case 'lg':
+        return {
+          iconBox: 80,
+          iconSize: 40,
+          titleSize: fontSizes.xl,
+          subtitleSize: fontSizes.md,
+          paddingVertical: theme.spacing[40],
+        };
+      case 'md':
+      default:
+        return {
+          iconBox: 68,
+          iconSize: 32,
+          titleSize: fontSizes.lg,
+          subtitleSize: fontSizes.sm,
+          paddingVertical: theme.spacing[48],
+        };
+    }
+  }, [size, fontSizes, theme.spacing]);
 
   return (
     <View
@@ -71,7 +74,7 @@ export const EmptyState = React.memo(function EmptyState({
           {
             width: dimensions.iconBox,
             height: dimensions.iconBox,
-            borderRadius: radius('full'),
+            borderRadius: theme.radius.full,
           },
         ]}
       >
@@ -120,41 +123,44 @@ export const EmptyState = React.memo(function EmptyState({
   );
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       alignItems: 'center',
-      paddingHorizontal: spacing('6'),
+      paddingHorizontal: theme.layout.screenPadding,
     },
     iconBox: {
-      backgroundColor: colors.surface,
+      backgroundColor: theme.colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: spacing('4'),
+      marginBottom: theme.spacing[16],
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     title: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      marginBottom: spacing('2'),
+      fontFamily: theme.fontFamilies.sansBold,
+      marginBottom: theme.spacing[8],
       textAlign: 'center',
+      letterSpacing: -0.4,
     },
     subtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       textAlign: 'center',
       maxWidth: 280,
       lineHeight: 20,
     },
     actionButton: {
-      marginTop: spacing('4'),
-      paddingVertical: spacing('2'),
-      paddingHorizontal: spacing('4'),
-      borderRadius: radius('full'),
-      backgroundColor: colors.surface,
+      marginTop: theme.spacing[16],
+      paddingVertical: theme.spacing[8],
+      paddingHorizontal: theme.spacing[16],
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     actionText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 13,
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 14,
     },
   });
 

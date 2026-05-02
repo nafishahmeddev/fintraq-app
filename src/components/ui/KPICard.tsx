@@ -1,8 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, radius } from '../../theme/tokens';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 import { MoneyText } from './MoneyText';
 
 type KPIMetrics = {
@@ -15,7 +13,6 @@ type Props = {
   selectedCurrency: string | null;
   onSelectCurrency: (currency: string) => void;
   metrics: KPIMetrics;
-  colors: ThemeColors;
 };
 
 /**
@@ -23,7 +20,7 @@ type Props = {
  * 
  * Structure:
  * - Card: 16px radius (lg), 16px padding, surface background
- * - Currency tabs: 12px radius (md), 8px gap
+ * - Currency tabs: pill radius (full), 8px gap
  * - Labels: Uppercase, 9-10px, letterSpacing 1.2
  * - Values: 24px large / 14px small
  */
@@ -32,9 +29,9 @@ export const KPICard = React.memo(function KPICard({
   selectedCurrency,
   onSelectCurrency,
   metrics,
-  colors
 }: Props) {
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const handleCurrencyPress = useCallback((curr: string) => {
     onSelectCurrency(curr);
@@ -44,9 +41,9 @@ export const KPICard = React.memo(function KPICard({
     <View style={styles.kpiCard}>
       {currencies.length > 1 && (
         <View style={styles.kpiTabsWrap}>
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false} 
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.currencyTabsRow}
           >
             {currencies.map((cur) => (
@@ -70,7 +67,7 @@ export const KPICard = React.memo(function KPICard({
           </ScrollView>
         </View>
       )}
-      
+
       <View style={styles.kpiBody}>
         {/* Top: Net Balance */}
         <View style={styles.kpiMainContent}>
@@ -80,7 +77,7 @@ export const KPICard = React.memo(function KPICard({
               amount={Math.abs(metrics.income - metrics.expense)}
               currency={selectedCurrency ?? undefined}
               type={metrics.income >= metrics.expense ? 'CR' : 'DR'}
-              weight="bold"
+              weight="sansBold"
               style={styles.kpiValueLarge}
             />
           </View>
@@ -96,7 +93,7 @@ export const KPICard = React.memo(function KPICard({
               amount={metrics.income}
               currency={selectedCurrency ?? undefined}
               type="CR"
-              weight="semibold"
+              weight="sansSemiBold"
               style={styles.kpiValueSmall}
             />
           </View>
@@ -107,7 +104,7 @@ export const KPICard = React.memo(function KPICard({
               amount={metrics.expense}
               currency={selectedCurrency ?? undefined}
               type="DR"
-              weight="semibold"
+              weight="sansSemiBold"
               style={styles.kpiValueSmall}
             />
           </View>
@@ -117,51 +114,50 @@ export const KPICard = React.memo(function KPICard({
   );
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     kpiCard: {
-      borderRadius: radius('lg'),
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       overflow: 'hidden',
     },
     kpiTabsWrap: {
       borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-      paddingVertical: spacing('2'),
-      paddingLeft: spacing('3'),
+      borderBottomColor: theme.colors.border,
+      paddingVertical: 8,
+      paddingLeft: 12,
     },
     currencyTabsRow: {
       flexDirection: 'row',
-      gap: spacing('2'),
-      paddingRight: spacing('3'),
+      gap: 8,
+      paddingRight: 12,
     },
     currencyTab: {
-      paddingHorizontal: spacing('3'),
-      paddingVertical: spacing('2'),
-      borderRadius: radius('full'),
-      backgroundColor: colors.background,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.background,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     currencyTabActive: {
-      backgroundColor: colors.primary,
-      borderColor: colors.primary,
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
     },
     currencyTabText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 12,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       letterSpacing: 0.3,
     },
     currencyTabTextActive: {
-      color: colors.background,
+      color: theme.colors.background,
     },
     kpiBody: {
-      padding: spacing('4'),
-      paddingBottom: spacing('4'),
-      gap: spacing('3'),
+      padding: 16,
+      gap: 12,
     },
     kpiMainContent: {
       flexDirection: 'row',
@@ -174,27 +170,27 @@ const createStyles = (colors: ThemeColors) =>
     },
     kpiCell: {
       flex: 1,
-      gap: spacing('0.5'),
+      gap: 2,
     },
     kpiVerticalSep: {
       width: 1,
       height: 24,
-      backgroundColor: colors.border,
-      marginHorizontal: spacing('4'),
+      backgroundColor: theme.colors.border,
+      marginHorizontal: 16,
       opacity: 0.6,
     },
     kpiLabel: {
-      color: colors.textMuted,
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 9,
+      color: theme.colors.textMuted,
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 10,
       letterSpacing: 1.2,
       textTransform: 'uppercase',
-      marginBottom: spacing('0.5'),
+      marginBottom: 2,
     },
     kpiLabelSmall: {
-      color: colors.textMuted,
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 8,
+      color: theme.colors.textMuted,
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 9,
       letterSpacing: 1,
       textTransform: 'uppercase',
     },
@@ -208,7 +204,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     kpiDivider: {
       height: 1,
-      backgroundColor: colors.border,
+      backgroundColor: theme.colors.border,
       opacity: 0.5,
     },
   });

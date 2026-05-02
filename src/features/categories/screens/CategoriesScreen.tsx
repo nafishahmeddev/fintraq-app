@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,23 +7,20 @@ import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Header } from '../../../components/ui/Header';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { CategoryType } from '../../../db/schema';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { Category } from '../api/categories';
 import { CategoryCard } from '../components/CategoryCard';
-import { CategoryFormModal } from '../components/CategoryFormModal';
 import { CategoryTypeSelector } from '../components/CategoryTypeSelector';
 import { useCategories, useDeleteCategory } from '../hooks/categories';
 
 export const CategoriesScreen = () => {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const router = useRouter();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { data: categories, isLoading } = useCategories();
   const { mutateAsync: deleteCategory } = useDeleteCategory();
 
-  const [modalVisible, setModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [activeType, setActiveType] = useState<CategoryType>('DR');
   const [query, setQuery] = useState('');
@@ -45,13 +43,11 @@ export const CategoriesScreen = () => {
   );
 
   const handleCreate = () => {
-    setSelectedCategory(null);
-    setModalVisible(true);
+    router.push('/category/create');
   };
 
   const handleEdit = (category: Category) => {
-    setSelectedCategory(category);
-    setModalVisible(true);
+    router.push(`/category/edit/${category.id}`);
   };
 
   const handleDelete = (id: number) => {
@@ -66,22 +62,26 @@ export const CategoriesScreen = () => {
         key: 'edit-category',
         label: 'Edit category',
         icon: 'create-outline' as const,
-        onPress: () => handleEdit(selectedCategory),
+        onPress: () => {
+          setShowManageDialog(false);
+          handleEdit(selectedCategory);
+        },
       },
       {
         key: 'delete-category',
         label: 'Delete category',
         icon: 'trash-outline' as const,
         destructive: true,
-        onPress: () => setShowDeleteDialog(true),
+        onPress: () => {
+          setShowManageDialog(false);
+          setShowDeleteDialog(true);
+        },
       },
     ];
   }, [selectedCategory]);
 
   return (
     <SafeAreaView style={styles.container}>
-
-
       <Header title="Categories" subtitle="Organize your spending" showBack />
 
       {isLoading ? (
@@ -92,7 +92,7 @@ export const CategoriesScreen = () => {
             <CategoryTypeSelector
               activeType={activeType}
               onTypeChange={setActiveType}
-              colors={colors}
+              theme={theme}
             />
 
             <View style={styles.searchWrap}>
@@ -124,7 +124,7 @@ export const CategoriesScreen = () => {
               <CategoryCard
                 item={item}
                 index={index}
-                colors={colors}
+                theme={theme}
                 onPress={handleEdit}
                 onLongPress={(cat) => {
                   setSelectedCategory(cat);
@@ -156,16 +156,10 @@ export const CategoriesScreen = () => {
         <Ionicons name="add" size={28} color="#000" />
       </TouchableOpacity>
 
-      <CategoryFormModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        category={selectedCategory || undefined}
-      />
-
       <OptionsDialog
         visible={showManageDialog}
         onClose={() => setShowManageDialog(false)}
-        title="Manage Category"
+        title="Manage category"
         subtitle={selectedCategory?.name}
         options={manageOptions}
       />
@@ -173,7 +167,7 @@ export const CategoriesScreen = () => {
       <ConfirmDialog
         visible={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
-        title="Delete Category"
+        title="Delete category"
         message="This will delete the category and associated transactions."
         confirmLabel="Delete"
         onConfirm={() => {
@@ -186,8 +180,8 @@ export const CategoriesScreen = () => {
   );
 };
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, overflow: 'hidden' },
+const createStyles = (theme: Theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.colors.background, overflow: 'hidden' },
 
   listContent: {
     paddingHorizontal: 20,
@@ -199,15 +193,15 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     marginHorizontal: 20,
     marginTop: 6,
     marginBottom: 8,
-    gap: 8,
+    gap: 12,
   },
 
   searchWrap: {
-    height: 42,
-    borderRadius: RADIUS.full,
+    height: 44,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.background + 'B8',
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -217,9 +211,9 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   searchInput: {
     flex: 1,
     height: '100%',
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     fontSize: 14,
-    color: colors.text,
+    color: theme.colors.text,
   },
 
   filterMetaRow: {
@@ -229,66 +223,66 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
 
   filterMetaText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansBold,
     fontSize: 10,
     letterSpacing: 0.4,
-    color: colors.textMuted,
-    textTransform: 'uppercase',
+    color: theme.colors.textMuted,
   },
 
   emptyContainer: {
     paddingVertical: 60,
     alignItems: 'center',
+    paddingHorizontal: 24,
   },
 
   emptyTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
+    fontFamily: theme.fontFamilies.sansBold,
+    color: theme.colors.text,
     fontSize: 20,
     marginTop: 10,
     letterSpacing: -0.4,
   },
 
   emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sans,
+    color: theme.colors.textMuted,
     fontSize: 13,
     marginTop: 4,
-    marginBottom: 14,
+    marginBottom: 16,
     textAlign: 'center',
     maxWidth: 260,
   },
 
   emptyBtn: {
-    height: 38,
-    borderRadius: RADIUS.full,
-    paddingHorizontal: 14,
-    backgroundColor: colors.surface,
+    height: 40,
+    borderRadius: theme.radius.md,
+    paddingHorizontal: 16,
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
   emptyBtnText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 12,
-    color: colors.text,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 13,
+    color: theme.colors.text,
   },
 
   fab: {
     position: 'absolute',
     bottom: 24,
     right: 24,
-    width: 64, // Normalized size
+    width: 64,
     height: 64,
-    borderRadius: RADIUS.full,
-    backgroundColor: colors.primary,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
 });

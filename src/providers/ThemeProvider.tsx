@@ -1,16 +1,53 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import { useColorScheme } from 'react-native';
-import { LIGHT_THEME, DARK_THEME, ThemeColors } from '../theme/colors';
+import { StatusBar, useColorScheme } from 'react-native';
+import { DARK_THEME, LIGHT_THEME, ThemeColors } from '../theme/colors';
+import {
+  animation,
+  layout,
+  opacity,
+  radius,
+  shadow,
+  spacing,
+  zIndex
+} from '../theme/tokens';
+import {
+  fontFamilies,
+  fontSizes,
+  letterSpacing,
+  lineHeights
+} from '../theme/typography';
 import { useSettings } from './SettingsProvider';
 
-type ThemeContextType = {
+export type Theme = {
   colors: ThemeColors;
   isDark: boolean;
+  spacing: typeof spacing;
+  radius: typeof radius;
+  shadow: typeof shadow;
+  layout: typeof layout;
+  animation: typeof animation;
+  opacity: typeof opacity;
+  zIndex: typeof zIndex;
+  fontFamilies: typeof fontFamilies;
+  fontSizes: typeof fontSizes;
+  lineHeights: typeof lineHeights;
+  letterSpacing: typeof letterSpacing;
 };
 
-const ThemeContext = createContext<ThemeContextType>({
+const ThemeContext = createContext<Theme>({
   colors: DARK_THEME,
   isDark: true,
+  spacing,
+  radius,
+  shadow,
+  layout,
+  animation,
+  opacity,
+  zIndex,
+  fontFamilies,
+  fontSizes,
+  lineHeights,
+  letterSpacing,
 });
 
 export const useTheme = () => useContext(ThemeContext);
@@ -19,16 +56,38 @@ export const ThemeProvider = React.memo(function ThemeProvider({ children }: { c
   const { profile } = useSettings();
   const systemColorScheme = useColorScheme();
 
-  const isDark = profile.theme === 'system'
-    ? systemColorScheme === 'dark'
-    : profile.theme === 'dark';
+  const isDark = useMemo(() => {
+    if (!profile?.theme || profile.theme === 'system') {
+      return systemColorScheme === 'dark';
+    }
+    return profile.theme === 'dark';
+  }, [profile?.theme, systemColorScheme]);
 
-  const colors = useMemo(() => isDark ? DARK_THEME : LIGHT_THEME, [isDark]);
+  const colors = useMemo(() => (isDark ? DARK_THEME : LIGHT_THEME), [isDark]);
 
-  const contextValue = useMemo(() => ({ colors, isDark }), [colors, isDark]);
+  const contextValue = useMemo(() => ({
+    colors,
+    isDark,
+    spacing,
+    radius,
+    shadow,
+    layout,
+    animation,
+    opacity,
+    zIndex,
+    fontFamilies,
+    fontSizes,
+    lineHeights,
+    letterSpacing,
+  }), [colors, isDark]);
 
   return (
     <ThemeContext.Provider value={contextValue}>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor="transparent"
+        translucent
+      />
       {children}
     </ThemeContext.Provider>
   );

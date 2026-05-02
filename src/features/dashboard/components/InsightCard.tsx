@@ -1,9 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { formatCurrency } from '../../../utils/format';
 import { DashboardInsight } from '../api/insights';
 
@@ -11,25 +9,20 @@ interface InsightCardProps {
   insight: DashboardInsight;
 }
 
-/**
- * InsightCard: An "Editorial Brutalist" card for displaying financial trends.
- * Features:
- * 1. Glassmorphic Surface: Semi-transparent background with sharp borders.
- * 2. Bold Typography: High-contrast headings and value indicators.
- * 3. Icon Branding: Thematic icons based on insight type.
- */
 export const InsightCard = React.memo(function InsightCard({ insight }: InsightCardProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const status = useMemo(() => {
     switch (insight.type) {
       case 'success': return { bg: colors.success + '15', text: colors.success };
       case 'danger': return { bg: colors.danger + '15', text: colors.danger };
       case 'warning': return { bg: colors.warning + '15', text: colors.warning };
-      case 'info': return { bg: colors.primary + '15', text: colors.primary };
-      default: return { bg: colors.surface, text: colors.text };
+      case 'info': return { bg: colors.primaryDark + '15', text: colors.primaryDark };
+      default: return { bg: colors.card, text: colors.text };
     }
-  }, [insight.type, colors.success, colors.danger, colors.warning, colors.primary, colors.surface, colors.text]);
+  }, [insight.type, colors]);
 
   const displayValue = useMemo(() => {
     switch (insight.valueType) {
@@ -43,18 +36,20 @@ export const InsightCard = React.memo(function InsightCard({ insight }: InsightC
   }, [insight]);
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.surface + '90', borderColor: colors.border }]}>
+    <View style={styles.card}>
       <View style={styles.header}>
         <View style={[styles.iconBox, { backgroundColor: status.bg }]}>
           <Ionicons name={insight.icon} size={16} color={status.text} />
         </View>
-        <Text style={[styles.title, { color: colors.textMuted }]}>{insight.title.toUpperCase()}</Text>
+        <Text style={styles.title}>{insight.title.toUpperCase()}</Text>
       </View>
 
       <View style={styles.body}>
-        <Text style={[styles.value, { color: colors.text }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{displayValue}</Text>
+        <Text style={styles.value} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+          {displayValue}
+        </Text>
         <View style={styles.trendContainer}>
-          <Text style={[styles.subtitle, { color: colors.textMuted }]} numberOfLines={1}>
+          <Text style={styles.subtitle} numberOfLines={1}>
             {insight.subtitle}
           </Text>
           {insight.trend && (
@@ -71,43 +66,49 @@ export const InsightCard = React.memo(function InsightCard({ insight }: InsightC
   );
 });
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   card: {
-    width: 210,
-    minHeight: 115,
-    borderRadius: RADIUS.xl,
+    width: 220,
+    minHeight: 120,
+    borderRadius: theme.radius.xl,
     borderWidth: 1,
-    padding: 14,
-    marginRight: 10,
+    borderColor: theme.colors.border,
+    padding: theme.spacing[16],
+    marginRight: theme.spacing[12],
     justifyContent: 'space-between',
-    overflow: 'hidden',
+    backgroundColor: theme.colors.card,
+    ...theme.shadow.xs,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
+    gap: theme.spacing[8],
+    marginBottom: theme.spacing[8],
   },
   iconBox: {
-    width: 28,
-    height: 28,
-    borderRadius: RADIUS.md,
+    width: 32,
+    height: 32,
+    borderRadius: theme.radius.md,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border + '10',
   },
   title: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 9,
     letterSpacing: 1.5,
+    color: theme.colors.textMuted,
   },
   body: {
     flex: 1,
     justifyContent: 'flex-end',
   },
   value: {
-    fontFamily: TYPOGRAPHY.fonts.monoBold,
-    fontSize: 24,
-    letterSpacing: -1,
+    fontFamily: theme.fontFamilies.monoBold,
+    fontSize: 26,
+    letterSpacing: -0.5,
+    color: theme.colors.text,
   },
   trendContainer: {
     flexDirection: 'row',
@@ -115,21 +116,12 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   subtitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 9,
-    letterSpacing: 0.2,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 10,
+    color: theme.colors.textMuted,
     flex: 1,
   },
   trendIcon: {
     marginLeft: 4,
-  },
-  accentLine: {
-    position: 'absolute',
-    bottom: -1,
-    left: 20,
-    right: 20,
-    height: 3,
-    borderRadius: 1.5,
-    opacity: 0.8,
   },
 });

@@ -6,18 +6,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card, ConfirmDialog, EmptyState, Header, MoneyText, OptionsDialog, Typography } from '../../../components/ui';
 import { usePremium } from '../../../providers/PremiumProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { LAYOUT, radius, spacing } from '../../../theme/tokens';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useDeleteLoan, useLoans, useLoansProgress } from '../api/loans';
 import { LoanProgress } from '../services/loanQueries';
 
 export const LoansScreen = React.memo(function LoansScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
   const { isPremium, showAlert } = usePremium();
   const router = useRouter();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const { data: loans, isLoading: loadingLoans } = useLoans();
   const { data: progressData, isLoading: loadingProgress } = useLoansProgress();
@@ -30,12 +29,12 @@ export const LoansScreen = React.memo(function LoansScreen() {
   const handleCreate = useCallback(() => {
     if (!isPremium && (loans?.length || 0) >= 2) {
       showAlert({
-        title: 'Limit Reached',
+        title: 'Limit reached',
         message: 'Free users can track up to 2 active loans. Upgrade to Pro for unlimited tracking!',
         type: 'warning',
         buttons: [
           { text: 'Maybe later', style: 'cancel' },
-          { text: 'Upgrade Now', onPress: () => router.push('/premium') }
+          { text: 'Upgrade now', onPress: () => router.push('/premium') }
         ]
       });
       return;
@@ -105,7 +104,7 @@ export const LoansScreen = React.memo(function LoansScreen() {
               <MoneyText 
                 amount={item.remaining} 
                 currency={item.currency} 
-                weight="bold" 
+                weight="sansBold" 
                 style={styles.remainingAmount}
               />
               <Typography variant="label" color={colors.textMuted}>remaining</Typography>
@@ -117,7 +116,7 @@ export const LoansScreen = React.memo(function LoansScreen() {
                <Typography variant="bodySm" color={colors.textMuted}>
                 {isPaid ? 'Paid in full' : `Paid ${item.currency} ${item.paid.toLocaleString()} of ${item.total.toLocaleString()}`}
               </Typography>
-              <Typography variant="monoSm" weight="bold">{Math.round(item.percentage)}%</Typography>
+              <Typography variant="monoSm" weight="sansBold">{Math.round(item.percentage)}%</Typography>
             </View>
             <View style={styles.progressBar}>
               <View 
@@ -134,7 +133,7 @@ export const LoansScreen = React.memo(function LoansScreen() {
         </TouchableOpacity>
       </Card>
     );
-  }, [colors, profile.defaultCurrency, styles, handleLoanPress, handleLoanLongPress]);
+  }, [colors, styles, handleLoanPress, handleLoanLongPress]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -159,6 +158,7 @@ export const LoansScreen = React.memo(function LoansScreen() {
           keyExtractor={(item) => item.loanId.toString()}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <EmptyState
               title="No loans found"
@@ -174,7 +174,7 @@ export const LoansScreen = React.memo(function LoansScreen() {
       <OptionsDialog
         visible={showOptions}
         onClose={() => setShowOptions(false)}
-        title="Loan Options"
+        title="Loan options"
         subtitle={selectedLoan?.name}
         options={options}
       />
@@ -182,7 +182,7 @@ export const LoansScreen = React.memo(function LoansScreen() {
       <ConfirmDialog
         visible={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
-        title="Delete Loan"
+        title="Delete loan"
         message={`Are you sure you want to delete "${selectedLoan?.name}"? Repayment history will remain but won't be linked to this loan.`}
         confirmLabel="Delete"
         destructive
@@ -195,10 +195,10 @@ export const LoansScreen = React.memo(function LoansScreen() {
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   center: {
     flex: 1,
@@ -206,26 +206,26 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
   },
   headerBtn: {
-    padding: spacing('2'),
+    padding: 8,
   },
   listContent: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
-    paddingBottom: spacing('10'),
-    gap: spacing('4'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 40,
+    gap: 16,
   },
   card: {
-    padding: spacing('5'),
+    padding: 20,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: spacing('5'),
+    marginBottom: 20,
   },
   cardInfo: {
     flex: 1,
-    gap: spacing('1'),
+    gap: 4,
   },
   typeBadge: {
     alignSelf: 'flex-start',
@@ -238,7 +238,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     fontSize: 20,
   },
   progressSection: {
-    gap: spacing('2'),
+    gap: 8,
   },
   progressInfo: {
     flexDirection: 'row',
@@ -247,12 +247,12 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   progressBar: {
     height: 6,
-    backgroundColor: colors.border + '40',
-    borderRadius: radius('full'),
+    backgroundColor: theme.colors.border + '40',
+    borderRadius: theme.radius.full,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: radius('full'),
+    borderRadius: theme.radius.full,
   },
 });

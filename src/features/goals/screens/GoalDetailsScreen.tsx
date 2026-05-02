@@ -4,11 +4,8 @@ import React, { useMemo, useCallback } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header, Card, Typography, MoneyText, SectionLabel, TransactionRow, EmptyState, IconButton } from '../../../components/ui';
-import { useTheme } from '../../../providers/ThemeProvider';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { radius, spacing, LAYOUT } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { useGoalById, useGoalProgress } from '../api/goals';
 import { useTransactions } from '../../transactions/hooks/transactions';
 import { formatCurrency } from '../../../utils/format';
@@ -16,10 +13,11 @@ import { formatCurrency } from '../../../utils/format';
 export const GoalDetailsScreen = React.memo(function GoalDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const goalId = parseInt(id, 10);
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
   const router = useRouter();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const { data: goal, isLoading: loadingGoal } = useGoalById(goalId);
   const { data: progress, isLoading: loadingProgress } = useGoalProgress(goalId);
@@ -78,7 +76,7 @@ export const GoalDetailsScreen = React.memo(function GoalDetailsScreen() {
             <Typography variant="bodySm" color={colors.textMuted}>
               {Math.round(progress.percentage)}% of {formatCurrency(progress.target, profile.defaultCurrency)}
             </Typography>
-            <Typography variant="monoSm" weight="bold">
+            <Typography variant="monoSm" weight="sansBold">
               {formatCurrency(progress.remaining, profile.defaultCurrency)} left
             </Typography>
           </View>
@@ -98,33 +96,26 @@ export const GoalDetailsScreen = React.memo(function GoalDetailsScreen() {
         <View style={styles.metaGrid}>
           <View style={styles.metaItem}>
             <Typography variant="label">Status</Typography>
-            <Typography variant="bodySm" weight="semibold" style={styles.capitalize}>
+            <Typography variant="bodySm" weight="sansSemiBold" style={styles.capitalize}>
               {goal.status.toLowerCase()}
             </Typography>
           </View>
           <View style={styles.metaItem}>
-            <Typography variant="label">End Date</Typography>
-            <Typography variant="bodySm" weight="semibold">
+            <Typography variant="label">End date</Typography>
+            <Typography variant="bodySm" weight="sansSemiBold">
               {goal.endDate ? new Date(goal.endDate).toLocaleDateString() : 'No date'}
             </Typography>
           </View>
           <View style={styles.metaItem}>
             <Typography variant="label">Projected</Typography>
-            <Typography variant="bodySm" weight="semibold">
-              {(() => {
-                if (progress.percentage >= 100) return 'Reached';
-                if (progress.current <= 0) return 'TBD';
-                
-                // Simple projection: (target / current) * daysElapsed = totalDays
-                // For now we'll just show "Tracking" or a placeholder since we don't have first transaction date easily here
-                return 'Tracking...';
-              })()}
+            <Typography variant="bodySm" weight="sansSemiBold">
+              {progress.percentage >= 100 ? 'Reached' : progress.current <= 0 ? 'TBD' : 'Tracking...'}
             </Typography>
           </View>
         </View>
       </Card>
 
-      <SectionLabel text="TRANSACTIONS" style={styles.sectionHeader} />
+      <SectionLabel text="Transactions" style={styles.sectionHeader} />
     </View>
   );
 
@@ -149,7 +140,6 @@ export const GoalDetailsScreen = React.memo(function GoalDetailsScreen() {
         renderItem={({ item, index }) => (
           <TransactionRow
             tx={item}
-            colors={colors}
             isFirst={index === 0}
             isLast={index === (transactions?.length || 0) - 1}
             showDate
@@ -167,15 +157,16 @@ export const GoalDetailsScreen = React.memo(function GoalDetailsScreen() {
           ) : null
         }
         contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   center: {
     flex: 1,
@@ -183,53 +174,53 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
   },
   headerBtn: {
-    padding: spacing('2'),
+    padding: 8,
   },
   headerContent: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
   },
   heroCard: {
-    padding: spacing('6'),
-    marginBottom: spacing('7'),
+    padding: 24,
+    marginBottom: 24,
   },
   heroTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: spacing('6'),
+    marginBottom: 24,
   },
   heroAmount: {
-    fontSize: TYPOGRAPHY.sizes.xxxl,
-    lineHeight: TYPOGRAPHY.sizes.xxxl * 1.1,
+    fontSize: 32,
+    lineHeight: 38,
     letterSpacing: -1,
   },
   progressSection: {
-    marginBottom: spacing('6'),
+    marginBottom: 24,
   },
   progressInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing('2'),
+    marginBottom: 8,
   },
   progressBar: {
     height: 8,
-    backgroundColor: colors.border + '40',
-    borderRadius: radius('full'),
+    backgroundColor: theme.colors.border + '40',
+    borderRadius: theme.radius.full,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: radius('full'),
+    borderRadius: theme.radius.full,
   },
   metaGrid: {
     flexDirection: 'row',
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: theme.colors.border,
     borderStyle: 'dashed',
-    paddingTop: spacing('5'),
-    gap: spacing('4'),
+    paddingTop: 20,
+    gap: 16,
   },
   metaItem: {
     flex: 1,
@@ -238,9 +229,9 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     textTransform: 'capitalize',
   },
   sectionHeader: {
-    marginBottom: spacing('4'),
+    marginBottom: 16,
   },
   listContent: {
-    paddingBottom: spacing('10'),
+    paddingBottom: 40,
   },
 });

@@ -1,16 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
-import { RADIUS } from '../../../theme/tokens';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useLoans } from '../../loans/api/loans';
 import { TransactionType } from '../../../db/schema';
 
 type Props = {
   selectedId: number | null;
   onSelect: (id: number | null) => void;
-  colors: ThemeColors;
   accountId: number | null;
   type: TransactionType;
 };
@@ -18,24 +15,20 @@ type Props = {
 export const TransactionLoanPicker = React.memo(function TransactionLoanPicker({
   selectedId,
   onSelect,
-  colors,
   accountId,
   type,
 }: Props) {
+  const theme = useTheme();
+  const { colors } = theme;
   const { data: loans, isLoading } = useLoans();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   
   const activeLoans = React.useMemo(() => {
     if (!loans) return [];
     
     return loans.filter(l => {
-      // If loan has no account, it shows up for all accounts
-      // If loan has an account, it must match the selected transaction account
       const isCorrectAccount = l.accountId === null || accountId === null || l.accountId === accountId;
       const isActive = l.status === 'ACTIVE';
-      
-      // BORROW loan repayment is an Expense (DR)
-      // LEND loan repayment is an Income (CR)
       const isCorrectType = (type === 'DR' && l.type === 'BORROW') || 
                           (type === 'CR' && l.type === 'LEND');
                           
@@ -59,6 +52,7 @@ export const TransactionLoanPicker = React.memo(function TransactionLoanPicker({
             selectedId === null && { backgroundColor: colors.text, borderColor: colors.text },
           ]}
           onPress={() => onSelect(null)}
+          activeOpacity={0.7}
         >
           <Text style={[styles.chipText, selectedId === null && { color: colors.background }]}>
             None
@@ -77,6 +71,7 @@ export const TransactionLoanPicker = React.memo(function TransactionLoanPicker({
                 isSelected && { backgroundColor: colors.text, borderColor: colors.text },
               ]}
               onPress={() => onSelect(loan.id)}
+              activeOpacity={0.7}
             >
               <Ionicons 
                 name={(loan.icon + '-outline') as any} 
@@ -94,34 +89,35 @@ export const TransactionLoanPicker = React.memo(function TransactionLoanPicker({
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     paddingHorizontal: 24,
-    gap: 12,
-    marginTop: 8,
+    gap: theme.spacing[12],
+    marginTop: theme.spacing[8],
   },
   sectionLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 10,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     letterSpacing: 1.5,
   },
   scrollContent: {
-    gap: 8,
+    gap: theme.spacing[8],
     paddingRight: 24,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: RADIUS.full,
+    gap: theme.spacing[8],
+    paddingHorizontal: theme.spacing[12],
+    height: 36,
+    borderRadius: theme.radius.full,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
   },
   chipText: {
-    fontFamily: TYPOGRAPHY.fonts.medium,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 12,
+    color: theme.colors.text,
   },
 });

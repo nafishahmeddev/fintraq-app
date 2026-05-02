@@ -1,10 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useMemo } from 'react';
 import { Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { RADIUS } from '../../theme/tokens';
-import { TYPOGRAPHY } from '../../theme/typography';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -35,8 +32,9 @@ export const OptionsDialog = React.memo(function OptionsDialog({
   options,
   closeLabel = 'Close',
 }: OptionsDialogProps) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const handleOptionPress = useCallback((option: OptionsDialogOption) => {
     if (option.closeOnPress !== false) {
@@ -112,101 +110,99 @@ export const OptionsDialog = React.memo(function OptionsDialog({
   );
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
       backgroundColor: 'rgba(0,0,0,0.52)',
       justifyContent: 'flex-end',
-      paddingHorizontal: 24,
+      paddingHorizontal: theme.layout.screenPadding,
       paddingBottom: 42,
     },
     card: {
       alignSelf: 'stretch',
-      borderRadius: RADIUS['2xl'],
-      backgroundColor: Platform.OS === 'ios' ? colors.background + 'F2' : colors.background,
+      borderRadius: theme.radius['2xl'],
+      backgroundColor: theme.colors.background,
       borderWidth: 1,
-      borderColor: colors.text + '18',
-      padding: 18,
-      shadowColor: '#000000',
-      shadowOpacity: 0.22,
-      shadowRadius: 24,
-      shadowOffset: { width: 0, height: 10 },
-      elevation: 10,
+      borderColor: theme.colors.border,
+      padding: theme.spacing[20],
+      ...theme.shadow.lg,
     },
     title: {
-      fontFamily: TYPOGRAPHY.fonts.headingRegular,
+      fontFamily: theme.fontFamilies.sansBold,
       fontSize: 24,
-      color: colors.text,
+      color: theme.colors.text,
       letterSpacing: -0.6,
     },
     subtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 12,
-      color: colors.textMuted,
+      fontFamily: theme.fontFamilies.sans,
+      fontSize: 14,
+      color: theme.colors.textMuted,
       marginTop: 4,
       marginBottom: 16,
     },
     optionsWrap: {
-      borderRadius: RADIUS.full,
       overflow: 'hidden',
     },
     optionRow: {
-      height: 48,
-      borderRadius: 999,
+      height: 52,
+      borderRadius: theme.radius.lg,
       marginBottom: 8,
-      backgroundColor: colors.surface,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.text + '10',
-      paddingHorizontal: 10,
+      borderColor: theme.colors.border,
+      paddingHorizontal: 12,
       flexDirection: 'row',
       alignItems: 'center',
     },
     optionRowActive: {
-      backgroundColor: colors.text,
-      borderColor: colors.text,
+      backgroundColor: theme.colors.text,
+      borderColor: theme.colors.text,
     },
     optionRowDestructive: {
-      borderColor: colors.danger + '35',
-      backgroundColor: colors.danger + '10',
+      borderColor: theme.colors.danger + '35',
+      backgroundColor: theme.colors.danger + '10',
     },
     optionIconWrap: {
-      width: 26,
-      height: 26,
-      borderRadius: 999,
-      backgroundColor: colors.background + 'CC',
+      width: 32,
+      height: 32,
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.background,
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: 10,
+      marginRight: 12,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     optionIconWrapActive: {
-      backgroundColor: colors.background + '66',
+      backgroundColor: theme.colors.background + '20',
+      borderColor: 'transparent',
     },
     optionText: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 13,
-      color: colors.text,
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 14,
+      color: theme.colors.text,
     },
     optionTextActive: {
-      color: colors.background,
+      color: theme.colors.background,
     },
     optionTextDestructive: {
-      color: colors.danger,
+      color: theme.colors.danger,
     },
     closeButton: {
       marginTop: 8,
-      height: 44,
-      borderRadius: 999,
+      height: 48,
+      borderRadius: theme.radius.lg,
       borderWidth: 1,
-      borderColor: colors.primary + '22',
-      backgroundColor: colors.surface,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surface,
       justifyContent: 'center',
       alignItems: 'center',
     },
     closeButtonText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansBold,
       fontSize: 14,
-      color: colors.text,
+      color: theme.colors.text,
     },
   });

@@ -1,35 +1,36 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { TransactionType } from '../../../types';
 
 type Props = {
   value: TransactionType;
   onChange: (value: TransactionType) => void;
-  colors: ThemeColors;
   disabled?: boolean;
   allowedTypes?: TransactionType[];
 };
 
-const TYPE_CONFIG: Record<TransactionType, { label: string; colorKey: keyof ThemeColors }> = {
-  DR: { label: 'Expense', colorKey: 'danger' },
-  CR: { label: 'Income', colorKey: 'success' },
-  TRANSFER: { label: 'Transfer', colorKey: 'primary' },
+const TYPE_CONFIG = {
+  DR: { label: 'Expense', colorKey: 'danger' as const },
+  CR: { label: 'Income', colorKey: 'success' as const },
+  TRANSFER: { label: 'Transfer', colorKey: 'primary' as const },
 };
 
-export const TransactionTypePicker = ({ value, onChange, colors, disabled, allowedTypes }: Props) => {
+export const TransactionTypePicker = ({ value, onChange, disabled, allowedTypes }: Props) => {
+  const theme = useTheme();
+  const { colors } = theme;
   const typesToRender = allowedTypes || (Object.keys(TYPE_CONFIG) as TransactionType[]);
 
   if (disabled) {
-    // Show only the selected type as a static display
     const config = TYPE_CONFIG[value];
     const activeColor = colors[config.colorKey];
 
     return (
       <View style={styles.container}>
         <View style={[styles.pill, { backgroundColor: activeColor, borderColor: activeColor }]}>
-          <Text style={[styles.pillText, { color: colors.background }]}>{config.label}</Text>
+          <Text style={[styles.pillText, { color: colors.background, fontFamily: theme.fontFamilies.sansBold }]}>
+            {config.label}
+          </Text>
         </View>
       </View>
     );
@@ -47,13 +48,19 @@ export const TransactionTypePicker = ({ value, onChange, colors, disabled, allow
             key={type}
             style={[
               styles.pill,
-              { backgroundColor: colors.surface, borderColor: colors.border },
+              { backgroundColor: colors.card, borderColor: colors.border },
               isSelected && { backgroundColor: activeColor, borderColor: activeColor },
             ]}
             onPress={() => onChange(type)}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
           >
-            <Text style={[styles.pillText, { color: isSelected ? colors.background : colors.textMuted }]}>
+            <Text style={[
+              styles.pillText, 
+              { 
+                color: isSelected ? colors.background : colors.textMuted,
+                fontFamily: isSelected ? theme.fontFamilies.sansBold : theme.fontFamilies.sansSemiBold
+              }
+            ]}>
               {config.label}
             </Text>
           </TouchableOpacity>
@@ -69,18 +76,17 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 8,
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
   },
   pill: {
     paddingHorizontal: 16,
-    height: 36,
-    borderRadius: 999,
+    height: 40,
+    borderRadius: 20, // theme.radius.full is better but fixed height here
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
   },
   pillText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
     fontSize: 13,
   },
 });

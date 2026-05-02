@@ -1,14 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { CategoryType } from '../../../db/schema';
 
 interface CategoryTypeSelectorProps {
   activeType: CategoryType;
   onTypeChange: (type: CategoryType) => void;
-  colors: ThemeColors;
+  theme: Theme;
 }
 
 const TYPE_CONFIG: Record<CategoryType, { label: string; icon: React.ComponentProps<typeof Ionicons>['name'] }> = {
@@ -20,9 +19,10 @@ const TYPE_CONFIG: Record<CategoryType, { label: string; icon: React.ComponentPr
 export const CategoryTypeSelector: React.FC<CategoryTypeSelectorProps> = ({
   activeType,
   onTypeChange,
-  colors,
+  theme,
 }) => {
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const { colors } = theme;
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   return (
     <View style={styles.typeTabsRail}>
@@ -51,14 +51,14 @@ export const CategoryTypeSelector: React.FC<CategoryTypeSelectorProps> = ({
   );
 };
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   typeTabsRail: {
     flexDirection: 'row',
-    height: 46,
-    borderRadius: 999,
+    height: 48,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface + 'D9',
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
     padding: 4,
     gap: 4,
   },
@@ -69,19 +69,19 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     gap: 6,
-    borderRadius: 999,
+    borderRadius: theme.radius.md,
     backgroundColor: 'transparent',
   },
   segmentPillActive: {
-    backgroundColor: colors.text,
+    backgroundColor: theme.colors.text,
   },
   segmentPillText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sansBold,
+    color: theme.colors.textMuted,
     fontSize: 12,
     letterSpacing: 0.3,
   },
   segmentPillTextActive: {
-    color: colors.background,
+    color: theme.colors.background,
   },
 });

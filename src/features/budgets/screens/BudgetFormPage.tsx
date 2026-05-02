@@ -20,10 +20,7 @@ import { ACCOUNT_COLORS } from '../../../constants/picker';
 import { BudgetMode, BudgetPeriod, BudgetScope } from '../../../db/schema';
 import { usePremium } from '../../../providers/PremiumProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { toDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
 import { useAccounts } from '../../accounts/hooks/accounts';
@@ -49,7 +46,7 @@ const PERIODS: { label: string; value: BudgetPeriod }[] = [
   { label: 'Weekly', value: 'WEEKLY' },
   { label: 'Monthly', value: 'MONTHLY' },
   { label: 'Yearly', value: 'YEARLY' },
-  { label: 'Custom Range', value: 'CUSTOM' },
+  { label: 'Custom range', value: 'CUSTOM' },
 ];
 
 const MODES: { label: string; value: BudgetMode; desc: string }[] = [
@@ -66,9 +63,10 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
   const router = useRouter();
   const isEditMode = formMode === 'edit';
 
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const categoriesQuery = useCategories();
   const accountsQuery = useAccounts();
@@ -211,12 +209,12 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
   return (
     <SafeAreaView style={styles.container}>
 
-      <Header title={isEditMode ? 'Edit Budget' : 'New Budget'} subtitle="Set your spending limit" showBack />
+      <Header title={isEditMode ? 'Edit budget' : 'New budget'} subtitle="Set your spending limit" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={{ marginTop: 24, marginBottom: 16 }}>
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>NAME</Text>
+            <Text style={styles.sectionLabel}>Name</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.textInput}
@@ -233,14 +231,13 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           value={amountInput}
           onChange={setAmountInput}
           currency={profile.defaultCurrency}
-          colors={colors}
         />
 
         <View style={styles.formBody}>
 
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>PERIOD</Text>
+            <Text style={styles.sectionLabel}>Period</Text>
             <View style={styles.grid}>
               {PERIODS.map((p) => (
                 <TouchableOpacity
@@ -277,7 +274,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>MODE</Text>
+            <Text style={styles.sectionLabel}>Mode</Text>
             <View style={styles.optionsGrid}>
               {MODES.map((m) => (
                 <TouchableOpacity
@@ -296,7 +293,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>SCOPE</Text>
+            <Text style={styles.sectionLabel}>Scope</Text>
             <View style={styles.optionsGrid}>
               {SCOPES.map((s) => (
                 <TouchableOpacity
@@ -316,7 +313,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
 
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>
-              {scope === 'OVERALL' ? 'EXCLUDED CATEGORIES' : 'INCLUDED CATEGORIES'}
+              {scope === 'OVERALL' ? 'Excluded categories' : 'Included categories'}
             </Text>
             <View style={styles.categoriesWrap}>
               {categories.map(cat => {
@@ -350,7 +347,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>ACCOUNTS (OPTIONAL)</Text>
+            <Text style={styles.sectionLabel}>Accounts (optional)</Text>
             <View style={styles.categoriesWrap}>
               {accounts.map(acc => {
                 const isSelected = selectedAccounts.includes(acc.id);
@@ -383,7 +380,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>COLOR</Text>
+            <Text style={styles.sectionLabel}>Color</Text>
             <View style={styles.colorRow}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.colorWrap}>
                 {ACCOUNT_COLORS.map((item) => (
@@ -405,14 +402,14 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>ADVANCED</Text>
+            <Text style={styles.sectionLabel}>Advanced</Text>
             <TouchableOpacity
               style={[styles.optionCard, isRolling && { borderColor: colors.text }]}
               onPress={() => setIsRolling(!isRolling)}
               activeOpacity={0.7}
             >
               <View style={styles.optionHeader}>
-                <Text style={[styles.optionTitle, isRolling && { color: colors.text }]}>Rolling Budget</Text>
+                <Text style={[styles.optionTitle, isRolling && { color: colors.text }]}>Rolling budget</Text>
                 <Ionicons
                   name={isRolling ? "checkbox" : "square-outline"}
                   size={20}
@@ -435,7 +432,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           {isSubmitting ? (
             <ActivityIndicator size="small" color={colors.background} />
           ) : (
-            <Text style={styles.saveBtnText}>{isEditMode ? 'Save Changes' : 'Save Budget'}</Text>
+            <Text style={styles.saveBtnText}>{isEditMode ? 'Save changes' : 'Save budget'}</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -465,17 +462,17 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     loadingWrap: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     content: {
       paddingBottom: 120,
@@ -489,24 +486,25 @@ const createStyles = (colors: ThemeColors) =>
       gap: 12,
     },
     sectionLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 10,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       letterSpacing: 1.5,
+      textTransform: 'uppercase',
     },
     inputContainer: {
       height: 48,
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.xl,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       paddingHorizontal: 16,
       justifyContent: 'center',
     },
     textInput: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 15,
-      color: colors.text,
+      color: theme.colors.text,
     },
     grid: {
       flexDirection: 'row',
@@ -516,15 +514,15 @@ const createStyles = (colors: ThemeColors) =>
     gridBtn: {
       paddingHorizontal: 16,
       paddingVertical: 10,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     gridBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 13,
-      color: colors.text,
+      color: theme.colors.text,
     },
     optionsList: {
       gap: 12,
@@ -534,18 +532,18 @@ const createStyles = (colors: ThemeColors) =>
       gap: 12,
     },
     optionCard: {
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.xl,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       padding: 16,
     },
     optionCardHalf: {
       flex: 1,
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.xl,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       padding: 16,
     },
     optionHeader: {
@@ -555,14 +553,14 @@ const createStyles = (colors: ThemeColors) =>
       marginBottom: 4,
     },
     optionTitle: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 14,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
     optionDesc: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 11,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       lineHeight: 16,
     },
     categoriesWrap: {
@@ -576,20 +574,20 @@ const createStyles = (colors: ThemeColors) =>
       gap: 6,
       paddingHorizontal: 12,
       paddingVertical: 8,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     catChipText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 13,
-      color: colors.text,
+      color: theme.colors.text,
     },
     emptyText: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
     colorRow: {
       marginHorizontal: -24,
@@ -600,7 +598,7 @@ const createStyles = (colors: ThemeColors) =>
     colorCell: {
       width: 44,
       height: 44,
-      borderRadius: RADIUS.full,
+      borderRadius: theme.radius.full,
       marginRight: 12,
       justifyContent: 'center',
       alignItems: 'center',
@@ -608,7 +606,7 @@ const createStyles = (colors: ThemeColors) =>
       borderColor: 'transparent',
     },
     colorCellActive: {
-      borderColor: colors.text,
+      borderColor: theme.colors.text,
     },
     footer: {
       position: 'absolute',
@@ -618,8 +616,8 @@ const createStyles = (colors: ThemeColors) =>
     },
     saveBtn: {
       height: 56,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.text,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.text,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -627,9 +625,9 @@ const createStyles = (colors: ThemeColors) =>
       opacity: 0.5,
     },
     saveBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 16,
-      color: colors.background,
+      color: theme.colors.background,
     },
     customDateRow: {
       flexDirection: 'row',
@@ -639,18 +637,18 @@ const createStyles = (colors: ThemeColors) =>
     },
     dateBtn: {
       height: 40,
-      borderRadius: RADIUS.lg,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 6,
     },
     dateBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 12,
-      color: colors.text,
+      color: theme.colors.text,
     },
   });

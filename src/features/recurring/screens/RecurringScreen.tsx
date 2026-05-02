@@ -18,11 +18,8 @@ import {
 } from '../../../components/ui';
 import { db } from '../../../db/client';
 import { RecurringEndCondition, RecurringFrequency, RecurringIntervalUnit, payments, recurringTransactions as recurringTransactionsTable } from '../../../db/schema';
-import { useTheme } from '../../../providers/ThemeProvider';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { NotificationService } from '../../../services/notification.service';
-import { ThemeColors } from '../../../theme/colors';
-import { COMPONENT_SIZES, LAYOUT, radius, shadow, spacing } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { TransactionType } from '../../../types';
 import { formatCurrency } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
@@ -35,8 +32,9 @@ const toHexColor = (value: number | null) => {
 };
 
 export const RecurringScreen = React.memo(function RecurringScreen() {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
 
   const { data: recurringTransactions, isLoading } = useRecurringTransactions();
@@ -234,7 +232,7 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
                 size="md"
               />
               <View style={styles.vStackFlex1Gap1}>
-                <Typography variant="body" weight="semibold" numberOfLines={1}>
+                <Typography variant="body" weight="sansSemiBold" numberOfLines={1}>
                   {item.name}
                 </Typography>
                 <View style={styles.hStackGap2AlignCenter}>
@@ -250,7 +248,7 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
                 </View>
               <Typography
                 variant="mono"
-                weight="bold"
+                weight="sansBold"
                 color={item.type === 'CR' ? colors.success : colors.text}
               >
                 {item.type === 'CR' ? '+' : '-'}{formatCurrency(item.amount, item.account?.currency || 'USD')}
@@ -261,7 +259,7 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
               <View style={styles.hStackGap1_5AlignCenter}>
                 <Ionicons name="time-outline" size={12} color={colors.textMuted} />
                 <Typography variant="label">
-                  {isDue ? 'DUE DATE:' : 'NEXT RUN:'}
+                  {isDue ? 'Due date:' : 'Next run:'}
                 </Typography>
                 <Typography
                   variant="monoSm"
@@ -362,7 +360,7 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
       <OptionsDialog
         visible={isManageDialogOpen}
         onClose={() => setIsManageDialogOpen(false)}
-        title="Manage Recurring"
+        title="Manage recurring"
         subtitle={selectedTemplate?.name}
         options={manageOptions}
       />
@@ -370,7 +368,7 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
       <ConfirmDialog
         visible={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
-        title="Delete Recurring"
+        title="Delete recurring"
         message="This will stop future automatic entries. Past entries will remain."
         confirmLabel="Delete"
         destructive
@@ -385,24 +383,24 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   listContent: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
     paddingBottom: 120,
-    gap: LAYOUT.cardGap,
+    gap: 12,
   },
   card: {
-    borderRadius: radius('2xl'),
-    backgroundColor: colors.surface,
-    padding: spacing('4'),
+    borderRadius: theme.radius['2xl'],
+    backgroundColor: theme.colors.surface,
+    padding: 16,
     borderWidth: 1,
-    borderColor: colors.border,
-    ...shadow('sm'),
+    borderColor: theme.colors.border,
+    ...theme.shadow.sm,
   },
   cardPaused: {
     opacity: 0.6,
@@ -410,9 +408,9 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: spacing('2'),
+    paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: theme.colors.border,
     borderStyle: 'dashed',
   },
   fab: {
@@ -421,11 +419,11 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     right: 24,
     width: 64,
     height: 64,
-    borderRadius: radius('full'),
-    backgroundColor: colors.primary,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    ...shadow('lg'),
+    ...theme.shadow.lg,
   },
   emptyContainer: {
     paddingVertical: 80,
@@ -433,72 +431,72 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     paddingHorizontal: 40,
   },
   emptyTitle: {
-    fontFamily: TYPOGRAPHY.fonts.heading,
-    color: colors.text,
+    fontFamily: theme.fontFamilies.sansBold,
+    color: theme.colors.text,
     fontSize: 24,
-    marginTop: spacing('4'),
+    marginTop: 16,
     textAlign: 'center',
   },
   emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sans,
+    color: theme.colors.textMuted,
     fontSize: 15,
-    marginTop: spacing('2'),
-    marginBottom: spacing('7'),
+    marginTop: 8,
+    marginBottom: 32,
     textAlign: 'center',
     lineHeight: 22,
   },
   emptyBtn: {
-    height: COMPONENT_SIZES.button.md.height,
-    borderRadius: radius('full'),
-    paddingHorizontal: spacing('6'),
-    backgroundColor: colors.text,
+    height: 48,
+    borderRadius: theme.radius.full,
+    paddingHorizontal: 24,
+    backgroundColor: theme.colors.text,
     justifyContent: 'center',
     alignItems: 'center',
   },
   emptyBtnText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansMedium,
     fontSize: 15,
-    color: colors.background,
+    color: theme.colors.background,
   },
   tabBar: {
     flexDirection: 'row',
-    paddingHorizontal: LAYOUT.screenPadding,
-    backgroundColor: colors.surface,
+    paddingHorizontal: 24,
+    backgroundColor: theme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: theme.colors.border,
   },
   tab: {
     flex: 1,
-    paddingVertical: spacing('4'),
+    paddingVertical: 16,
     alignItems: 'center',
     position: 'relative',
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: colors.text,
+    borderBottomColor: theme.colors.text,
   },
   tabText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansMedium,
     fontSize: 13,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
   },
   activeTabText: {
-    color: colors.text,
+    color: theme.colors.text,
   },
   dotIndicator: {
     position: 'absolute',
-    top: spacing('3'),
+    top: 12,
     right: '25%',
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: colors.danger,
+    backgroundColor: theme.colors.danger,
   },
   actionRow: {
     flexDirection: 'row',
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: theme.colors.border,
   },
   actionBtn: {
     flex: 1,
@@ -508,54 +506,54 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   skipBtn: {
     borderRightWidth: 1,
-    borderRightColor: colors.border,
+    borderRightColor: theme.colors.border,
   },
   skipBtnText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansMedium,
     fontSize: 14,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
   },
   processBtn: {
-    backgroundColor: colors.primary + '10',
+    backgroundColor: theme.colors.primary + '10',
   },
   processBtnText: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
     fontSize: 14,
-    color: colors.primary,
+    color: theme.colors.primary,
   },
   vStackGap3: {
-    gap: spacing('3'),
+    gap: 12,
   },
   hStackGap3AlignCenter: {
     flexDirection: 'row',
-    gap: spacing('3'),
+    gap: 12,
     alignItems: 'center',
   },
   vStackFlex1Gap1: {
     flex: 1,
-    gap: spacing('1'),
+    gap: 4,
   },
   hStackGap2AlignCenter: {
     flexDirection: 'row',
-    gap: spacing('2'),
+    gap: 8,
     alignItems: 'center',
   },
   hStackGap4AlignCenter: {
     flexDirection: 'row',
-    gap: spacing('4'),
+    gap: 16,
     alignItems: 'center',
   },
   vStackGap1: {
-    gap: spacing('1'),
+    gap: 4,
   },
   vStackFlex1AlignEndGap1: {
     flex: 1,
     alignItems: 'flex-end',
-    gap: spacing('1'),
+    gap: 4,
   },
   hStackGap1_5AlignCenter: {
     flexDirection: 'row',
-    gap: spacing('1.5'),
+    gap: 6,
     alignItems: 'center',
   },
 });

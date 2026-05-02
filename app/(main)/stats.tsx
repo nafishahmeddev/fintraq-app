@@ -10,9 +10,7 @@ import { PremiumGuard } from '../../src/components/ui/PremiumGuard';
 import { DEFAULT_CURRENCY } from '../../src/constants/currency';
 import { useAccounts } from '../../src/features/accounts/hooks/accounts';
 import { useTransactions } from '../../src/features/transactions/hooks/transactions';
-import { useTheme } from '../../src/providers/ThemeProvider';
-import { ThemeColors } from '../../src/theme/colors';
-import { TYPOGRAPHY } from '../../src/theme/typography';
+import { Theme, useTheme } from '../../src/providers/ThemeProvider';
 
 const RANGE_OPTIONS = [
   { label: '7D', value: 7 },
@@ -47,10 +45,11 @@ const computeFlow = (items: { type: 'CR' | 'DR'; amount: number }[]) =>
   );
 
 const StatsScreen = React.memo(function StatsScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { isPremium } = usePremium();
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { data: transactions, isLoading: txLoading } = useTransactions();
   const { data: accounts, isLoading: accountsLoading } = useAccounts();
 
@@ -272,7 +271,7 @@ const StatsScreen = React.memo(function StatsScreen() {
           <View style={styles.listBody}>
             <View style={styles.listTopLine}>
               <Text style={styles.listTitle}>{category.name}</Text>
-              <MoneyText amount={category.amount} currency={selectedCurrency} type="DR" style={styles.listAmount} weight="bold" />
+              <MoneyText amount={category.amount} currency={selectedCurrency} type="DR" style={styles.listAmount} weight="sansBold" />
             </View>
             <View style={styles.progressTrack}>
               <View style={[styles.progressFill, { width: `${width}%`, backgroundColor: category.color }]} />
@@ -294,7 +293,7 @@ const StatsScreen = React.memo(function StatsScreen() {
         <View style={styles.listBody}>
           <View style={styles.listTopLine}>
             <Text style={styles.listTitle}>{account.name}</Text>
-            <MoneyText amount={account.balance} currency={selectedCurrency} style={styles.listAmount} weight="bold" />
+            <MoneyText amount={account.balance} currency={selectedCurrency} style={styles.listAmount} weight="sansBold" />
           </View>
           <View style={styles.progressTrack}>
             <View style={[styles.progressFill, { width: `${account.share * 100}%`, backgroundColor: account.colorHex }]} />
@@ -325,7 +324,7 @@ const StatsScreen = React.memo(function StatsScreen() {
           <View style={styles.listBody}>
             <View style={styles.listTopLine}>
               <Text style={styles.listTitle}>{transaction.note || categoryName}</Text>
-              <MoneyText amount={transaction.amount} currency={selectedCurrency} type={transaction.type} style={styles.listAmount} weight="bold" />
+              <MoneyText amount={transaction.amount} currency={selectedCurrency} type={transaction.type} style={styles.listAmount} weight="sansBold" />
             </View>
             <Text style={styles.listMeta}>{transaction.account.name} · {DAY_FORMATTER.format(new Date(transaction.datetime))}</Text>
           </View>
@@ -412,7 +411,7 @@ const StatsScreen = React.memo(function StatsScreen() {
           <View style={styles.snapshotTopRow}>
             <View>
               <Text style={styles.snapshotKicker}>NET POSITION</Text>
-              <MoneyText amount={Math.abs(summary.net)} currency={selectedCurrency} type={summary.net >= 0 ? 'CR' : 'DR'} style={styles.snapshotAmount} weight="bold" />
+              <MoneyText amount={Math.abs(summary.net)} currency={selectedCurrency} type={summary.net >= 0 ? 'CR' : 'DR'} style={styles.snapshotAmount} weight="sansBold" />
             </View>
             <View style={styles.rangeBadge}>
               <Text style={styles.rangeBadgeText}>{selectedRange === null ? 'ALL TIME' : `${selectedRange} DAYS`}</Text>
@@ -422,15 +421,15 @@ const StatsScreen = React.memo(function StatsScreen() {
           <View style={styles.snapshotGrid}>
             <View style={styles.snapshotCell}>
               <Text style={styles.snapshotLabel}>INCOME</Text>
-              <MoneyText amount={summary.income} currency={selectedCurrency} type="CR" style={styles.snapshotValue} weight="bold" />
+              <MoneyText amount={summary.income} currency={selectedCurrency} type="CR" style={styles.snapshotValue} weight="sansBold" />
             </View>
             <View style={styles.snapshotCell}>
               <Text style={styles.snapshotLabel}>EXPENSE</Text>
-              <MoneyText amount={summary.expense} currency={selectedCurrency} type="DR" style={styles.snapshotValue} weight="bold" />
+              <MoneyText amount={summary.expense} currency={selectedCurrency} type="DR" style={styles.snapshotValue} weight="sansBold" />
             </View>
             <View style={styles.snapshotCell}>
               <Text style={styles.snapshotLabel}>BALANCE</Text>
-              <MoneyText amount={summary.balance} currency={selectedCurrency} style={styles.snapshotValue} weight="bold" />
+              <MoneyText amount={summary.balance} currency={selectedCurrency} style={styles.snapshotValue} weight="sansBold" />
             </View>
           </View>
         </View>
@@ -444,7 +443,7 @@ const StatsScreen = React.memo(function StatsScreen() {
             <View style={styles.metricGrid}>
               <View style={styles.metricCell}>
                 <Text style={styles.metricLabel}>AVG DAILY BURN</Text>
-                <MoneyText amount={practicalMetrics.dailyBurn} currency={selectedCurrency} type="DR" style={styles.metricValue} weight="bold" />
+                <MoneyText amount={practicalMetrics.dailyBurn} currency={selectedCurrency} type="DR" style={styles.metricValue} weight="sansBold" />
               </View>
               <View style={styles.metricCell}>
                 <Text style={styles.metricLabel}>SAVINGS RATE</Text>
@@ -480,7 +479,7 @@ const StatsScreen = React.memo(function StatsScreen() {
                     currency={selectedCurrency}
                     type={comparison.deltaIncome >= 0 ? 'CR' : 'DR'}
                     style={styles.deltaValue}
-                    weight="bold"
+                    weight="sansBold"
                   />
                 </View>
 
@@ -494,7 +493,7 @@ const StatsScreen = React.memo(function StatsScreen() {
                     currency={selectedCurrency}
                     type={comparison.deltaExpense <= 0 ? 'CR' : 'DR'}
                     style={styles.deltaValue}
-                    weight="bold"
+                    weight="sansBold"
                   />
                 </View>
 
@@ -508,7 +507,7 @@ const StatsScreen = React.memo(function StatsScreen() {
                     currency={selectedCurrency}
                     type={comparison.deltaNet >= 0 ? 'CR' : 'DR'}
                     style={styles.deltaValue}
-                    weight="bold"
+                    weight="sansBold"
                   />
                 </View>
               </View>
@@ -604,7 +603,7 @@ const StatsScreen = React.memo(function StatsScreen() {
                     currency={selectedCurrency}
                     type="DR"
                     style={styles.listAmount}
-                    weight="bold"
+                    weight="sansBold"
                   />
                 </View>
                 <Text style={styles.listMeta}>
@@ -625,17 +624,17 @@ const StatsScreen = React.memo(function StatsScreen() {
 
 export default StatsScreen;
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
     overflow: 'hidden',
   },
   loadingContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   header: {
     marginTop: 12,
@@ -647,8 +646,8 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   headerButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.surface,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -660,15 +659,15 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     paddingHorizontal: 14,
   },
   headerKicker: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.textMuted,
     fontSize: 10,
     letterSpacing: 1.5,
     marginBottom: 4,
   },
   headerTitle: {
-    fontFamily: TYPOGRAPHY.fonts.headingRegular,
-    color: colors.text,
+    fontFamily: theme.fontFamilies.heading,
+    color: theme.colors.text,
     fontSize: 30,
     lineHeight: 34,
     letterSpacing: -0.9,
@@ -679,18 +678,18 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   controlCard: {
     padding: 16,
-    borderRadius: 18,
-    backgroundColor: colors.surface,
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     marginBottom: 14,
   },
   snapshotCard: {
     padding: 18,
-    borderRadius: 20,
-    backgroundColor: colors.surface,
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     marginBottom: 18,
   },
   snapshotTopRow: {
@@ -701,8 +700,8 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     gap: 12,
   },
   snapshotKicker: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.textMuted,
     fontSize: 9,
     letterSpacing: 1.4,
     marginBottom: 6,
@@ -714,23 +713,23 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   rangeBadge: {
     height: 28,
-    borderRadius: 999,
-    backgroundColor: colors.background + 'B3',
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.background + 'B3',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
   },
   rangeBadgeText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.textMuted,
     fontSize: 10,
     letterSpacing: 1,
   },
   cardLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.textMuted,
     fontSize: 10,
     letterSpacing: 1.2,
     marginBottom: 8,
@@ -744,27 +743,27 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     minWidth: 52,
     height: 34,
     paddingHorizontal: 12,
-    borderRadius: 999,
-    backgroundColor: colors.background + '80',
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.background + '80',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     gap: 4,
   },
   segmentPillActive: {
-    backgroundColor: colors.text,
+    backgroundColor: theme.colors.text,
   },
   segmentPillLocked: {
     opacity: 0.6,
   },
   segmentText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.textMuted,
     fontSize: 11,
     letterSpacing: 0.6,
   },
   segmentTextActive: {
-    color: colors.background,
+    color: theme.colors.background,
   },
   lockIcon: {
     marginLeft: 2,
@@ -776,16 +775,16 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   snapshotCell: {
     flex: 1,
     minHeight: 78,
-    borderRadius: 14,
-    backgroundColor: colors.background + '80',
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.background + '80',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     padding: 10,
     justifyContent: 'space-between',
   },
   snapshotLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.textMuted,
     fontSize: 9,
     letterSpacing: 1,
   },
@@ -800,22 +799,22 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.text,
     fontSize: 10,
     letterSpacing: 1.2,
   },
   sectionHint: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sans,
+    color: theme.colors.textMuted,
     fontSize: 11,
   },
   sectionCard: {
-    borderRadius: 18,
-    backgroundColor: colors.surface,
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.surface,
     padding: 14,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     marginBottom: 22,
   },
   metricGrid: {
@@ -826,16 +825,16 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   metricCell: {
     width: '47%',
     minHeight: 74,
-    borderRadius: 14,
-    backgroundColor: colors.background + '80',
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.background + '80',
     borderWidth: 1,
-    borderColor: colors.background + '40',
+    borderColor: theme.colors.background + '40',
     padding: 10,
     justifyContent: 'space-between',
   },
   metricLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.textMuted,
     fontSize: 9,
     letterSpacing: 1,
   },
@@ -843,8 +842,8 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     fontSize: 13,
   },
   metricPlainValue: {
-    fontFamily: TYPOGRAPHY.fonts.monoBold,
-    color: colors.text,
+    fontFamily: theme.fontFamilies.mono,
+    color: theme.colors.text,
     fontSize: 14,
   },
   deltaList: {
@@ -854,10 +853,10 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.background + '80',
-    borderRadius: 12,
+    backgroundColor: theme.colors.background + '80',
+    borderRadius: theme.radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     paddingVertical: 10,
     paddingHorizontal: 12,
   },
@@ -867,8 +866,8 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     gap: 7,
   },
   deltaLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.textMuted,
     fontSize: 11,
     letterSpacing: 0.8,
   },
@@ -888,11 +887,11 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   legendDot: {
     width: 7,
     height: 7,
-    borderRadius: 7,
+    borderRadius: theme.radius.full,
   },
   legendText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.textMuted,
     fontSize: 10,
     letterSpacing: 0.5,
   },
@@ -906,13 +905,13 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     width: 40,
   },
   trendDay: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.text,
     fontSize: 11,
   },
   trendDate: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sans,
+    color: theme.colors.textMuted,
     fontSize: 9,
   },
   trendBars: {
@@ -921,7 +920,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   trendBarTrack: {
     height: 6,
-    backgroundColor: colors.background + '80',
+    backgroundColor: theme.colors.background + '80',
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -930,17 +929,17 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     borderRadius: 3,
   },
   trendIncomeFill: {
-    backgroundColor: colors.success,
+    backgroundColor: theme.colors.success,
   },
   trendExpenseFill: {
-    backgroundColor: colors.danger,
+    backgroundColor: theme.colors.danger,
   },
   listRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.background + '40',
+    borderBottomColor: theme.colors.background + '40',
     gap: 12,
   },
   listRowLast: {
@@ -949,7 +948,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   listIcon: {
     width: 36,
     height: 36,
-    borderRadius: 10,
+    borderRadius: theme.radius.sm,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -963,8 +962,8 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     marginBottom: 4,
   },
   listTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.text,
     fontSize: 14,
   },
   listAmount: {
@@ -972,18 +971,18 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   progressTrack: {
     height: 4,
-    backgroundColor: colors.background + '80',
-    borderRadius: 2,
+    backgroundColor: theme.colors.background + '80',
+    borderRadius: theme.radius.full,
     overflow: 'hidden',
     marginBottom: 4,
   },
   progressFill: {
     height: '100%',
-    borderRadius: 2,
+    borderRadius: theme.radius.full,
   },
   listMeta: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sans,
+    color: theme.colors.textMuted,
     fontSize: 11,
   },
   txRow: {
@@ -991,7 +990,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.background + '40',
+    borderBottomColor: theme.colors.background + '40',
     gap: 12,
     position: 'relative',
   },
@@ -1001,7 +1000,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     top: 14,
     bottom: 14,
     width: 3,
-    borderRadius: 2,
+    borderRadius: theme.radius.sm,
   },
   highlightRow: {
     flexDirection: 'row',
@@ -1018,13 +1017,13 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
   },
   emptyTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.text,
     fontSize: 15,
   },
   emptyText: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    color: colors.textMuted,
+    fontFamily: theme.fontFamilies.sans,
+    color: theme.colors.textMuted,
     fontSize: 12,
     textAlign: 'center',
     maxWidth: 240,

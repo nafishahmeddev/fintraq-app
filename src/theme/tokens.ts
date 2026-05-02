@@ -1,167 +1,53 @@
 /**
  * Design Tokens - Luno Design System
  * 
- * Editorial Brutalist Design Language
- * - Clean, minimal aesthetics with precise spacing
- * - No arbitrary values - everything uses the token system
- * - Consistent 4px base grid
+ * A systematic approach to design constants following fintech best practices.
+ * Focused on consistency, accessibility, and high-performance UI.
  */
 
 // ============================================
-// SPACING SCALE (4px base)
+// 1. SPACING (4px Base Grid)
 // ============================================
-export const SPACING = {
-  // Base units (4px grid)
-  '0': 0,
-  '0.5': 2,
-  '1': 4,
-  '1.5': 6,
-  '2': 8,
-  '2.5': 10,
-  '3': 12,
-  '3.5': 14,
-  '4': 16,
-  '5': 20,
-  '6': 24,
-  '7': 32,
-  '8': 40,
-  '9': 48,
-  '10': 64,
-  '11': 80,
-  '12': 96,
+export const spacing = {
+  0: 0,
+  2: 2,
+  4: 4,
+  8: 8,
+  12: 12,
+  16: 16,
+  20: 20,
+  24: 24,
+  32: 32,
+  40: 40,
+  48: 48,
+  64: 64,
+  80: 80,
+  96: 96,
 } as const;
 
-export type SpacingToken = keyof typeof SPACING;
+export type Spacing = keyof typeof spacing;
 
 // ============================================
-// BORDER RADIUS SCALE
+// 2. RADIUS (Border Radius)
 // ============================================
-export const RADIUS = {
-  'none': 0,
-  'xs': 4,
-  'sm': 8,
-  'md': 12,
-  'lg': 16,
-  'xl': 20,
+export const radius = {
+  none: 0,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
   '2xl': 24,
   '3xl': 28,
-  'full': 999,
+  full: 9999,
 } as const;
 
-export type RadiusToken = keyof typeof RADIUS;
+export type Radius = keyof typeof radius;
 
 // ============================================
-// LAYOUT GRID
+// 3. SHADOWS (Elevation)
 // ============================================
-export const LAYOUT = {
-  // Screen margins
-  screenPadding: 24,
-
-  // Content max widths for readability
-  maxContentWidth: 400,
-
-  // Component gaps
-  sectionGap: 24,
-  cardGap: 12,
-  elementGap: 8,
-
-  // Touch targets
-  minTouchTarget: 44,
-
-  // Icon sizes
-  iconSm: 16,
-  iconMd: 20,
-  iconLg: 24,
-  iconXl: 28,
-} as const;
-
-// ============================================
-// COMPONENT SIZE VARIANTS
-// ============================================
-export const COMPONENT_SIZES = {
-  button: {
-    sm: {
-      height: 36,
-      paddingHorizontal: SPACING['3'],
-      borderRadius: RADIUS.sm,
-      fontSize: 14,
-    },
-    md: {
-      height: 48,
-      paddingHorizontal: SPACING['4'],
-      borderRadius: RADIUS.md,
-      fontSize: 16,
-    },
-    lg: {
-      height: 56,
-      paddingHorizontal: SPACING['5'],
-      borderRadius: RADIUS.lg,
-      fontSize: 16,
-    },
-  },
-
-  input: {
-    sm: {
-      height: 40,
-      paddingHorizontal: SPACING['3'],
-      borderRadius: RADIUS.sm,
-    },
-    md: {
-      height: 56,
-      paddingHorizontal: SPACING['4'],
-      borderRadius: RADIUS.md,
-    },
-    lg: {
-      height: 64,
-      paddingHorizontal: SPACING['4'],
-      borderRadius: RADIUS.lg,
-    },
-  },
-
-  card: {
-    sm: {
-      padding: SPACING['3'],
-      borderRadius: RADIUS.xl,
-    },
-    md: {
-      padding: SPACING['4'],
-      borderRadius: RADIUS['2xl'],
-    },
-    lg: {
-      padding: SPACING['5'],
-      borderRadius: RADIUS['3xl'],
-    },
-  },
-
-  iconButton: {
-    sm: 32,
-    md: 40,
-    lg: 44,
-  },
-} as const;
-
-// ============================================
-// OPACITY SCALE
-// ============================================
-export const OPACITY = {
-  '0': 0,
-  '10': 0.1,
-  '20': 0.2,
-  '30': 0.3,
-  '40': 0.4,
-  '50': 0.5,
-  '60': 0.6,
-  '70': 0.7,
-  '80': 0.8,
-  '90': 0.9,
-  '100': 1,
-} as const;
-
-// ============================================
-// ELEVATION / SHADOWS
-// Editorial Brutalist: Subtle, never harsh
-// ============================================
-export const SHADOWS = {
+export const shadow = {
   none: {
     shadowColor: 'transparent',
     shadowOffset: { width: 0, height: 0 },
@@ -172,111 +58,72 @@ export const SHADOWS = {
   xs: {
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.04,
     shadowRadius: 2,
-    elevation: 2,
+    elevation: 1,
   },
   sm: {
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
-    elevation: 4,
+    elevation: 2,
   },
   md: {
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.12,
     shadowRadius: 8,
-    elevation: 6,
+    elevation: 4,
   },
   lg: {
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.16,
     shadowRadius: 16,
-    elevation: 10,
+    elevation: 8,
   },
 } as const;
 
-export type ShadowToken = keyof typeof SHADOWS;
+export type Shadow = keyof typeof shadow;
 
 // ============================================
-// Z-INDEX SCALE
+// 4. LAYOUT (Grid & Structure)
 // ============================================
-export const Z_INDEX = {
-  '0': 0,
-  '10': 10,
-  '20': 20,
-  '30': 30,
-  '40': 40,
-  '50': 50,
-  'auto': 'auto',
+export const layout = {
+  screenPadding: spacing[24],
+  sectionGap: spacing[24],
+  itemGap: spacing[12],
+  elementGap: spacing[8],
+  touchTarget: 44,
+  maxWidth: 480,
 } as const;
 
 // ============================================
-// TRANSITIONS / ANIMATION
+// 5. ANIMATION (Timing)
 // ============================================
-export const ANIMATION = {
+export const animation = {
   fast: 150,
-  normal: 200,
-  slow: 300,
+  normal: 250,
+  slow: 400,
 } as const;
 
 // ============================================
-// TYPOGRAPHY LINE HEIGHT SCALE
+// 6. OPACITY
 // ============================================
-export const LINE_HEIGHT = {
-  tight: 1.1,
-  snug: 1.25,
-  normal: 1.5,
-  relaxed: 1.75,
+export const opacity = {
+  muted: 0.6,
+  subtle: 0.4,
+  disabled: 0.2,
 } as const;
 
 // ============================================
-// LETTER SPACING
+// 7. Z-INDEX
 // ============================================
-export const LETTER_SPACING = {
-  tight: -1,
-  snug: -0.5,
-  normal: 0,
-  wide: 0.5,
-  wider: 1,
-  widest: 2,
+export const zIndex = {
+  base: 0,
+  drawer: 10,
+  modal: 20,
+  overlay: 30,
+  toast: 40,
 } as const;
-
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
-
-/**
- * Get spacing value from token
- */
-export function spacing(token: SpacingToken): number {
-  return SPACING[token];
-}
-
-/**
- * Get border radius value from token
- */
-export function radius(token: RadiusToken): number {
-  return RADIUS[token];
-}
-
-/**
- * Get shadow style object
- */
-export function shadow(token: ShadowToken) {
-  return SHADOWS[token];
-}
-
-/**
- * Create a spacing object for StyleSheet
- * Usage: spacingStyle('margin', 4) => { margin: 16 }
- */
-export function spacingStyle(
-  property: 'margin' | 'marginHorizontal' | 'marginVertical' | 'marginTop' | 'marginBottom' | 'marginLeft' | 'marginRight' | 'padding' | 'paddingHorizontal' | 'paddingVertical' | 'paddingTop' | 'paddingBottom' | 'paddingLeft' | 'paddingRight' | 'gap',
-  token: SpacingToken
-) {
-  return { [property]: SPACING[token] };
-}

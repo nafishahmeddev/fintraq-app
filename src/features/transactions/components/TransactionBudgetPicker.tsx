@@ -1,36 +1,41 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { budgets } from '../../../db/schema';
 
 type Props = {
   budgetsList: typeof budgets.$inferSelect[];
   selectedId: number | null;
   onSelect: (id: number | null) => void;
-  colors: ThemeColors;
 };
 
-export const TransactionBudgetPicker = ({ budgetsList, selectedId, onSelect, colors }: Props) => {
-  const styles = useMemo(() => createStyles(colors), [colors]);
+export const TransactionBudgetPicker = ({ budgetsList, selectedId, onSelect }: Props) => {
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   if (budgetsList.length === 0) return null;
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { color: colors.textMuted }]}>BUDGET (OPTIONAL)</Text>
+      <Text style={styles.label}>BUDGET (OPTIONAL)</Text>
       <View style={styles.grid}>
         <TouchableOpacity
           style={[
             styles.pill,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-            selectedId === null && { backgroundColor: colors.textMuted + '20', borderColor: colors.textMuted },
+            { backgroundColor: theme.colors.card, borderColor: theme.colors.border },
+            selectedId === null && { backgroundColor: theme.colors.textMuted + '15', borderColor: theme.colors.textMuted },
           ]}
           onPress={() => onSelect(null)}
-          activeOpacity={0.8}
+          activeOpacity={0.7}
         >
-          <Text style={[styles.name, { color: selectedId === null ? colors.text : colors.textMuted }]}>
+          <Text style={[
+            styles.name, 
+            { 
+              color: selectedId === null ? theme.colors.text : theme.colors.textMuted,
+              fontFamily: selectedId === null ? theme.fontFamilies.sansBold : theme.fontFamilies.sansSemiBold
+            }
+          ]}>
             None
           </Text>
         </TouchableOpacity>
@@ -42,21 +47,24 @@ export const TransactionBudgetPicker = ({ budgetsList, selectedId, onSelect, col
               key={budget.id}
               style={[
                 styles.pill,
-                { backgroundColor: colors.surface, borderColor: colors.border },
-                selected && { backgroundColor: colors.primary, borderColor: colors.primary },
+                { backgroundColor: theme.colors.card, borderColor: theme.colors.border },
+                selected && { backgroundColor: theme.colors.primaryDark, borderColor: theme.colors.primaryDark },
               ]}
               onPress={() => onSelect(budget.id)}
-              activeOpacity={0.8}
+              activeOpacity={0.7}
             >
               <Ionicons
                 name="pie-chart-outline"
                 size={14}
-                color={selected ? colors.background : colors.text}
+                color={selected ? theme.colors.background : theme.colors.text}
               />
               <Text
                 style={[
                   styles.name,
-                  { color: selected ? colors.background : colors.text },
+                  { 
+                    color: selected ? theme.colors.background : theme.colors.text,
+                    fontFamily: selected ? theme.fontFamilies.sansBold : theme.fontFamilies.sansSemiBold
+                  },
                 ]}
                 numberOfLines={1}
               >
@@ -70,34 +78,35 @@ export const TransactionBudgetPicker = ({ budgetsList, selectedId, onSelect, col
   );
 };
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
-      paddingVertical: 12,
+      paddingVertical: theme.spacing[12],
       paddingHorizontal: 24,
     },
     label: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 10,
+      color: theme.colors.textMuted,
       letterSpacing: 1.5,
-      marginBottom: 12,
+      marginBottom: theme.spacing[12],
     },
     grid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 8,
+      gap: theme.spacing[8],
     },
     pill: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8,
-      paddingHorizontal: 12,
-      height: 36,
-      borderRadius: 999,
+      gap: theme.spacing[8],
+      paddingHorizontal: theme.spacing[12],
+      height: 40,
+      borderRadius: theme.radius.md,
       borderWidth: 1,
+      ...theme.shadow.xs,
     },
     name: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
       fontSize: 13,
     },
   });

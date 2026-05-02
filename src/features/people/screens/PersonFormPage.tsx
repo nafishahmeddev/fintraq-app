@@ -11,9 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header, Input, Button, IconPickerDialog, Typography } from '../../../components/ui';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { spacing, LAYOUT, radius } from '../../../theme/tokens';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { CATEGORY_COLORS } from '../../../constants/picker';
 import { toDbColor, fromDbColor } from '../../../utils/format';
 import { useCreatePerson, useUpdatePerson, usePersonById } from '../api/people';
@@ -25,8 +23,9 @@ type Props = {
 
 export const PersonFormPage = React.memo(function PersonFormPage({ mode, personId }: Props) {
   const router = useRouter();
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const isEditMode = mode === 'edit';
   const { data: editingPerson, isLoading: loadingPerson } = usePersonById(isEditMode ? personId ?? null : null);
@@ -92,7 +91,7 @@ export const PersonFormPage = React.memo(function PersonFormPage({ mode, personI
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <Header 
-        title={isEditMode ? 'Edit Person' : 'New Person'} 
+        title={isEditMode ? 'Edit person' : 'New person'} 
         showBack 
       />
       
@@ -112,7 +111,7 @@ export const PersonFormPage = React.memo(function PersonFormPage({ mode, personI
         </View>
 
         <View style={styles.section}>
-          <Typography variant="label">Contact Info (Optional)</Typography>
+          <Typography variant="label">Contact info (optional)</Typography>
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
               <Input
@@ -124,7 +123,7 @@ export const PersonFormPage = React.memo(function PersonFormPage({ mode, personI
               />
             </View>
           </View>
-          <View style={[styles.row, { marginTop: spacing('2') }]}>
+          <View style={[styles.row, { marginTop: 8 }]}>
             <View style={{ flex: 1 }}>
               <Input
                 placeholder="Phone number"
@@ -169,7 +168,7 @@ export const PersonFormPage = React.memo(function PersonFormPage({ mode, personI
 
       <View style={styles.footer}>
         <Button
-          title={isEditMode ? 'Update Person' : 'Add Person'}
+          title={isEditMode ? 'Update person' : 'Add person'}
           onPress={handleSave}
           isLoading={isSubmitting}
           size="lg"
@@ -181,16 +180,16 @@ export const PersonFormPage = React.memo(function PersonFormPage({ mode, personI
         onClose={() => setShowIconPicker(false)}
         selectedIcon={iconKey}
         onSelect={setIconKey}
-        title="Person Icon"
+        title="Person icon"
       />
     </SafeAreaView>
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   center: {
     flex: 1,
@@ -201,36 +200,36 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
-    paddingBottom: spacing('12'),
-    gap: spacing('6'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 48,
+    gap: 24,
   },
   section: {
-    gap: spacing('2'),
+    gap: 8,
   },
   row: {
     flexDirection: 'row',
-    gap: spacing('4'),
+    gap: 16,
   },
   visualsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('6'),
-    padding: spacing('4'),
-    backgroundColor: colors.surface,
-    borderRadius: radius('lg'),
+    gap: 24,
+    padding: 16,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
   },
   iconBtn: {
     alignItems: 'center',
-    gap: spacing('2'),
+    gap: 8,
   },
   iconBox: {
     width: 56,
     height: 56,
-    borderRadius: radius('md'),
+    borderRadius: theme.radius.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -238,7 +237,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing('2'),
+    gap: 8,
   },
   colorCircle: {
     width: 28,
@@ -246,9 +245,9 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     borderRadius: 14,
   },
   footer: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingBottom: spacing('6'),
-    paddingTop: spacing('2'),
-    backgroundColor: colors.background,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    paddingTop: 8,
+    backgroundColor: theme.colors.background,
   },
 });

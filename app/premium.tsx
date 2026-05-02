@@ -1,9 +1,7 @@
 import { Header } from '@/src/components/ui/Header';
 import { FEATURES, SKU_LIFETIME } from '@/src/constants/iap';
 import { usePremium } from '@/src/providers/PremiumProvider';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { TYPOGRAPHY } from '@/src/theme/typography';
+import { Theme, useTheme } from '@/src/providers/ThemeProvider';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -15,7 +13,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
  * Refined to match the 'Settings' pattern for a cohesive app experience.
  */
 export default function PremiumScreen() {
-  const { colors, isDark } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { products, purchasePremium, restorePurchase, isPremium, isLoading } = usePremium();
   const router = useRouter();
   const { width: screenWidth } = useWindowDimensions();
@@ -25,7 +24,7 @@ export default function PremiumScreen() {
     return products.find(p => p.id === SKU_LIFETIME);
   }, [products]);
 
-  const styles = useMemo(() => createStyles(colors, screenWidth), [colors, screenWidth]);
+  const styles = useMemo(() => createStyles(theme, screenWidth), [theme, screenWidth]);
 
   const handlePurchase = useCallback(async () => {
     setIsProcessing(true);
@@ -50,7 +49,7 @@ export default function PremiumScreen() {
 
             <View style={styles.proHero}>
               <Text style={styles.proKicker}>Lifetime access</Text>
-              <Text style={styles.proHeading}>Luno Pro{"\n"}Unlocked.</Text>
+              <Text style={styles.proHeading}>Luno Pro{"\n"}unlocked.</Text>
             </View>
 
             <View style={styles.proStatusRow}>
@@ -83,7 +82,6 @@ export default function PremiumScreen() {
   return (
     <SafeAreaView style={styles.container}>
 
-
       {/* ── Header ── */}
       <Header title="Luno Pro" showBack />
 
@@ -101,11 +99,11 @@ export default function PremiumScreen() {
           <View style={styles.lifetimeCard}>
             <View style={styles.cardHeader}>
               <View>
-                <Text style={styles.cardTitle}>Lifetime Access</Text>
-                <Text style={styles.cardSubtitle}>Forever Pro License</Text>
+                <Text style={styles.cardTitle}>Lifetime access</Text>
+                <Text style={styles.cardSubtitle}>Forever pro license</Text>
               </View>
               <View style={styles.cardBadge}>
-                <Text style={styles.cardBadgeText}>Best Value</Text>
+                <Text style={styles.cardBadgeText}>Best value</Text>
               </View>
             </View>
 
@@ -132,7 +130,7 @@ export default function PremiumScreen() {
             <View style={styles.trustInfo}>
               <View style={styles.trustRow}>
                 <Ionicons name="shield-checkmark" size={14} color={colors.success} />
-                <Text style={styles.trustText}>Permanent Device Account License</Text>
+                <Text style={styles.trustText}>Permanent device account license</Text>
               </View>
               <View style={styles.trustRow}>
                 <Ionicons name="cloud-done" size={14} color={colors.success} />
@@ -144,7 +142,7 @@ export default function PremiumScreen() {
 
         {/* ── Detailed Features (Settings Pattern) ── */}
         <View style={styles.featuresSection}>
-          <Text style={styles.sectionLabel}>Pro Capabilities</Text>
+          <Text style={styles.sectionLabel}>Pro capabilities</Text>
           <View style={styles.settingsCard}>
             {FEATURES.map((feature, index) => (
               <View key={index} style={[styles.settingsRow, index === FEATURES.length - 1 && { borderBottomWidth: 0 }]}>
@@ -181,7 +179,7 @@ export default function PremiumScreen() {
             <ActivityIndicator color={colors.background} />
           ) : (
             <Text style={styles.buyBtnText}>
-              {isPremium ? 'Pro Member' : `Upgrade forever`}
+              {isPremium ? 'Pro member' : `Upgrade forever`}
             </Text>
           )}
         </TouchableOpacity>
@@ -200,22 +198,22 @@ export default function PremiumScreen() {
   );
 }
 
-const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+const createStyles = (theme: Theme, screenWidth: number) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.colors.background },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
 
   heroSection: { marginTop: 20, marginBottom: 24 },
-  heroKicker: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.primary, letterSpacing: 2.5, marginBottom: 8 },
-  heroTitle: { fontFamily: TYPOGRAPHY.fonts.headingRegular, fontSize: 40, lineHeight: 44, color: colors.text, letterSpacing: -2, marginBottom: 4 },
-  heroSubtitle: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 14, color: colors.textMuted, lineHeight: 22, maxWidth: '85%' },
+  heroKicker: { fontFamily: theme.fontFamilies.sansBold, fontSize: 10, color: theme.colors.primary, letterSpacing: 2.5, marginBottom: 8, textTransform: 'uppercase' },
+  heroTitle: { fontFamily: theme.fontFamilies.heading, fontSize: 40, lineHeight: 44, color: theme.colors.text, letterSpacing: -2, marginBottom: 4 },
+  heroSubtitle: { fontFamily: theme.fontFamilies.sans, fontSize: 14, color: theme.colors.textMuted, lineHeight: 22, maxWidth: '85%' },
 
   offerSection: { marginBottom: 28 },
   lifetimeCard: {
-    backgroundColor: colors.surface + '80',
-    borderRadius: 24,
+    backgroundColor: theme.colors.surface + '80',
+    borderRadius: theme.radius['2xl'],
     padding: 22,
     borderWidth: 1.5,
-    borderColor: colors.primary,
+    borderColor: theme.colors.primary,
     position: 'relative',
   },
   cardHeader: {
@@ -224,45 +222,45 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     alignItems: 'flex-start',
     marginBottom: 16,
   },
-  cardTitle: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 18, color: colors.text, letterSpacing: 0.5 },
-  cardSubtitle: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 12, color: colors.textMuted, marginTop: 1 },
-  cardBadge: { backgroundColor: colors.primary, paddingHorizontal: 9, height: 20, borderRadius: 10, justifyContent: 'center' },
-  cardBadgeText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 8, color: colors.background, letterSpacing: 1 },
+  cardTitle: { fontFamily: theme.fontFamilies.sansBold, fontSize: 18, color: theme.colors.text, letterSpacing: 0.5 },
+  cardSubtitle: { fontFamily: theme.fontFamilies.sans, fontSize: 12, color: theme.colors.textMuted, marginTop: 1 },
+  cardBadge: { backgroundColor: theme.colors.primary, paddingHorizontal: 9, height: 20, borderRadius: theme.radius.full, justifyContent: 'center' },
+  cardBadgeText: { fontFamily: theme.fontFamilies.sansBold, fontSize: 8, color: theme.colors.background, letterSpacing: 1, textTransform: 'uppercase' },
 
   priceContainer: { marginBottom: 18 },
   priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
-  originalPrice: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 18, color: colors.textMuted, textDecorationLine: 'line-through', opacity: 0.6 },
-  priceValue: { fontFamily: TYPOGRAPHY.fonts.monoBold, fontSize: 44, color: colors.text, letterSpacing: -1.5 },
-  priceSuffix: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 13, color: colors.textMuted, opacity: 0.8 },
-  priceError: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 14, color: colors.danger },
+  originalPrice: { fontFamily: theme.fontFamilies.sans, fontSize: 18, color: theme.colors.textMuted, textDecorationLine: 'line-through', opacity: 0.6 },
+  priceValue: { fontFamily: theme.fontFamilies.mono, fontSize: 44, color: theme.colors.text, letterSpacing: -1.5 },
+  priceSuffix: { fontFamily: theme.fontFamilies.sansBold, fontSize: 13, color: theme.colors.textMuted, opacity: 0.8 },
+  priceError: { fontFamily: theme.fontFamilies.sans, fontSize: 14, color: theme.colors.danger },
 
-  cardDivider: { height: 1, backgroundColor: colors.border, marginBottom: 14, opacity: 0.5 },
+  cardDivider: { height: 1, backgroundColor: theme.colors.border, marginBottom: 14, opacity: 0.5 },
   trustInfo: { gap: 8 },
   trustRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-  trustText: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 11, color: colors.success, letterSpacing: 0.1 },
+  trustText: { fontFamily: theme.fontFamilies.sansBold, fontSize: 11, color: theme.colors.success, letterSpacing: 0.1 },
 
-  sectionLabel: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.textMuted, letterSpacing: 2, marginBottom: 14, opacity: 0.8 },
+  sectionLabel: { fontFamily: theme.fontFamilies.sansBold, fontSize: 10, color: theme.colors.textMuted, letterSpacing: 2, marginBottom: 14, opacity: 0.8, textTransform: 'uppercase' },
 
   /* ── Settings-like Feature Styles ── */
   featuresSection: { marginBottom: 32 },
   settingsCard: {
-    borderRadius: 20,
-    backgroundColor: colors.surface + '80',
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.surface + '80',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
   },
   settingsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: theme.colors.border,
   },
   iconBox: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
@@ -272,14 +270,14 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     flex: 1,
   },
   rowTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansBold,
     fontSize: 16,
-    color: colors.text,
+    color: theme.colors.text,
   },
   rowSubtitle: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     fontSize: 12,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     marginTop: 2,
   },
   rowRightSide: {
@@ -289,21 +287,21 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
   },
 
   brandingBox: { alignItems: 'center', marginTop: 10, marginBottom: 0 },
-  brandingText: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 10, color: colors.text + '20', letterSpacing: 3 },
+  brandingText: { fontFamily: theme.fontFamilies.sansBold, fontSize: 10, color: theme.colors.text + '20', letterSpacing: 3, textTransform: 'uppercase' },
 
-  footer: { padding: 24, paddingBottom: Platform.OS === 'ios' ? 40 : 32, backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.primary + '10' },
-  buyBtn: { backgroundColor: colors.primary, height: 60, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
-  buyBtnText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 16, color: colors.background, letterSpacing: 0.5 },
+  footer: { padding: 24, paddingBottom: Platform.OS === 'ios' ? 40 : 32, backgroundColor: theme.colors.surface, borderTopWidth: 1, borderTopColor: theme.colors.primary + '10' },
+  buyBtn: { backgroundColor: theme.colors.primary, height: 60, borderRadius: theme.radius.lg, justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
+  buyBtnText: { fontFamily: theme.fontFamilies.sansBold, fontSize: 16, color: theme.colors.background, letterSpacing: 0.5 },
   legalRows: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16 },
-  legalLink: { fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 10, color: colors.textMuted, letterSpacing: 1.5 },
-  legalSeparator: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.primary + '20' },
+  legalLink: { fontFamily: theme.fontFamilies.sansBold, fontSize: 10, color: theme.colors.textMuted, letterSpacing: 1.5, textTransform: 'uppercase' },
+  legalSeparator: { width: 4, height: 4, borderRadius: theme.radius.full, backgroundColor: theme.colors.primary + '20' },
 
   successWrapper: { flex: 1, padding: 32, justifyContent: 'space-between' },
   proContent: { flex: 1, justifyContent: 'center' },
-  proBadge: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.primary + '20', justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
+  proBadge: { width: 64, height: 64, borderRadius: theme.radius.full, backgroundColor: theme.colors.primary + '20', justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
   proHero: { marginBottom: 24 },
-  proKicker: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 11, color: colors.primary, letterSpacing: 3, marginBottom: 8 },
-  proHeading: { fontFamily: TYPOGRAPHY.fonts.heading, fontSize: 56, lineHeight: 60, color: colors.text, letterSpacing: -3 },
+  proKicker: { fontFamily: theme.fontFamilies.sansBold, fontSize: 11, color: theme.colors.primary, letterSpacing: 3, marginBottom: 8, textTransform: 'uppercase' },
+  proHeading: { fontFamily: theme.fontFamilies.heading, fontSize: 56, lineHeight: 60, color: theme.colors.text, letterSpacing: -3 },
 
   proStatusRow: { flexDirection: 'row', marginBottom: 32 },
   statusPill: {
@@ -312,16 +310,16 @@ const createStyles = (colors: ThemeColors, screenWidth: number) => StyleSheet.cr
     gap: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 20,
-    backgroundColor: colors.surface,
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: colors.primary + '30'
+    borderColor: theme.colors.primary + '30'
   },
-  statusDot: { width: 6, height: 6, borderRadius: 3 },
-  statusText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 10, color: colors.text, letterSpacing: 1 },
+  statusDot: { width: 6, height: 6, borderRadius: theme.radius.full },
+  statusText: { fontFamily: theme.fontFamilies.sansBold, fontSize: 10, color: theme.colors.text, letterSpacing: 1, textTransform: 'uppercase' },
 
-  proDescription: { fontFamily: TYPOGRAPHY.fonts.regular, fontSize: 16, color: colors.textMuted, lineHeight: 26, maxWidth: '90%' },
+  proDescription: { fontFamily: theme.fontFamilies.sans, fontSize: 16, color: theme.colors.textMuted, lineHeight: 26, maxWidth: '90%' },
   proActions: { gap: 16, marginBottom: 12 },
-  actionBtn: { height: 68, backgroundColor: colors.text, borderRadius: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16 },
-  actionBtnText: { fontFamily: TYPOGRAPHY.fonts.bold, fontSize: 15, color: colors.background, letterSpacing: 1 },
+  actionBtn: { height: 68, backgroundColor: theme.colors.text, borderRadius: theme.radius.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16 },
+  actionBtnText: { fontFamily: theme.fontFamilies.sansBold, fontSize: 15, color: theme.colors.background, letterSpacing: 1 },
 });

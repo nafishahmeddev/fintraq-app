@@ -35,14 +35,15 @@ import { toDbColor } from '../../src/utils/format';
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createOnboardingStyles(colors), [colors]);
+  const theme = useTheme();
+  const styles = React.useMemo(() => createOnboardingStyles(theme), [theme]);
+  const { colors } = theme;
+
   const { completeOnboarding } = useOnboarding();
   const { updateProfile } = useSettings();
   const { mutateAsync: createAccount, isPending: accountPending } = useCreateAccount();
   const { mutateAsync: createCategory, isPending: categoryPending } = useCreateCategory();
-
-  const [stepIndex, setStepIndex] = React.useState(0);
+  const [stepIndex, setStepIndex] = useState(0);
   const currentStep = ONBOARDING_STEPS[stepIndex];
 
   // Import from backup state

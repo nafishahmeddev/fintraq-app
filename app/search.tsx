@@ -1,9 +1,6 @@
 import { SearchScreen } from '@/src/features/search/screens/SearchScreen';
 import { usePremium } from '@/src/providers/PremiumProvider';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { RADIUS, SPACING } from '@/src/theme/tokens';
-import { TYPOGRAPHY } from '@/src/theme/typography';
+import { Theme, useTheme } from '@/src/providers/ThemeProvider';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -17,13 +14,13 @@ const SEARCH_FEATURES = [
 ];
 
 function SearchGate() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   return (
     <SafeAreaView style={styles.container}>
-
 
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} activeOpacity={0.75}>
         <Ionicons name="arrow-back" size={20} color={colors.text} />
@@ -38,7 +35,7 @@ function SearchGate() {
           </View>
         </View>
 
-        <Text style={styles.title}>Global Search</Text>
+        <Text style={styles.title}>Global search</Text>
         <Text style={styles.subtitle}>
           Find anything across your entire financial history in one place.
         </Text>
@@ -76,37 +73,37 @@ export default function SearchRoute() {
   return isPremium ? <SearchScreen /> : <SearchGate />;
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     backBtn: {
       width: 44,
       height: 44,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
-      margin: SPACING['4'],
+      margin: 16,
     },
     body: {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: SPACING['8'],
+      paddingHorizontal: 32,
       paddingBottom: 80,
-      gap: SPACING['4'],
+      gap: 16,
     },
     iconWrap: {
       width: 72,
       height: 72,
-      borderRadius: RADIUS['2xl'],
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius['2xl'],
+      backgroundColor: theme.colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: SPACING['2'],
+      marginBottom: 8,
     },
     proBadge: {
       position: 'absolute',
@@ -117,48 +114,48 @@ const createStyles = (colors: ThemeColors) =>
       gap: 3,
       paddingHorizontal: 7,
       height: 20,
-      borderRadius: RADIUS.sm,
-      backgroundColor: colors.text,
+      borderRadius: theme.radius.sm,
+      backgroundColor: theme.colors.text,
     },
     proBadgeText: {
-      fontFamily: TYPOGRAPHY.fonts.bold,
+      fontFamily: theme.fontFamilies.sansBold,
       fontSize: 9,
       letterSpacing: 1,
     },
     title: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: theme.fontFamilies.heading,
       fontSize: 32,
-      color: colors.text,
+      color: theme.colors.text,
       letterSpacing: -1,
       textAlign: 'center',
     },
     subtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 15,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       textAlign: 'center',
       lineHeight: 22,
       maxWidth: 260,
     },
     featureList: {
       width: '100%',
-      gap: SPACING['2'],
-      marginVertical: SPACING['2'],
+      gap: 8,
+      marginVertical: 8,
     },
     featureRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: SPACING['3'],
+      gap: 12,
     },
     featureIcon: {
       width: 34,
       height: 34,
-      borderRadius: RADIUS.md,
+      borderRadius: theme.radius.md,
       alignItems: 'center',
       justifyContent: 'center',
     },
     featureLabel: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
       flex: 1,
     },
@@ -166,21 +163,21 @@ const createStyles = (colors: ThemeColors) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: SPACING['2'],
+      gap: 8,
       width: '100%',
       height: 52,
-      borderRadius: RADIUS.lg,
-      marginTop: SPACING['2'],
+      borderRadius: theme.radius.lg,
+      marginTop: 8,
     },
     ctaBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 15,
     },
     dismissBtn: {
-      paddingVertical: SPACING['2'],
+      paddingVertical: 8,
     },
     dismissText: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 13,
     },
   });

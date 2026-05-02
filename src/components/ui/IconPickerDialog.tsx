@@ -11,10 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { RADIUS, SPACING } from '../../theme/tokens';
-import { TYPOGRAPHY } from '../../theme/typography';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 import { resolveIcon } from '../../utils/icons';
 
 export const ICON_GROUPS = {
@@ -142,8 +139,9 @@ export const IconPickerDialog = React.memo(function IconPickerDialog({
   onSelect,
   title = 'Select icon',
 }: Props) {
-  const { colors, isDark } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredGroups = useMemo(() => {
@@ -180,8 +178,6 @@ export const IconPickerDialog = React.memo(function IconPickerDialog({
         <TouchableOpacity style={styles.backdrop} onPress={handleClose} activeOpacity={1} />
 
         <View style={styles.sheet}>
-
-
           <View style={styles.handle} />
 
           <View style={styles.header}>
@@ -255,7 +251,7 @@ export const IconPickerDialog = React.memo(function IconPickerDialog({
 
 IconPickerDialog.displayName = 'IconPickerDialog';
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
@@ -267,103 +263,110 @@ const createStyles = (colors: ThemeColors) =>
     },
     sheet: {
       height: '82%',
-      borderTopLeftRadius: RADIUS['3xl'],
-      borderTopRightRadius: RADIUS['3xl'],
+      borderTopLeftRadius: theme.radius['2xl'],
+      borderTopRightRadius: theme.radius['2xl'],
       borderTopWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       overflow: 'hidden',
-      backgroundColor: 'transparent',
+      backgroundColor: theme.colors.background,
     },
     handle: {
       alignSelf: 'center',
       width: 42,
       height: 4,
-      borderRadius: 999,
-      marginTop: SPACING['2.5'],
-      backgroundColor: colors.textMuted + '55',
+      borderRadius: theme.radius.full,
+      marginTop: theme.spacing[12],
+      backgroundColor: theme.colors.border,
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['3.5'],
-      paddingBottom: SPACING['2.5'],
+      paddingHorizontal: theme.layout.screenPadding,
+      paddingTop: theme.spacing[20],
+      paddingBottom: theme.spacing[12],
     },
     title: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 28,
-      color: colors.text,
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 24,
+      color: theme.colors.text,
       letterSpacing: -0.8,
     },
     closeBtn: {
-      width: 38,
-      height: 38,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
+      width: 36,
+      height: 36,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.surface,
       justifyContent: 'center',
       alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     searchWrap: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginHorizontal: SPACING['6'],
-      marginBottom: SPACING['2.5'],
+      marginHorizontal: theme.layout.screenPadding,
+      marginBottom: theme.spacing[12],
       height: 44,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
-      paddingHorizontal: SPACING['3'],
-      gap: SPACING['2'],
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: theme.spacing[12],
+      gap: theme.spacing[8],
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     searchInput: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
-      color: colors.text,
+      color: theme.colors.text,
       padding: 0,
     },
     scrollView: {
       flex: 1,
     },
     scrollContent: {
-      paddingHorizontal: SPACING['6'],
-      paddingBottom: SPACING['6'],
+      paddingHorizontal: theme.layout.screenPadding,
+      paddingBottom: 40,
     },
     groupSection: {
-      marginBottom: SPACING['5'],
+      marginBottom: theme.spacing[24],
     },
     groupTitle: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansBold,
       fontSize: 10,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       letterSpacing: 1.2,
       textTransform: 'uppercase',
-      marginBottom: SPACING['2.5'],
+      marginBottom: theme.spacing[12],
     },
     iconGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: SPACING['2'],
+      gap: theme.spacing[12],
     },
     iconCell: {
-      width: 48,
-      height: 48,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
+      width: 52,
+      height: 52,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.surface,
       justifyContent: 'center',
       alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     iconCellSelected: {
-      backgroundColor: colors.primary,
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
     },
     emptyState: {
       alignItems: 'center',
-      paddingVertical: SPACING['12'],
-      gap: SPACING['3'],
+      paddingVertical: 48,
+      gap: theme.spacing[12],
     },
     emptyText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 14,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
   });

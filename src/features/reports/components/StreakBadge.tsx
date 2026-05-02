@@ -1,9 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useUsageStreak } from '../hooks/useStreak';
 
 /**
@@ -12,9 +10,10 @@ import { useUsageStreak } from '../hooks/useStreak';
  * Re-aligned with core patterns and properly typed.
  */
 export function StreakBadge() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { data: streak, isLoading } = useUsageStreak();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   if (isLoading || !streak || streak === 0) return null;
 
@@ -22,13 +21,13 @@ export function StreakBadge() {
     <View style={styles.container}>
       <Ionicons name="flame" size={11} color={colors.primary} />
       <Text style={[styles.text, { color: colors.text }]}>
-        {streak}D STREAK
+        {streak}d streak
       </Text>
     </View>
   );
 }
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     height: 24, // Matches accountCurrencyBadge exactly
     flexDirection: 'row',
@@ -36,13 +35,13 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 999,
     gap: 4,
-    backgroundColor: colors.background + '80', // Translucent dark-mode friendly bg
+    backgroundColor: theme.colors.background + '80', // Translucent dark-mode friendly bg
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     alignSelf: 'flex-start',
   },
   text: {
-    fontFamily: TYPOGRAPHY.fonts.semibold, // Matches currency chip
+    fontFamily: theme.fontFamilies.sansSemiBold, // Matches currency chip
     fontSize: 10,
     letterSpacing: 0.5,
   },

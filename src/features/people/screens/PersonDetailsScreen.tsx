@@ -1,26 +1,24 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useCallback } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, View, Platform } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { ActivityIndicator, FlatList, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, Card, Typography, MoneyText, SectionLabel, TransactionRow, EmptyState, IconButton, Divider } from '../../../components/ui';
-import { useTheme } from '../../../providers/ThemeProvider';
+import { Card, Divider, EmptyState, Header, IconButton, MoneyText, SectionLabel, TransactionRow, Typography } from '../../../components/ui';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { radius, spacing, LAYOUT } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
-import { usePersonById, usePersonSummary } from '../api/people';
-import { useTransactions } from '../../transactions/hooks/transactions';
-import { useLoans } from '../../loans/api/loans';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { fromDbColor } from '../../../utils/format';
+import { useLoans } from '../../loans/api/loans';
+import { useTransactions } from '../../transactions/hooks/transactions';
+import { usePersonById, usePersonSummary } from '../api/people';
 
 export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const personId = parseInt(id, 10);
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
   const router = useRouter();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const { data: person, isLoading: loadingPerson } = usePersonById(personId);
   const { data: summary, isLoading: loadingSummary } = usePersonSummary(personId);
@@ -57,32 +55,32 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
             />
           </View>
 
-          <Divider style={{ marginVertical: spacing('4') }} />
+          <Divider style={{ marginVertical: 16 }} />
 
           <View style={styles.statsGrid}>
             <View style={styles.statBox}>
               <Typography variant="bodySm" color={colors.textMuted}>Lent</Typography>
-              <MoneyText 
-                amount={summary.remainingLent} 
-                currency={profile.defaultCurrency} 
+              <MoneyText
+                amount={summary.remainingLent}
+                currency={profile.defaultCurrency}
                 style={[styles.statAmount, { color: colors.success }]}
               />
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
               <Typography variant="bodySm" color={colors.textMuted}>Borrowed</Typography>
-              <MoneyText 
-                amount={summary.remainingBorrowed} 
-                currency={profile.defaultCurrency} 
+              <MoneyText
+                amount={summary.remainingBorrowed}
+                currency={profile.defaultCurrency}
                 style={[styles.statAmount, { color: colors.danger }]}
               />
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
               <Typography variant="bodySm" color={colors.textMuted}>Net</Typography>
-              <MoneyText 
-                amount={summary.netPosition} 
-                currency={profile.defaultCurrency} 
+              <MoneyText
+                amount={summary.netPosition}
+                currency={profile.defaultCurrency}
                 style={styles.statAmount}
               />
             </View>
@@ -91,10 +89,10 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
 
         {loans && loans.length > 0 && (
           <View style={styles.section}>
-            <SectionLabel text="Active Loans" />
+            <SectionLabel text="Active loans" />
             {loans.map(loan => (
               <Card key={loan.id} variant="outlined" size="sm" style={styles.loanItem}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   activeOpacity={0.7}
                   onPress={() => router.push(`/loans/details/${loan.id}`)}
                   style={styles.loanContent}
@@ -103,13 +101,13 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
                     <Ionicons name={(loan.icon as any) || 'cash'} size={16} color={fromDbColor(loan.color)} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Typography variant="body" weight="semibold">{loan.name}</Typography>
+                    <Typography variant="body" weight="sansSemiBold">{loan.name}</Typography>
                     <Typography variant="bodySm" color={colors.textMuted}>{loan.type}</Typography>
                   </View>
-                  <MoneyText 
-                    amount={loan.remainingAmount} 
-                    currency={loan.account?.currency || profile.defaultCurrency} 
-                    weight="bold"
+                  <MoneyText
+                    amount={loan.remainingAmount}
+                    currency={loan.account?.currency || profile.defaultCurrency}
+                    weight="sansBold"
                   />
                 </TouchableOpacity>
               </Card>
@@ -118,19 +116,18 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
         )}
 
         <View style={styles.section}>
-          <SectionLabel text="Recent Transactions" />
+          <SectionLabel text="Recent transactions" />
         </View>
       </View>
     );
   }, [person, summary, loans, colors, profile, styles, handleEdit, router]);
 
   const renderItem = useCallback(({ item }: { item: any }) => (
-    <TransactionRow 
-      tx={item} 
-      colors={colors} 
+    <TransactionRow
+      tx={item}
       onPress={(tx) => router.push(`/transactions/edit/${tx.id}`)}
     />
-  ), [colors, router]);
+  ), [router]);
 
   const keyExtractor = useCallback((item: any) => item.id.toString(), []);
 
@@ -146,9 +143,9 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <Header title="Person not found" showBack />
-        <EmptyState 
-          title="Not Found" 
-          subtitle="This person could not be found." 
+        <EmptyState
+          title="Not found"
+          subtitle="This person could not be found."
           icon="alert-circle-outline"
         />
       </SafeAreaView>
@@ -157,7 +154,7 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Contact Details" showBack />
+      <Header title="Contact details" showBack />
       <FlatList
         data={transactions}
         keyExtractor={keyExtractor}
@@ -183,10 +180,10 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   center: {
     flex: 1,
@@ -194,26 +191,26 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
   },
   listContent: {
-    paddingBottom: spacing('10'),
+    paddingBottom: 40,
   },
   headerContent: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
-    gap: spacing('6'),
-    marginBottom: spacing('4'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    gap: 24,
+    marginBottom: 16,
   },
   heroCard: {
-    padding: spacing('5'),
+    padding: 20,
   },
   heroTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('4'),
+    gap: 16,
   },
   avatar: {
     width: 56,
     height: 56,
-    borderRadius: radius('full'),
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -224,37 +221,37 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   statsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: spacing('2'),
+    gap: 8,
   },
   statBox: {
     flex: 1,
-    gap: spacing('1'),
+    gap: 4,
   },
   statDivider: {
     width: 1,
     height: '60%',
-    backgroundColor: colors.border,
+    backgroundColor: theme.colors.border,
     alignSelf: 'center',
   },
   statAmount: {
     fontSize: 16,
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
   },
   section: {
-    gap: spacing('3'),
+    gap: 12,
   },
   loanItem: {
-    marginBottom: spacing('2'),
+    marginBottom: 8,
   },
   loanContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('3'),
+    gap: 12,
   },
   loanIcon: {
     width: 32,
     height: 32,
-    borderRadius: radius('md'),
+    borderRadius: theme.radius.md,
     justifyContent: 'center',
     alignItems: 'center',
   },

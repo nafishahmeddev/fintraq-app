@@ -4,10 +4,7 @@ import { TransactionRow } from '@/src/components/ui/TransactionRow';
 import type { Account } from '@/src/features/accounts/api/accounts';
 import type { Category } from '@/src/features/categories/api/categories';
 import type { TransactionListItem } from '@/src/features/transactions/api/transactions';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { RADIUS, SPACING } from '@/src/theme/tokens';
-import { TYPOGRAPHY } from '@/src/theme/typography';
+import { Theme, useTheme } from '@/src/providers/ThemeProvider';
 import { resolveIcon } from '@/src/utils/icons';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -52,32 +49,34 @@ const AccountRow = React.memo(function AccountRow({
   isFirst: boolean;
   isLast: boolean;
 }) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const accentColor = useMemo(() => toHexColor(account.color), [account.color]);
   const handlePress = useCallback(() => onPress(account.id), [onPress, account.id]);
+  const styles = useMemo(() => accountRowStyles(theme), [theme]);
 
   const containerStyle = useMemo(() => ({
     backgroundColor: colors.surface,
-    borderTopLeftRadius: isFirst ? RADIUS.lg : 0,
-    borderTopRightRadius: isFirst ? RADIUS.lg : 0,
-    borderBottomLeftRadius: isLast ? RADIUS.lg : 0,
-    borderBottomRightRadius: isLast ? RADIUS.lg : 0,
+    borderTopLeftRadius: isFirst ? theme.radius.lg : 0,
+    borderTopRightRadius: isFirst ? theme.radius.lg : 0,
+    borderBottomLeftRadius: isLast ? theme.radius.lg : 0,
+    borderBottomRightRadius: isLast ? theme.radius.lg : 0,
     borderBottomWidth: isLast ? 0 : 1,
     borderBottomColor: colors.text + '08',
-  }), [isFirst, isLast, colors]);
+  }), [isFirst, isLast, colors, theme]);
 
   return (
     <TouchableOpacity
-      style={[accountRowStyles.container, containerStyle]}
+      style={[styles.container, containerStyle]}
       onPress={handlePress}
       activeOpacity={0.75}
     >
-      <View style={[accountRowStyles.iconBox, { backgroundColor: accentColor + '18' }]}>
+      <View style={[styles.iconBox, { backgroundColor: accentColor + '18' }]}>
         <Ionicons name={resolveIcon(account.icon, 'wallet-outline')} size={18} color={accentColor} />
       </View>
-      <View style={accountRowStyles.info}>
-        <Text style={[accountRowStyles.name, { color: colors.text }]}>{account.name}</Text>
-        <Text style={[accountRowStyles.meta, { color: colors.textMuted }]}>
+      <View style={styles.info}>
+        <Text style={[styles.name, { color: colors.text }]}>{account.name}</Text>
+        <Text style={[styles.meta, { color: colors.textMuted }]}>
           {account.currency} · {account.accountNumber && account.accountNumber !== 'N/A'
             ? `•••• ${account.accountNumber.slice(-4)}`
             : 'Account'}
@@ -86,39 +85,39 @@ const AccountRow = React.memo(function AccountRow({
       <MoneyText
         amount={account.balance}
         currency={account.currency}
-        weight="bold"
-        style={accountRowStyles.balance}
+        weight="sansBold"
+        style={styles.balance}
       />
       <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
     </TouchableOpacity>
   );
 });
 
-const accountRowStyles = StyleSheet.create({
+const accountRowStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: SPACING['3'],
-    paddingHorizontal: SPACING['4'],
-    gap: SPACING['3'],
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    gap: 12,
   },
   iconBox: {
     width: 40,
     height: 40,
-    borderRadius: RADIUS.md,
+    borderRadius: theme.radius.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   info: {
     flex: 1,
-    gap: SPACING['0.5'],
+    gap: 2,
   },
   name: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 14,
   },
   meta: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     fontSize: 12,
   },
   balance: {
@@ -139,36 +138,38 @@ const CategoryRow = React.memo(function CategoryRow({
   isFirst: boolean;
   isLast: boolean;
 }) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const catColor = useMemo(() => toHexColor(category.color), [category.color]);
   const handlePress = useCallback(() => onPress(category.id), [onPress, category.id]);
+  const styles = useMemo(() => categoryRowStyles(theme), [theme]);
 
   const containerStyle = useMemo(() => ({
     backgroundColor: colors.surface,
-    borderTopLeftRadius: isFirst ? RADIUS.lg : 0,
-    borderTopRightRadius: isFirst ? RADIUS.lg : 0,
-    borderBottomLeftRadius: isLast ? RADIUS.lg : 0,
-    borderBottomRightRadius: isLast ? RADIUS.lg : 0,
+    borderTopLeftRadius: isFirst ? theme.radius.lg : 0,
+    borderTopRightRadius: isFirst ? theme.radius.lg : 0,
+    borderBottomLeftRadius: isLast ? theme.radius.lg : 0,
+    borderBottomRightRadius: isLast ? theme.radius.lg : 0,
     borderBottomWidth: isLast ? 0 : 1,
     borderBottomColor: colors.text + '08',
-  }), [isFirst, isLast, colors]);
+  }), [isFirst, isLast, colors, theme]);
 
   return (
     <TouchableOpacity
-      style={[categoryRowStyles.container, containerStyle]}
+      style={[styles.container, containerStyle]}
       onPress={handlePress}
       activeOpacity={0.75}
     >
-      <View style={[categoryRowStyles.iconBox, { backgroundColor: catColor + '18' }]}>
+      <View style={[styles.iconBox, { backgroundColor: catColor + '18' }]}>
         <Ionicons name={resolveIcon(category.icon, 'pricetag-outline')} size={18} color={catColor} />
       </View>
-      <Text style={[categoryRowStyles.name, { color: colors.text }]}>{category.name}</Text>
+      <Text style={[styles.name, { color: colors.text }]}>{category.name}</Text>
       <View style={[
-        categoryRowStyles.typeBadge,
+        styles.typeBadge,
         { backgroundColor: (category.type === 'CR' ? colors.success : colors.danger) + '15' },
       ]}>
         <Text style={[
-          categoryRowStyles.typeBadgeText,
+          styles.typeBadgeText,
           { color: category.type === 'CR' ? colors.success : colors.danger },
         ]}>
           {category.type === 'CR' ? 'Income' : 'Expense'}
@@ -179,35 +180,35 @@ const CategoryRow = React.memo(function CategoryRow({
   );
 });
 
-const categoryRowStyles = StyleSheet.create({
+const categoryRowStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: SPACING['3'],
-    paddingHorizontal: SPACING['4'],
-    gap: SPACING['3'],
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    gap: 12,
   },
   iconBox: {
     width: 40,
     height: 40,
-    borderRadius: RADIUS.md,
+    borderRadius: theme.radius.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   name: {
     flex: 1,
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 14,
   },
   typeBadge: {
-    paddingHorizontal: SPACING['2'],
+    paddingHorizontal: 8,
     height: 22,
-    borderRadius: RADIUS.sm,
+    borderRadius: theme.radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   typeBadgeText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 11,
   },
 });
@@ -215,9 +216,10 @@ const categoryRowStyles = StyleSheet.create({
 // ─── SearchScreen ─────────────────────────────────────────────────────────────
 
 export function SearchScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const router = useRouter();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const inputRef = useRef<TextInput>(null);
 
   const [query, setQuery] = useState('');
@@ -248,21 +250,21 @@ export function SearchScreen() {
 
     if (data.transactions.length > 0) {
       result.push({
-        title: 'TRANSACTIONS',
+        title: 'Transactions',
         count: data.transactions.length,
         data: data.transactions.map(item => ({ kind: 'transaction' as const, data: item })),
       });
     }
     if (data.accounts.length > 0) {
       result.push({
-        title: 'ACCOUNTS',
+        title: 'Accounts',
         count: data.accounts.length,
         data: data.accounts.map(item => ({ kind: 'account' as const, data: item })),
       });
     }
     if (data.categories.length > 0) {
       result.push({
-        title: 'CATEGORIES',
+        title: 'Categories',
         count: data.categories.length,
         data: data.categories.map(item => ({ kind: 'category' as const, data: item })),
       });
@@ -282,7 +284,6 @@ export function SearchScreen() {
         return (
           <TransactionRow
             tx={item.data}
-            colors={colors}
             isFirst={isFirst}
             isLast={isLast}
             showDate
@@ -309,7 +310,7 @@ export function SearchScreen() {
         />
       );
     },
-    [colors, handleTransactionPress, handleAccountPress, handleCategoryPress],
+    [handleTransactionPress, handleAccountPress, handleCategoryPress],
   );
 
   const renderSectionHeader = useCallback(
@@ -322,7 +323,7 @@ export function SearchScreen() {
     [styles],
   );
 
-  const renderSectionFooter = useCallback(() => <View style={{ height: SPACING['5'] }} />, []);
+  const renderSectionFooter = useCallback(() => <View style={{ height: 20 }} />, []);
 
   const keyExtractor = useCallback((item: SearchItem) => {
     if (item.kind === 'transaction') return `tx-${item.data.id}`;
@@ -407,32 +408,32 @@ export function SearchScreen() {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
 
     // ─── Search input ───────────────────────────────────────────────────────
     searchRow: {
-      paddingHorizontal: SPACING['6'],
-      paddingBottom: SPACING['4'],
+      paddingHorizontal: 24,
+      paddingBottom: 16,
     },
     searchWrap: {
       flexDirection: 'row',
       alignItems: 'center',
       height: 52,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.surface,
-      paddingHorizontal: SPACING['4'],
-      gap: SPACING['2'],
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: 16,
+      gap: 8,
     },
     searchInput: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 16,
-      color: colors.text,
+      color: theme.colors.text,
       padding: 0,
     },
 
@@ -442,53 +443,54 @@ const createStyles = (colors: ThemeColors) =>
       alignItems: 'center',
       justifyContent: 'center',
       paddingBottom: 80,
-      gap: SPACING['3'],
+      gap: 12,
     },
     promptIconBox: {
       width: 68,
       height: 68,
-      borderRadius: RADIUS['2xl'],
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius['2xl'],
+      backgroundColor: theme.colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: SPACING['1'],
+      marginBottom: 4,
     },
     promptTitle: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 18,
-      color: colors.text,
+      color: theme.colors.text,
       letterSpacing: -0.3,
     },
     promptSubtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       textAlign: 'center',
       lineHeight: 20,
     },
 
     // ─── Results list ───────────────────────────────────────────────────────
     listContent: {
-      paddingHorizontal: SPACING['6'],
+      paddingHorizontal: 24,
       paddingBottom: 60,
     },
     sectionHeader: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingLeft: SPACING['1'],
-      marginBottom: SPACING['2'],
+      paddingLeft: 4,
+      marginBottom: 8,
     },
     sectionHeaderText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 9,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       letterSpacing: 1.2,
       textTransform: 'uppercase',
     },
     sectionHeaderCount: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 10,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
   });
+

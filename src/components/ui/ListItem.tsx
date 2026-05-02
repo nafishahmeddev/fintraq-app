@@ -1,10 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, radius } from '../../theme/tokens';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 import { IconBox } from './IconBox';
 
 export interface ListItemProps {
@@ -36,8 +33,9 @@ export const ListItem = React.memo(function ListItem({
   showDivider = true,
   style,
 }: ListItemProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   const containerStyle = [
     styles.container,
@@ -101,39 +99,39 @@ export const ListItem = React.memo(function ListItem({
   return <View style={containerStyle}>{content}</View>;
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: spacing('3'),
-      paddingHorizontal: spacing('4'),
-      gap: spacing('3'),
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      gap: 12,
     },
     firstItem: {
-      borderTopLeftRadius: radius('lg'),
-      borderTopRightRadius: radius('lg'),
+      borderTopLeftRadius: theme.radius.lg,
+      borderTopRightRadius: theme.radius.lg,
     },
     lastItem: {
-      borderBottomLeftRadius: radius('lg'),
-      borderBottomRightRadius: radius('lg'),
+      borderBottomLeftRadius: theme.radius.lg,
+      borderBottomRightRadius: theme.radius.lg,
     },
     content: {
       flex: 1,
       justifyContent: 'center',
     },
     title: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 14,
     },
     subtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 12,
-      color: colors.textMuted,
-      marginTop: spacing('0.5'),
+      color: theme.colors.textMuted,
+      marginTop: 2,
     },
     rightElement: {
-      marginLeft: spacing('2'),
+      marginLeft: 8,
     },
   });
 

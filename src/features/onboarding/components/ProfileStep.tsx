@@ -2,16 +2,14 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { CURRENCIES } from '../../../constants/currency';
 import { CurrencyPickerModal } from '../../../components/ui/CurrencyPickerModal';
 import { OnboardingFormValues } from '../types';
 
 export function ProfileStep() {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { control, formState: { errors } } = useFormContext<OnboardingFormValues>();
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
 
@@ -32,7 +30,7 @@ export function ProfileStep() {
               onChangeText={field.onChange}
               onBlur={field.onBlur}
               placeholder="John"
-              placeholderTextColor={colors.textMuted + '80'}
+              placeholderTextColor={theme.colors.textMuted + '80'}
               style={[styles.nameInput, errors.name && styles.nameInputError]}
               autoCapitalize="words"
               autoCorrect={false}
@@ -45,7 +43,7 @@ export function ProfileStep() {
           <Text style={styles.errorMessage}>{errors.name.message}</Text>
         ) : (
           <View style={styles.noteRow}>
-            <Ionicons name="person-circle-outline" size={18} color={colors.primary} />
+            <Ionicons name="person-circle-outline" size={18} color={theme.colors.primary} />
             <Text style={styles.noteText}>Used for your profile and account default holder.</Text>
           </View>
         )}
@@ -80,7 +78,7 @@ export function ProfileStep() {
                   <Ionicons 
                     name="chevron-down" 
                     size={20} 
-                    color={errors.currency ? colors.danger : colors.textMuted} 
+                    color={errors.currency ? theme.colors.danger : theme.colors.textMuted} 
                   />
                 </TouchableOpacity>
 
@@ -104,116 +102,117 @@ export function ProfileStep() {
   );
 }
 
-const createStyles = (colors: { [key: string]: string }) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     wrapper: {
-      gap: 32,
+      gap: theme.spacing[32],
     },
     section: {
-      gap: 12,
+      gap: theme.spacing[12],
     },
     prompt: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 14,
-      color: colors.textMuted,
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: theme.fontSizes.sm,
+      color: theme.colors.textMuted,
       letterSpacing: 0.2,
     },
     errorText: {
-      color: colors.danger,
+      color: theme.colors.danger,
     },
     nameInput: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 44,
-      lineHeight: 48,
-      color: colors.text,
-      letterSpacing: -1.2,
+      fontFamily: theme.fontFamilies.heading,
+      fontSize: 52,
+      lineHeight: 56,
+      color: theme.colors.text,
+      letterSpacing: theme.letterSpacing.tight,
       paddingHorizontal: 0,
       paddingVertical: 2,
-      minHeight: 58,
+      minHeight: 64,
     },
     nameInputError: {
-      color: colors.danger,
+      color: theme.colors.danger,
     },
     nameUnderline: {
       height: 2,
-      borderRadius: 999,
-      backgroundColor: colors.primary + '66',
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary + '66',
       marginTop: -2,
-      marginBottom: 8,
+      marginBottom: theme.spacing[8],
     },
     nameUnderlineError: {
-      backgroundColor: colors.danger,
+      backgroundColor: theme.colors.danger,
     },
     errorMessage: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 12,
-      color: colors.danger,
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: theme.fontSizes.xs,
+      color: theme.colors.danger,
       marginTop: -4,
     },
     noteRow: {
-      marginTop: 4,
+      marginTop: theme.spacing[4],
       minHeight: 46,
-      borderRadius: RADIUS.lg,
-      paddingHorizontal: 14,
-      paddingVertical: 12,
-      backgroundColor: colors.primary + '12',
+      borderRadius: theme.radius.lg,
+      paddingHorizontal: theme.spacing[12],
+      paddingVertical: theme.spacing[12],
+      backgroundColor: theme.colors.primary + '12',
       borderWidth: 1,
-      borderColor: colors.primary + '26',
+      borderColor: theme.colors.primary + '26',
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 10,
+      gap: theme.spacing[8],
     },
     noteText: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 12,
+      fontFamily: theme.fontFamilies.sans,
+      fontSize: theme.fontSizes.xs,
       lineHeight: 18,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
     currencyTrigger: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: colors.surface,
+      backgroundColor: theme.colors.card,
       borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: RADIUS.lg,
-      padding: 12,
-      gap: 12,
+      borderColor: theme.colors.border,
+      borderRadius: theme.radius.lg,
+      padding: theme.spacing[12],
+      gap: theme.spacing[12],
+      ...theme.shadow.xs,
     },
     currencyTriggerError: {
-      borderColor: colors.danger,
-      backgroundColor: colors.danger + '05',
+      borderColor: theme.colors.danger,
+      backgroundColor: theme.colors.danger + '05',
     },
     currencyIconBox: {
       width: 44,
       height: 44,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.primary + '15',
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.primary + '15',
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 1,
-      borderColor: colors.primary + '30',
+      borderColor: theme.colors.primary + '30',
     },
     currencyIconBoxError: {
-      backgroundColor: colors.danger + '15',
-      borderColor: colors.danger + '30',
+      backgroundColor: theme.colors.danger + '15',
+      borderColor: theme.colors.danger + '30',
     },
     currencySymbol: {
-      fontSize: 18,
-      fontFamily: TYPOGRAPHY.fonts.bold,
-      color: colors.primary,
+      fontSize: theme.fontSizes.lg,
+      fontFamily: theme.fontFamilies.sansBold,
+      color: theme.colors.primary,
     },
     currencyInfo: {
       flex: 1,
       gap: 2,
     },
     currencyCode: {
-      fontFamily: TYPOGRAPHY.fonts.bold,
-      fontSize: 16,
-      color: colors.text,
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: theme.fontSizes.md,
+      color: theme.colors.text,
     },
     currencyName: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      fontSize: 12,
-      color: colors.textMuted,
+      fontFamily: theme.fontFamilies.sans,
+      fontSize: theme.fontSizes.xs,
+      color: theme.colors.textMuted,
     },
   });

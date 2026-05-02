@@ -1,10 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, radius } from '../../theme/tokens';
+import React, { useMemo } from 'react';
+import { StyleSheet, Text, TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 export type ChipVariant = 'default' | 'primary' | 'success' | 'danger' | 'warning';
 export type ChipSize = 'sm' | 'md' | 'lg';
@@ -20,27 +17,6 @@ export interface ChipProps {
   style?: ViewStyle;
 }
 
-const SIZES = {
-  sm: {
-    height: 30,
-    paddingHorizontal: spacing('3'),
-    fontSize: 12,
-    iconSize: 14,
-  },
-  md: {
-    height: 36,
-    paddingHorizontal: spacing('4'),
-    fontSize: 13,
-    iconSize: 16,
-  },
-  lg: {
-    height: 44,
-    paddingHorizontal: spacing('5'),
-    fontSize: 14,
-    iconSize: 18,
-  },
-};
-
 export const Chip = React.memo(function Chip({
   label,
   selected = false,
@@ -51,33 +27,59 @@ export const Chip = React.memo(function Chip({
   disabled = false,
   style,
 }: ChipProps) {
-  const { colors } = useTheme();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
-  const dimensions = SIZES[size];
+  const theme = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  
+  const dimensions = useMemo(() => {
+    switch (size) {
+      case 'sm':
+        return {
+          height: 32,
+          paddingHorizontal: 12,
+          fontSize: 12,
+          iconSize: 14,
+        };
+      case 'lg':
+        return {
+          height: 44,
+          paddingHorizontal: 20,
+          fontSize: 16,
+          iconSize: 18,
+        };
+      case 'md':
+      default:
+        return {
+          height: 38,
+          paddingHorizontal: 16,
+          fontSize: 14,
+          iconSize: 16,
+        };
+    }
+  }, [size]);
 
   const getBackgroundColor = () => {
-    if (disabled) return colors.surface;
-    if (!selected) return colors.surface;
-    
+    if (disabled) return theme.colors.surface;
+    if (!selected) return theme.colors.surface;
+
     switch (variant) {
-      case 'primary': return colors.primary;
-      case 'success': return colors.success;
-      case 'danger': return colors.danger;
-      case 'warning': return colors.warning;
-      default: return colors.text;
+      case 'primary': return theme.colors.primary;
+      case 'success': return theme.colors.success;
+      case 'danger': return theme.colors.danger;
+      case 'warning': return theme.colors.warning;
+      default: return theme.colors.text;
     }
   };
 
   const getTextColor = () => {
-    if (disabled) return colors.textMuted;
-    if (!selected) return colors.text;
-    return colors.background;
+    if (disabled) return theme.colors.textMuted;
+    if (!selected) return theme.colors.text;
+    return theme.colors.background;
   };
 
   const getBorderColor = () => {
-    if (disabled) return colors.border;
+    if (disabled) return theme.colors.border;
     if (selected) return getBackgroundColor();
-    return colors.border;
+    return theme.colors.border;
   };
 
   return (
@@ -120,22 +122,22 @@ export const Chip = React.memo(function Chip({
   );
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: radius('full'),
+      borderRadius: theme.radius.lg,
       borderWidth: 1,
-      gap: spacing('2'),
+      gap: 6,
     },
     icon: {
-      marginLeft: -spacing('1'),
+      marginLeft: -2,
     },
     label: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      letterSpacing: 0.3,
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      letterSpacing: -0.2,
     },
   });
 

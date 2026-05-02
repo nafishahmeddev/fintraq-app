@@ -21,11 +21,8 @@ import { ACCOUNT_COLORS } from '../../../constants/picker';
 import { RECURRING_INTERVAL_UNITS, RecurringEndCondition, RecurringFrequency, RecurringIntervalUnit } from '../../../db/schema';
 import { usePremium } from '../../../providers/PremiumProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { useTheme } from '../../../providers/ThemeProvider';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { NotificationService } from '../../../services/notification.service';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { formatCurrency, toDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
 import { useAccounts } from '../../accounts/hooks/accounts';
@@ -67,9 +64,10 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
   const router = useRouter();
   const isEditMode = mode === 'edit';
 
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const accountsQuery = useAccounts();
   const categoriesQuery = useCategories();
@@ -275,7 +273,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
   return (
     <SafeAreaView style={styles.container}>
 
-      <Header title={isEditMode ? 'Edit Recurring' : 'New Recurring'} subtitle="Automate your flow" showBack />
+      <Header title={isEditMode ? 'Edit recurring' : 'New recurring'} subtitle="Automate your flow" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <TransactionTypePicker
@@ -283,7 +281,6 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
           onChange={(v) => {
             if (v === 'CR' || v === 'DR') setType(v);
           }}
-          colors={colors}
           allowedTypes={['DR', 'CR']}
         />
 
@@ -291,12 +288,11 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
           value={amountInput}
           onChange={setAmountInput}
           currency={selectedAccount?.currency ?? profile.defaultCurrency}
-          colors={colors}
         />
 
         <View style={styles.formBody}>
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>NAME</Text>
+            <Text style={styles.sectionLabel}>Name</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.textInput}
@@ -313,7 +309,6 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
             selectedId={selectedAccountId}
             onSelect={setSelectedAccountId}
             onAdd={() => router.push('/account/create')}
-            colors={colors}
             label="Account"
           />
 
@@ -322,11 +317,10 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
             selectedId={selectedCategoryId}
             onSelect={setSelectedCategoryId}
             onAdd={() => router.push('/category/create')}
-            colors={colors}
           />
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>FREQUENCY</Text>
+            <Text style={styles.sectionLabel}>Frequency</Text>
             <View style={styles.grid}>
               {FREQUENCIES.map((f) => (
                 <TouchableOpacity
@@ -358,8 +352,8 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
                     <TouchableOpacity
                       key={unit}
                       style={[
-                        styles.unitBtn,
-                        intervalUnit === unit && { backgroundColor: colors.text, borderColor: colors.text }
+                         styles.unitBtn,
+                         intervalUnit === unit && { backgroundColor: colors.text, borderColor: colors.text }
                       ]}
                       onPress={() => setIntervalUnit(unit)}
                     >
@@ -374,7 +368,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>REMINDER</Text>
+            <Text style={styles.sectionLabel}>Reminder</Text>
             <View style={styles.grid}>
               {[0, 1, 3, 7].map((dayOption) => (
                 <TouchableOpacity
@@ -394,7 +388,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>START DATE</Text>
+            <Text style={styles.sectionLabel}>Start date</Text>
             <TouchableOpacity style={styles.dateBtn} onPress={() => setShowStartDatePicker(true)}>
               <Ionicons name="calendar-outline" size={18} color={colors.primary} />
               <Text style={styles.dateBtnText}>{formattedStartDate}</Text>
@@ -402,7 +396,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>END CONDITION</Text>
+            <Text style={styles.sectionLabel}>End condition</Text>
             <View style={styles.grid}>
               {END_CONDITIONS.map((c) => (
                 <TouchableOpacity
@@ -445,7 +439,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>APPEARANCE</Text>
+            <Text style={styles.sectionLabel}>Appearance</Text>
             <View style={styles.appearanceRow}>
               <TouchableOpacity
                 style={[styles.appearanceBtn, { borderColor: colorHex }]}
@@ -475,7 +469,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>NOTE</Text>
+            <Text style={styles.sectionLabel}>Note</Text>
             <View style={styles.noteContainer}>
               <TextInput
                 style={styles.noteInput}
@@ -499,7 +493,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
           {isSubmitting ? (
             <ActivityIndicator size="small" color={colors.background} />
           ) : (
-            <Text style={styles.saveBtnText}>{isEditMode ? 'Save Changes' : 'Create Recurring'}</Text>
+            <Text style={styles.saveBtnText}>{isEditMode ? 'Save changes' : 'Create recurring'}</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -516,23 +510,23 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
         onClose={() => setShowIconPicker(false)}
         selectedIcon={iconKey}
         onSelect={setIconKey}
-        title="Select Icon"
+        title="Select icon"
       />
     </SafeAreaView>
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     loadingWrap: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     content: {
       paddingBottom: 120,
@@ -545,24 +539,23 @@ const createStyles = (colors: ThemeColors) =>
       gap: 12,
     },
     sectionLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 10,
-      color: colors.textMuted,
-      letterSpacing: 1.5,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 13,
+      color: theme.colors.textMuted,
     },
     inputContainer: {
       height: 48,
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.xl,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       paddingHorizontal: 16,
       justifyContent: 'center',
     },
     textInput: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 15,
-      color: colors.text,
+      color: theme.colors.text,
     },
     grid: {
       flexDirection: 'row',
@@ -572,31 +565,31 @@ const createStyles = (colors: ThemeColors) =>
     gridBtn: {
       paddingHorizontal: 16,
       paddingVertical: 10,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     gridBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 13,
-      color: colors.text,
+      color: theme.colors.text,
     },
     dateBtn: {
       height: 48,
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.xl,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 8,
     },
     dateBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 14,
-      color: colors.text,
+      color: theme.colors.text,
     },
     appearanceRow: {
       flexDirection: 'row',
@@ -606,17 +599,17 @@ const createStyles = (colors: ThemeColors) =>
     appearanceBtn: {
       width: 72,
       height: 72,
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.xl,
+      backgroundColor: theme.colors.surface,
       borderWidth: 2,
       justifyContent: 'center',
       alignItems: 'center',
       gap: 4,
     },
     appearanceBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 11,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
     colorScroll: {
       alignItems: 'center',
@@ -626,28 +619,28 @@ const createStyles = (colors: ThemeColors) =>
     colorCell: {
       width: 40,
       height: 40,
-      borderRadius: RADIUS.full,
+      borderRadius: theme.radius.full,
       borderWidth: 2,
       borderColor: 'transparent',
       justifyContent: 'center',
       alignItems: 'center',
     },
     colorCellActive: {
-      borderColor: colors.text,
+      borderColor: theme.colors.text,
       transform: [{ scale: 1.1 }],
     },
     noteContainer: {
-      borderRadius: RADIUS.xl,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.xl,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       padding: 16,
       minHeight: 100,
     },
     noteInput: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 15,
-      color: colors.text,
+      color: theme.colors.text,
       textAlignVertical: 'top',
     },
     footer: {
@@ -658,8 +651,8 @@ const createStyles = (colors: ThemeColors) =>
     },
     saveBtn: {
       height: 56,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.text,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.text,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -667,9 +660,9 @@ const createStyles = (colors: ThemeColors) =>
       opacity: 0.5,
     },
     saveBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 16,
-      color: colors.background,
+      color: theme.colors.background,
     },
     customFreqRow: {
       flexDirection: 'row',
@@ -686,15 +679,15 @@ const createStyles = (colors: ThemeColors) =>
     unitBtn: {
       paddingHorizontal: 8,
       paddingVertical: 6,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     unitBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 11,
-      color: colors.text,
+      color: theme.colors.text,
       textTransform: 'capitalize',
     },
   });

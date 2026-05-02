@@ -4,9 +4,7 @@ import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
 import { ACCOUNT_COLORS } from '@/src/constants/picker';
 import { ACCOUNT_TYPES, AccountType } from '@/src/db/schema';
 import { useCreateAccount } from '@/src/features/accounts/hooks/accounts';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { TYPOGRAPHY } from '@/src/theme/typography';
+import { Theme, useTheme } from '@/src/providers/ThemeProvider';
 import { parseAmount, toDbColor } from '@/src/utils/format';
 import { resolveIcon } from '@/src/utils/icons';
 import { Ionicons } from '@expo/vector-icons';
@@ -50,9 +48,10 @@ const ACCOUNT_TYPE_ICONS: Record<AccountType, string> = {
 };
 
 export default function AccountCreatePage() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const router = useRouter();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const { mutateAsync: createAccount, isPending } = useCreateAccount();
 
   const [currency, setCurrency] = useState<string>('USD');
@@ -94,178 +93,180 @@ export default function AccountCreatePage() {
 
   return (
     <SafeAreaView style={styles.container}>
-
       <Header title="New Account" subtitle="Configure where your money lives" showBack />
 
       <ScrollView
-        style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.section}>
-          <Text style={styles.label}>Account Name</Text>
-          <Controller
-            control={control}
-            name="name"
-            rules={{ required: 'Account name is required' }}
-            render={({ field }) => (
-              <TextInput
-                value={field.value}
-                onChangeText={field.onChange}
-                onBlur={field.onBlur}
-                placeholder="Main Wallet"
-                placeholderTextColor={colors.textMuted + '50'}
-                autoFocus
-                style={styles.answerInput}
-                autoCapitalize="words"
-                autoCorrect={false}
-                returnKeyType="next"
+        <View style={styles.formSection}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>ACCOUNT NAME</Text>
+            <View style={styles.card}>
+              <Controller
+                control={control}
+                name="name"
+                rules={{ required: 'Account name is required' }}
+                render={({ field }) => (
+                  <TextInput
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder="e.g. Daily Spending"
+                    placeholderTextColor={colors.textMuted + '80'}
+                    style={styles.input}
+                    autoCapitalize="words"
+                    autoCorrect={false}
+                  />
+                )}
               />
-            )}
-          />
-          <View style={[styles.answerLine, errors.name && styles.answerLineError]} />
-
-          <Text style={[styles.label, styles.labelSpaced]}>Holder Name</Text>
-          <Controller
-            control={control}
-            name="holderName"
-            render={({ field }) => (
-              <TextInput
-                value={field.value}
-                onChangeText={field.onChange}
-                onBlur={field.onBlur}
-                placeholder="Account Holder"
-                placeholderTextColor={colors.textMuted + '50'}
-                style={styles.answerInput}
-                autoCapitalize="words"
-                autoCorrect={false}
-                returnKeyType="next"
-              />
-            )}
-          />
-          <View style={styles.answerLine} />
-
-          <Text style={[styles.label, styles.labelSpaced]}>Account Number</Text>
-          <Controller
-            control={control}
-            name="accountNumber"
-            render={({ field }) => (
-              <TextInput
-                value={field.value}
-                onChangeText={field.onChange}
-                onBlur={field.onBlur}
-                placeholder="IBAN / Account Number"
-                placeholderTextColor={colors.textMuted + '50'}
-                style={styles.answerInput}
-                autoCorrect={false}
-                autoCapitalize="none"
-                returnKeyType="next"
-              />
-            )}
-          />
-          <View style={styles.answerLine} />
-
-          <Text style={[styles.label, styles.labelSpaced]}>Account Type</Text>
-          <View style={styles.typeGrid}>
-            {ACCOUNT_TYPES.map((type: AccountType) => (
-              <TouchableOpacity
-                key={type}
-                activeOpacity={0.9}
-                onPress={() => setAccountType(type)}
-                style={[
-                  styles.typeCell,
-                  accountType === type && { backgroundColor: colorHex, borderColor: colorHex },
-                  accountType === type && styles.typeCellActive,
-                ]}
-              >
-                <Ionicons
-                  name={ACCOUNT_TYPE_ICONS[type] as any}
-                  size={16}
-                  color={accountType === type ? '#000100' : colors.text}
-                />
-                <Text
-                  style={[
-                    styles.typeLabel,
-                    { color: accountType === type ? '#000100' : colors.text },
-                  ]}
-                >
-                  {ACCOUNT_TYPE_LABELS[type]}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            </View>
           </View>
 
-          <Text style={[styles.label, styles.labelSpaced]}>Opening Balance</Text>
-          <Controller
-            control={control}
-            name="balance"
-            rules={{
-              validate: (v) =>
-                !v.trim() || (!isNaN(parseFloat(v)) && parseFloat(v) >= 0) || 'Enter a valid amount',
-            }}
-            render={({ field }) => (
-              <TextInput
-                value={field.value}
-                onChangeText={field.onChange}
-                onBlur={field.onBlur}
-                placeholder="0.00"
-                placeholderTextColor={colors.textMuted + '50'}
-                keyboardType="decimal-pad"
-                style={[styles.answerInput, styles.answerInputAmount]}
-                returnKeyType="done"
-              />
-            )}
-          />
-          <View style={[styles.answerLine, errors.balance && styles.answerLineError]} />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Currency</Text>
-          <TouchableOpacity
-            style={styles.currencyRow}
-            onPress={() => setShowCurrencyPicker(true)}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.currencyValue}>{currency}</Text>
-            <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-          </TouchableOpacity>
-          <View style={styles.answerLine} />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Icon</Text>
-          <TouchableOpacity
-            style={styles.iconSelector}
-            onPress={() => setShowIconPicker(true)}
-            activeOpacity={0.85}
-          >
-            <View style={[styles.iconPreviewBox, { backgroundColor: colorHex + '20' }]}>
-              <Ionicons name={resolveIcon(iconKey, 'wallet-outline')} size={24} color={colorHex} />
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>ACCOUNT TYPE</Text>
+            <View style={styles.typeGrid}>
+              {ACCOUNT_TYPES.map((type: AccountType) => {
+                const isSelected = accountType === type;
+                return (
+                  <TouchableOpacity
+                    key={type}
+                    activeOpacity={0.7}
+                    onPress={() => setAccountType(type)}
+                    style={[
+                      styles.typeCell,
+                      isSelected && { backgroundColor: colorHex, borderColor: colorHex },
+                    ]}
+                  >
+                    <Ionicons
+                      name={ACCOUNT_TYPE_ICONS[type] as any}
+                      size={16}
+                      color={isSelected ? colors.background : colors.text}
+                    />
+                    <Text
+                      style={[
+                        styles.typeLabel,
+                        { color: isSelected ? colors.background : colors.text },
+                        isSelected && { fontFamily: theme.fontFamilies.sansBold }
+                      ]}
+                    >
+                      {ACCOUNT_TYPE_LABELS[type]}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
-            <Text style={styles.iconSelectorText}>{iconKey.replace('-outline', '').replace('-', ' ')}</Text>
-            <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-          </TouchableOpacity>
-          <View style={styles.answerLine} />
-        </View>
+          </View>
 
-        <View style={[styles.section, styles.sectionLast]}>
-          <Text style={styles.label}>Color</Text>
-          <View style={styles.colorGrid}>
-            {ACCOUNT_COLORS.map((item: string) => (
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>OPENING BALANCE</Text>
+            <View style={styles.card}>
+              <Controller
+                control={control}
+                name="balance"
+                rules={{
+                  validate: (v) =>
+                    !v.trim() || (!isNaN(parseFloat(v)) && parseFloat(v) >= 0) || 'Enter a valid amount',
+                }}
+                render={({ field }) => (
+                  <View style={styles.amountRow}>
+                    <Text style={styles.currencySymbol}>{currency}</Text>
+                    <TextInput
+                      value={field.value}
+                      onChangeText={field.onChange}
+                      onBlur={field.onBlur}
+                      placeholder="0.00"
+                      placeholderTextColor={colors.textMuted + '80'}
+                      keyboardType="decimal-pad"
+                      style={styles.amountInput}
+                    />
+                  </View>
+                )}
+              />
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>VISUALS</Text>
+            <View style={styles.visualsRow}>
               <TouchableOpacity
-                key={item}
-                activeOpacity={0.9}
-                onPress={() => setColorHex(item)}
-                style={[
-                  styles.colorCell,
-                  { backgroundColor: item },
-                  colorHex === item && styles.colorCellActive,
-                ]}
+                style={styles.visualBtn}
+                onPress={() => setShowIconPicker(true)}
+                activeOpacity={0.7}
               >
-                {colorHex === item ? <Ionicons name="checkmark" size={14} color="#000100" /> : null}
+                <View style={[styles.iconBox, { backgroundColor: colorHex + '15' }]}>
+                  <Ionicons name={resolveIcon(iconKey, 'wallet-outline')} size={20} color={colorHex} />
+                </View>
+                <Text style={styles.visualBtnText}>Icon</Text>
               </TouchableOpacity>
-            ))}
+
+              <TouchableOpacity
+                style={styles.visualBtn}
+                onPress={() => setShowCurrencyPicker(true)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.iconBox}>
+                  <Text style={styles.currencyInitial}>{currency}</Text>
+                </View>
+                <Text style={styles.visualBtnText}>Currency</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>PICK A COLOR</Text>
+            <View style={styles.colorGrid}>
+              {ACCOUNT_COLORS.map((item: string) => (
+                <TouchableOpacity
+                  key={item}
+                  activeOpacity={0.7}
+                  onPress={() => setColorHex(item)}
+                  style={[
+                    styles.colorCell,
+                    { backgroundColor: item },
+                    colorHex === item && styles.colorCellActive,
+                  ]}
+                >
+                  {colorHex === item ? <Ionicons name="checkmark" size={16} color={colors.background} /> : null}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>EXTENDED DETAILS (OPTIONAL)</Text>
+            <View style={styles.card}>
+              <Controller
+                control={control}
+                name="holderName"
+                render={({ field }) => (
+                  <TextInput
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder="Holder Name"
+                    placeholderTextColor={colors.textMuted + '80'}
+                    style={[styles.input, styles.subInput]}
+                  />
+                )}
+              />
+              <View style={styles.divider} />
+              <Controller
+                control={control}
+                name="accountNumber"
+                render={({ field }) => (
+                  <TextInput
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder="Account Number / IBAN"
+                    placeholderTextColor={colors.textMuted + '80'}
+                    style={[styles.input, styles.subInput]}
+                  />
+                )}
+              />
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -277,8 +278,9 @@ export default function AccountCreatePage() {
           onPress={handleSave}
           disabled={!isValid || isPending}
         >
-          <Text style={styles.primaryBtnText}>Create Account</Text>
-          <Ionicons name="arrow-forward" size={16} color="#FFF" />
+          <Text style={styles.primaryBtnText}>
+            {isPending ? 'Creating...' : 'Create Account'}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -300,137 +302,138 @@ export default function AccountCreatePage() {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
-    },
-    scroll: {
-      flex: 1,
+      backgroundColor: theme.colors.background,
     },
     content: {
       paddingHorizontal: 24,
-      paddingTop: 10,
-      paddingBottom: 120,
+      paddingTop: 24,
+      paddingBottom: 140,
     },
-    section: {
-      paddingBottom: 22,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-      marginBottom: 22,
+    formSection: {
+      gap: theme.spacing[24],
     },
-    sectionLast: {
-      borderBottomWidth: 0,
-      marginBottom: 0,
-      paddingBottom: 0,
+    inputGroup: {
+      gap: theme.spacing[12],
     },
     label: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      fontSize: 13,
-      color: colors.textMuted,
-      letterSpacing: 0.1,
-      marginBottom: 6,
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 10,
+      color: theme.colors.textMuted,
+      letterSpacing: 1.5,
     },
-    labelSpaced: {
-      marginTop: 16,
+    card: {
+      backgroundColor: theme.colors.card,
+      borderRadius: theme.radius.lg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      padding: theme.spacing[16],
+      ...theme.shadow.xs,
     },
-    answerInput: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 28,
-      lineHeight: 34,
-      color: colors.text,
-      letterSpacing: -0.7,
-      paddingHorizontal: 0,
-      paddingVertical: 4,
+    input: {
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 16,
+      color: theme.colors.text,
+      paddingVertical: 0,
     },
-    answerInputAmount: {
-      fontFamily: TYPOGRAPHY.fonts.monoBold,
-      letterSpacing: 0,
+    subInput: {
+      fontSize: 14,
+      fontFamily: theme.fontFamilies.sans,
     },
-    answerLine: {
-      height: 2,
-      borderRadius: 999,
-      backgroundColor: colors.primary + '55',
-      marginTop: 4,
+    divider: {
+      height: 1,
+      backgroundColor: theme.colors.border,
+      marginVertical: theme.spacing[12],
     },
-    answerLineError: {
-      backgroundColor: colors.danger + '88',
-    },
-    currencyRow: {
+    amountRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: 6,
+      gap: theme.spacing[12],
     },
-    currencyValue: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 28,
-      lineHeight: 34,
-      color: colors.text,
-      letterSpacing: -0.7,
+    currencySymbol: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 18,
+      color: theme.colors.textMuted,
     },
-    iconSelector: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-      paddingVertical: 6,
-    },
-    iconPreviewBox: {
-      width: 44,
-      height: 44,
-      borderRadius: 12,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    iconSelectorText: {
+    amountInput: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 20,
-      color: colors.text,
-      textTransform: 'capitalize',
-    },
-    colorGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 12,
-    },
-    colorCell: {
-      width: 34,
-      height: 34,
-      borderRadius: 17,
-      borderWidth: 2,
-      borderColor: 'transparent',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    colorCellActive: {
-      borderColor: colors.text,
-      transform: [{ scale: 1.08 }],
+      fontFamily: theme.fontFamilies.monoBold,
+      fontSize: 24,
+      color: theme.colors.text,
+      paddingVertical: 0,
     },
     typeGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 8,
-      marginTop: 8,
+      gap: theme.spacing[8],
     },
     typeCell: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 12,
+      gap: theme.spacing[8],
+      paddingHorizontal: theme.spacing[12],
+      height: 40,
+      borderRadius: theme.radius.md,
       borderWidth: 1,
-      borderColor: colors.text + '10',
-      backgroundColor: colors.background + 'B8',
-    },
-    typeCellActive: {
-      borderColor: 'transparent',
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.card,
     },
     typeLabel: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 12,
+    },
+    visualsRow: {
+      flexDirection: 'row',
+      gap: theme.spacing[12],
+    },
+    visualBtn: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing[12],
+      padding: theme.spacing[12],
+      backgroundColor: theme.colors.card,
+      borderRadius: theme.radius.lg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      ...theme.shadow.xs,
+    },
+    iconBox: {
+      width: 40,
+      height: 40,
+      borderRadius: theme.radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.background,
+    },
+    visualBtnText: {
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 14,
+      color: theme.colors.text,
+    },
+    currencyInitial: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 14,
+      color: theme.colors.textMuted,
+    },
+    colorGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: theme.spacing[12],
+    },
+    colorCell: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    colorCellActive: {
+      borderWidth: 2,
+      borderColor: theme.colors.text,
     },
     footer: {
       position: 'absolute',
@@ -440,25 +443,18 @@ const createStyles = (colors: ThemeColors) =>
     },
     primaryBtn: {
       height: 56,
-      borderRadius: 16,
-      backgroundColor: colors.primary,
-      flexDirection: 'row',
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.text,
       justifyContent: 'center',
       alignItems: 'center',
-      shadowColor: colors.primary,
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.25,
-      shadowRadius: 12,
-      elevation: 5,
+      ...theme.shadow.md,
     },
     primaryBtnDisabled: {
-      opacity: 0.45,
+      opacity: 0.5,
     },
     primaryBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
-      fontSize: 14,
-      color: '#FFFFFF',
-      letterSpacing: 0.3,
-      marginRight: 10,
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 16,
+      color: theme.colors.background,
     },
   });

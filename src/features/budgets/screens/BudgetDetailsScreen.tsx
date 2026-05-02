@@ -4,21 +4,19 @@ import React from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header, TransactionRow, Typography, Card, MoneyText, EmptyState, SectionLabel, Badge, IconButton } from '../../../components/ui';
-import { useTheme } from '../../../providers/ThemeProvider';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { radius, spacing, LAYOUT } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
 import { useBudgetById, useBudgetsProgress } from '../api/budgets';
 import { useTransactions } from '../../transactions/hooks/transactions';
 
 export const BudgetDetailsScreen = React.memo(function BudgetDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const budgetId = parseInt(id, 10);
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   const { data: budget, isLoading: loadingBudget } = useBudgetById(budgetId);
   const { data: progressData, isLoading: loadingProgress } = useBudgetsProgress();
@@ -84,7 +82,7 @@ export const BudgetDetailsScreen = React.memo(function BudgetDetailsScreen() {
             <Typography variant="bodySm" color={colors.textMuted}>
               Spent {formatCurrency(spent, profile.defaultCurrency)} of {formatCurrency(total, profile.defaultCurrency)}
             </Typography>
-            <Typography variant="monoSm" weight="bold">{Math.round(percentage)}%</Typography>
+            <Typography variant="monoSm" weight="sansBold">{Math.round(percentage)}%</Typography>
           </View>
           <View style={styles.progressBar}>
             <View 
@@ -102,26 +100,26 @@ export const BudgetDetailsScreen = React.memo(function BudgetDetailsScreen() {
         <View style={styles.metaGrid}>
           <View style={styles.metaItem}>
             <Typography variant="label">Period</Typography>
-            <Typography variant="bodySm" weight="semibold" style={styles.capitalize}>
+            <Typography variant="bodySm" weight="sansSemiBold" style={styles.capitalize}>
               {budget.period.toLowerCase()}
             </Typography>
           </View>
           <View style={styles.metaItem}>
             <Typography variant="label">Mode</Typography>
-            <Typography variant="bodySm" weight="semibold" style={styles.capitalize}>
+            <Typography variant="bodySm" weight="sansSemiBold" style={styles.capitalize}>
               {budget.mode.toLowerCase()}
             </Typography>
           </View>
           <View style={styles.metaItem}>
             <Typography variant="label">Type</Typography>
-            <Typography variant="bodySm" weight="semibold">
+            <Typography variant="bodySm" weight="sansSemiBold">
               {budget.type === 'DR' ? 'Expense' : 'Income'}
             </Typography>
           </View>
         </View>
       </Card>
 
-      <SectionLabel text="TRANSACTIONS" style={styles.sectionHeader} />
+      <SectionLabel text="Transactions" style={styles.sectionHeader} />
     </View>
   );
 
@@ -135,7 +133,6 @@ export const BudgetDetailsScreen = React.memo(function BudgetDetailsScreen() {
         renderItem={({ item, index }) => (
           <TransactionRow
             tx={item}
-            colors={colors}
             isFirst={index === 0}
             isLast={index === (transactions?.length || 0) - 1}
             showDate
@@ -166,62 +163,62 @@ const formatCurrency = (amount: number, currency: string) => {
   }).format(amount);
 };
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   headerContent: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
   },
   heroCard: {
-    padding: spacing('6'),
-    marginBottom: spacing('7'),
+    padding: 24,
+    marginBottom: 32,
   },
   heroTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: spacing('6'),
+    marginBottom: 24,
   },
   heroAmount: {
-    fontSize: TYPOGRAPHY.sizes.xxxl,
-    lineHeight: TYPOGRAPHY.sizes.xxxl * 1.1,
+    fontSize: 32,
+    lineHeight: 38,
     letterSpacing: -1,
   },
   progressSection: {
-    marginBottom: spacing('6'),
+    marginBottom: 24,
   },
   progressInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing('2'),
+    marginBottom: 8,
   },
   progressBar: {
     height: 6,
-    backgroundColor: colors.border + '40',
-    borderRadius: radius('full'),
+    backgroundColor: theme.colors.border + '40',
+    borderRadius: theme.radius.full,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: radius('full'),
+    borderRadius: theme.radius.full,
   },
   metaGrid: {
     flexDirection: 'row',
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: theme.colors.border,
     borderStyle: 'dashed',
-    paddingTop: spacing('5'),
-    gap: spacing('4'),
+    paddingTop: 20,
+    gap: 16,
   },
   metaItem: {
     flex: 1,
@@ -230,9 +227,9 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     textTransform: 'capitalize',
   },
   sectionHeader: {
-    marginBottom: spacing('4'),
+    marginBottom: 16,
   },
   listContent: {
-    paddingBottom: spacing('10'),
+    paddingBottom: 40,
   },
 });

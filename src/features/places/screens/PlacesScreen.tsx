@@ -5,17 +5,16 @@ import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, View, Platfo
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card, ConfirmDialog, EmptyState, Header, OptionsDialog, Typography } from '../../../components/ui';
 import { usePremium } from '../../../providers/PremiumProvider';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { LAYOUT, radius, spacing } from '../../../theme/tokens';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useDeletePlace, usePlaces, Place } from '../api/places';
 import { fromDbColor } from '../../../utils/format';
 
 export const PlacesScreen = React.memo(function PlacesScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { isPremium, showAlert } = usePremium();
   const router = useRouter();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const { data: places, isLoading: loadingPlaces } = usePlaces();
   const { mutate: deletePlace } = useDeletePlace();
@@ -27,12 +26,12 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
   const handleCreate = useCallback(() => {
     if (!isPremium && (places?.length || 0) >= 5) {
       showAlert({
-        title: 'Limit Reached',
+        title: 'Limit reached',
         message: 'Free users can track up to 5 places. Upgrade to Pro for unlimited locations!',
         type: 'warning',
         buttons: [
           { text: 'Maybe later', style: 'cancel' },
-          { text: 'Upgrade Now', onPress: () => router.push('/premium') }
+          { text: 'Upgrade now', onPress: () => router.push('/premium') }
         ]
       });
       return;
@@ -134,6 +133,7 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
           initialNumToRender={10}
           maxToRenderPerBatch={10}
           windowSize={5}
+          showsVerticalScrollIndicator={false}
           removeClippedSubviews={Platform.OS === 'android'}
           ListEmptyComponent={
             <EmptyState
@@ -150,7 +150,7 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
       <OptionsDialog
         visible={showOptions}
         onClose={() => setShowOptions(false)}
-        title="Place Options"
+        title="Place options"
         subtitle={selectedPlace?.name}
         options={options}
       />
@@ -158,7 +158,7 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
       <ConfirmDialog
         visible={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
-        title="Delete Place"
+        title="Delete place"
         message={`Are you sure you want to delete "${selectedPlace?.name}"? Linked transactions will remain but won't be associated with this place.`}
         confirmLabel="Delete"
         destructive
@@ -171,10 +171,10 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   center: {
     flex: 1,
@@ -182,13 +182,13 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
   },
   headerBtn: {
-    padding: spacing('2'),
+    padding: 8,
   },
   listContent: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
-    paddingBottom: spacing('10'),
-    gap: spacing('4'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 40,
+    gap: 16,
   },
   card: {
     padding: 0,
@@ -197,13 +197,13 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: spacing('4'),
-    gap: spacing('4'),
+    padding: 16,
+    gap: 16,
   },
   avatar: {
     width: 56,
     height: 56,
-    borderRadius: radius('full'),
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },

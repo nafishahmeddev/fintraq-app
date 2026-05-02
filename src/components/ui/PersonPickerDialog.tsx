@@ -11,13 +11,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { RADIUS, spacing } from '../../theme/tokens';
-import { TYPOGRAPHY } from '../../theme/typography';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 import { usePeople } from '../../features/people/api/people';
 import { fromDbColor } from '../../utils/format';
-import { Typography } from './Typography';
 
 type Props = {
   visible: boolean;
@@ -36,9 +32,10 @@ export const PersonPickerDialog = React.memo(function PersonPickerDialog({
   title = 'Select person',
   onAddPerson,
 }: Props) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { data: people, isLoading } = usePeople();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredPeople = useMemo(() => {
@@ -142,7 +139,7 @@ export const PersonPickerDialog = React.memo(function PersonPickerDialog({
                   onPress={() => handleSelect(person.id)}
                   activeOpacity={0.7}
                 >
-                  <View style={[styles.avatar, { backgroundColor: fromDbColor(person.color) + '20' }]}>
+                  <View style={[styles.avatar, { backgroundColor: fromDbColor(person.color) + '15' }]}>
                     <Ionicons 
                       name={(person.icon as any) || 'person'} 
                       size={20} 
@@ -177,7 +174,7 @@ export const PersonPickerDialog = React.memo(function PersonPickerDialog({
   );
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
@@ -189,128 +186,131 @@ const createStyles = (colors: ThemeColors) =>
     },
     sheet: {
       height: '70%',
-      backgroundColor: colors.background,
-      borderTopLeftRadius: RADIUS['3xl'],
-      borderTopRightRadius: RADIUS['3xl'],
+      backgroundColor: theme.colors.background,
+      borderTopLeftRadius: theme.radius['2xl'],
+      borderTopRightRadius: theme.radius['2xl'],
       borderTopWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       overflow: 'hidden',
     },
     handle: {
       alignSelf: 'center',
       width: 40,
       height: 4,
-      borderRadius: RADIUS.full,
-      marginTop: spacing('3'),
-      backgroundColor: colors.border,
+      borderRadius: theme.radius.full,
+      marginTop: 12,
+      backgroundColor: theme.colors.border,
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: spacing('6'),
-      paddingTop: spacing('4'),
-      paddingBottom: spacing('4'),
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      paddingBottom: 16,
     },
     headerRight: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing('4'),
+      gap: 16,
     },
     title: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: theme.fontFamilies.sansBold,
       fontSize: 24,
-      color: colors.text,
+      color: theme.colors.text,
+      letterSpacing: -0.5,
     },
     addBtn: {
       width: 40,
       height: 40,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.surface,
       justifyContent: 'center',
       alignItems: 'center',
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     closeBtn: {
       width: 40,
       height: 40,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.surface,
       justifyContent: 'center',
       alignItems: 'center',
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     searchWrap: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginHorizontal: spacing('6'),
-      marginBottom: spacing('4'),
+      marginHorizontal: 24,
+      marginBottom: 16,
       height: 48,
-      borderRadius: RADIUS.lg,
-      backgroundColor: colors.surface,
-      paddingHorizontal: spacing('4'),
-      gap: spacing('3'),
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: 16,
+      gap: 12,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     searchInput: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 16,
-      color: colors.text,
+      color: theme.colors.text,
     },
     scrollView: {
       flex: 1,
     },
     scrollContent: {
-      paddingHorizontal: spacing('6'),
-      paddingBottom: spacing('8'),
+      paddingHorizontal: 24,
+      paddingBottom: 32,
     },
     personRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: spacing('4'),
+      paddingVertical: 16,
       borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-      gap: spacing('4'),
+      borderBottomColor: theme.colors.border,
+      gap: 16,
     },
     personRowSelected: {
-      backgroundColor: colors.primary + '08',
+      backgroundColor: theme.colors.primary + '08',
     },
     avatar: {
       width: 48,
       height: 48,
-      borderRadius: RADIUS.full,
+      borderRadius: theme.radius.full,
       justifyContent: 'center',
       alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     personInfo: {
       flex: 1,
     },
     personName: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 16,
-      color: colors.text,
+      color: theme.colors.text,
     },
     selectedText: {
-      color: colors.primary,
+      color: theme.colors.primary,
     },
     personPhone: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 12,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       marginTop: 2,
     },
     emptyState: {
       alignItems: 'center',
-      paddingVertical: spacing('12'),
-      gap: spacing('3'),
+      paddingVertical: 48,
+      gap: 12,
     },
     emptyText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 14,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
   });

@@ -15,38 +15,47 @@ export type ThemePalette = {
   info: string;
 };
 
+/**
+ * Wise Absolute Color Palette
+ * Based on official wise.design foundations (2024)
+ * 
+ * Primary brand values:
+ * Bright Green: #9FE870
+ * Forest Green: #163300
+ */
+
 export const DARK_THEME: ThemePalette = {
-  background: '#000100',
-  card: 'rgba(255, 255, 255, 0.02)',
-  surface: 'rgba(255, 255, 255, 0.05)',
-  primary: '#B8D641',
-  primaryLight: '#cae560',
-  primaryDark: '#a0c119',
-  secondary: '#f9fff3',
-  text: '#fbfff3',
-  textMuted: '#b2bb8b',
-  border: 'transparent',
-  success: '#6BD498',
-  danger: '#EF4444',
-  warning: '#F59E0B',
-  info: '#3B82F6',
+  background: '#163300', // Forest Green (Primary Brand)
+  card: '#1E4000',
+  surface: '#264D00',
+  primary: '#9FE870', // Bright Green
+  primaryLight: '#B5EE8D',
+  primaryDark: '#163300',
+  secondary: '#FFFFFF',
+  text: '#FFFFFF',
+  textMuted: '#A6B399',
+  border: '#2E4D1A',
+  success: '#9FE870',
+  danger: '#F1404B',
+  warning: '#F2BB05',
+  info: '#2ED3F2',
 };
 
 export const LIGHT_THEME: ThemePalette = {
-  background: '#F6FFF9',
-  card: 'rgba(0, 0, 0, 0.02)',
-  surface: 'rgba(0, 0, 0, 0.05)',
-  primary: '#a6c13a',
-  primaryLight: '#b9d253',
-  primaryDark: '#8caa14',
-  secondary: '#000100',
-  text: '#000100',
-  textMuted: '#737a5f',
-  border: 'transparent',
-  success: '#43B875',
-  danger: '#DC2626',
-  warning: '#D97706',
-  info: '#2563EB',
+  background: '#FFFFFF', 
+  card: '#F2F5F7', // Background Neutral (8% Forest Green tint)
+  surface: '#E8EDF1',
+  primary: '#9FE870', // Bright Green (Interactive Accent)
+  primaryLight: '#B5EE8D',
+  primaryDark: '#163300', // Forest Green
+  secondary: '#163300',
+  text: '#163300', // Content Primary (Forest Green based)
+  textMuted: '#5D7079', // Content Secondary
+  border: '#E2E8ED', // Separator
+  success: '#007D44', // Accessible Success Green (for text on white)
+  danger: '#D92D20', // Accessible Error Red
+  warning: '#F79009', // Accessible Warning Orange
+  info: '#00B9FF',
 };
 
 export type ThemeColors = ThemePalette;

@@ -14,16 +14,15 @@ import { OptionsDialog } from '../../src/components/ui/OptionsDialog';
 import { db } from '../../src/db/client';
 import { accounts, categories, payments } from '../../src/db/schema';
 import { useSettings } from '../../src/providers/SettingsProvider';
-import { useTheme } from '../../src/providers/ThemeProvider';
+import { Theme, useTheme } from '../../src/providers/ThemeProvider';
 import { NotificationService } from '../../src/services/notification.service';
-import { ThemeColors } from '../../src/theme/colors';
-import { TYPOGRAPHY } from '../../src/theme/typography';
 
 export default function SettingsScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { isPremium, resetPremium } = usePremium();
   const { profile, updateProfile } = useSettings();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
   const [showAppearanceDialog, setShowAppearanceDialog] = React.useState(false);
   const [showResetConfirmDialog, setShowResetConfirmDialog] = React.useState(false);
@@ -33,9 +32,9 @@ export default function SettingsScreen() {
   const [devClickCount, setDevClickCount] = React.useState(0);
 
   const themeOptions: { label: string; value: 'light' | 'dark' | 'system'; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { label: 'Light Mode', value: 'light', icon: 'sunny-outline' },
-    { label: 'Dark Mode', value: 'dark', icon: 'moon-outline' },
-    { label: 'Follow System', value: 'system', icon: 'phone-portrait-outline' },
+    { label: 'Light mode', value: 'light', icon: 'sunny-outline' },
+    { label: 'Dark mode', value: 'dark', icon: 'moon-outline' },
+    { label: 'Follow system', value: 'system', icon: 'phone-portrait-outline' },
   ];
 
   const handleResetData = () => {
@@ -144,42 +143,41 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container}>
 
-
       <Header title="Settings" subtitle="System preferences" showBack />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.heroPanel}>
           <View style={styles.heroHeader}>
             <View>
-              <Text style={styles.heroKicker}>DEVICE PROFILE</Text>
-              <Text style={styles.heroTitle}>App Configuration</Text>
+              <Text style={styles.heroKicker}>Device profile</Text>
+              <Text style={styles.heroTitle}>App configuration</Text>
             </View>
             <View style={styles.heroBadge}>
               <View style={styles.heroBadgeDot} />
-              <Text style={styles.heroBadgeText}>ACTIVE</Text>
+              <Text style={styles.heroBadgeText}>Active</Text>
             </View>
           </View>
 
           <View style={styles.heroGrid}>
             <View style={styles.heroGridItem}>
-              <Text style={styles.heroGridLabel}>APPEARANCE</Text>
+              <Text style={styles.heroGridLabel}>Appearance</Text>
               <Text style={styles.heroGridValue}>{activeTheme}</Text>
             </View>
             <View style={styles.heroGridDivider} />
             <View style={styles.heroGridItem}>
-              <Text style={styles.heroGridLabel}>VERSION</Text>
+              <Text style={styles.heroGridLabel}>Version</Text>
               <Text style={styles.heroGridValue}>v{Constants.expoConfig?.version || '1.0.0'}</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>SUBSCRIPTION</Text>
+          <Text style={styles.sectionLabel}>Subscription</Text>
           <View style={[styles.card, isPremium && { borderColor: colors.primary, borderWidth: 1.5 }]}>
             <PreferenceRow
               icon="sparkles"
               title={isPremium ? 'Luno Pro (Lifetime)' : 'Upgrade to Pro'}
-              value={isPremium ? "ACTIVE" : "FREE"}
+              value={isPremium ? "Active" : "Free"}
               subtitle={
                 isPremium ? "Enjoying full access to all features" :
                   "Unlock advanced analytics & insights"
@@ -192,7 +190,7 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>FEATURES</Text>
+          <Text style={styles.sectionLabel}>Features</Text>
           <View style={styles.card}>
             <PreferenceRow
               icon="people-outline"
@@ -217,12 +215,12 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>ACCOUNT</Text>
+          <Text style={styles.sectionLabel}>Account</Text>
           <View style={styles.card}>
             <PreferenceRow
               icon="person-outline"
-              title="Display Name"
-              value={profile.name ? undefined : 'NOT SET'}
+              title="Display name"
+              value={profile.name ? undefined : 'Not set'}
               subtitle={profile.name || 'Personalize your dashboard'}
               onPress={openEditName}
               isLast
@@ -231,18 +229,18 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>NOTIFICATIONS</Text>
+          <Text style={styles.sectionLabel}>Notifications</Text>
           <View style={styles.card}>
             <PreferenceRow
               icon="notifications-outline"
-              title="Daily Reminder"
-              value={profile.reminderEnabled ? 'ON' : 'OFF'}
+              title="Daily reminder"
+              value={profile.reminderEnabled ? 'On' : 'Off'}
               subtitle="Get notified to track your daily spend"
               onPress={handleToggleReminders}
             />
             <PreferenceRow
               icon="time-outline"
-              title="Reminder Time"
+              title="Reminder time"
               value={profile.reminderTime}
               subtitle="Preferred time for daily alert"
               onPress={() => setShowTimePicker(true)}
@@ -269,7 +267,7 @@ export default function SettingsScreen() {
         })()}
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>GENERAL</Text>
+          <Text style={styles.sectionLabel}>General</Text>
           <View style={styles.card}>
             <PreferenceRow
               icon="contrast-outline"
@@ -289,7 +287,7 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>DATA</Text>
+          <Text style={styles.sectionLabel}>Data</Text>
           <View style={styles.card}>
             <PreferenceRow
               icon="download-outline"
@@ -299,13 +297,13 @@ export default function SettingsScreen() {
             />
             <PreferenceRow
               icon="cloud-outline"
-              title="Backup & Restore"
+              title="Backup & restore"
               subtitle="Full data backup and restore"
               onPress={() => router.push('/backup')}
             />
             <PreferenceRow
               icon="trash-bin-outline"
-              title="Factory Reset"
+              title="Factory reset"
               destructive
               subtitle="Permanently wipe all local data"
               onPress={handleResetData}
@@ -318,7 +316,7 @@ export default function SettingsScreen() {
           <TouchableOpacity onPress={handleFooterClick} activeOpacity={1}>
             <Text style={styles.footerBrand}>LUNO / CORE</Text>
           </TouchableOpacity>
-          <Text style={styles.footerCopy}>ALL DATA IS ENCRYPTED AND STORED LOCALLY BY DEFAULT.</Text>
+          <Text style={styles.footerCopy}>All data is encrypted and stored locally by default.</Text>
 
           {devClickCount > 0 && (
             <TouchableOpacity
@@ -328,7 +326,7 @@ export default function SettingsScreen() {
                 Alert.alert("Premium Reset", "Account downgraded to Free.");
               }}
             >
-              <Text style={{ color: colors.danger, fontFamily: TYPOGRAPHY.fonts.semibold, fontSize: 10 }}>RESET SUBSCRIPTION ({7 - devClickCount})</Text>
+              <Text style={{ color: colors.danger, fontFamily: theme.fontFamilies.sansSemiBold, fontSize: 10 }}>Reset subscription ({7 - devClickCount})</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -362,7 +360,7 @@ export default function SettingsScreen() {
           <View style={styles.modalOverlay}>
             <TouchableOpacity style={StyleSheet.absoluteFillObject} activeOpacity={1} onPress={() => setShowEditNameModal(false)} />
             <View style={styles.modalCard}>
-              <Text style={styles.modalTitle}>Display Name</Text>
+              <Text style={styles.modalTitle}>Display name</Text>
               <Text style={styles.modalSubtitle}>{"How you'll be greeted in the dashboard"}</Text>
               <TextInput
                 style={styles.modalInput}
@@ -379,7 +377,7 @@ export default function SettingsScreen() {
                   <Text style={styles.modalBtnCancelText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.modalBtnSave} onPress={saveEditName} activeOpacity={0.8}>
-                  <Text style={styles.modalBtnSaveText}>Save Changes</Text>
+                  <Text style={styles.modalBtnSaveText}>Save changes</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -400,10 +398,10 @@ export default function SettingsScreen() {
   );
 }
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   scrollContent: {
     paddingHorizontal: 24,
@@ -411,9 +409,9 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     paddingBottom: 48,
   },
   heroPanel: {
-    borderRadius: 24,
+    borderRadius: theme.radius['2xl'],
     padding: 24,
-    backgroundColor: colors.surface,
+    backgroundColor: theme.colors.surface,
     marginBottom: 28,
   },
   heroHeader: {
@@ -423,16 +421,17 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     marginBottom: 24,
   },
   heroKicker: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 10,
-    color: colors.primary,
+    color: theme.colors.primary,
     letterSpacing: 2,
     marginBottom: 4,
+    textTransform: 'uppercase',
   },
   heroTitle: {
-    fontFamily: TYPOGRAPHY.fonts.heading,
+    fontFamily: theme.fontFamilies.heading,
     fontSize: 26,
-    color: colors.text,
+    color: theme.colors.text,
     letterSpacing: -0.5,
   },
   heroBadge: {
@@ -441,20 +440,21 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     gap: 6,
     paddingHorizontal: 10,
     height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.background,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.background,
   },
   heroBadgeDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: colors.success,
+    backgroundColor: theme.colors.success,
   },
   heroBadgeText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 9,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   heroGrid: {
     flexDirection: 'row',
@@ -465,37 +465,39 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     flex: 1,
   },
   heroGridLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 9,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     letterSpacing: 1,
     marginBottom: 4,
+    textTransform: 'uppercase',
   },
   heroGridValue: {
-    fontFamily: TYPOGRAPHY.fonts.heading,
+    fontFamily: theme.fontFamilies.heading,
     fontSize: 18,
-    color: colors.text,
+    color: theme.colors.text,
     letterSpacing: -0.2,
   },
   heroGridDivider: {
     width: 1,
     height: 24,
-    backgroundColor: colors.text + '08',
+    backgroundColor: theme.colors.text + '08',
   },
   section: {
     marginBottom: 28,
   },
   sectionLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 10,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     letterSpacing: 2,
     marginBottom: 12,
     paddingLeft: 4,
+    textTransform: 'uppercase',
   },
   card: {
-    borderRadius: 20,
-    backgroundColor: colors.surface,
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.surface,
     overflow: 'hidden',
   },
   row: {
@@ -506,24 +508,24 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   iconBox: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: theme.colors.surface,
     marginRight: 14,
   },
   textDetails: {
     flex: 1,
   },
   rowTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 16,
-    color: colors.text,
+    color: theme.colors.text,
   },
   rowSubtitle: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     fontSize: 12,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     marginTop: 2,
   },
   rowRightSide: {
@@ -532,10 +534,11 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     gap: 8,
   },
   rowValue: {
-    fontFamily: TYPOGRAPHY.fonts.medium,
+    fontFamily: theme.fontFamilies.sansMedium,
     fontSize: 11,
-    color: colors.primary,
+    color: theme.colors.primary,
     letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   footer: {
     marginTop: 12,
@@ -543,15 +546,15 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     gap: 6,
   },
   footerBrand: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 10,
-    color: colors.text,
+    color: theme.colors.text,
     letterSpacing: 3,
   },
   footerCopy: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     fontSize: 9,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     textAlign: 'center',
     maxWidth: 200,
     lineHeight: 14,
@@ -564,8 +567,8 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     paddingHorizontal: 32,
   },
   modalCard: {
-    backgroundColor: colors.background,
-    borderRadius: 24,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius['2xl'],
     padding: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 12 },
@@ -574,24 +577,24 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     elevation: 8,
   },
   modalTitle: {
-    fontFamily: TYPOGRAPHY.fonts.heading,
+    fontFamily: theme.fontFamilies.heading,
     fontSize: 24,
-    color: colors.text,
+    color: theme.colors.text,
     marginBottom: 6,
   },
   modalSubtitle: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     fontSize: 14,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     marginBottom: 20,
   },
   modalInput: {
     height: 54,
-    borderRadius: 16,
-    backgroundColor: colors.surface,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.surface,
     paddingHorizontal: 16,
     fontSize: 16,
-    color: colors.text,
+    color: theme.colors.text,
     marginBottom: 20,
   },
   modalActions: {
@@ -601,26 +604,26 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   modalBtnCancel: {
     flex: 1,
     height: 48,
-    borderRadius: 14,
+    borderRadius: theme.radius.md,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: theme.colors.surface,
   },
   modalBtnCancelText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.text,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.text,
   },
   modalBtnSave: {
     flex: 1,
     height: 48,
-    borderRadius: 14,
+    borderRadius: theme.radius.md,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.text,
+    backgroundColor: theme.colors.text,
   },
   modalBtnSaveText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    color: colors.background,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    color: theme.colors.background,
   },
   devCard: {
     flexDirection: 'row',
@@ -629,9 +632,9 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     padding: 16,
   },
   devText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 13,
-    color: colors.text,
+    color: theme.colors.text,
     letterSpacing: 0.5,
   },
 });

@@ -2,9 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ThemeColors } from '../../theme/colors';
-import { RADIUS, spacing } from '../../theme/tokens';
-import { TYPOGRAPHY } from '../../theme/typography';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 import { TransactionType } from '../../types';
 import { MoneyText } from './MoneyText';
 import { fromDbColor } from '../../utils/format';
@@ -39,39 +37,29 @@ type TransactionData = {
 
 type Props = {
   tx: TransactionData;
-  colors: ThemeColors;
   onPress?: (tx: TransactionData) => void;
   isFirst?: boolean;
   isLast?: boolean;
   showDate?: boolean;
 };
 
-
-/**
- * TransactionRow - Editorial Brutalist Design
- * 
- * Layout:
- * - Card radius: 0 for middle items, 16px (lg) for first/last corners
- * - Padding: 14px vertical
- * - Gap: 10px between elements
- * - Icon box: 40px, 12px radius (md)
- */
 export const TransactionRow = React.memo(function TransactionRow({
   tx,
-  colors,
   onPress,
   isFirst,
   isLast,
   showDate
 }: Props) {
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const isTransfer = tx.type === 'TRANSFER';
   const categoryColor = useMemo(() => {
-    if (isTransfer) return colors.primary;
+    if (isTransfer) return colors.primaryDark;
     if (!tx.category) return colors.textMuted;
     return fromDbColor(tx.category.color);
-  }, [tx.category, isTransfer, colors.primary, colors.textMuted]);
+  }, [tx.category, isTransfer, colors.primaryDark, colors.textMuted]);
 
   const iconName: keyof typeof Ionicons.glyphMap = useMemo(() => {
     if (isTransfer) return 'swap-horizontal-outline';
@@ -88,12 +76,12 @@ export const TransactionRow = React.memo(function TransactionRow({
   const containerStyle = useMemo(() => ({
     borderBottomWidth: isLast ? 0 : 1,
     borderBottomColor: colors.border,
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: isFirst ? RADIUS['2xl'] : 0,
-    borderTopRightRadius: isFirst ? RADIUS['2xl'] : 0,
-    borderBottomLeftRadius: isLast ? RADIUS['2xl'] : 0,
-    borderBottomRightRadius: isLast ? RADIUS['2xl'] : 0,
-  }), [isFirst, isLast, colors.border, colors.surface]);
+    backgroundColor: colors.card,
+    borderTopLeftRadius: isFirst ? theme.radius.xl : 0,
+    borderTopRightRadius: isFirst ? theme.radius.xl : 0,
+    borderBottomLeftRadius: isLast ? theme.radius.xl : 0,
+    borderBottomRightRadius: isLast ? theme.radius.xl : 0,
+  }), [isFirst, isLast, colors.border, colors.card, theme.radius.xl]);
 
   const categoryName = isTransfer
     ? (tx.toAccount?.name ?? 'Transfer')
@@ -103,32 +91,31 @@ export const TransactionRow = React.memo(function TransactionRow({
   return (
     <TouchableOpacity
       style={[styles.container, containerStyle]}
-      activeOpacity={0.75}
+      activeOpacity={0.7}
       onPress={handlePress}
     >
-
       <View
         style={[
           styles.iconBox,
-          { backgroundColor: categoryColor + '20' },
+          { backgroundColor: categoryColor + '12' },
         ]}
       >
         <Ionicons name={iconName} size={18} color={categoryColor} />
       </View>
       <View style={styles.info}>
         <Text
-          style={[styles.title, { color: colors.text }]}
+          style={styles.title}
           numberOfLines={1}
         >
           {displayNote}
         </Text>
         <View style={styles.metaRow}>
           <Text
-            style={[styles.meta, { color: colors.textMuted }]}
+            style={styles.meta}
             numberOfLines={1}
           >
             {isTransfer
-              ? `Transfer to ${tx.toAccount?.name ?? 'account'} · ${tx.account.name}`
+              ? `To ${tx.toAccount?.name ?? 'account'} · ${tx.account.name}`
               : `${categoryName} · ${tx.account.name}${tx.person ? ` · ${tx.person.name}` : ''}${tx.place ? ` · ${tx.place.name}` : ''}`
             }
           </Text>
@@ -139,10 +126,10 @@ export const TransactionRow = React.memo(function TransactionRow({
           amount={tx.amount}
           currency={tx.account.currency}
           type={tx.type}
-          weight="bold"
+          weight="sansBold"
           style={styles.amount}
         />
-        <Text style={[styles.date, { color: colors.textMuted }]}>
+        <Text style={styles.date}>
           {showDate
             ? format(new Date(tx.datetime), 'MMM d')
             : format(new Date(tx.datetime), 'HH:mm')}
@@ -154,46 +141,51 @@ export const TransactionRow = React.memo(function TransactionRow({
 
 TransactionRow.displayName = 'TransactionRow';
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: spacing('3.5'),
-    gap: spacing('2.5'),
+    padding: theme.spacing[16],
+    gap: theme.spacing[12],
   },
   iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: RADIUS['2xl'],
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.md,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border + '10',
   },
   info: {
     flex: 1,
-    gap: spacing('1'),
+    gap: theme.spacing[2],
   },
   title: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontSize: 14,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: theme.fontSizes.sm,
+    color: theme.colors.text,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('1'),
+    gap: theme.spacing[4],
   },
   meta: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 12,
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: theme.fontSizes.xs,
+    color: theme.colors.textMuted,
   },
   right: {
     alignItems: 'flex-end',
-    gap: spacing('1'),
+    gap: theme.spacing[4],
   },
   amount: {
-    fontSize: 14,
+    fontSize: theme.fontSizes.sm,
   },
   date: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
-    fontSize: 11,
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 10,
+    color: theme.colors.textMuted,
   },
 });

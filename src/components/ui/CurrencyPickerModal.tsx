@@ -12,9 +12,7 @@ import {
   View,
 } from 'react-native';
 import { CURRENCIES } from '../../constants/currency';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 export type CurrencyPickerModalProps = {
   visible: boolean;
@@ -31,8 +29,9 @@ export const CurrencyPickerModal = React.memo(function CurrencyPickerModal({
   value,
   onChange
 }: CurrencyPickerModalProps) {
-  const { colors, isDark } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const [query, setQuery] = useState('');
 
   const filtered = useMemo(() => {
@@ -97,8 +96,6 @@ export const CurrencyPickerModal = React.memo(function CurrencyPickerModal({
         <TouchableOpacity style={styles.backdrop} onPress={handleClose} activeOpacity={1} />
 
         <View style={styles.sheet}>
-
-
           <View style={styles.handle} />
 
           {/* Header */}
@@ -158,7 +155,7 @@ export const CurrencyPickerModal = React.memo(function CurrencyPickerModal({
   );
 });
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
@@ -170,24 +167,20 @@ const createStyles = (colors: ThemeColors) =>
     },
     sheet: {
       height: '82%',
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
+      borderTopLeftRadius: theme.radius['2xl'],
+      borderTopRightRadius: theme.radius['2xl'],
       borderTopWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       overflow: 'hidden',
-      backgroundColor: colors.background,
-    },
-    glow: {
-      position: 'absolute',
-      borderRadius: 999,
+      backgroundColor: theme.colors.background,
     },
     handle: {
       alignSelf: 'center',
       width: 42,
       height: 4,
-      borderRadius: 999,
+      borderRadius: theme.radius.full,
       marginTop: 10,
-      backgroundColor: colors.textMuted + '55',
+      backgroundColor: theme.colors.textMuted + '55',
     },
     header: {
       paddingHorizontal: 24,
@@ -198,24 +191,24 @@ const createStyles = (colors: ThemeColors) =>
       justifyContent: 'space-between',
     },
     title: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: theme.fontFamilies.sansBold,
       fontSize: 28,
-      color: colors.text,
+      color: theme.colors.text,
       letterSpacing: -0.8,
     },
     subtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 12,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       marginTop: 2,
     },
     closeBtn: {
       width: 38,
       height: 38,
-      borderRadius: 999,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -225,10 +218,10 @@ const createStyles = (colors: ThemeColors) =>
       marginHorizontal: 24,
       marginBottom: 10,
       height: 44,
-      borderRadius: 999,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       paddingHorizontal: 12,
       gap: 8,
     },
@@ -237,9 +230,9 @@ const createStyles = (colors: ThemeColors) =>
     },
     searchInput: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
-      color: colors.text,
+      color: theme.colors.text,
       paddingVertical: 0,
     },
     listContent: {
@@ -248,7 +241,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     separator: {
       height: 1,
-      backgroundColor: colors.border,
+      backgroundColor: theme.colors.border,
       marginLeft: 54,
     },
     row: {
@@ -261,43 +254,43 @@ const createStyles = (colors: ThemeColors) =>
     codeWrap: {
       width: 42,
       height: 30,
-      borderRadius: 999,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.sm,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       alignItems: 'center',
       justifyContent: 'center',
     },
     codeWrapSelected: {
-      backgroundColor: colors.primary + '20',
-      borderColor: colors.primary + '50',
+      backgroundColor: theme.colors.primary + '15',
+      borderColor: theme.colors.primary + '30',
     },
     code: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 11,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       letterSpacing: 0.5,
     },
     codeSelected: {
-      color: colors.primary,
+      color: theme.colors.primary,
     },
     name: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
-      color: colors.text,
+      color: theme.colors.text,
     },
     nameSelected: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      color: colors.text,
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      color: theme.colors.text,
     },
     emptyWrap: {
       paddingVertical: 48,
       alignItems: 'center',
     },
     emptyText: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
   });

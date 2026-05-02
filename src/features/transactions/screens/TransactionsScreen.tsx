@@ -18,10 +18,7 @@ import { Header } from '../../../components/ui/Header';
 import { KPICard } from '../../../components/ui/KPICard';
 import { MoneyText } from '../../../components/ui/MoneyText';
 import { TransactionRow } from '../../../components/ui/TransactionRow';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS, SHADOWS, SPACING } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useCategories } from '../../categories/hooks/categories';
 import { AdvancedFilterService, AdvancedFilters, DEFAULT_ADVANCED_FILTERS } from '../../filters/api/advanced-filters.service';
@@ -136,7 +133,8 @@ const SwipeableRow = React.memo(function SwipeableRow({
   onEdit: (tx: TransactionListItem) => void;
   onDelete: (tx: TransactionListItem) => void;
 }) {
-  const { colors } = useTheme(); // Get colors from context to prevent prop-drilling re-renders
+  const theme = useTheme();
+  const { colors } = theme;
   const swipeRef = React.useRef<SwipeableInstance>(null);
 
   // Use refs to avoid dependency issues while maintaining stable callbacks
@@ -205,7 +203,6 @@ const SwipeableRow = React.memo(function SwipeableRow({
     >
       <TransactionRow
         tx={tx}
-        colors={colors}
         isFirst={isFirst}
         isLast={isLast}
         onPress={handleEdit}
@@ -220,8 +217,9 @@ export function TransactionsScreen() {
   const initialAccountId = React.useMemo(() => resolveParamNumber(params.accountId), [params.accountId]);
   const initialCategoryId = React.useMemo(() => resolveParamNumber(params.categoryId), [params.categoryId]);
 
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   // Advanced filters state
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilters>(() => {
@@ -516,7 +514,6 @@ export function TransactionsScreen() {
               selectedCurrency={selectedKpiCurrency}
               onSelectCurrency={setSelectedKpiCurrency}
               metrics={activeTotals}
-              colors={colors}
             />
 
             {activeFilterCount > 0 && (
@@ -584,30 +581,32 @@ export function TransactionsScreen() {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     loadingWrap: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
       justifyContent: 'center',
       alignItems: 'center',
     },
     headerActions: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: SPACING['2'],
+      gap: theme.spacing[8],
     },
     headerBtn: {
-      width: 44,
-      height: 44,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
+      width: 40,
+      height: 40,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.card,
       alignItems: 'center',
       justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     filterBadge: {
       position: 'absolute',
@@ -615,26 +614,26 @@ const createStyles = (colors: ThemeColors) =>
       right: -2,
       minWidth: 18,
       height: 18,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.primary,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 2,
-      borderColor: colors.background,
+      borderColor: theme.colors.background,
     },
     filterBadgeText: {
-      color: colors.background,
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      color: theme.colors.primaryDark,
+      fontFamily: theme.fontFamilies.sansBold,
       fontSize: 10,
     },
     content: {
-      paddingHorizontal: SPACING['6'],
-      paddingTop: SPACING['3'],
+      paddingHorizontal: theme.layout.screenPadding,
+      paddingTop: theme.spacing[12],
       paddingBottom: 120,
     },
     listHeader: {
-      gap: SPACING['5'],
-      marginBottom: SPACING['6'],
+      gap: theme.spacing[20],
+      marginBottom: theme.spacing[24],
     },
     activeFiltersRow: {
       flexDirection: 'row',
@@ -642,106 +641,103 @@ const createStyles = (colors: ThemeColors) =>
       justifyContent: 'space-between',
     },
     activeFiltersLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 10,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       letterSpacing: 1.5,
     },
     clearChip: {
-      backgroundColor: colors.danger + '12',
-      paddingHorizontal: SPACING['3'],
+      backgroundColor: theme.colors.danger + '12',
+      paddingHorizontal: theme.spacing[12],
       height: 28,
-      borderRadius: RADIUS.full,
+      borderRadius: theme.radius.full,
       alignItems: 'center',
       justifyContent: 'center',
     },
     clearChipText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 11,
-      color: colors.danger,
+      color: theme.colors.danger,
     },
-    daySection: { gap: SPACING['3'] },
     dayHeaderRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: SPACING['1'],
-      marginBottom: SPACING['3'],
+      paddingHorizontal: theme.spacing[4],
+      marginBottom: theme.spacing[12],
     },
     dayTitle: {
-      color: colors.textMuted,
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      color: theme.colors.textMuted,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 11,
       letterSpacing: 1.2,
       textTransform: 'uppercase',
     },
     dayTotals: {
       flexDirection: 'row',
-      gap: SPACING['3'],
+      gap: theme.spacing[12],
     },
     dayTotalValue: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.monoBold,
       fontSize: 12,
     },
-    dayCard: {
-      borderRadius: RADIUS.full,
-      overflow: 'hidden',
-    },
     emptyWrap: {
-      paddingVertical: 60,
+      paddingVertical: 80,
       alignItems: 'center',
-      gap: SPACING['4'],
+      gap: theme.spacing[16],
     },
     emptyIconBox: {
       width: 80,
       height: 80,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.card,
       alignItems: 'center',
       justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     emptyTitle: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      color: colors.text,
+      fontFamily: theme.fontFamilies.sansBold,
+      color: theme.colors.text,
       fontSize: 18,
     },
     emptySubtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
-      color: colors.textMuted,
+      fontFamily: theme.fontFamilies.sans,
+      color: theme.colors.textMuted,
       fontSize: 14,
       textAlign: 'center',
-      maxWidth: 240,
+      maxWidth: 260,
       lineHeight: 20,
     },
     emptyAction: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: SPACING['2.5'],
-      paddingHorizontal: SPACING['5'],
+      gap: theme.spacing[8],
+      paddingHorizontal: theme.spacing[20],
       height: 48,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.text,
-      marginTop: SPACING['2'],
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.text,
+      marginTop: theme.spacing[8],
     },
     emptyActionText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
-      color: colors.background,
+      fontFamily: theme.fontFamilies.sansBold,
+      color: theme.colors.background,
       fontSize: 15,
     },
     loadMoreWrap: {
-      paddingVertical: SPACING['7'],
+      paddingVertical: theme.spacing[32],
       alignItems: 'center',
     },
     fab: {
       position: 'absolute',
       bottom: 34,
-      right: SPACING['6'],
+      right: theme.layout.screenPadding,
       width: 60,
       height: 60,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.text,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.text,
       alignItems: 'center',
       justifyContent: 'center',
-      ...SHADOWS.lg,
+      ...theme.shadow.lg,
     },
   });

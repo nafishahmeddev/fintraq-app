@@ -7,17 +7,16 @@ import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
 import { Header } from '../../src/components/ui/Header';
 import { Input } from '../../src/components/ui/Input';
 import { usePremium } from '../../src/providers/PremiumProvider';
-import { useTheme } from '../../src/providers/ThemeProvider';
+import { Theme, useTheme } from '../../src/providers/ThemeProvider';
 import { NotificationService } from '../../src/services/notification.service';
-import { ThemeColors } from '../../src/theme/colors';
-import { TYPOGRAPHY } from '../../src/theme/typography';
 import { toErrorMessage } from '../../src/utils/errors';
 import { seedDummyData } from '../../src/utils/seed';
 
 export default function DeveloperScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { devOverride, setDevOverride } = usePremium();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [pin, setPin] = React.useState('');
@@ -240,10 +239,10 @@ export default function DeveloperScreen() {
   );
 }
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   scrollContent: {
     paddingHorizontal: 24,
@@ -263,7 +262,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   lockIconBox: {
     width: 80,
     height: 80,
-    borderRadius: 24,
+    borderRadius: theme.radius['2xl'],
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
@@ -275,15 +274,15 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     gap: 8,
   },
   lockTitle: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
     fontSize: 12,
-    color: colors.text,
+    color: theme.colors.text,
     letterSpacing: 4,
   },
   lockSubtitle: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     fontSize: 14,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -293,16 +292,16 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   pinInput: {
     fontSize: 24,
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
     letterSpacing: 10,
   },
   securityBranding: {
     marginTop: 48,
   },
   securityText: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 9,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     letterSpacing: 1.5,
     opacity: 0.5,
   },
@@ -310,16 +309,16 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     marginBottom: 28,
   },
   sectionLabel: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 10,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     letterSpacing: 2,
     marginBottom: 12,
     paddingLeft: 4,
   },
   card: {
-    borderRadius: 20,
-    backgroundColor: colors.surface,
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.surface,
     overflow: 'hidden',
   },
   row: {
@@ -342,7 +341,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   smallBtn: {
     flex: 1,
     height: 36,
-    borderRadius: 12,
+    borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: '#00000010',
     justifyContent: 'center',
@@ -350,31 +349,31 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     backgroundColor: '#00000005',
   },
   btnLabel: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
     fontSize: 10,
     letterSpacing: 0.5,
   },
   iconBox: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: theme.colors.surface,
     marginRight: 14,
   },
   textDetails: {
     flex: 1,
   },
   rowTitle: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 16,
-    color: colors.text,
+    color: theme.colors.text,
   },
   rowSubtitle: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     fontSize: 12,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     marginTop: 2,
   },
   infoRow: {
@@ -382,17 +381,17 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.text + '08',
+    borderBottomColor: theme.colors.text + '08',
   },
   infoLabel: {
-    fontFamily: TYPOGRAPHY.fonts.medium,
+    fontFamily: theme.fontFamilies.sansMedium,
     fontSize: 13,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
   },
   infoValue: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 13,
-    color: colors.text,
+    color: theme.colors.text,
   },
   footer: {
     marginTop: 48,
@@ -400,15 +399,15 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     gap: 6,
   },
   footerBrand: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 10,
-    color: colors.text,
+    color: theme.colors.text,
     letterSpacing: 3,
   },
   footerCopy: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     fontSize: 9,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     textAlign: 'center',
     maxWidth: 200,
     lineHeight: 14,

@@ -13,14 +13,11 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, CurrencyPickerModal, Header, IconPickerDialog, Input, Typography } from '../../../components/ui';
+import { Button, Header, IconPickerDialog, Input, Typography } from '../../../components/ui';
 import { CATEGORY_COLORS } from '../../../constants/picker';
 import { GoalStatus } from '../../../db/schema';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { LAYOUT, radius, spacing } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { parseAmount, toDbColor } from '../../../utils/format';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useCreateGoal, useGoalById, useUpdateGoal } from '../api/goals';
@@ -32,9 +29,10 @@ type Props = {
 
 export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: Props) {
   const router = useRouter();
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const isEditMode = mode === 'edit';
   const { data: editingGoal, isLoading: loadingGoal } = useGoalById(isEditMode ? goalId ?? null : null);
@@ -64,7 +62,6 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
       setStartDate(editingGoal.startDate ? new Date(editingGoal.startDate) : new Date());
       setEndDate(editingGoal.endDate ? new Date(editingGoal.endDate) : null);
       setAccountId(editingGoal.accountId);
-      // setCurrency will be handled by accountId effect or initial load
       setIconKey(editingGoal.icon + '-outline');
       setStatus(editingGoal.status);
     }
@@ -97,7 +94,7 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
     } catch (error) {
       Alert.alert('Error', 'Failed to save goal. Please try again.');
     }
-  }, [name, targetAmount, currency, startDate, endDate, accountId, iconKey, colorHex, status, isEditMode, goalId, createGoal, updateGoal, router]);
+  }, [name, targetAmount, startDate, endDate, accountId, iconKey, colorHex, status, isEditMode, goalId, createGoal, updateGoal, router]);
 
   const onStartDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowStartDatePicker(Platform.OS === 'ios');
@@ -126,7 +123,7 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        title={isEditMode ? 'Edit Goal' : 'New Goal'}
+        title={isEditMode ? 'Edit goal' : 'New goal'}
         subtitle={isEditMode ? 'Update your target' : 'Set a new savings target'}
         showBack
       />
@@ -137,17 +134,17 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.section}>
-          <Typography variant="label">Goal Name</Typography>
+          <Typography variant="label">Goal name</Typography>
           <Input
             value={name}
             onChangeText={setName}
-            placeholder="e.g. New Car, Travel Fund"
+            placeholder="e.g. New car, Travel fund"
             autoFocus={!isEditMode}
           />
         </View>
 
         <View style={styles.section}>
-          <Typography variant="label">Target Amount</Typography>
+          <Typography variant="label">Target amount</Typography>
           <View style={styles.amountContainer}>
             <Typography variant="h2" color={colors.textMuted}>{currency}</Typography>
             <Input
@@ -161,14 +158,14 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
         </View>
 
         <View style={styles.section}>
-          <Typography variant="label">Linked Account</Typography>
+          <Typography variant="label">Linked account</Typography>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.accountsRow}>
             {accountsList?.map((account) => (
               <TouchableOpacity
                 key={account.id}
                 style={[
                   styles.accountChip,
-                  accountId === account.id && { backgroundColor: colors.primary, borderColor: colors.primary }
+                  accountId === account.id && { backgroundColor: colors.text, borderColor: colors.text }
                 ]}
                 onPress={() => {
                   setAccountId(account.id);
@@ -188,7 +185,7 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
 
         <View style={styles.row}>
           <View style={[styles.section, { flex: 1 }]}>
-            <Typography variant="label">Start Date</Typography>
+            <Typography variant="label">Start date</Typography>
             <TouchableOpacity 
               style={styles.pickerBtn} 
               onPress={() => setShowStartDatePicker(true)}
@@ -202,7 +199,7 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
           </View>
 
           <View style={[styles.section, { flex: 1 }]}>
-            <Typography variant="label">End Date</Typography>
+            <Typography variant="label">End date</Typography>
             <TouchableOpacity 
               style={styles.pickerBtn} 
               onPress={() => setShowEndDatePicker(true)}
@@ -224,7 +221,7 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
               onPress={() => setShowIconPicker(true)}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconBox, { backgroundColor: colorHex + '20' }]}>
+              <View style={[styles.iconBox, { backgroundColor: colorHex + '15' }]}>
                 <Ionicons name={iconKey as any} size={24} color={colorHex} />
               </View>
               <Typography variant="bodySm">Icon</Typography>
@@ -255,7 +252,7 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
                   key={s}
                   style={[
                     styles.statusChip,
-                    status === s && { backgroundColor: colors.primary, borderColor: colors.primary }
+                    status === s && { backgroundColor: colors.text, borderColor: colors.text }
                   ]}
                   onPress={() => setStatus(s)}
                 >
@@ -274,7 +271,7 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
 
       <View style={styles.footer}>
         <Button
-          title={isEditMode ? 'Update Goal' : 'Create Goal'}
+          title={isEditMode ? 'Update goal' : 'Create goal'}
           onPress={handleSave}
           isLoading={isSubmitting}
           shadow="none"
@@ -305,16 +302,16 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
         onClose={() => setShowIconPicker(false)}
         selectedIcon={iconKey}
         onSelect={setIconKey}
-        title="Goal Icon"
+        title="Goal icon"
       />
     </SafeAreaView>
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   center: {
     flex: 1,
@@ -322,98 +319,100 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
   },
   content: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
-    paddingBottom: spacing('12'),
-    gap: spacing('6'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 48,
+    gap: 24,
   },
   section: {
-    gap: spacing('2'),
+    gap: 8,
   },
   row: {
     flexDirection: 'row',
-    gap: spacing('4'),
+    gap: 16,
   },
   amountContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('3'),
+    gap: 12,
   },
   amountInput: {
     flex: 1,
     fontSize: 32,
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
   },
   pickerBtn: {
     height: 56,
-    borderRadius: radius('lg'),
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing('4'),
-    gap: spacing('3'),
-    backgroundColor: colors.surface,
+    paddingHorizontal: 16,
+    gap: 12,
+    backgroundColor: theme.colors.surface,
   },
   visualsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('6'),
-    padding: spacing('4'),
-    backgroundColor: colors.surface,
-    borderRadius: radius('lg'),
+    gap: 24,
+    padding: 16,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
   },
   iconBtn: {
     alignItems: 'center',
-    gap: spacing('2'),
+    gap: 8,
   },
   iconBox: {
     width: 56,
     height: 56,
-    borderRadius: radius('md'),
+    borderRadius: theme.radius.md,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   colorGrid: {
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing('2'),
+    gap: 8,
   },
   colorCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 32,
+    height: 32,
+    borderRadius: theme.radius.full,
   },
   statusRow: {
     flexDirection: 'row',
-    gap: spacing('2'),
+    gap: 8,
   },
   statusChip: {
-    paddingHorizontal: spacing('4'),
-    paddingVertical: spacing('2'),
-    borderRadius: radius('full'),
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
   },
   accountsRow: {
-    paddingVertical: spacing('2'),
+    paddingVertical: 8,
   },
   accountChip: {
-    paddingHorizontal: spacing('4'),
-    paddingVertical: spacing('2'),
-    borderRadius: radius('full'),
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
-    marginRight: spacing('2'),
-    backgroundColor: colors.surface,
+    borderColor: theme.colors.border,
+    marginRight: 8,
+    backgroundColor: theme.colors.surface,
   },
   footer: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingBottom: spacing('6'),
-    paddingTop: spacing('2'),
-    backgroundColor: colors.background,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    paddingTop: 8,
+    backgroundColor: theme.colors.background,
   },
 });

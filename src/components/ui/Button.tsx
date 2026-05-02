@@ -1,10 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useMemo } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { COMPONENT_SIZES, ShadowToken, shadow, spacing } from '../../theme/tokens';
-import { TYPOGRAPHY } from '../../theme/typography';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'success' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -18,25 +15,17 @@ type ButtonProps = {
   disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
-  shadow?: ShadowToken;
+  shadow?: keyof Theme['shadow'];
   icon?: keyof typeof Ionicons.glyphMap;
 };
 
 /**
  * Button - Editorial Brutalist Design
  * 
- * Size variants:
- * - sm: 36px height, 12px radius (md)
- * - md: 48px height, 16px radius (lg) - DEFAULT
- * - lg: 56px height, 20px radius (xl)
- * 
- * Variants:
- * - primary: Filled with primary color
- * - secondary: Outlined with border
- * - outline: Same as secondary (alias)
- * - danger: Filled with danger color
- * - success: Filled with success color
- * - ghost: Transparent with text only
+ * Size variants mapped to atomic tokens:
+ * - sm: 36px height, 12px radius (md), 13px font
+ * - md: 48px height, 16px radius (lg), 16px font - DEFAULT
+ * - lg: 56px height, 20px radius (xl), 18px font
  */
 export const Button = React.memo(function Button({
   title,
@@ -50,16 +39,27 @@ export const Button = React.memo(function Button({
   shadow: shadowToken,
   icon,
 }: ButtonProps) {
-  const { colors, isDark } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors, fontFamilies, fontSizes } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
-  const sizeConfig = COMPONENT_SIZES.button[size];
+  const sizeStyles = useMemo(() => {
+    switch (size) {
+      case 'sm':
+        return { height: 36, paddingHorizontal: 12, borderRadius: theme.radius.md, fontSize: fontSizes.sm };
+      case 'lg':
+        return { height: 56, paddingHorizontal: 24, borderRadius: theme.radius.xl, fontSize: fontSizes.lg };
+      case 'md':
+      default:
+        return { height: 48, paddingHorizontal: 16, borderRadius: theme.radius.lg, fontSize: fontSizes.md };
+    }
+  }, [size, theme.radius, fontSizes]);
 
   const textColor = useMemo(() => {
     if (disabled) return colors.textMuted;
     if (variant === 'secondary' || variant === 'outline' || variant === 'ghost') return colors.text;
-    return '#FFFFFF';
-  }, [variant, disabled, colors.text, colors.textMuted]);
+    return colors.background;
+  }, [variant, disabled, colors.text, colors.textMuted, colors.background]);
 
   const backgroundColor = useMemo(() => {
     if (disabled) return colors.surface;
@@ -82,10 +82,10 @@ export const Button = React.memo(function Button({
   }, [variant, disabled, colors.border]);
 
   const shadowStyle = useMemo(() => {
-    if (shadowToken) return shadow(shadowToken);
-    if (variant === 'primary' && !disabled) return shadow('sm');
-    return shadow('none');
-  }, [shadowToken, variant, disabled]);
+    if (shadowToken) return theme.shadow[shadowToken];
+    if (variant === 'primary' && !disabled) return theme.shadow.sm;
+    return theme.shadow.none;
+  }, [shadowToken, variant, disabled, theme.shadow]);
 
   const handlePress = useCallback(() => {
     if (!disabled && !isLoading) {
@@ -98,9 +98,9 @@ export const Button = React.memo(function Button({
       style={[
         styles.base,
         {
-          height: sizeConfig.height,
-          paddingHorizontal: sizeConfig.paddingHorizontal,
-          borderRadius: sizeConfig.borderRadius,
+          height: sizeStyles.height,
+          paddingHorizontal: sizeStyles.paddingHorizontal,
+          borderRadius: sizeStyles.borderRadius,
           backgroundColor,
           borderColor,
           borderWidth: variant === 'secondary' || variant === 'outline' ? 1 : 0,
@@ -119,7 +119,7 @@ export const Button = React.memo(function Button({
           name={icon}
           size={size === 'sm' ? 16 : size === 'lg' ? 24 : 20}
           color={textColor}
-          style={{ marginRight: spacing('2') }}
+          style={{ marginRight: 8 }}
         />
       )}
 
@@ -131,7 +131,7 @@ export const Button = React.memo(function Button({
             styles.text,
             {
               color: textColor,
-              fontSize: sizeConfig.fontSize,
+              fontSize: sizeStyles.fontSize,
             },
             textStyle
           ]}
@@ -143,7 +143,7 @@ export const Button = React.memo(function Button({
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   base: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -151,8 +151,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     overflow: 'hidden',
   },
   text: {
-    fontFamily: TYPOGRAPHY.fonts.semibold,
-    fontWeight: TYPOGRAPHY.weights.semibold,
+    fontFamily: theme.fontFamilies.sansSemiBold,
     letterSpacing: -0.2,
   },
 });

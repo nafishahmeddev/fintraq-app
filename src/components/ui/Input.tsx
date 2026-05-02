@@ -1,9 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
-import { useTheme } from '../../providers/ThemeProvider';
-import { ThemeColors } from '../../theme/colors';
-import { TYPOGRAPHY } from '../../theme/typography';
-import { spacing, COMPONENT_SIZES } from '../../theme/tokens';
+import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 type InputSize = 'sm' | 'md' | 'lg';
 type InputVariant = 'default' | 'minimal' | 'filled';
@@ -18,15 +15,10 @@ interface InputProps extends TextInputProps {
 /**
  * Input - Editorial Brutalist Design
  * 
- * Size variants (height + padding + radius):
+ * Size variants mapped to atomic tokens:
  * - sm: 40px height, 12px padding, 12px radius (md)
  * - md: 56px height, 16px padding, 16px radius (lg) - DEFAULT
  * - lg: 64px height, 16px padding, 20px radius (xl)
- * 
- * Variants:
- * - default: Outlined with border
- * - minimal: Bottom border only
- * - filled: Solid background, no border
  */
 export const Input = React.memo(function Input({ 
   label, 
@@ -37,17 +29,29 @@ export const Input = React.memo(function Input({
   placeholderTextColor,
   ...props 
 }: InputProps) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors, size), [colors, size]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
-  const sizeConfig = COMPONENT_SIZES.input[size];
+  const sizeStyles = useMemo(() => {
+    switch (size) {
+      case 'sm':
+        return { height: 40, paddingHorizontal: 12, borderRadius: theme.radius.md, fontSize: 14 };
+      case 'lg':
+        return { height: 64, paddingHorizontal: 16, borderRadius: theme.radius.xl, fontSize: 18 };
+      case 'md':
+      default:
+        return { height: 56, paddingHorizontal: 16, borderRadius: theme.radius.lg, fontSize: 16 };
+    }
+  }, [size, theme.radius]);
 
   const containerStyle = useMemo(() => {
     switch (variant) {
       case 'filled':
         return { 
           backgroundColor: colors.surface,
-          borderWidth: 0,
+          borderWidth: 1,
+          borderColor: error ? colors.danger : colors.border,
         };
       case 'minimal':
         return { 
@@ -65,7 +69,7 @@ export const Input = React.memo(function Input({
     }
   }, [variant, error, colors.surface, colors.border, colors.danger]);
 
-  const placeholderColor = placeholderTextColor || colors.textMuted + '80';
+  const placeholderColor = placeholderTextColor || colors.textMuted;
 
   return (
     <View style={styles.container}>
@@ -75,9 +79,9 @@ export const Input = React.memo(function Input({
       <View style={[
         styles.inputContainer,
         {
-          height: sizeConfig.height,
-          paddingHorizontal: variant === 'minimal' ? 0 : sizeConfig.paddingHorizontal,
-          borderRadius: variant === 'minimal' ? 0 : sizeConfig.borderRadius,
+          height: sizeStyles.height,
+          paddingHorizontal: variant === 'minimal' ? 0 : sizeStyles.paddingHorizontal,
+          borderRadius: variant === 'minimal' ? 0 : sizeStyles.borderRadius,
         },
         containerStyle,
       ]}>
@@ -86,7 +90,7 @@ export const Input = React.memo(function Input({
             styles.input,
             {
               color: colors.text,
-              fontSize: size === 'sm' ? 14 : size === 'lg' ? 18 : 16,
+              fontSize: sizeStyles.fontSize,
               paddingVertical: 0,
             },
             variant === 'minimal' && { paddingHorizontal: 0 },
@@ -103,29 +107,28 @@ export const Input = React.memo(function Input({
   );
 });
 
-const createStyles = (colors: ThemeColors, size: InputSize) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     marginBottom: 0,
   },
   label: {
     fontSize: 14,
-    color: colors.textMuted,
-    marginBottom: spacing('2'),
-    fontFamily: TYPOGRAPHY.fonts.medium,
-    fontWeight: TYPOGRAPHY.weights.medium,
+    color: theme.colors.textMuted,
+    marginBottom: 8,
+    fontFamily: theme.fontFamilies.sansSemiBold,
   },
   inputContainer: {
     overflow: 'hidden',
     justifyContent: 'center',
   },
   input: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     textAlignVertical: 'center',
   },
   errorText: {
-    color: colors.danger,
+    color: theme.colors.danger,
     fontSize: 12,
-    marginTop: spacing('1'),
-    fontFamily: TYPOGRAPHY.fonts.medium,
+    marginTop: 4,
+    fontFamily: theme.fontFamilies.sansMedium,
   },
 });

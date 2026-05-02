@@ -9,17 +9,15 @@ import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { Typography, Card, MoneyText } from '../../../components/ui';
 import { budgets } from '../../../db/schema';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { radius, spacing, LAYOUT } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { formatCurrency } from '../../../utils/format';
 import { useBudgets, useBudgetsProgress, useDeleteBudget } from '../api/budgets';
 
 export const BudgetsScreen = () => {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
 
   const { data: budgetsData, isLoading: loadingBudgets } = useBudgets();
@@ -92,7 +90,7 @@ export const BudgetsScreen = () => {
             <View style={styles.cardInfo}>
               <Typography variant="h3" style={styles.cardName}>{item.name}</Typography>
               <View style={styles.badgeRow}>
-                <Typography variant="label">{item.period} • {item.mode}</Typography>
+                <Typography variant="label" style={styles.capitalize}>{item.period.toLowerCase()} • {item.mode.toLowerCase()}</Typography>
                 {item.isRolling && (
                   <View style={styles.rollingBadge}>
                     <Ionicons name="repeat" size={10} color={colors.primary} />
@@ -105,7 +103,7 @@ export const BudgetsScreen = () => {
               <MoneyText 
                 amount={remaining} 
                 currency={profile.defaultCurrency} 
-                weight="bold" 
+                weight="sansBold" 
                 style={styles.cardAmount} 
               />
               <Typography variant="bodySm" color={colors.textMuted}>left</Typography>
@@ -159,7 +157,7 @@ export const BudgetsScreen = () => {
                 Set spending limits to stay on track.
               </Typography>
               <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate}>
-                <Typography variant="body" weight="semibold">Create budget</Typography>
+                <Typography variant="body" weight="sansSemiBold">Create budget</Typography>
               </TouchableOpacity>
             </View>
           }
@@ -173,7 +171,7 @@ export const BudgetsScreen = () => {
       <OptionsDialog
         visible={showManageDialog}
         onClose={() => setShowManageDialog(false)}
-        title="Manage Budget"
+        title="Manage budget"
         subtitle={selectedItem?.name}
         options={manageOptions}
       />
@@ -181,7 +179,7 @@ export const BudgetsScreen = () => {
       <ConfirmDialog
         visible={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
-        title="Delete Budget"
+        title="Delete budget"
         message="Are you sure you want to delete this budget? Existing transactions will not be deleted."
         confirmLabel="Delete"
         destructive
@@ -196,31 +194,34 @@ export const BudgetsScreen = () => {
   );
 };
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
   listContent: {
-    paddingHorizontal: LAYOUT.screenPadding,
-    paddingTop: spacing('4'),
+    paddingHorizontal: 24,
+    paddingTop: 16,
     paddingBottom: 100,
-    gap: spacing('4'),
+    gap: 16,
   },
   card: {
-    padding: spacing('5'),
+    padding: 20,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: spacing('5'),
+    marginBottom: 20,
   },
   cardInfo: {
     flex: 1,
   },
   cardName: {
-    marginBottom: spacing('0.5'),
+    marginBottom: 2,
+  },
+  capitalize: {
+    textTransform: 'capitalize',
   },
   cardRight: {
     alignItems: 'flex-end',
@@ -232,74 +233,74 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   progressRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: spacing('2'),
+    marginBottom: 8,
   },
   progressBar: {
     height: 6,
-    borderRadius: radius('full'),
-    backgroundColor: colors.border + '40',
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.border + '40',
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: radius('full'),
+    borderRadius: theme.radius.full,
   },
   fab: {
     position: 'absolute',
-    bottom: spacing('7'),
-    right: spacing('7'),
+    bottom: 32,
+    right: 32,
     width: 64,
     height: 64,
-    borderRadius: radius('full'),
-    backgroundColor: colors.text,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.text,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
   },
   emptyContainer: {
-    paddingVertical: spacing('12'),
+    paddingVertical: 48,
     alignItems: 'center',
   },
   emptyTitle: {
-    marginTop: spacing('4'),
+    marginTop: 16,
   },
   emptyText: {
-    color: colors.textMuted,
-    marginTop: spacing('2'),
-    marginBottom: spacing('6'),
+    color: theme.colors.textMuted,
+    marginTop: 8,
+    marginBottom: 24,
     textAlign: 'center',
   },
   emptyBtn: {
     height: 44,
-    borderRadius: radius('full'),
-    paddingHorizontal: spacing('5'),
-    backgroundColor: colors.surface,
+    borderRadius: theme.radius.full,
+    paddingHorizontal: 20,
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('2'),
+    gap: 8,
   },
   rollingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing('1'),
-    backgroundColor: colors.primary + '20',
-    paddingHorizontal: spacing('1.5'),
-    paddingVertical: spacing('0.5'),
-    borderRadius: radius('xs'),
+    gap: 4,
+    backgroundColor: theme.colors.primary + '20',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: theme.radius.xs,
   },
   rollingBadgeText: {
     fontSize: 9,
-    color: colors.primary,
+    color: theme.colors.primary,
   },
   adjustmentText: {
-    marginTop: spacing('2'),
+    marginTop: 8,
     textAlign: 'right',
   },
 });

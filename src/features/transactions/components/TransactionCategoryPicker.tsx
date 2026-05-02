@@ -1,8 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import type { Category } from '../../categories/api/categories';
 
 type Props = {
@@ -10,7 +9,6 @@ type Props = {
   selectedId: number | null;
   onSelect: (id: number) => void;
   onAdd?: () => void;
-  colors: ThemeColors;
 };
 
 const toHexColor = (value: number) => `#${value.toString(16).padStart(6, '0')}`;
@@ -20,12 +18,13 @@ const resolveIconName = (raw: string | null | undefined): keyof typeof Ionicons.
   return 'pricetag-outline';
 };
 
-export const TransactionCategoryPicker = ({ categories, selectedId, onSelect, onAdd, colors }: Props) => {
-  const styles = useMemo(() => createStyles(colors), [colors]);
+export const TransactionCategoryPicker = ({ categories, selectedId, onSelect, onAdd }: Props) => {
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { color: colors.textMuted }]}>CATEGORY</Text>
+      <Text style={styles.label}>CATEGORY</Text>
       <View style={styles.grid}>
         {categories.map((cat) => {
           const selected = selectedId === cat.id;
@@ -35,21 +34,24 @@ export const TransactionCategoryPicker = ({ categories, selectedId, onSelect, on
               key={cat.id}
               style={[
                 styles.pill,
-                { backgroundColor: colors.surface, borderColor: colors.border },
+                { backgroundColor: theme.colors.card, borderColor: theme.colors.border },
                 selected && { backgroundColor: catColor, borderColor: catColor },
               ]}
               onPress={() => onSelect(cat.id)}
-              activeOpacity={0.8}
+              activeOpacity={0.7}
             >
               <Ionicons
                 name={resolveIconName(cat.icon)}
                 size={14}
-                color={selected ? colors.background : catColor}
+                color={selected ? theme.colors.background : catColor}
               />
               <Text
                 style={[
                   styles.name,
-                  { color: selected ? colors.background : colors.text },
+                  { 
+                    color: selected ? theme.colors.background : theme.colors.text,
+                    fontFamily: selected ? theme.fontFamilies.sansBold : theme.fontFamilies.sansSemiBold
+                  },
                 ]}
                 numberOfLines={1}
               >
@@ -59,15 +61,14 @@ export const TransactionCategoryPicker = ({ categories, selectedId, onSelect, on
           );
         })}
         
-        {/* Add Category Button */}
         {onAdd && (
           <TouchableOpacity
             style={[styles.pill, styles.addPill]}
             onPress={onAdd}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
           >
             <View style={styles.addIconCircle}>
-              <Ionicons name="add-outline" size={14} color={colors.textMuted} />
+              <Ionicons name="add" size={14} color={theme.colors.textMuted} />
             </View>
             <Text style={styles.addName}>New</Text>
           </TouchableOpacity>
@@ -77,54 +78,56 @@ export const TransactionCategoryPicker = ({ categories, selectedId, onSelect, on
   );
 };
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
-      paddingVertical: 12,
+      paddingVertical: theme.spacing[12],
       paddingHorizontal: 24,
     },
     label: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 10,
+      color: theme.colors.textMuted,
       letterSpacing: 1.5,
-      marginBottom: 12,
+      marginBottom: theme.spacing[12],
     },
     grid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 8,
+      gap: theme.spacing[8],
     },
     pill: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8,
-      paddingHorizontal: 12,
-      height: 36,
-      borderRadius: 999,
+      gap: theme.spacing[8],
+      paddingHorizontal: theme.spacing[12],
+      height: 40,
+      borderRadius: theme.radius.md,
       borderWidth: 1,
+      ...theme.shadow.xs,
     },
     addPill: {
       borderStyle: 'dashed',
-      borderColor: colors.border,
-      backgroundColor: colors.surface + '60',
+      borderColor: theme.colors.border,
+      backgroundColor: 'transparent',
+      shadowOpacity: 0,
     },
     addIconCircle: {
-      width: 20,
-      height: 20,
-      borderRadius: 999,
+      width: 22,
+      height: 22,
+      borderRadius: theme.radius.xs,
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       borderStyle: 'dashed',
     },
     name: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
       fontSize: 13,
     },
     addName: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 13,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
   });

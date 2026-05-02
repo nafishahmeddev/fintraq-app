@@ -15,10 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CurrencyPickerModal } from '../../../components/ui/CurrencyPickerModal';
 import { ACCOUNT_COLORS, ACCOUNT_ICONS } from '../../../constants/picker';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { parseAmount, toDbColor } from '../../../utils/format';
 import { IoniconName, resolveIcon } from '../../../utils/icons';
 import { Account, ACCOUNT_TYPES, AccountType } from '../api/accounts';
@@ -56,9 +53,10 @@ export type AccountFormModalProps = {
 };
 
 export function AccountFormModal({ visible, onClose, account }: AccountFormModalProps) {
-  const { colors, isDark } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const isEditing = !!account;
   const ModalWrapper = Platform.OS === 'ios' ? KeyboardAvoidingView : View;
 
@@ -361,8 +359,9 @@ export function AccountFormModal({ visible, onClose, account }: AccountFormModal
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
+const createStyles = (theme: Theme) => {
+  const { colors, radius, fontFamilies } = theme;
+  return StyleSheet.create({
     overlay: {
       flex: 1,
       backgroundColor: 'rgba(0,0,0,0.55)',
@@ -373,8 +372,8 @@ const createStyles = (colors: ThemeColors) =>
     },
     sheet: {
       height: '86%',
-      borderTopLeftRadius: RADIUS.full,
-      borderTopRightRadius: RADIUS.full,
+      borderTopLeftRadius: radius.full,
+      borderTopRightRadius: radius.full,
       borderTopWidth: 1,
       borderColor: colors.border,
       overflow: 'hidden',
@@ -382,7 +381,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     glow: {
       position: 'absolute',
-      borderRadius: RADIUS.full,
+      borderRadius: radius.full,
     },
     handle: {
       alignSelf: 'center',
@@ -402,13 +401,13 @@ const createStyles = (colors: ThemeColors) =>
       alignItems: 'flex-start',
     },
     title: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: fontFamilies.heading,
       fontSize: 30,
       color: colors.text,
       letterSpacing: -1,
     },
     subtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: fontFamilies.sans,
       fontSize: 12,
       color: colors.textMuted,
       marginTop: 3,
@@ -416,7 +415,7 @@ const createStyles = (colors: ThemeColors) =>
     closeBtn: {
       width: 38,
       height: 38,
-      borderRadius: RADIUS.full,
+      borderRadius: radius.full,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
@@ -443,7 +442,7 @@ const createStyles = (colors: ThemeColors) =>
       paddingBottom: 0,
     },
     label: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: fontFamilies.sansSemiBold,
       fontSize: 13,
       color: colors.textMuted,
       letterSpacing: 0.1,
@@ -453,7 +452,7 @@ const createStyles = (colors: ThemeColors) =>
       marginTop: 16,
     },
     answerInput: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: fontFamilies.heading,
       fontSize: 28,
       lineHeight: 34,
       color: colors.text,
@@ -462,12 +461,12 @@ const createStyles = (colors: ThemeColors) =>
       paddingVertical: 4,
     },
     answerInputAmount: {
-      fontFamily: TYPOGRAPHY.fonts.monoBold,
+      fontFamily: fontFamilies.monoBold,
       letterSpacing: 0,
     },
     answerLine: {
       height: 2,
-      borderRadius: RADIUS.full,
+      borderRadius: radius.full,
       backgroundColor: colors.primary + '55',
       marginTop: 4,
     },
@@ -481,7 +480,7 @@ const createStyles = (colors: ThemeColors) =>
       paddingVertical: 6,
     },
     currencyValue: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: fontFamilies.heading,
       fontSize: 28,
       lineHeight: 34,
       color: colors.text,
@@ -500,7 +499,7 @@ const createStyles = (colors: ThemeColors) =>
     colorCell: {
       width: 34,
       height: 34,
-      borderRadius: RADIUS.full,
+      borderRadius: radius.full,
       borderWidth: 2,
       borderColor: 'transparent',
       justifyContent: 'center',
@@ -513,7 +512,7 @@ const createStyles = (colors: ThemeColors) =>
     iconCell: {
       width: 46,
       height: 46,
-      borderRadius: RADIUS.full,
+      borderRadius: radius.full,
       borderWidth: 1,
       borderColor: colors.text + '10',
       backgroundColor: colors.background + 'B8',
@@ -533,7 +532,7 @@ const createStyles = (colors: ThemeColors) =>
       gap: 6,
       paddingHorizontal: 12,
       paddingVertical: 8,
-      borderRadius: RADIUS.full,
+      borderRadius: radius.full,
       borderWidth: 1,
       borderColor: colors.text + '10',
       backgroundColor: colors.background + 'B8',
@@ -542,7 +541,7 @@ const createStyles = (colors: ThemeColors) =>
       borderColor: 'transparent',
     },
     typeLabel: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: fontFamilies.sansMedium,
       fontSize: 12,
     },
     footer: {
@@ -555,7 +554,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     primaryBtn: {
       height: 56,
-      borderRadius: RADIUS.full,
+      borderRadius: radius.full,
       backgroundColor: colors.primary,
       flexDirection: 'row',
       justifyContent: 'center',
@@ -570,10 +569,11 @@ const createStyles = (colors: ThemeColors) =>
       opacity: 0.45,
     },
     primaryBtnText: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: fontFamilies.heading,
       fontSize: 14,
       color: '#FFFFFF',
       letterSpacing: 0.3,
       marginRight: 10,
     },
   });
+};

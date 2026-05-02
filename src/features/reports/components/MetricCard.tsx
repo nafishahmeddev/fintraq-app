@@ -1,11 +1,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { MoneyText } from '../../../components/ui/MoneyText';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { RADIUS } from '../../../theme/tokens';
-import { TYPOGRAPHY } from '../../../theme/typography';
-
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { TrendMode } from '../../../types';
 
 interface MetricCardProps {
@@ -34,8 +30,9 @@ export const MetricCard = React.memo(function MetricCard({
   suffix,
   isAmount = true
 }: MetricCardProps) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const trendColor = useMemo(() => {
     if (changeValue === undefined || changeValue === 0 || trendMode === 'neutral') {
@@ -61,7 +58,7 @@ export const MetricCard = React.memo(function MetricCard({
             amount={value} 
             currency={currency} 
             style={styles.value} 
-            weight="bold" 
+            weight="sansBold" 
           />
         ) : (
           <Text style={[styles.value, { color: colors.text }]}>
@@ -80,21 +77,21 @@ export const MetricCard = React.memo(function MetricCard({
   );
 });
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     padding: 16,
-    borderRadius: RADIUS.xl,
-    backgroundColor: colors.surface + '80',
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.surface + '80',
     borderWidth: 1,
-    borderColor: colors.border, 
+    borderColor: theme.colors.border, 
     flex: 1,
     minHeight: 100,
     justifyContent: 'center',
   },
   label: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
     fontSize: 9,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     letterSpacing: 2,
     marginBottom: 8,
     textTransform: 'uppercase',
@@ -111,7 +108,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     marginTop: 8,
   },
   percentageText: {
-    fontFamily: TYPOGRAPHY.fonts.bold,
+    fontFamily: theme.fontFamilies.sansBold,
     fontSize: 9,
     letterSpacing: 0.5,
   },

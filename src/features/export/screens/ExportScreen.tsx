@@ -2,10 +2,7 @@ import { Header } from '@/src/components/ui/Header';
 import { OptionsDialog } from '@/src/components/ui/OptionsDialog';
 import { PremiumGuard } from '@/src/components/ui/PremiumGuard';
 import { useAccounts } from '@/src/features/accounts/hooks/accounts';
-import { useTheme } from '@/src/providers/ThemeProvider';
-import { ThemeColors } from '@/src/theme/colors';
-import { RADIUS } from '@/src/theme/tokens';
-import { TYPOGRAPHY } from '@/src/theme/typography';
+import { Theme, useTheme } from '@/src/providers/ThemeProvider';
 import { resolveIcon } from '@/src/utils/icons';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
@@ -24,8 +21,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CsvExportService, ExportDateRange } from '../api/csv-export.service';
 
 export function ExportScreen() {
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const accountsQuery = useAccounts();
 
@@ -157,7 +155,6 @@ export function ExportScreen() {
   return (
     <SafeAreaView style={styles.container}>
 
-
       <Header title="Export CSV" subtitle="Download your data" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -166,14 +163,14 @@ export function ExportScreen() {
             <View style={styles.heroIconContainer}>
               <Ionicons name="document-text" size={32} color={colors.primary} />
             </View>
-            <Text style={styles.heroTitle}>Export to Spreadsheet</Text>
+            <Text style={styles.heroTitle}>Export to spreadsheet</Text>
             <Text style={styles.heroSubtitle}>
               Export your transactions as CSV. Choose to save to a folder or share to other apps.
             </Text>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>DATE RANGE</Text>
+            <Text style={styles.sectionLabel}>Date range</Text>
             <View style={styles.card}>
               {presets.map((preset, index) => (
                 <TouchableOpacity
@@ -260,7 +257,7 @@ export function ExportScreen() {
           )}
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>ACCOUNT (OPTIONAL)</Text>
+            <Text style={styles.sectionLabel}>Account (optional)</Text>
             <View style={styles.card}>
               <TouchableOpacity
                 style={[styles.filterRow, selectedAccountId === null && styles.filterRowSelected]}
@@ -304,7 +301,7 @@ export function ExportScreen() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>TYPE (OPTIONAL)</Text>
+            <Text style={styles.sectionLabel}>Type (optional)</Text>
             <View style={styles.typeGrid}>
               {(['ALL', 'CR', 'DR'] as const).map((type) => (
                 <TouchableOpacity
@@ -380,14 +377,14 @@ export function ExportScreen() {
         options={[
           {
             key: 'save',
-            label: Platform.OS === 'ios' ? 'Save to Files' : 'Save to Folder',
+            label: Platform.OS === 'ios' ? 'Save to Files' : 'Save to folder',
             icon: 'folder-outline',
             selected: false,
             onPress: handleSaveToFolder,
           },
           {
             key: 'share',
-            label: 'Share to Apps',
+            label: 'Share to apps',
             icon: 'share-outline',
             selected: false,
             onPress: handleShare,
@@ -398,11 +395,11 @@ export function ExportScreen() {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     content: {
       paddingHorizontal: 24,
@@ -410,8 +407,8 @@ const createStyles = (colors: ThemeColors) =>
       paddingBottom: 48,
     },
     heroCard: {
-      backgroundColor: colors.surface,
-      borderRadius: RADIUS.xl,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.xl,
       padding: 24,
       alignItems: 'center',
       marginBottom: 32,
@@ -419,22 +416,22 @@ const createStyles = (colors: ThemeColors) =>
     heroIconContainer: {
       width: 64,
       height: 64,
-      borderRadius: RADIUS.full,
-      backgroundColor: colors.primary + '15',
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary + '15',
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: 16,
     },
     heroTitle: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: theme.fontFamilies.heading,
       fontSize: 20,
-      color: colors.text,
+      color: theme.colors.text,
       marginBottom: 8,
     },
     heroSubtitle: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       textAlign: 'center',
       lineHeight: 20,
     },
@@ -442,16 +439,17 @@ const createStyles = (colors: ThemeColors) =>
       marginBottom: 24,
     },
     sectionLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 10,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       letterSpacing: 2,
       marginBottom: 12,
       paddingLeft: 4,
+      textTransform: 'uppercase',
     },
     card: {
-      backgroundColor: colors.surface,
-      borderRadius: RADIUS.xl,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.xl,
       overflow: 'hidden',
     },
     presetRow: {
@@ -460,7 +458,7 @@ const createStyles = (colors: ThemeColors) =>
       justifyContent: 'space-between',
       padding: 16,
       borderBottomWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     presetRowLast: {
       borderBottomWidth: 0,
@@ -475,7 +473,7 @@ const createStyles = (colors: ThemeColors) =>
       height: 20,
       borderRadius: 10,
       borderWidth: 1.5,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -485,13 +483,13 @@ const createStyles = (colors: ThemeColors) =>
       borderRadius: 5,
     },
     presetLabel: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 15,
-      color: colors.text,
+      color: theme.colors.text,
     },
     divider: {
       height: 1,
-      backgroundColor: colors.border,
+      backgroundColor: theme.colors.border,
       marginHorizontal: 16,
     },
     customDatesContainer: {
@@ -500,27 +498,27 @@ const createStyles = (colors: ThemeColors) =>
       gap: 12,
       padding: 16,
       paddingTop: 8,
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
     },
     dateButton: {
       flex: 1,
-      backgroundColor: colors.surface,
-      borderRadius: RADIUS.md,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.md,
       padding: 12,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     dateLabel: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 10,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
       letterSpacing: 0.5,
       marginBottom: 4,
     },
     dateValue: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 14,
-      color: colors.text,
+      color: theme.colors.text,
     },
     filterRow: {
       flexDirection: 'row',
@@ -528,13 +526,13 @@ const createStyles = (colors: ThemeColors) =>
       justifyContent: 'space-between',
       padding: 14,
       borderBottomWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
     },
     filterRowLast: {
       borderBottomWidth: 0,
     },
     filterRowSelected: {
-      backgroundColor: colors.primary + '08',
+      backgroundColor: theme.colors.primary + '08',
     },
     filterLeft: {
       flexDirection: 'row',
@@ -544,14 +542,14 @@ const createStyles = (colors: ThemeColors) =>
     filterIconBox: {
       width: 36,
       height: 36,
-      borderRadius: RADIUS.md,
+      borderRadius: theme.radius.md,
       alignItems: 'center',
       justifyContent: 'center',
     },
     filterLabel: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 15,
-      color: colors.text,
+      color: theme.colors.text,
     },
     typeGrid: {
       flexDirection: 'row',
@@ -561,20 +559,20 @@ const createStyles = (colors: ThemeColors) =>
       flex: 1,
       paddingVertical: 12,
       paddingHorizontal: 8,
-      borderRadius: RADIUS.md,
-      backgroundColor: colors.surface,
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: theme.colors.border,
       alignItems: 'center',
     },
     typeChipText: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 13,
-      color: colors.text,
+      color: theme.colors.text,
     },
     summaryCard: {
-      backgroundColor: colors.surface,
-      borderRadius: RADIUS.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.lg,
       padding: 16,
       marginBottom: 20,
       gap: 12,
@@ -585,19 +583,19 @@ const createStyles = (colors: ThemeColors) =>
       justifyContent: 'space-between',
     },
     summaryLabel: {
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 14,
-      color: colors.textMuted,
+      color: theme.colors.textMuted,
     },
     summaryValue: {
-      fontFamily: TYPOGRAPHY.fonts.heading,
+      fontFamily: theme.fontFamilies.heading,
       fontSize: 20,
-      color: colors.text,
+      color: theme.colors.text,
     },
     summaryValueSmall: {
-      fontFamily: TYPOGRAPHY.fonts.medium,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 13,
-      color: colors.text,
+      color: theme.colors.text,
     },
     exportButton: {
       flexDirection: 'row',
@@ -605,28 +603,28 @@ const createStyles = (colors: ThemeColors) =>
       justifyContent: 'center',
       gap: 10,
       height: 56,
-      borderRadius: RADIUS.lg,
-      backgroundColor: colors.text,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.text,
       marginBottom: 16,
     },
     exportButtonText: {
-      fontFamily: TYPOGRAPHY.fonts.semibold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 16,
-      color: colors.background,
+      color: theme.colors.background,
     },
     warningCard: {
       flexDirection: 'row',
       alignItems: 'flex-start',
       gap: 12,
-      backgroundColor: (colors.warning || '#F59E0B') + '10',
-      borderRadius: RADIUS.md,
+      backgroundColor: (theme.colors.warning || '#F59E0B') + '10',
+      borderRadius: theme.radius.md,
       padding: 12,
     },
     warningText: {
       flex: 1,
-      fontFamily: TYPOGRAPHY.fonts.regular,
+      fontFamily: theme.fontFamilies.sans,
       fontSize: 13,
-      color: colors.warning || '#F59E0B',
+      color: theme.colors.warning || '#F59E0B',
       lineHeight: 18,
     },
   });

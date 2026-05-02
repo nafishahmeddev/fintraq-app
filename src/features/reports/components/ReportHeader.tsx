@@ -2,9 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '../../../providers/ThemeProvider';
-import { ThemeColors } from '../../../theme/colors';
-import { TYPOGRAPHY } from '../../../theme/typography';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 
 interface ReportHeaderProps {
   title: string;
@@ -16,9 +14,10 @@ interface ReportHeaderProps {
  * Aligns with the journalistic aesthetic.
  */
 export function ReportHeader({ title, subtitle }: ReportHeaderProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   return (
     <View style={styles.container}>
@@ -36,7 +35,7 @@ export function ReportHeader({ title, subtitle }: ReportHeaderProps) {
   );
 }
 
-const createStyles = (colors: ThemeColors) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     paddingHorizontal: 24,
     paddingTop: 12,
@@ -49,25 +48,25 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.surface,
+    backgroundColor: theme.colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
   },
   content: {
     flex: 1,
   },
   title: {
-    fontFamily: TYPOGRAPHY.fonts.heading,
+    fontFamily: theme.fontFamilies.heading,
     fontSize: 28,
     lineHeight: 32,
     letterSpacing: -1,
   },
   subtitle: {
-    fontFamily: TYPOGRAPHY.fonts.regular,
+    fontFamily: theme.fontFamilies.sans,
     fontSize: 13,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
     marginTop: 2,
   },
 });
