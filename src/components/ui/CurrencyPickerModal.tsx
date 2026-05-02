@@ -175,7 +175,7 @@ const createStyles = (colors: ThemeColors) =>
       borderTopWidth: 1,
       borderColor: colors.border,
       overflow: 'hidden',
-      backgroundColor: 'transparent',
+      backgroundColor: colors.background,
     },
     glow: {
       position: 'absolute',

@@ -16,12 +16,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../src/components/ui/Button';
 import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
 import { getDeviceCurrencyCode } from '../../src/constants/currency';
-import { ACCOUNT_COLORS, ACCOUNT_ICONS } from '../../src/constants/picker';
-import { AccountType } from '../../src/db/schema';
+import { ACCOUNT_COLORS } from '../../src/constants/picker';
 import { useCreateAccount } from '../../src/features/accounts/hooks/accounts';
 import { BackupService } from '../../src/features/backup/api/backup.service';
 import { useCreateCategory } from '../../src/features/categories/hooks/categories';
-import { AccountStep } from '../../src/features/onboarding/components/AccountStep';
 import { ProfileStep } from '../../src/features/onboarding/components/ProfileStep';
 import { WelcomeStep } from '../../src/features/onboarding/components/WelcomeStep';
 import {
@@ -33,7 +31,7 @@ import { useOnboarding } from '../../src/providers/OnboardingProvider';
 import { useSettings } from '../../src/providers/SettingsProvider';
 import { useTheme } from '../../src/providers/ThemeProvider';
 import { NotificationService } from '../../src/services/notification.service';
-import { parseAmount, toDbColor } from '../../src/utils/format';
+import { toDbColor } from '../../src/utils/format';
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -46,11 +44,6 @@ export default function OnboardingScreen() {
 
   const [stepIndex, setStepIndex] = React.useState(0);
   const currentStep = ONBOARDING_STEPS[stepIndex];
-
-  const [accountCurrency, setAccountCurrency] = React.useState<string>(() => getDeviceCurrencyCode());
-  const [accountIcon, setAccountIcon] = React.useState<string>(ACCOUNT_ICONS[0]);
-  const [accountColor, setAccountColor] = React.useState<string>(ACCOUNT_COLORS[0]);
-  const [accountType, setAccountType] = React.useState<AccountType>('cash');
 
   // Import from backup state
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
@@ -72,11 +65,7 @@ export default function OnboardingScreen() {
     mode: 'onChange',
     defaultValues: {
       name: '',
-      accountName: '',
-      accountHolder: '',
-      accountNumber: '',
-      accountType: 'cash',
-      openingBalance: '0',
+      currency: getDeviceCurrencyCode(),
     },
   });
 
@@ -166,10 +155,7 @@ export default function OnboardingScreen() {
 
   const validateStep = async () => {
     if (currentStep.id === 'profile') {
-      return trigger('name');
-    }
-    if (currentStep.id === 'account') {
-      return trigger(['accountName', 'accountHolder', 'openingBalance']);
+      return trigger(['name', 'currency']);
     }
     return true;
   };
@@ -246,23 +232,25 @@ export default function OnboardingScreen() {
   const finalizeSetup = async () => {
     const values = getValues();
     try {
+      const selectedCurrency = values.currency;
+
       await updateProfile({
         name: values.name.trim(),
         email: '',
         phone: '',
-        defaultCurrency: accountCurrency,
+        defaultCurrency: selectedCurrency,
       });
 
       await createAccount({
-        name: values.accountName.trim(),
-        holderName: values.accountHolder.trim(),
-        accountNumber: values.accountNumber.trim() || null,
-        type: accountType,
-        icon: accountIcon.replace('-outline', ''),
-        color: toDbColor(accountColor),
+        name: 'Main Wallet',
+        holderName: values.name.trim(),
+        accountNumber: null,
+        type: 'cash',
+        icon: 'wallet',
+        color: toDbColor(ACCOUNT_COLORS[0]),
         isDefault: true,
-        currency: accountCurrency,
-        balance: parseAmount(values.openingBalance),
+        currency: selectedCurrency,
+        balance: 0,
         income: 0,
         expense: 0,
       });
@@ -294,19 +282,6 @@ export default function OnboardingScreen() {
         return <WelcomeStep onImportPress={handleImportFromBackup} />;
       case 'profile':
         return <ProfileStep />;
-      case 'account':
-        return (
-          <AccountStep
-            accountCurrency={accountCurrency}
-            accountIcon={accountIcon}
-            accountColor={accountColor}
-            accountType={accountType}
-            onCurrencyChange={setAccountCurrency}
-            onIconChange={setAccountIcon}
-            onColorChange={setAccountColor}
-            onTypeChange={setAccountType}
-          />
-        );
       default:
         return null;
     }

@@ -56,18 +56,18 @@ export type RadiusToken = keyof typeof RADIUS;
 export const LAYOUT = {
   // Screen margins
   screenPadding: 24,
-  
+
   // Content max widths for readability
   maxContentWidth: 400,
-  
+
   // Component gaps
   sectionGap: 24,
   cardGap: 12,
   elementGap: 8,
-  
+
   // Touch targets
   minTouchTarget: 44,
-  
+
   // Icon sizes
   iconSm: 16,
   iconMd: 20,
@@ -83,19 +83,19 @@ export const COMPONENT_SIZES = {
     sm: {
       height: 36,
       paddingHorizontal: SPACING['3'],
-      borderRadius: RADIUS.full,
+      borderRadius: RADIUS.sm,
       fontSize: 14,
     },
     md: {
       height: 48,
       paddingHorizontal: SPACING['4'],
-      borderRadius: RADIUS.full,
+      borderRadius: RADIUS.md,
       fontSize: 16,
     },
     lg: {
       height: 56,
       paddingHorizontal: SPACING['5'],
-      borderRadius: RADIUS.full,
+      borderRadius: RADIUS.lg,
       fontSize: 16,
     },
   },
@@ -104,17 +104,17 @@ export const COMPONENT_SIZES = {
     sm: {
       height: 40,
       paddingHorizontal: SPACING['3'],
-      borderRadius: RADIUS.full,
+      borderRadius: RADIUS.sm,
     },
     md: {
       height: 56,
       paddingHorizontal: SPACING['4'],
-      borderRadius: RADIUS.full,
+      borderRadius: RADIUS.md,
     },
     lg: {
       height: 64,
       paddingHorizontal: SPACING['4'],
-      borderRadius: RADIUS.full,
+      borderRadius: RADIUS.lg,
     },
   },
 
@@ -132,7 +132,7 @@ export const COMPONENT_SIZES = {
       borderRadius: RADIUS['3xl'],
     },
   },
-  
+
   iconButton: {
     sm: 32,
     md: 40,
