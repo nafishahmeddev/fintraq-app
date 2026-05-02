@@ -25,18 +25,19 @@ export const IconBox = React.memo(function IconBox({
   borderColor,
   style,
 }: IconBoxProps) {
+  // borderColor only applies when explicitly passed — no default border
   const theme = useTheme();
   const { colors } = theme;
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   const dimensions = React.useMemo(() => {
     switch (size) {
-      case 'xs': return { container: 24, icon: 12 };
-      case 'sm': return { container: 32, icon: 14 };
+      case 'xs': return { container: 28, icon: 14 };
+      case 'sm': return { container: 32, icon: 16 };
       case 'lg': return { container: 48, icon: 22 };
-      case 'xl': return { container: 64, icon: 28 };
+      case 'xl': return { container: 56, icon: 26 };
       case 'md':
-      default: return { container: 40, icon: 18 };
+      default: return { container: 40, icon: 20 };
     }
   }, [size]);
 
@@ -58,7 +59,8 @@ export const IconBox = React.memo(function IconBox({
           height: dimensions.container,
           borderRadius: borderRadius,
           backgroundColor: backgroundColor || colors.surface,
-          borderColor: borderColor || colors.border,
+          borderColor: borderColor,
+          borderWidth: borderColor ? 1 : 0,
         },
         style,
       ]}
@@ -72,12 +74,11 @@ export const IconBox = React.memo(function IconBox({
   );
 });
 
-const createStyles = (theme: Theme) =>
+const createStyles = (_theme: Theme) =>
   StyleSheet.create({
     container: {
       alignItems: 'center',
       justifyContent: 'center',
-      borderWidth: 1,
     },
   });
 

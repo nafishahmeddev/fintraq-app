@@ -1,15 +1,17 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, TextProps, TextStyle } from 'react-native';
+import { Text, TextProps, TextStyle } from 'react-native';
 import { Theme, useTheme } from '../../providers/ThemeProvider';
 
-type TypographyVariant = 
-  | 'h1' 
-  | 'h2' 
-  | 'h3' 
-  | 'body' 
-  | 'bodySm' 
-  | 'label' 
-  | 'mono' 
+type TypographyVariant =
+  | 'display'
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'body'
+  | 'bodySm'
+  | 'label'
+  | 'caption'
+  | 'mono'
   | 'monoSm';
 
 type TypographyProps = TextProps & {
@@ -37,6 +39,13 @@ export const Typography = React.memo(function Typography({
 
   const variantStyle = useMemo(() => {
     switch (variant) {
+      case 'display':
+        return {
+          fontSize: 40,
+          fontFamily: fontFamilies.heading,
+          lineHeight: 44,
+          letterSpacing: -1.5,
+        };
       case 'h1':
         return {
           fontSize: fontSizes['3xl'],
@@ -73,10 +82,16 @@ export const Typography = React.memo(function Typography({
       case 'label':
         return {
           fontSize: fontSizes.xs,
-          fontFamily: fontFamilies.sansSemiBold,
+          fontFamily: fontFamilies.sansMedium,
           color: colors.textMuted,
-          textTransform: 'uppercase' as const,
-          letterSpacing: 0.5,
+          letterSpacing: -0.1,
+        };
+      case 'caption':
+        return {
+          fontSize: 11,
+          fontFamily: fontFamilies.sans,
+          color: colors.textMuted,
+          lineHeight: 15,
         };
       case 'mono':
         return {

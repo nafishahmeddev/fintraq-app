@@ -518,7 +518,7 @@ export function TransactionsScreen() {
 
             {activeFilterCount > 0 && (
               <View style={styles.activeFiltersRow}>
-                <Text style={styles.activeFiltersLabel}>ACTIVE FILTERS</Text>
+                <Text style={styles.activeFiltersLabel}>Active filters</Text>
                 <TouchableOpacity style={styles.clearChip} onPress={clearFilters}>
                   <Text style={styles.clearChipText}>Clear All</Text>
                 </TouchableOpacity>
@@ -529,7 +529,7 @@ export function TransactionsScreen() {
         ListEmptyComponent={(
           <View style={styles.emptyWrap}>
             <View style={styles.emptyIconBox}>
-              <Ionicons name="receipt-outline" size={32} color={colors.textMuted} />
+              <Ionicons name="receipt-outline" size={32} color={colors.primary} />
             </View>
             <Text style={styles.emptyTitle}>Nothing here yet</Text>
             <Text style={styles.emptySubtitle}>
@@ -538,8 +538,8 @@ export function TransactionsScreen() {
                 : 'Add your first transaction to start tracking.'}
             </Text>
             <TouchableOpacity style={styles.emptyAction} onPress={() => router.push('/transactions/create')}>
-              <Text style={styles.emptyActionText}>Add Transaction</Text>
-              <Ionicons name="arrow-forward" size={14} color={colors.background} />
+              <Text style={styles.emptyActionText}>Add transaction</Text>
+              <Ionicons name="arrow-forward" size={14} color={colors.onPrimary} />
             </TouchableOpacity>
           </View>
         )}
@@ -551,7 +551,7 @@ export function TransactionsScreen() {
       />
 
       <TouchableOpacity style={styles.fab} onPress={() => router.push('/transactions/create')} activeOpacity={0.9}>
-        <Ionicons name="add" size={28} color={colors.background} />
+        <Ionicons name="add" size={28} color={colors.onPrimary} />
       </TouchableOpacity>
 
       <ConfirmDialog
@@ -605,8 +605,6 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.card,
       alignItems: 'center',
       justifyContent: 'center',
-      borderWidth: 1,
-      borderColor: theme.colors.border,
     },
     filterBadge: {
       position: 'absolute',
@@ -641,10 +639,9 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'space-between',
     },
     activeFiltersLabel: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 10,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 1.5,
     },
     clearChip: {
       backgroundColor: theme.colors.danger + '12',
@@ -668,10 +665,8 @@ const createStyles = (theme: Theme) =>
     },
     dayTitle: {
       color: theme.colors.textMuted,
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 11,
-      letterSpacing: 1.2,
-      textTransform: 'uppercase',
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
     },
     dayTotals: {
       flexDirection: 'row',
@@ -687,14 +682,12 @@ const createStyles = (theme: Theme) =>
       gap: theme.spacing[16],
     },
     emptyIconBox: {
-      width: 80,
-      height: 80,
+      width: 72,
+      height: 72,
       borderRadius: theme.radius.full,
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.primary + '1A',
       alignItems: 'center',
       justifyContent: 'center',
-      borderWidth: 1,
-      borderColor: theme.colors.border,
     },
     emptyTitle: {
       fontFamily: theme.fontFamilies.sansBold,
@@ -714,15 +707,15 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       gap: theme.spacing[8],
       paddingHorizontal: theme.spacing[20],
-      height: 48,
-      borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.text,
+      height: 44,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary,
       marginTop: theme.spacing[8],
     },
     emptyActionText: {
-      fontFamily: theme.fontFamilies.sansBold,
-      color: theme.colors.background,
-      fontSize: 15,
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      color: theme.colors.onPrimary,
+      fontSize: 14,
     },
     loadMoreWrap: {
       paddingVertical: theme.spacing[32],
@@ -732,12 +725,12 @@ const createStyles = (theme: Theme) =>
       position: 'absolute',
       bottom: 34,
       right: theme.layout.screenPadding,
-      width: 60,
-      height: 60,
+      width: 56,
+      height: 56,
       borderRadius: theme.radius.full,
-      backgroundColor: theme.colors.text,
+      backgroundColor: theme.colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
-      ...theme.shadow.lg,
+      ...theme.shadow.md,
     },
   });

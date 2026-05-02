@@ -92,9 +92,11 @@ export type Shadow = keyof typeof shadow;
 // ============================================
 export const layout = {
   screenPadding: spacing[24],
-  sectionGap: spacing[24],
-  itemGap: spacing[12],
+  sectionGap: spacing[32],
+  itemGap: spacing[16],
   elementGap: spacing[8],
+  cardPadding: spacing[20],
+  listItemHeight: 56,
   touchTarget: 44,
   maxWidth: 480,
 } as const;

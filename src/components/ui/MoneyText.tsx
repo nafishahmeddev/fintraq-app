@@ -9,6 +9,7 @@ interface MoneyTextProps extends TextProps {
   currency?: string;
   type?: TransactionType | 'NONE';
   weight?: keyof Theme['fontFamilies'];
+  display?: boolean;
 }
 
 export const MoneyText = React.memo(function MoneyText({
@@ -16,6 +17,7 @@ export const MoneyText = React.memo(function MoneyText({
   currency,
   type = 'NONE',
   weight = 'monoBold',
+  display = false,
   style,
   ...props
 }: MoneyTextProps) {
@@ -45,12 +47,15 @@ export const MoneyText = React.memo(function MoneyText({
     return { prefix: p, color: c, formattedAmount: formatted, fontFamily: ff };
   }, [type, amount, currency, weight, theme]);
 
+  const displayStyle = display ? { fontSize: 40, letterSpacing: -1.5, lineHeight: 44 } : undefined;
+
   return (
     <Text
       style={[
         styles.base,
         { color, fontFamily },
-        style
+        displayStyle,
+        style,
       ]}
       numberOfLines={1}
       adjustsFontSizeToFit

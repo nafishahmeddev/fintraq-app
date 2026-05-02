@@ -153,7 +153,7 @@ export default function CategoryCreatePage() {
                   colorHex === item && styles.colorCellActive,
                 ]}
               >
-                {colorHex === item ? <Ionicons name="checkmark" size={14} color="#000" /> : null}
+                {colorHex === item ? <Ionicons name="checkmark" size={14} color={colors.background} /> : null}
               </TouchableOpacity>
             ))}
           </View>
@@ -168,7 +168,7 @@ export default function CategoryCreatePage() {
           disabled={!isValid || isPending}
         >
           <Text style={styles.primaryBtnText}>Create category</Text>
-          <Ionicons name="arrow-forward" size={16} color="#FFF" />
+          <Ionicons name="arrow-forward" size={16} color={colors.onPrimary} />
         </TouchableOpacity>
       </View>
 
@@ -209,10 +209,9 @@ const createStyles = (theme: Theme) =>
       paddingBottom: 0,
     },
     label: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 13,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 0.1,
       marginBottom: 6,
     },
     typeTabsRow: {
@@ -223,25 +222,24 @@ const createStyles = (theme: Theme) =>
     typeTab: {
       paddingHorizontal: 16,
       paddingVertical: 8,
-      borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.card,
       borderWidth: 1,
       borderColor: theme.colors.border,
       justifyContent: 'center',
       alignItems: 'center',
     },
     typeTabActive: {
-      backgroundColor: theme.colors.text,
-      borderColor: theme.colors.text,
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
     },
     typeTabText: {
       fontFamily: theme.fontFamilies.sansBold,
       fontSize: 11,
       color: theme.colors.textMuted,
-      letterSpacing: 0.4,
     },
     typeTabTextActive: {
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
     answerInput: {
       fontFamily: theme.fontFamilies.sansBold,
@@ -270,11 +268,9 @@ const createStyles = (theme: Theme) =>
     iconPreviewBox: {
       width: 44,
       height: 44,
-      borderRadius: theme.radius.md,
+      borderRadius: theme.radius.full,
       justifyContent: 'center',
       alignItems: 'center',
-      borderWidth: 1,
-      borderColor: theme.colors.border,
     },
     iconSelectorText: {
       flex: 1,
@@ -298,7 +294,7 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
     },
     colorCellActive: {
-      borderColor: theme.colors.text,
+      borderColor: theme.colors.primary,
       transform: [{ scale: 1.08 }],
     },
     footer: {
@@ -309,11 +305,12 @@ const createStyles = (theme: Theme) =>
     },
     primaryBtn: {
       height: 56,
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius.full,
       backgroundColor: theme.colors.primary,
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
+      ...theme.shadow.md,
     },
     primaryBtnDisabled: {
       opacity: 0.45,
@@ -321,8 +318,7 @@ const createStyles = (theme: Theme) =>
     primaryBtnText: {
       fontFamily: theme.fontFamilies.sansBold,
       fontSize: 16,
-      color: '#FFFFFF',
-      letterSpacing: 0.3,
+      color: theme.colors.onPrimary,
       marginRight: 10,
     },
   });

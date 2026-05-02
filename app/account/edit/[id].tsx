@@ -114,7 +114,7 @@ export default function AccountEditPage() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primaryDark} />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -122,7 +122,7 @@ export default function AccountEditPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Edit Account" subtitle="Update your account details" showBack />
+      <Header title="Edit account" subtitle="Update your account details" showBack />
 
       <ScrollView
         contentContainerStyle={styles.content}
@@ -131,7 +131,7 @@ export default function AccountEditPage() {
       >
         <View style={styles.formSection}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>ACCOUNT NAME</Text>
+            <Text style={styles.label}>Account name</Text>
             <View style={styles.card}>
               <Controller
                 control={control}
@@ -154,7 +154,7 @@ export default function AccountEditPage() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>ACCOUNT TYPE</Text>
+            <Text style={styles.label}>Account type</Text>
             <View style={styles.typeGrid}>
               {ACCOUNT_TYPES.map((type: AccountType) => {
                 const isSelected = accountType === type;
@@ -189,7 +189,7 @@ export default function AccountEditPage() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>VISUALS</Text>
+            <Text style={styles.label}>Visuals</Text>
             <View style={styles.visualsRow}>
               <TouchableOpacity
                 style={styles.visualBtn}
@@ -216,7 +216,7 @@ export default function AccountEditPage() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>PICK A COLOR</Text>
+            <Text style={styles.label}>Pick a color</Text>
             <View style={styles.colorGrid}>
               {ACCOUNT_COLORS.map((item: string) => (
                 <TouchableOpacity
@@ -236,7 +236,7 @@ export default function AccountEditPage() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>EXTENDED DETAILS (OPTIONAL)</Text>
+            <Text style={styles.label}>Extended details (optional)</Text>
             <View style={styles.card}>
               <Controller
                 control={control}
@@ -280,7 +280,7 @@ export default function AccountEditPage() {
           disabled={!isValid || isPending}
         >
           <Text style={styles.primaryBtnText}>
-            {isPending ? 'Saving...' : 'Save Changes'}
+            {isPending ? 'Saving...' : 'Save changes'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -326,18 +326,16 @@ const createStyles = (theme: Theme) =>
       gap: theme.spacing[12],
     },
     label: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 10,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 1.5,
     },
     card: {
       backgroundColor: theme.colors.card,
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius['3xl'],
       borderWidth: 1,
       borderColor: theme.colors.border,
       padding: theme.spacing[16],
-      ...theme.shadow.xs,
     },
     input: {
       fontFamily: theme.fontFamilies.sansSemiBold,
@@ -365,7 +363,7 @@ const createStyles = (theme: Theme) =>
       gap: theme.spacing[8],
       paddingHorizontal: theme.spacing[12],
       height: 40,
-      borderRadius: theme.radius.md,
+      borderRadius: theme.radius.full,
       borderWidth: 1,
       borderColor: theme.colors.border,
       backgroundColor: theme.colors.card,
@@ -385,15 +383,14 @@ const createStyles = (theme: Theme) =>
       gap: theme.spacing[12],
       padding: theme.spacing[12],
       backgroundColor: theme.colors.card,
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius['3xl'],
       borderWidth: 1,
       borderColor: theme.colors.border,
-      ...theme.shadow.xs,
     },
     iconBox: {
       width: 40,
       height: 40,
-      borderRadius: theme.radius.md,
+      borderRadius: theme.radius.full,
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: theme.colors.background,
@@ -422,7 +419,7 @@ const createStyles = (theme: Theme) =>
     },
     colorCellActive: {
       borderWidth: 2,
-      borderColor: theme.colors.text,
+      borderColor: theme.colors.primary,
     },
     footer: {
       position: 'absolute',
@@ -432,8 +429,8 @@ const createStyles = (theme: Theme) =>
     },
     primaryBtn: {
       height: 56,
-      borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.text,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary,
       justifyContent: 'center',
       alignItems: 'center',
       ...theme.shadow.md,
@@ -444,6 +441,6 @@ const createStyles = (theme: Theme) =>
     primaryBtnText: {
       fontFamily: theme.fontFamilies.sansBold,
       fontSize: 16,
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
   });

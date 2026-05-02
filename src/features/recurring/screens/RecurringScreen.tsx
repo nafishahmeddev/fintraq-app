@@ -271,7 +271,7 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
 
               {item.isPaused && (
                 <Badge
-                  label="PAUSED"
+                  label="Paused"
                   variant="default"
                   style={{ borderStyle: 'dashed' }}
                 />
@@ -354,7 +354,7 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
       )}
 
       <TouchableOpacity style={styles.fab} onPress={onNavigateToCreate}>
-        <Ionicons name="add" size={28} color="#000" />
+        <Ionicons name="add" size={28} color={colors.onPrimary} />
       </TouchableOpacity>
 
       <OptionsDialog
@@ -417,13 +417,13 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     position: 'absolute',
     bottom: 34,
     right: 24,
-    width: 64,
-    height: 64,
+    width: 56,
+    height: 56,
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    ...theme.shadow.lg,
+    ...theme.shadow.md,
   },
   emptyContainer: {
     paddingVertical: 80,
@@ -450,14 +450,14 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     height: 48,
     borderRadius: theme.radius.full,
     paddingHorizontal: 24,
-    backgroundColor: theme.colors.text,
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   emptyBtnText: {
     fontFamily: theme.fontFamilies.sansMedium,
     fontSize: 15,
-    color: theme.colors.background,
+    color: theme.colors.onPrimary,
   },
   tabBar: {
     flexDirection: 'row',
@@ -474,7 +474,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: theme.colors.text,
+    borderBottomColor: theme.colors.primary,
   },
   tabText: {
     fontFamily: theme.fontFamilies.sansMedium,
@@ -482,7 +482,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     color: theme.colors.textMuted,
   },
   activeTabText: {
-    color: theme.colors.text,
+    color: theme.colors.primary,
   },
   dotIndicator: {
     position: 'absolute',

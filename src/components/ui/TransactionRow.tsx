@@ -97,10 +97,10 @@ export const TransactionRow = React.memo(function TransactionRow({
       <View
         style={[
           styles.iconBox,
-          { backgroundColor: categoryColor + '12' },
+          { backgroundColor: categoryColor + '20' },
         ]}
       >
-        <Ionicons name={iconName} size={18} color={categoryColor} />
+        <Ionicons name={iconName} size={20} color={categoryColor} />
       </View>
       <View style={styles.info}>
         <Text
@@ -145,17 +145,16 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    minHeight: 64,
     padding: theme.spacing[16],
     gap: theme.spacing[12],
   },
   iconBox: {
     width: 44,
     height: 44,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border + '10',
   },
   info: {
     flex: 1,
@@ -185,7 +184,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   date: {
     fontFamily: theme.fontFamilies.sans,
-    fontSize: 10,
+    fontSize: 11,
     color: theme.colors.textMuted,
   },
 });

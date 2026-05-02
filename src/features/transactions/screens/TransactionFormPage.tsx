@@ -311,12 +311,12 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title={isEditMode ? 'Edit Entry' : 'New Entry'} subtitle="Record flow with precision" showBack />
+      <Header title={isEditMode ? 'Edit entry' : 'New entry'} subtitle="Record flow with precision" showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={{ marginTop: 24, marginBottom: 16 }}>
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>NOTE</Text>
+            <Text style={styles.sectionLabel}>Note</Text>
             <View style={styles.noteContainer}>
               <TextInput
                 style={styles.noteInput}
@@ -359,7 +359,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
                 />
               ) : (
                 <View style={styles.section}>
-                  <Text style={styles.sectionLabel}>TO ACCOUNT</Text>
+                  <Text style={styles.sectionLabel}>To account</Text>
                   <View style={styles.disabledCard}>
                     <Text style={styles.disabledText}>
                       {!selectedAccount
@@ -402,14 +402,14 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           />
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>PERSON (OPTIONAL)</Text>
+            <Text style={styles.sectionLabel}>Person (optional)</Text>
             <TouchableOpacity 
               style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: 16 }]} 
               onPress={() => setShowPersonPicker(true)}
               activeOpacity={0.7}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Ionicons name="person-outline" size={18} color={colors.primaryDark} />
+                <Ionicons name="person-outline" size={18} color={colors.primary} />
                 <Text style={styles.dateTimeText}>{selectedPersonId ? 'Selected' : 'Link person'}</Text>
               </View>
               <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
@@ -417,14 +417,14 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>PLACE (OPTIONAL)</Text>
+            <Text style={styles.sectionLabel}>Place (optional)</Text>
             <TouchableOpacity 
               style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: 16 }]} 
               onPress={() => setShowPlacePicker(true)}
               activeOpacity={0.7}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Ionicons name="location-outline" size={18} color={colors.primaryDark} />
+                <Ionicons name="location-outline" size={18} color={colors.primary} />
                 <Text style={styles.dateTimeText}>{selectedPlaceId ? 'Selected' : 'Link place'}</Text>
               </View>
               <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
@@ -432,14 +432,14 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>DATE & TIME</Text>
+            <Text style={styles.sectionLabel}>Date & time</Text>
             <View style={styles.dateTimeRow}>
               <TouchableOpacity style={styles.dateTimeBtn} onPress={() => setShowDatePicker(true)} activeOpacity={0.7}>
-                <Ionicons name="calendar-outline" size={18} color={colors.primaryDark} />
+                <Ionicons name="calendar-outline" size={18} color={colors.primary} />
                 <Text style={styles.dateTimeText}>{formattedDate}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.dateTimeBtn} onPress={() => setShowTimePicker(true)} activeOpacity={0.7}>
-                <Ionicons name="time-outline" size={18} color={colors.primaryDark} />
+                <Ionicons name="time-outline" size={18} color={colors.primary} />
                 <Text style={styles.dateTimeText}>{formattedTime}</Text>
               </TouchableOpacity>
             </View>
@@ -462,9 +462,9 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           activeOpacity={0.9}
         >
           {isSubmitting ? (
-            <ActivityIndicator size="small" color={colors.background} />
+            <ActivityIndicator size="small" color={colors.onPrimary} />
           ) : (
-            <Text style={styles.saveBtnText}>{isEditMode ? 'Save Changes' : 'Save Transaction'}</Text>
+            <Text style={styles.saveBtnText}>{isEditMode ? 'Save changes' : 'Save transaction'}</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -511,10 +511,9 @@ const createStyles = (theme: Theme) =>
       gap: theme.spacing[12],
     },
     sectionLabel: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 10,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 1.5,
     },
     dateTimeRow: {
       flexDirection: 'row',
@@ -523,7 +522,7 @@ const createStyles = (theme: Theme) =>
     dateTimeBtn: {
       flex: 1,
       height: 52,
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius['3xl'],
       backgroundColor: theme.colors.card,
       borderWidth: 1,
       borderColor: theme.colors.border,
@@ -531,7 +530,6 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       justifyContent: 'center',
       gap: theme.spacing[8],
-      ...theme.shadow.xs,
     },
     dateTimeText: {
       fontFamily: theme.fontFamilies.sansSemiBold,
@@ -539,13 +537,12 @@ const createStyles = (theme: Theme) =>
       color: theme.colors.text,
     },
     noteContainer: {
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius['3xl'],
       backgroundColor: theme.colors.card,
       borderWidth: 1,
       borderColor: theme.colors.border,
       padding: theme.spacing[16],
       minHeight: 120,
-      ...theme.shadow.xs,
     },
     noteInput: {
       fontFamily: theme.fontFamilies.sans,
@@ -561,8 +558,8 @@ const createStyles = (theme: Theme) =>
     },
     saveBtn: {
       height: 56,
-      borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.text,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
       ...theme.shadow.md,
@@ -573,11 +570,11 @@ const createStyles = (theme: Theme) =>
     saveBtnText: {
       fontFamily: theme.fontFamilies.sansBold,
       fontSize: 16,
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
     disabledCard: {
       height: 52,
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius['3xl'],
       backgroundColor: theme.colors.card,
       borderWidth: 1,
       borderColor: theme.colors.border,

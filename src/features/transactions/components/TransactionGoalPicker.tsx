@@ -35,7 +35,7 @@ export const TransactionGoalPicker = React.memo(function TransactionGoalPicker({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionLabel}>LINK TO GOAL</Text>
+      <Text style={styles.sectionLabel}>Link to goal</Text>
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false} 
@@ -44,12 +44,12 @@ export const TransactionGoalPicker = React.memo(function TransactionGoalPicker({
         <TouchableOpacity
           style={[
             styles.chip,
-            selectedId === null && { backgroundColor: colors.text, borderColor: colors.text },
+            selectedId === null && { backgroundColor: colors.primary, borderColor: colors.primary },
           ]}
           onPress={() => onSelect(null)}
           activeOpacity={0.7}
         >
-          <Text style={[styles.chipText, selectedId === null && { color: colors.background }]}>
+          <Text style={[styles.chipText, selectedId === null && { color: colors.onPrimary }]}>
             None
           </Text>
         </TouchableOpacity>
@@ -63,7 +63,7 @@ export const TransactionGoalPicker = React.memo(function TransactionGoalPicker({
               key={goal.id}
               style={[
                 styles.chip,
-                isSelected && { backgroundColor: colors.text, borderColor: colors.text },
+                isSelected && { backgroundColor: colors.primary, borderColor: colors.primary },
               ]}
               onPress={() => onSelect(goal.id)}
               activeOpacity={0.7}
@@ -71,9 +71,9 @@ export const TransactionGoalPicker = React.memo(function TransactionGoalPicker({
               <Ionicons 
                 name={(goal.icon + '-outline') as any} 
                 size={14} 
-                color={isSelected ? colors.background : goalColor} 
+                color={isSelected ? colors.onPrimary : goalColor} 
               />
-              <Text style={[styles.chipText, isSelected && { color: colors.background }]}>
+              <Text style={[styles.chipText, isSelected && { color: colors.onPrimary }]}>
                 {goal.name}
               </Text>
             </TouchableOpacity>
@@ -91,10 +91,9 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     marginTop: theme.spacing[8],
   },
   sectionLabel: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 10,
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 12,
     color: theme.colors.textMuted,
-    letterSpacing: 1.5,
   },
   scrollContent: {
     gap: theme.spacing[8],

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Theme, useTheme } from '../../providers/ThemeProvider';
 import { IconBox } from './IconBox';
@@ -37,10 +37,12 @@ export const ListItem = React.memo(function ListItem({
   const { colors } = theme;
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
+  const handlePress = useCallback(() => onPress?.(), [onPress]);
+
   const containerStyle = [
     styles.container,
     {
-      backgroundColor: colors.surface,
+      backgroundColor: selected ? colors.primary + '15' : colors.card,
       borderBottomColor: showDivider && !isLast ? colors.border : 'transparent',
       borderBottomWidth: showDivider && !isLast ? 1 : 0,
     },
@@ -76,11 +78,13 @@ export const ListItem = React.memo(function ListItem({
           </Text>
         )}
       </View>
-      {rightElement && (
+      {rightElement ? (
         <View style={styles.rightElement}>
           {rightElement}
         </View>
-      )}
+      ) : onPress ? (
+        <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+      ) : null}
     </>
   );
 
@@ -88,7 +92,7 @@ export const ListItem = React.memo(function ListItem({
     return (
       <TouchableOpacity
         style={containerStyle}
-        onPress={onPress}
+        onPress={handlePress}
         activeOpacity={0.75}
       >
         {content}
@@ -104,17 +108,18 @@ const createStyles = (theme: Theme) =>
     container: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      gap: 12,
+      minHeight: theme.layout.listItemHeight,
+      paddingVertical: theme.spacing[12],
+      paddingHorizontal: theme.spacing[16],
+      gap: theme.spacing[12],
     },
     firstItem: {
-      borderTopLeftRadius: theme.radius.lg,
-      borderTopRightRadius: theme.radius.lg,
+      borderTopLeftRadius: theme.radius['3xl'],
+      borderTopRightRadius: theme.radius['3xl'],
     },
     lastItem: {
-      borderBottomLeftRadius: theme.radius.lg,
-      borderBottomRightRadius: theme.radius.lg,
+      borderBottomLeftRadius: theme.radius['3xl'],
+      borderBottomRightRadius: theme.radius['3xl'],
     },
     content: {
       flex: 1,
@@ -122,16 +127,16 @@ const createStyles = (theme: Theme) =>
     },
     title: {
       fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 14,
+      fontSize: theme.fontSizes.sm,
     },
     subtitle: {
       fontFamily: theme.fontFamilies.sans,
-      fontSize: 12,
+      fontSize: theme.fontSizes.xs,
       color: theme.colors.textMuted,
       marginTop: 2,
     },
     rightElement: {
-      marginLeft: 8,
+      marginLeft: theme.spacing[4],
     },
   });
 

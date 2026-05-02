@@ -72,7 +72,7 @@ export const KPICard = React.memo(function KPICard({
         {/* Top: Net Balance */}
         <View style={styles.kpiMainContent}>
           <View>
-            <Text style={styles.kpiLabel}>NET SAVINGS</Text>
+            <Text style={styles.kpiLabel}>Net savings</Text>
             <MoneyText
               amount={Math.abs(metrics.income - metrics.expense)}
               currency={selectedCurrency ?? undefined}
@@ -88,7 +88,7 @@ export const KPICard = React.memo(function KPICard({
         {/* Bottom: In/Out Split */}
         <View style={styles.kpiSecondaryContent}>
           <View style={styles.kpiCell}>
-            <Text style={styles.kpiLabelSmall}>INCOME</Text>
+            <Text style={styles.kpiLabelSmall}>Income</Text>
             <MoneyText
               amount={metrics.income}
               currency={selectedCurrency ?? undefined}
@@ -99,7 +99,7 @@ export const KPICard = React.memo(function KPICard({
           </View>
           <View style={styles.kpiVerticalSep} />
           <View style={styles.kpiCell}>
-            <Text style={styles.kpiLabelSmall}>EXPENSES</Text>
+            <Text style={styles.kpiLabelSmall}>Expenses</Text>
             <MoneyText
               amount={metrics.expense}
               currency={selectedCurrency ?? undefined}
@@ -117,10 +117,8 @@ export const KPICard = React.memo(function KPICard({
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
     kpiCard: {
-      borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.surface,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderRadius: theme.radius['3xl'],
+      backgroundColor: theme.colors.card,
       overflow: 'hidden',
     },
     kpiTabsWrap: {
@@ -153,7 +151,7 @@ const createStyles = (theme: Theme) =>
       letterSpacing: 0.3,
     },
     currencyTabTextActive: {
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
     kpiBody: {
       padding: 16,
@@ -181,18 +179,16 @@ const createStyles = (theme: Theme) =>
     },
     kpiLabel: {
       color: theme.colors.textMuted,
-      fontFamily: theme.fontFamilies.sansBold,
-      fontSize: 10,
-      letterSpacing: 1.2,
-      textTransform: 'uppercase',
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
+      letterSpacing: -0.1,
       marginBottom: 2,
     },
     kpiLabelSmall: {
       color: theme.colors.textMuted,
-      fontFamily: theme.fontFamilies.sansBold,
-      fontSize: 9,
-      letterSpacing: 1,
-      textTransform: 'uppercase',
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 11,
+      letterSpacing: -0.1,
     },
     kpiValueLarge: {
       fontSize: 24,

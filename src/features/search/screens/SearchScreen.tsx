@@ -56,13 +56,13 @@ const AccountRow = React.memo(function AccountRow({
   const styles = useMemo(() => accountRowStyles(theme), [theme]);
 
   const containerStyle = useMemo(() => ({
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: isFirst ? theme.radius.lg : 0,
-    borderTopRightRadius: isFirst ? theme.radius.lg : 0,
-    borderBottomLeftRadius: isLast ? theme.radius.lg : 0,
-    borderBottomRightRadius: isLast ? theme.radius.lg : 0,
+    backgroundColor: colors.card,
+    borderTopLeftRadius: isFirst ? theme.radius['3xl'] : 0,
+    borderTopRightRadius: isFirst ? theme.radius['3xl'] : 0,
+    borderBottomLeftRadius: isLast ? theme.radius['3xl'] : 0,
+    borderBottomRightRadius: isLast ? theme.radius['3xl'] : 0,
     borderBottomWidth: isLast ? 0 : 1,
-    borderBottomColor: colors.text + '08',
+    borderBottomColor: colors.border,
   }), [isFirst, isLast, colors, theme]);
 
   return (
@@ -71,7 +71,7 @@ const AccountRow = React.memo(function AccountRow({
       onPress={handlePress}
       activeOpacity={0.75}
     >
-      <View style={[styles.iconBox, { backgroundColor: accentColor + '18' }]}>
+      <View style={[styles.iconBox, { backgroundColor: accentColor + '20' }]}>
         <Ionicons name={resolveIcon(account.icon, 'wallet-outline')} size={18} color={accentColor} />
       </View>
       <View style={styles.info}>
@@ -97,6 +97,7 @@ const accountRowStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    minHeight: 56,
     paddingVertical: 12,
     paddingHorizontal: 16,
     gap: 12,
@@ -104,7 +105,7 @@ const accountRowStyles = (theme: Theme) => StyleSheet.create({
   iconBox: {
     width: 40,
     height: 40,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.full,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -145,13 +146,13 @@ const CategoryRow = React.memo(function CategoryRow({
   const styles = useMemo(() => categoryRowStyles(theme), [theme]);
 
   const containerStyle = useMemo(() => ({
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: isFirst ? theme.radius.lg : 0,
-    borderTopRightRadius: isFirst ? theme.radius.lg : 0,
-    borderBottomLeftRadius: isLast ? theme.radius.lg : 0,
-    borderBottomRightRadius: isLast ? theme.radius.lg : 0,
+    backgroundColor: colors.card,
+    borderTopLeftRadius: isFirst ? theme.radius['3xl'] : 0,
+    borderTopRightRadius: isFirst ? theme.radius['3xl'] : 0,
+    borderBottomLeftRadius: isLast ? theme.radius['3xl'] : 0,
+    borderBottomRightRadius: isLast ? theme.radius['3xl'] : 0,
     borderBottomWidth: isLast ? 0 : 1,
-    borderBottomColor: colors.text + '08',
+    borderBottomColor: colors.border,
   }), [isFirst, isLast, colors, theme]);
 
   return (
@@ -160,7 +161,7 @@ const CategoryRow = React.memo(function CategoryRow({
       onPress={handlePress}
       activeOpacity={0.75}
     >
-      <View style={[styles.iconBox, { backgroundColor: catColor + '18' }]}>
+      <View style={[styles.iconBox, { backgroundColor: catColor + '20' }]}>
         <Ionicons name={resolveIcon(category.icon, 'pricetag-outline')} size={18} color={catColor} />
       </View>
       <Text style={[styles.name, { color: colors.text }]}>{category.name}</Text>
@@ -184,6 +185,7 @@ const categoryRowStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    minHeight: 56,
     paddingVertical: 12,
     paddingHorizontal: 16,
     gap: 12,
@@ -191,7 +193,7 @@ const categoryRowStyles = (theme: Theme) => StyleSheet.create({
   iconBox: {
     width: 40,
     height: 40,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.full,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -373,7 +375,7 @@ export function SearchScreen() {
       {!isEnabled ? (
         <View style={styles.promptWrap}>
           <View style={styles.promptIconBox}>
-            <Ionicons name="search" size={28} color={colors.textMuted} />
+            <Ionicons name="search" size={28} color={colors.primary} />
           </View>
           <Text style={styles.promptTitle}>Find anything</Text>
           <Text style={styles.promptSubtitle}>
@@ -383,7 +385,7 @@ export function SearchScreen() {
       ) : noResults ? (
         <View style={styles.promptWrap}>
           <View style={styles.promptIconBox}>
-            <Ionicons name="file-tray-outline" size={28} color={colors.textMuted} />
+            <Ionicons name="file-tray-outline" size={28} color={colors.primary} />
           </View>
           <Text style={styles.promptTitle}>No results</Text>
           <Text style={styles.promptSubtitle}>
@@ -423,9 +425,11 @@ const createStyles = (theme: Theme) =>
     searchWrap: {
       flexDirection: 'row',
       alignItems: 'center',
-      height: 52,
-      borderRadius: theme.radius.md,
-      backgroundColor: theme.colors.surface,
+      height: 48,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.card,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
       paddingHorizontal: 16,
       gap: 8,
     },
@@ -446,10 +450,10 @@ const createStyles = (theme: Theme) =>
       gap: 12,
     },
     promptIconBox: {
-      width: 68,
-      height: 68,
-      borderRadius: theme.radius['2xl'],
-      backgroundColor: theme.colors.surface,
+      width: 72,
+      height: 72,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary + '1A',
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: 4,
@@ -481,11 +485,9 @@ const createStyles = (theme: Theme) =>
       marginBottom: 8,
     },
     sectionHeaderText: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 9,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 1.2,
-      textTransform: 'uppercase',
     },
     sectionHeaderCount: {
       fontFamily: theme.fontFamilies.sansSemiBold,

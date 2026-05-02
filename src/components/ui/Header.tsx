@@ -38,10 +38,10 @@ export const Header = React.memo(function Header({
       <View style={styles.left}>
         {showBack && (
           <IconButton
-            icon="arrow-back"
+            icon="chevron-back"
             onPress={handleBack}
             size="md"
-            variant="default"
+            variant="ghost"
           />
         )}
         <View style={styles.titleBlock}>

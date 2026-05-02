@@ -38,14 +38,13 @@ const createStyles = (theme: Theme) =>
       marginBottom: theme.spacing[12],
     },
     title: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontFamily: theme.fontFamilies.sansMedium,
       color: theme.colors.textMuted,
-      fontSize: 10,
-      letterSpacing: 1.5,
+      fontSize: 12,
     },
     right: {
       fontFamily: theme.fontFamilies.sansSemiBold,
-      color: theme.colors.primaryDark,
+      color: theme.colors.primary,
       fontSize: theme.fontSizes.sm,
     },
   });

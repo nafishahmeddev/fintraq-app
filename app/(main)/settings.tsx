@@ -409,9 +409,9 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     paddingBottom: 48,
   },
   heroPanel: {
-    borderRadius: theme.radius['2xl'],
+    borderRadius: theme.radius['3xl'],
     padding: 24,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.card,
     marginBottom: 28,
   },
   heroHeader: {
@@ -421,12 +421,10 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     marginBottom: 24,
   },
   heroKicker: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 10,
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 12,
     color: theme.colors.primary,
-    letterSpacing: 2,
     marginBottom: 4,
-    textTransform: 'uppercase',
   },
   heroTitle: {
     fontFamily: theme.fontFamilies.heading,
@@ -450,11 +448,9 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     backgroundColor: theme.colors.success,
   },
   heroBadgeText: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 9,
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
     color: theme.colors.textMuted,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
   },
   heroGrid: {
     flexDirection: 'row',
@@ -465,12 +461,10 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
   },
   heroGridLabel: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 9,
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
     color: theme.colors.textMuted,
-    letterSpacing: 1,
     marginBottom: 4,
-    textTransform: 'uppercase',
   },
   heroGridValue: {
     fontFamily: theme.fontFamilies.heading,
@@ -487,17 +481,15 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     marginBottom: 28,
   },
   sectionLabel: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 10,
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 12,
     color: theme.colors.textMuted,
-    letterSpacing: 2,
     marginBottom: 12,
     paddingLeft: 4,
-    textTransform: 'uppercase',
   },
   card: {
-    borderRadius: theme.radius.xl,
-    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    backgroundColor: theme.colors.card,
     overflow: 'hidden',
   },
   row: {
@@ -506,8 +498,8 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     padding: 16,
   },
   iconBox: {
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
     borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
@@ -519,7 +511,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   rowTitle: {
     fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 16,
+    fontSize: 15,
     color: theme.colors.text,
   },
   rowSubtitle: {
@@ -535,10 +527,8 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   rowValue: {
     fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 11,
+    fontSize: 12,
     color: theme.colors.primary,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
   },
   footer: {
     marginTop: 12,
@@ -568,11 +558,11 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   modalCard: {
     backgroundColor: theme.colors.background,
-    borderRadius: theme.radius['2xl'],
+    borderRadius: theme.radius['3xl'],
     padding: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 16,
     elevation: 8,
   },
@@ -591,11 +581,13 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   modalInput: {
     height: 54,
     borderRadius: theme.radius.lg,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.card,
     paddingHorizontal: 16,
     fontSize: 16,
     color: theme.colors.text,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   modalActions: {
     flexDirection: 'row',
@@ -603,11 +595,13 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   modalBtnCancel: {
     flex: 1,
-    height: 48,
-    borderRadius: theme.radius.md,
+    height: 44,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.card,
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
   },
   modalBtnCancelText: {
     fontFamily: theme.fontFamilies.sansSemiBold,
@@ -615,15 +609,15 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   modalBtnSave: {
     flex: 1,
-    height: 48,
-    borderRadius: theme.radius.md,
+    height: 44,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.text,
+    backgroundColor: theme.colors.primary,
   },
   modalBtnSaveText: {
     fontFamily: theme.fontFamilies.sansSemiBold,
-    color: theme.colors.background,
+    color: theme.colors.onPrimary,
   },
   devCard: {
     flexDirection: 'row',

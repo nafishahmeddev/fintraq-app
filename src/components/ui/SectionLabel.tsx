@@ -77,7 +77,7 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'space-between',
     },
     label: {
-      fontFamily: theme.fontFamilies.sansBold,
+      fontFamily: theme.fontFamilies.sansMedium,
     },
   });
 

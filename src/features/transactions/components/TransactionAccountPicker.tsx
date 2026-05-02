@@ -19,7 +19,7 @@ const resolveIconName = (raw: string | null | undefined): keyof typeof Ionicons.
 
 const toHexColor = (value: number) => `#${value.toString(16).padStart(6, '0')}`;
 
-export const TransactionAccountPicker = ({ accounts, selectedId, onSelect, onAdd, label = 'ACCOUNT' }: Props) => {
+export const TransactionAccountPicker = ({ accounts, selectedId, onSelect, onAdd, label = 'Account' }: Props) => {
   const theme = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
@@ -86,10 +86,9 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: 24,
     },
     label: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 10,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 1.5,
       marginBottom: theme.spacing[12],
     },
     grid: {

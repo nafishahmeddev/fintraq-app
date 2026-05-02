@@ -430,7 +430,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           disabled={!canSubmit}
         >
           {isSubmitting ? (
-            <ActivityIndicator size="small" color={colors.background} />
+            <ActivityIndicator size="small" color={colors.onPrimary} />
           ) : (
             <Text style={styles.saveBtnText}>{isEditMode ? 'Save changes' : 'Save budget'}</Text>
           )}
@@ -617,9 +617,10 @@ const createStyles = (theme: Theme) =>
     saveBtn: {
       height: 56,
       borderRadius: theme.radius.full,
-      backgroundColor: theme.colors.text,
+      backgroundColor: theme.colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
+      ...theme.shadow.md,
     },
     saveBtnDisabled: {
       opacity: 0.5,
@@ -627,7 +628,7 @@ const createStyles = (theme: Theme) =>
     saveBtnText: {
       fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 16,
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
     customDateRow: {
       flexDirection: 'row',

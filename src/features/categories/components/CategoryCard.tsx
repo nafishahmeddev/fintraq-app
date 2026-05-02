@@ -134,8 +134,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   typeBadgeText: {
     fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 9,
-    letterSpacing: 0.5,
+    fontSize: 10,
   },
   typeBadgeTextDanger: {
     color: theme.colors.danger,
@@ -174,7 +173,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   cardFooterText: {
     fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 10,
-    letterSpacing: 0.2,
     color: theme.colors.textMuted,
   },
 });

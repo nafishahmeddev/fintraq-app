@@ -24,7 +24,7 @@ export const TransactionCategoryPicker = ({ categories, selectedId, onSelect, on
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>CATEGORY</Text>
+      <Text style={styles.label}>Category</Text>
       <View style={styles.grid}>
         {categories.map((cat) => {
           const selected = selectedId === cat.id;
@@ -85,10 +85,9 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: 24,
     },
     label: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 10,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 1.5,
       marginBottom: theme.spacing[12],
     },
     grid: {

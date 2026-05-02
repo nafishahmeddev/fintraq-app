@@ -36,10 +36,10 @@ export const CategoryTypeSelector: React.FC<CategoryTypeSelectorProps> = ({
             onPress={() => onTypeChange(type)}
             activeOpacity={0.9}
           >
-            <Ionicons 
-              name={config.icon} 
-              size={14} 
-              color={isActive ? colors.background : colors.textMuted} 
+            <Ionicons
+              name={config.icon}
+              size={14}
+              color={isActive ? colors.onPrimary : colors.textMuted}
             />
             <Text style={[styles.segmentPillText, isActive && styles.segmentPillTextActive]}>
               {config.label}
@@ -55,10 +55,10 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   typeTabsRail: {
     flexDirection: 'row',
     height: 48,
-    borderRadius: theme.radius.lg,
+    borderRadius: theme.radius['3xl'],
     borderWidth: 1,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.card,
     padding: 4,
     gap: 4,
   },
@@ -69,19 +69,18 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     gap: 6,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.xl,
     backgroundColor: 'transparent',
   },
   segmentPillActive: {
-    backgroundColor: theme.colors.text,
+    backgroundColor: theme.colors.primary,
   },
   segmentPillText: {
     fontFamily: theme.fontFamilies.sansBold,
     color: theme.colors.textMuted,
     fontSize: 12,
-    letterSpacing: 0.3,
   },
   segmentPillTextActive: {
-    color: theme.colors.background,
+    color: theme.colors.onPrimary,
   },
 });

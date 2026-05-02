@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Theme, useTheme } from '../../providers/ThemeProvider';
+import { Button } from './Button';
 
 export type EmptyStateSize = 'sm' | 'md' | 'lg';
 
@@ -25,7 +26,8 @@ export const EmptyState = React.memo(function EmptyState({
   style,
 }: EmptyStateProps) {
   const theme = useTheme();
-  const { colors, fontSizes } = theme;
+  const { colors } = theme;
+  const { fontSizes } = theme;
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   const dimensions = useMemo(() => {
@@ -81,7 +83,7 @@ export const EmptyState = React.memo(function EmptyState({
         <Ionicons
           name={icon}
           size={dimensions.iconSize}
-          color={colors.textMuted}
+          color={theme.colors.primary}
         />
       </View>
       <Text
@@ -109,15 +111,13 @@ export const EmptyState = React.memo(function EmptyState({
         </Text>
       )}
       {actionLabel && onAction && (
-        <TouchableOpacity
-          style={styles.actionButton}
+        <Button
+          title={actionLabel}
           onPress={onAction}
-          activeOpacity={0.75}
-        >
-          <Text style={[styles.actionText, { color: colors.primary }]}>
-            {actionLabel}
-          </Text>
-        </TouchableOpacity>
+          variant="primary"
+          size="md"
+          style={styles.actionButton}
+        />
       )}
     </View>
   );
@@ -130,12 +130,10 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: theme.layout.screenPadding,
     },
     iconBox: {
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.primary + '1A',
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: theme.spacing[16],
-      borderWidth: 1,
-      borderColor: theme.colors.border,
     },
     title: {
       fontFamily: theme.fontFamilies.sansBold,
@@ -150,17 +148,7 @@ const createStyles = (theme: Theme) =>
       lineHeight: 20,
     },
     actionButton: {
-      marginTop: theme.spacing[16],
-      paddingVertical: theme.spacing[8],
-      paddingHorizontal: theme.spacing[16],
-      borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.surface,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
-    actionText: {
-      fontFamily: theme.fontFamilies.sansBold,
-      fontSize: 14,
+      marginTop: theme.spacing[24],
     },
   });
 

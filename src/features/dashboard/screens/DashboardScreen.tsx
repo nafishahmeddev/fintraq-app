@@ -251,7 +251,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
           )}
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-            <Text style={styles.heroBadge}>TOTAL BALANCE</Text>
+            <Text style={styles.heroBadge}>Total balance</Text>
             <StreakBadge />
           </View>
           <MoneyText
@@ -259,19 +259,20 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
             currency={selectedCurrency}
             style={styles.heroBalance}
             weight="sansBold"
+            display
           />
 
           {/* Income / Expense split bar */}
           <View style={styles.splitRow}>
             <View style={styles.splitItem}>
               <View style={[styles.splitDot, { backgroundColor: colors.success }]} />
-              <Text style={styles.splitLabel}>IN</Text>
+              <Text style={styles.splitLabel}>In</Text>
               <MoneyText amount={totals.income} currency={selectedCurrency} type="CR" weight="sansBold" style={styles.splitValue} />
             </View>
             <View style={styles.splitDivider} />
             <View style={styles.splitItem}>
               <View style={[styles.splitDot, { backgroundColor: colors.danger }]} />
-              <Text style={styles.splitLabel}>OUT</Text>
+              <Text style={styles.splitLabel}>Out</Text>
               <MoneyText amount={totals.expense} currency={selectedCurrency} type="DR" weight="sansBold" style={styles.splitValue} />
             </View>
           </View>
@@ -294,7 +295,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
               <View style={[styles.kpiIcon, { backgroundColor: colors.primary + '15' }]}>
                 <Ionicons name="sparkles-outline" size={16} color={colors.primary} />
               </View>
-              <Text style={styles.kpiLabel}>SAVED</Text>
+              <Text style={styles.kpiLabel}>Saved</Text>
             </View>
             <MoneyText
               amount={totals.totalSaved || 0}
@@ -313,7 +314,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
               <View style={[styles.kpiIcon, { backgroundColor: colors.danger + '15' }]}>
                 <Ionicons name="alert-circle-outline" size={16} color={colors.danger} />
               </View>
-              <Text style={styles.kpiLabel}>DEBT</Text>
+              <Text style={styles.kpiLabel}>Debt</Text>
             </View>
             <MoneyText
               amount={totals.totalDebt || 0}
@@ -344,18 +345,18 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
         {/* ── Quick actions ── */}
         <View style={styles.quickActions}>
           <TouchableOpacity style={styles.quickActionPrimary} onPress={navigateToCreateTransaction} activeOpacity={0.85}>
-            <Ionicons name="add" size={20} color={colors.background} />
-            <Text style={styles.quickActionPrimaryText}>Add Transaction</Text>
+            <Ionicons name="add" size={20} color={colors.onPrimary} />
+            <Text style={styles.quickActionPrimaryText}>Add transaction</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.quickActionSecondary} onPress={navigateToTransactions} activeOpacity={0.85}>
             <Ionicons name="list-outline" size={18} color={colors.text} />
-            <Text style={styles.quickActionSecondaryText}>All Transactions</Text>
+            <Text style={styles.quickActionSecondaryText}>All transactions</Text>
           </TouchableOpacity>
         </View>
 
         {/* ── Accounts section ── */}
         <SectionHeader
-          title="ACCOUNTS"
+          title="Accounts"
           rightText="New"
           onPressRight={openAccountForm}
         />
@@ -397,17 +398,17 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
                     </View>
                   </View>
 
-                  <Text style={styles.accountBalanceLabel}>AVAILABLE</Text>
+                  <Text style={styles.accountBalanceLabel}>Available</Text>
                   <MoneyText amount={acc.balance} currency={acc.currency} style={styles.accountCardBalance} weight="sansBold" />
 
                   <View style={styles.accountCardStats}>
                     <View style={styles.accountCardStatCol}>
-                      <Text style={styles.accountCardStatLabel}>TOTAL IN</Text>
+                      <Text style={styles.accountCardStatLabel}>Total in</Text>
                       <MoneyText amount={acc.income} currency={acc.currency} style={styles.accountCardStatValue} type="CR" />
                     </View>
                     <View style={styles.accountCardStatDivider} />
                     <View style={styles.accountCardStatCol}>
-                      <Text style={styles.accountCardStatLabel}>TOTAL OUT</Text>
+                      <Text style={styles.accountCardStatLabel}>Total out</Text>
                       <MoneyText amount={acc.expense} currency={acc.currency} style={styles.accountCardStatValue} type="DR" />
                     </View>
                   </View>
@@ -432,7 +433,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
         </ScrollView>
 
         {/* ── Top expense categories ── */}
-        <SectionHeader title="TOP EXPENSE CATEGORIES" rightText={selectedTopCategoryCurrency} />
+        <SectionHeader title="Top expense categories" rightText={selectedTopCategoryCurrency} />
         <TopExpenseCategoriesCard
           currencies={topCategoryCurrencies}
           selectedCurrency={selectedTopCategoryCurrency}
@@ -441,7 +442,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
         />
 
         {/* ── Recent activity ── */}
-        <SectionHeader title="RECENT" rightText="See all" onPressRight={navigateToTransactions} />
+        <SectionHeader title="Recent" rightText="See all" onPressRight={navigateToTransactions} />
 
         <View style={[styles.activityCard, { backgroundColor: "transparent" }]}>
           {transactions && transactions.length > 0 ? (
@@ -460,11 +461,11 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
             })
           ) : (
             <View style={styles.emptyActivity}>
-              <Ionicons name="receipt-outline" size={28} color={colors.textMuted} />
+              <Ionicons name="receipt-outline" size={28} color={colors.primary} />
               <Text style={styles.emptyActivityText}>No transactions yet</Text>
               <TouchableOpacity style={styles.emptyActivityAction} onPress={navigateToCreateTransaction}>
                 <Text style={styles.emptyActivityActionText}>Add one now</Text>
-                <Ionicons name="arrow-forward" size={12} color={colors.background} />
+                <Ionicons name="arrow-forward" size={12} color={colors.onPrimary} />
               </TouchableOpacity>
             </View>
           )}
@@ -474,7 +475,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
 
       {/* FAB */}
       <TouchableOpacity style={styles.fab} onPress={navigateToCreateTransaction} activeOpacity={0.9}>
-        <Ionicons name="add" size={28} color={colors.background} />
+        <Ionicons name="add" size={28} color={colors.onPrimary} />
       </TouchableOpacity>
 
       <OptionsDialog
@@ -520,13 +521,10 @@ const createStyles = (theme: Theme, screenWidth: number) =>
     heroCard: {
       marginHorizontal: theme.layout.screenPadding,
       marginTop: theme.spacing[16],
-      marginBottom: theme.spacing[24],
+      marginBottom: theme.spacing[32],
       padding: theme.spacing[24],
-      borderRadius: theme.radius.xl,
+      borderRadius: theme.radius['3xl'],
       backgroundColor: theme.colors.card,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      ...theme.shadow.sm,
     },
     currencyTabsRow: {
       flexDirection: 'row',
@@ -542,8 +540,8 @@ const createStyles = (theme: Theme, screenWidth: number) =>
       borderColor: theme.colors.border,
     },
     currencyTabActive: {
-      backgroundColor: theme.colors.text,
-      borderColor: theme.colors.text,
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
     },
     currencyTabText: {
       fontFamily: theme.fontFamilies.sansSemiBold,
@@ -551,17 +549,14 @@ const createStyles = (theme: Theme, screenWidth: number) =>
       color: theme.colors.textMuted,
     },
     currencyTabTextActive: {
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
     heroBadge: {
-      fontFamily: theme.fontFamilies.sansBold,
-      fontSize: 10,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 1.5,
     },
     heroBalance: {
-      fontSize: 36,
-      letterSpacing: -1,
       marginBottom: theme.spacing[24],
     },
     splitRow: {
@@ -595,8 +590,8 @@ const createStyles = (theme: Theme, screenWidth: number) =>
       backgroundColor: theme.colors.border,
     },
     flowBar: {
-      height: 6,
-      backgroundColor: theme.colors.background,
+      height: 4,
+      backgroundColor: theme.colors.surface,
       borderRadius: theme.radius.full,
       flexDirection: 'row',
       overflow: 'hidden',
@@ -619,11 +614,8 @@ const createStyles = (theme: Theme, screenWidth: number) =>
     kpiCard: {
       flex: 1,
       padding: theme.spacing[16],
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius['3xl'],
       backgroundColor: theme.colors.card,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      ...theme.shadow.xs,
     },
     kpiHeader: {
       flexDirection: 'row',
@@ -634,15 +626,14 @@ const createStyles = (theme: Theme, screenWidth: number) =>
     kpiIcon: {
       width: 28,
       height: 28,
-      borderRadius: theme.radius.md,
+      borderRadius: theme.radius.full,
       alignItems: 'center',
       justifyContent: 'center',
     },
     kpiLabel: {
-      fontFamily: theme.fontFamilies.sansBold,
-      fontSize: 9,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 1,
     },
     kpiValue: {
       fontSize: 18,
@@ -656,26 +647,25 @@ const createStyles = (theme: Theme, screenWidth: number) =>
     },
     quickActionPrimary: {
       flex: 1.2,
-      height: 48,
-      backgroundColor: theme.colors.text,
-      borderRadius: theme.radius.lg,
+      height: 44,
+      backgroundColor: theme.colors.primary,
+      borderRadius: theme.radius.full,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       gap: theme.spacing[8],
-      ...theme.shadow.sm,
     },
     quickActionPrimaryText: {
-      fontFamily: theme.fontFamilies.sansBold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 13,
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
     quickActionSecondary: {
       flex: 1,
-      height: 48,
+      height: 44,
       backgroundColor: theme.colors.card,
-      borderRadius: theme.radius.lg,
-      borderWidth: 1,
+      borderRadius: theme.radius.full,
+      borderWidth: 1.5,
       borderColor: theme.colors.border,
       flexDirection: 'row',
       alignItems: 'center',
@@ -699,11 +689,8 @@ const createStyles = (theme: Theme, screenWidth: number) =>
     accountCard: {
       width: screenWidth * 0.75,
       padding: theme.spacing[20],
-      borderRadius: theme.radius.xl,
+      borderRadius: theme.radius['3xl'],
       backgroundColor: theme.colors.card,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      ...theme.shadow.sm,
     },
     accountCardInner: {
       gap: theme.spacing[16],
@@ -722,7 +709,7 @@ const createStyles = (theme: Theme, screenWidth: number) =>
     accountIconBox: {
       width: 40,
       height: 40,
-      borderRadius: theme.radius.md,
+      borderRadius: theme.radius.full,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -743,20 +730,17 @@ const createStyles = (theme: Theme, screenWidth: number) =>
     accountCurrencyBadge: {
       paddingHorizontal: 8,
       paddingVertical: 4,
-      borderRadius: theme.radius.sm,
-      backgroundColor: theme.colors.background,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.surface,
     },
     accountCurrencyText: {
       fontFamily: theme.fontFamilies.monoBold,
       fontSize: 10,
     },
     accountBalanceLabel: {
-      fontFamily: theme.fontFamilies.sansBold,
-      fontSize: 9,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 11,
       color: theme.colors.textMuted,
-      letterSpacing: 1,
     },
     accountCardBalance: {
       fontSize: 28,
@@ -774,10 +758,9 @@ const createStyles = (theme: Theme, screenWidth: number) =>
       gap: 2,
     },
     accountCardStatLabel: {
-      fontFamily: theme.fontFamilies.sansBold,
-      fontSize: 8,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 11,
       color: theme.colors.textMuted,
-      letterSpacing: 0.5,
     },
     accountCardStatValue: {
       fontSize: 13,
@@ -790,9 +773,9 @@ const createStyles = (theme: Theme, screenWidth: number) =>
     accountPlaceholderCard: {
       width: screenWidth * 0.75,
       height: '100%',
-      borderRadius: theme.radius.xl,
+      borderRadius: theme.radius['3xl'],
       backgroundColor: theme.colors.card,
-      borderWidth: 1,
+      borderWidth: 1.5,
       borderColor: theme.colors.border,
       borderStyle: 'dashed',
       justifyContent: 'center',
@@ -832,8 +815,8 @@ const createStyles = (theme: Theme, screenWidth: number) =>
       alignItems: 'center',
       gap: theme.spacing[12],
       backgroundColor: theme.colors.card,
-      borderRadius: theme.radius.xl,
-      borderWidth: 1,
+      borderRadius: theme.radius['3xl'],
+      borderWidth: 1.5,
       borderColor: theme.colors.border,
       borderStyle: 'dashed',
     },
@@ -849,23 +832,23 @@ const createStyles = (theme: Theme, screenWidth: number) =>
       paddingHorizontal: theme.spacing[16],
       height: 36,
       borderRadius: theme.radius.full,
-      backgroundColor: theme.colors.text,
+      backgroundColor: theme.colors.primary,
     },
     emptyActivityActionText: {
-      fontFamily: theme.fontFamilies.sansBold,
+      fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 12,
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
     fab: {
       position: 'absolute',
       bottom: 34,
       right: theme.layout.screenPadding,
-      width: 60,
-      height: 60,
+      width: 56,
+      height: 56,
       borderRadius: theme.radius.full,
-      backgroundColor: theme.colors.text,
+      backgroundColor: theme.colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
-      ...theme.shadow.lg,
+      ...theme.shadow.md,
     },
   });

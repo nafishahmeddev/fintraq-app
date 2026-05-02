@@ -130,17 +130,16 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'center',
     },
     tabActive: {
-      backgroundColor: theme.colors.text,
-      borderColor: theme.colors.text,
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
     },
     tabText: {
       fontFamily: theme.fontFamilies.sansSemiBold,
       color: theme.colors.textMuted,
       fontSize: theme.fontSizes.xs,
-      letterSpacing: 0.4,
     },
     tabTextActive: {
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
     content: {
       padding: theme.spacing[4],

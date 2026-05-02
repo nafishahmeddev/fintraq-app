@@ -368,7 +368,7 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
                           isSelected && styles.checkboxActive,
                         ]}>
                           {isSelected && (
-                            <Ionicons name="checkmark" size={11} color={colors.background} />
+                            <Ionicons name="checkmark" size={11} color={colors.onPrimary} />
                           )}
                         </View>
                       </TouchableOpacity>
@@ -460,7 +460,7 @@ export const AdvancedFilterSheet = React.memo(function AdvancedFilterSheet({
                           <Ionicons
                             name={icon}
                             size={11}
-                            color={isActive ? colors.background : colors.textMuted}
+                            color={isActive ? colors.onPrimary : colors.textMuted}
                           />
                           <Text style={[styles.sortToggleText, isActive && styles.sortToggleTextActive]}>
                             {label}
@@ -518,8 +518,8 @@ const createStyles = (theme: Theme) =>
     },
     sheet: {
       backgroundColor: Platform.OS === 'ios' ? theme.colors.background + 'F5' : theme.colors.background,
-      borderTopLeftRadius: theme.radius['2xl'],
-      borderTopRightRadius: theme.radius['2xl'],
+      borderTopLeftRadius: theme.radius['3xl'],
+      borderTopRightRadius: theme.radius['3xl'],
       borderWidth: 1,
       borderColor: theme.colors.text + '15',
       borderBottomWidth: 0,
@@ -567,12 +567,12 @@ const createStyles = (theme: Theme) =>
     countBadgeText: {
       fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 11,
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
     resetBtn: {
       height: 30,
       paddingHorizontal: 12,
-      borderRadius: theme.radius.md,
+      borderRadius: theme.radius.full,
       backgroundColor: theme.colors.danger + '12',
       alignItems: 'center',
       justifyContent: 'center',
@@ -585,7 +585,7 @@ const createStyles = (theme: Theme) =>
     closeIconBtn: {
       width: 30,
       height: 30,
-      borderRadius: theme.radius.sm,
+      borderRadius: theme.radius.full,
       backgroundColor: theme.colors.text + '08',
       alignItems: 'center',
       justifyContent: 'center',
@@ -601,8 +601,10 @@ const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
       height: 44,
-      borderRadius: theme.radius.md,
-      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.card,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
       paddingHorizontal: 12,
       gap: 8,
     },
@@ -623,18 +625,17 @@ const createStyles = (theme: Theme) =>
       marginBottom: 20,
     },
     sectionLabel: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 11,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 0.5,
       marginBottom: 8,
       paddingLeft: 4,
     },
 
     // ─── Shared card surface ─────────────────────────────────────────────────
     card: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.card,
+      borderRadius: theme.radius['3xl'],
       overflow: 'hidden',
     },
 
@@ -648,8 +649,8 @@ const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
       height: 60,
-      borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius['3xl'],
+      backgroundColor: theme.colors.card,
       overflow: 'hidden',
     },
     typeAccentBar: {
@@ -669,7 +670,7 @@ const createStyles = (theme: Theme) =>
     typeIconBox: {
       width: 32,
       height: 32,
-      borderRadius: theme.radius.sm,
+      borderRadius: theme.radius.full,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -690,17 +691,15 @@ const createStyles = (theme: Theme) =>
       paddingVertical: 4,
     },
     dateFieldLabel: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 10,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 11,
       color: theme.colors.textMuted,
-      letterSpacing: 0.5,
       marginBottom: 2,
     },
     dateFieldValue: {
       fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 15,
       color: theme.colors.text,
-      letterSpacing: -0.3,
     },
     dateFieldSep: {
       width: 1,
@@ -752,10 +751,9 @@ const createStyles = (theme: Theme) =>
       gap: 4,
     },
     amountFieldLabel: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 10,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 11,
       color: theme.colors.textMuted,
-      letterSpacing: 0.5,
     },
     amountInput: {
       fontFamily: theme.fontFamilies.sansBold,
@@ -788,7 +786,7 @@ const createStyles = (theme: Theme) =>
     listIconBox: {
       width: 34,
       height: 34,
-      borderRadius: theme.radius.sm,
+      borderRadius: theme.radius.full,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -801,15 +799,15 @@ const createStyles = (theme: Theme) =>
     checkbox: {
       width: 20,
       height: 20,
-      borderRadius: theme.radius.xs,
+      borderRadius: theme.radius.full,
       borderWidth: 1.5,
       borderColor: theme.colors.text + '20',
       alignItems: 'center',
       justifyContent: 'center',
     },
     checkboxActive: {
-      backgroundColor: theme.colors.text,
-      borderColor: theme.colors.text,
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
     },
 
     // ─── Category chips ──────────────────────────────────────────────────────
@@ -823,8 +821,8 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       paddingHorizontal: 12,
       height: 34,
-      borderRadius: theme.radius.md,
-      backgroundColor: theme.colors.surface,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.card,
       gap: 4,
     },
     chipText: {
@@ -861,11 +859,11 @@ const createStyles = (theme: Theme) =>
       gap: 4,
       paddingHorizontal: 12,
       height: 30,
-      borderRadius: theme.radius.md,
+      borderRadius: theme.radius.full,
       backgroundColor: theme.colors.text + '08',
     },
     sortToggleActive: {
-      backgroundColor: theme.colors.text,
+      backgroundColor: theme.colors.primary,
     },
     sortToggleText: {
       fontFamily: theme.fontFamilies.sansSemiBold,
@@ -873,7 +871,7 @@ const createStyles = (theme: Theme) =>
       color: theme.colors.textMuted,
     },
     sortToggleTextActive: {
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
 
     // ─── Footer ──────────────────────────────────────────────────────────────
@@ -891,14 +889,14 @@ const createStyles = (theme: Theme) =>
     },
     applyBtn: {
       height: 52,
-      borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.text,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
     },
     applyBtnText: {
       fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 15,
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
   });

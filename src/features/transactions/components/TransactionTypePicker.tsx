@@ -11,24 +11,26 @@ type Props = {
 };
 
 const TYPE_CONFIG = {
-  DR: { label: 'Expense', colorKey: 'danger' as const },
-  CR: { label: 'Income', colorKey: 'success' as const },
-  TRANSFER: { label: 'Transfer', colorKey: 'primary' as const },
+  DR: { label: 'Expense', colorKey: 'danger' as const, onColorKey: 'background' as const },
+  CR: { label: 'Income', colorKey: 'success' as const, onColorKey: 'background' as const },
+  TRANSFER: { label: 'Transfer', colorKey: 'primary' as const, onColorKey: 'onPrimary' as const },
 };
 
 export const TransactionTypePicker = ({ value, onChange, disabled, allowedTypes }: Props) => {
   const theme = useTheme();
   const { colors } = theme;
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const typesToRender = allowedTypes || (Object.keys(TYPE_CONFIG) as TransactionType[]);
 
   if (disabled) {
     const config = TYPE_CONFIG[value];
     const activeColor = colors[config.colorKey];
+    const textColor = colors[config.onColorKey];
 
     return (
       <View style={styles.container}>
         <View style={[styles.pill, { backgroundColor: activeColor, borderColor: activeColor }]}>
-          <Text style={[styles.pillText, { color: colors.background, fontFamily: theme.fontFamilies.sansBold }]}>
+          <Text style={[styles.pillText, { color: textColor, fontFamily: theme.fontFamilies.sansBold }]}>
             {config.label}
           </Text>
         </View>
@@ -42,6 +44,7 @@ export const TransactionTypePicker = ({ value, onChange, disabled, allowedTypes 
         const config = TYPE_CONFIG[type];
         const isSelected = value === type;
         const activeColor = colors[config.colorKey];
+        const textColor = colors[config.onColorKey];
 
         return (
           <TouchableOpacity
@@ -55,11 +58,11 @@ export const TransactionTypePicker = ({ value, onChange, disabled, allowedTypes 
             activeOpacity={0.7}
           >
             <Text style={[
-              styles.pillText, 
-              { 
-                color: isSelected ? colors.background : colors.textMuted,
-                fontFamily: isSelected ? theme.fontFamilies.sansBold : theme.fontFamilies.sansSemiBold
-              }
+              styles.pillText,
+              {
+                color: isSelected ? textColor : colors.textMuted,
+                fontFamily: isSelected ? theme.fontFamilies.sansBold : theme.fontFamilies.sansSemiBold,
+              },
             ]}>
               {config.label}
             </Text>
@@ -70,7 +73,7 @@ export const TransactionTypePicker = ({ value, onChange, disabled, allowedTypes 
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     paddingHorizontal: 24,
     paddingTop: 16,
@@ -81,7 +84,7 @@ const styles = StyleSheet.create({
   pill: {
     paddingHorizontal: 16,
     height: 40,
-    borderRadius: 20, // theme.radius.full is better but fixed height here
+    borderRadius: theme.radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,

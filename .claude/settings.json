@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:wise.design)",
+      "Bash(sed -i '' 's/letterSpacing: 1.5,//' /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/features/transactions/components/TransactionCategoryPicker.tsx)",
+      "Bash(sed -i '' 's/fontSize: 10,/fontSize: 12,/' /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/features/transactions/components/TransactionCategoryPicker.tsx)",
+      "Bash(sed -i '' \"s/fontFamily: theme.fontFamilies.sansSemiBold,\\\\n      fontSize: 12,//\" /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/features/transactions/components/TransactionCategoryPicker.tsx)"
+    ]
+  }
+}

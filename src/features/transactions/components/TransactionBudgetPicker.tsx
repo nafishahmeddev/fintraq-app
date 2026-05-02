@@ -18,7 +18,7 @@ export const TransactionBudgetPicker = ({ budgetsList, selectedId, onSelect }: P
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>BUDGET (OPTIONAL)</Text>
+      <Text style={styles.label}>Budget (optional)</Text>
       <View style={styles.grid}>
         <TouchableOpacity
           style={[
@@ -85,10 +85,9 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: 24,
     },
     label: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 10,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 1.5,
       marginBottom: theme.spacing[12],
     },
     grid: {

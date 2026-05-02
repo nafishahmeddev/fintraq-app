@@ -5,6 +5,8 @@ export type ThemePalette = {
   primary: string;
   primaryLight: string;
   primaryDark: string;
+  onPrimary: string;
+  backgroundNeutral: string;
   secondary: string;
   text: string;
   textMuted: string;
@@ -31,6 +33,8 @@ export const DARK_THEME: ThemePalette = {
   primary: '#9FE870', // Bright Green
   primaryLight: '#B5EE8D',
   primaryDark: '#163300',
+  onPrimary: '#163300', // Forest Green text on Bright Green bg
+  backgroundNeutral: '#264D00',
   secondary: '#FFFFFF',
   text: '#FFFFFF',
   textMuted: '#A6B399',
@@ -42,12 +46,14 @@ export const DARK_THEME: ThemePalette = {
 };
 
 export const LIGHT_THEME: ThemePalette = {
-  background: '#FFFFFF', 
+  background: '#FFFFFF',
   card: '#F2F5F7', // Background Neutral (8% Forest Green tint)
   surface: '#E8EDF1',
   primary: '#9FE870', // Bright Green (Interactive Accent)
   primaryLight: '#B5EE8D',
   primaryDark: '#163300', // Forest Green
+  onPrimary: '#163300', // Forest Green text on Bright Green bg
+  backgroundNeutral: '#16330014', // 8% Forest Green tint per Wise spec
   secondary: '#163300',
   text: '#163300', // Content Primary (Forest Green based)
   textMuted: '#5D7079', // Content Secondary

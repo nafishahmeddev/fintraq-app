@@ -165,7 +165,7 @@ export const BudgetsScreen = () => {
       )}
 
       <TouchableOpacity style={styles.fab} onPress={handleCreate}>
-        <Ionicons name="add" size={28} color={colors.background} />
+        <Ionicons name="add" size={28} color={colors.onPrimary} />
       </TouchableOpacity>
 
       <OptionsDialog

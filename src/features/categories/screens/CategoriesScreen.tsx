@@ -153,7 +153,7 @@ export const CategoriesScreen = () => {
       )}
 
       <TouchableOpacity style={styles.fab} onPress={handleCreate}>
-        <Ionicons name="add" size={28} color="#000" />
+        <Ionicons name="add" size={28} color={colors.onPrimary} />
       </TouchableOpacity>
 
       <OptionsDialog
@@ -198,10 +198,10 @@ const createStyles = (theme: Theme) => StyleSheet.create({
 
   searchWrap: {
     height: 44,
-    borderRadius: theme.radius.lg,
+    borderRadius: theme.radius.full,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.card,
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -223,9 +223,8 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
 
   filterMetaText: {
-    fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 10,
-    letterSpacing: 0.4,
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
     color: theme.colors.textMuted,
   },
 
@@ -240,7 +239,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     color: theme.colors.text,
     fontSize: 20,
     marginTop: 10,
-    letterSpacing: -0.4,
   },
 
   emptyText: {
@@ -255,34 +253,28 @@ const createStyles = (theme: Theme) => StyleSheet.create({
 
   emptyBtn: {
     height: 40,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.full,
     paddingHorizontal: 16,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   emptyBtnText: {
     fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 13,
-    color: theme.colors.text,
+    color: theme.colors.onPrimary,
   },
 
   fab: {
     position: 'absolute',
     bottom: 24,
     right: 24,
-    width: 64,
-    height: 64,
+    width: 56,
+    height: 56,
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    ...theme.shadow.md,
   },
 });

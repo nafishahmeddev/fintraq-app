@@ -80,21 +80,19 @@ export const MetricCard = React.memo(function MetricCard({
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     padding: 16,
-    borderRadius: theme.radius.xl,
-    backgroundColor: theme.colors.surface + '80',
+    borderRadius: theme.radius['3xl'],
+    backgroundColor: theme.colors.card,
     borderWidth: 1,
-    borderColor: theme.colors.border, 
+    borderColor: theme.colors.border,
     flex: 1,
     minHeight: 100,
     justifyContent: 'center',
   },
   label: {
-    fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 9,
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
     color: theme.colors.textMuted,
-    letterSpacing: 2,
     marginBottom: 8,
-    textTransform: 'uppercase',
   },
   valueRow: {
     flexDirection: 'row',
@@ -108,8 +106,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     marginTop: 8,
   },
   percentageText: {
-    fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 9,
-    letterSpacing: 0.5,
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
   },
 });

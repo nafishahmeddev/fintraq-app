@@ -151,7 +151,7 @@ export default function CategoryEditPage() {
                   colorHex === item && styles.colorCellActive,
                 ]}
               >
-                {colorHex === item ? <Ionicons name="checkmark" size={14} color="#000" /> : null}
+                {colorHex === item ? <Ionicons name="checkmark" size={14} color={colors.background} /> : null}
               </TouchableOpacity>
             ))}
           </View>
@@ -166,7 +166,7 @@ export default function CategoryEditPage() {
           disabled={!isValid || isPending}
         >
           <Text style={styles.primaryBtnText}>Save category</Text>
-          <Ionicons name="arrow-forward" size={16} color="#FFF" />
+          <Ionicons name="arrow-forward" size={16} color={colors.onPrimary} />
         </TouchableOpacity>
       </View>
 
@@ -212,10 +212,9 @@ const createStyles = (theme: Theme) =>
       paddingBottom: 0,
     },
     label: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 13,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 12,
       color: theme.colors.textMuted,
-      letterSpacing: 0.1,
       marginBottom: 6,
     },
     answerInput: {
@@ -245,11 +244,9 @@ const createStyles = (theme: Theme) =>
     iconPreviewBox: {
       width: 44,
       height: 44,
-      borderRadius: theme.radius.md,
+      borderRadius: theme.radius.full,
       justifyContent: 'center',
       alignItems: 'center',
-      borderWidth: 1,
-      borderColor: theme.colors.border,
     },
     iconSelectorText: {
       flex: 1,
@@ -273,7 +270,7 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
     },
     colorCellActive: {
-      borderColor: theme.colors.text,
+      borderColor: theme.colors.primary,
       transform: [{ scale: 1.08 }],
     },
     footer: {
@@ -284,11 +281,12 @@ const createStyles = (theme: Theme) =>
     },
     primaryBtn: {
       height: 56,
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius.full,
       backgroundColor: theme.colors.primary,
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
+      ...theme.shadow.md,
     },
     primaryBtnDisabled: {
       opacity: 0.45,
@@ -296,8 +294,7 @@ const createStyles = (theme: Theme) =>
     primaryBtnText: {
       fontFamily: theme.fontFamilies.sansBold,
       fontSize: 16,
-      color: '#FFFFFF',
-      letterSpacing: 0.3,
+      color: theme.colors.onPrimary,
       marginRight: 10,
     },
   });

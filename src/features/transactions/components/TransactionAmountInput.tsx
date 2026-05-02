@@ -27,7 +27,7 @@ export const TransactionAmountInput = ({ value, onChange, currency }: Props) => 
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { color: theme.colors.textMuted }]}>AMOUNT</Text>
+      <Text style={[styles.label, { color: theme.colors.textMuted }]}>Amount</Text>
       <View style={styles.inputRow}>
         <Text style={[styles.currency, { color: theme.colors.textMuted }]}>{currency}</Text>
         <TextInput
@@ -50,9 +50,8 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     paddingVertical: 12,
   },
   label: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: theme.fontSizes.xs,
-    letterSpacing: theme.letterSpacing.snug,
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 12,
     marginBottom: theme.spacing[2],
   },
   inputRow: {

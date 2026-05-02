@@ -59,21 +59,25 @@ export const Chip = React.memo(function Chip({
 
   const getBackgroundColor = () => {
     if (disabled) return theme.colors.surface;
-    if (!selected) return theme.colors.surface;
+    if (!selected) return theme.colors.card;
 
     switch (variant) {
       case 'primary': return theme.colors.primary;
       case 'success': return theme.colors.success;
       case 'danger': return theme.colors.danger;
       case 'warning': return theme.colors.warning;
-      default: return theme.colors.text;
+      default: return theme.colors.primary;
     }
   };
 
   const getTextColor = () => {
     if (disabled) return theme.colors.textMuted;
     if (!selected) return theme.colors.text;
-    return theme.colors.background;
+    switch (variant) {
+      case 'primary':
+      default:
+        return theme.colors.onPrimary;
+    }
   };
 
   const getBorderColor = () => {
@@ -128,7 +132,7 @@ const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius.full,
       borderWidth: 1,
       gap: 6,
     },

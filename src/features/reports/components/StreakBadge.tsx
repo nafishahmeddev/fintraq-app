@@ -41,8 +41,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     alignSelf: 'flex-start',
   },
   text: {
-    fontFamily: theme.fontFamilies.sansSemiBold, // Matches currency chip
-    fontSize: 10,
-    letterSpacing: 0.5,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 11,
   },
 });

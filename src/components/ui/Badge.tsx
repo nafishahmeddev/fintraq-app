@@ -48,8 +48,8 @@ export const Badge = React.memo(function Badge({
 
 const createStyles = (theme: Theme) => StyleSheet.create({
   badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: theme.radius.full,
     borderWidth: 1,
     alignSelf: 'flex-start',
@@ -57,9 +57,8 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    fontSize: theme.fontSizes.xs,
+    fontSize: 11,
     fontFamily: theme.fontFamilies.sansSemiBold,
-    letterSpacing: -0.2,
-    textTransform: 'uppercase',
+    letterSpacing: -0.1,
   },
 });

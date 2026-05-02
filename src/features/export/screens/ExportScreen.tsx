@@ -346,10 +346,10 @@ export function ExportScreen() {
             activeOpacity={0.8}
           >
             {isExporting ? (
-              <ActivityIndicator size="small" color={colors.background} />
+              <ActivityIndicator size="small" color={colors.onPrimary} />
             ) : (
               <>
-                <Ionicons name="download-outline" size={20} color={colors.background} />
+                <Ionicons name="download-outline" size={20} color={colors.onPrimary} />
                 <Text style={styles.exportButtonText}>Export CSV</Text>
               </>
             )}
@@ -603,14 +603,15 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'center',
       gap: 10,
       height: 56,
-      borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.text,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primary,
       marginBottom: 16,
+      ...theme.shadow.md,
     },
     exportButtonText: {
       fontFamily: theme.fontFamilies.sansSemiBold,
       fontSize: 16,
-      color: theme.colors.background,
+      color: theme.colors.onPrimary,
     },
     warningCard: {
       flexDirection: 'row',
