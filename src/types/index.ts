@@ -16,12 +16,4 @@ export type TransactionType = 'CR' | 'DR' | 'TRANSFER';
  */
 export type TrendMode = 'high_is_good' | 'low_is_good' | 'neutral';
 
-/**
- * InsightStatus: Determines the visual style of a dashboard insight card.
- */
-export type InsightStatus = 'success' | 'danger' | 'info' | 'warning';
 
-/**
- * InsightTrend: Indicates the direction of a metric change.
- */
-export type InsightTrend = 'up' | 'down' | 'neutral';

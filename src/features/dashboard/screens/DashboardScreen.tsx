@@ -15,7 +15,6 @@ import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import type { Account } from '../../accounts/api/accounts';
 import { useAccounts, useDeleteAccount } from '../../accounts/hooks/accounts';
-import { StreakBadge } from '../../reports/components/StreakBadge';
 import { useTransactions } from '../../transactions/hooks/transactions';
 import { BudgetSummaryCard } from '../components/BudgetSummaryCard';
 import { GoalsSummaryCard } from '../components/GoalsSummaryCard';
@@ -109,12 +108,8 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
     router.push('/search');
   }, [router]);
 
-  const navigateToStats = useCallback(() => {
-    router.push('/(main)/stats');
-  }, [router]);
-
-  const navigateToReports = useCallback(() => {
-    router.push('/(main)/reports');
+  const navigateToAnalytics = useCallback(() => {
+    router.push('/(main)/analytics');
   }, [router]);
 
   const navigateToSettings = useCallback(() => {
@@ -212,14 +207,8 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
                 badge={!isPremium}
               />
               <IconButton
-                icon="stats-chart-outline"
-                onPress={isPremium ? navigateToStats : navigateToPremium}
-                size="md"
-                badge={!isPremium}
-              />
-              <IconButton
-                icon="newspaper-outline"
-                onPress={isPremium ? navigateToReports : navigateToPremium}
+                icon="analytics-outline"
+                onPress={isPremium ? navigateToAnalytics : navigateToPremium}
                 size="md"
                 badge={!isPremium}
               />
@@ -252,7 +241,6 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
             <Text style={styles.heroBadge}>Total balance</Text>
-            <StreakBadge />
           </View>
           <MoneyText
             amount={balancesByCurrency[selectedCurrency] || 0}

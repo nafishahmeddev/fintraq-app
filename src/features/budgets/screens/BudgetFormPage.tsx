@@ -175,7 +175,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
       if (activeCount >= 2) {
         showAlert({
           title: 'Pro Feature',
-          message: 'Free users can manage up to 2 active budgets. Upgrade to Pro for unlimited tracking and advanced insights.',
+          message: 'Free users can manage up to 2 active budgets. Upgrade to Pro for unlimited tracking.',
           type: 'warning',
           buttons: [
             { text: 'Maybe Later', style: 'cancel' },

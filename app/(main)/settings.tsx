@@ -180,7 +180,7 @@ export default function SettingsScreen() {
               value={isPremium ? "Active" : "Free"}
               subtitle={
                 isPremium ? "Enjoying full access to all features" :
-                  "Unlock advanced analytics & insights"
+                  "Unlock advanced analytics & premium features"
               }
               onPress={() => router.push('/premium')}
               color={isPremium ? colors.primary : undefined}
