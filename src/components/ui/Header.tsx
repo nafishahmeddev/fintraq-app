@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useMemo, useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Theme, useTheme } from '../../providers/ThemeProvider';
 import { IconButton } from './IconButton';
@@ -19,11 +19,11 @@ export type HeaderProps = {
  * - Title and optional subtitle
  * - Right action slot for custom buttons
  */
-export const Header = React.memo(function Header({ 
-  title, 
-  subtitle, 
-  showBack, 
-  rightAction 
+export const Header = React.memo(function Header({
+  title,
+  subtitle,
+  showBack,
+  rightAction
 }: HeaderProps) {
   const router = useRouter();
   const theme = useTheme();
@@ -41,7 +41,7 @@ export const Header = React.memo(function Header({
             icon="chevron-back"
             onPress={handleBack}
             size="md"
-            variant="ghost"
+            variant="default"
           />
         )}
         <View style={styles.titleBlock}>

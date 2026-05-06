@@ -14,12 +14,13 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Header, IconPickerDialog, Input, PersonPickerDialog, SectionLabel, Typography } from '../../../components/ui';
+import { Header, IconPickerDialog, Input, PersonPickerDialog, SectionLabel } from '../../../components/ui';
 import { CATEGORY_COLORS } from '../../../constants/picker';
 import { LoanStatus, LoanType } from '../../../db/schema';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { parseAmount, toDbColor } from '../../../utils/format';
+import { resolveIcon } from '../../../utils/icons';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useCreateLoan, useLoanById, useUpdateLoan } from '../api/loans';
 
@@ -48,7 +49,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [accountId, setAccountId] = useState<number | null>(null);
   const [currency, setCurrency] = useState(profile.defaultCurrency);
-  const [colorHex, setColorHex] = useState<string>(CATEGORY_COLORS[20]);
+  const [colorHex, setColorHex] = useState<string>(CATEGORY_COLORS[0]);
   const [iconKey, setIconKey] = useState('cash-outline');
   const [status, setStatus] = useState<LoanStatus>('ACTIVE');
   const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
@@ -115,6 +116,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
   }, []);
 
   const isSubmitting = creating || updating;
+  const canSubmit = !!name.trim() && !!totalAmount && !isSubmitting;
 
   if (isEditMode && loadingLoan) {
     return (
@@ -148,7 +150,7 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
           <View style={styles.section}>
             <SectionLabel size="sm" text="Total amount" />
             <View style={styles.amountRow}>
-              <Typography variant="h3" color={colors.textMuted}>{currency}</Typography>
+              <Text style={styles.currencyLabel}>{currency}</Text>
               <Input
                 value={totalAmount}
                 onChangeText={setTotalAmount}
@@ -174,12 +176,9 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
                   ]}
                   onPress={() => setLoanType(t)}
                 >
-                  <Typography
-                    variant="label"
-                    color={loanType === t ? '#FFF' : colors.textMuted}
-                  >
+                  <Text style={[styles.typeChipText, { color: loanType === t ? '#FFF' : colors.textMuted }]}>
                     {t === 'BORROW' ? 'Borrowing' : 'Lending'}
-                  </Typography>
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -200,12 +199,9 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
                     setCurrency(account.currency);
                   }}
                 >
-                  <Typography
-                    variant="label"
-                    color={accountId === account.id ? colors.background : colors.text}
-                  >
+                  <Text style={[styles.chipText, { color: accountId === account.id ? colors.background : colors.text }]}>
                     {account.name}
-                  </Typography>
+                  </Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -247,46 +243,45 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
               activeOpacity={0.7}
             >
               <Ionicons name="person-outline" size={18} color={colors.primary} />
-              <Typography
-                variant="body"
-                color={selectedPersonId ? colors.text : colors.textMuted}
-                style={{ flex: 1 }}
-              >
+              <Text style={[styles.pickerBtnText, { color: selectedPersonId ? colors.text : colors.textMuted }]}>
                 {selectedPersonId ? 'Person linked' : 'Link a person'}
-              </Typography>
+              </Text>
               <Ionicons name="chevron-down" size={14} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
-            <SectionLabel size="sm" text="Appearance" />
-            <View style={styles.visualsRow}>
-              <TouchableOpacity
-                style={styles.iconBtn}
-                onPress={() => setShowIconPicker(true)}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.iconBox, { backgroundColor: colorHex + '15' }]}>
-                  <Ionicons name={iconKey as any} size={24} color={colorHex} />
-                </View>
-                <Typography variant="bodySm" color={colors.textMuted}>Icon</Typography>
-              </TouchableOpacity>
+            <SectionLabel size="sm" text="Icon" />
+            <TouchableOpacity
+              style={styles.iconSelectorBtn}
+              onPress={() => setShowIconPicker(true)}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.iconPreview, { backgroundColor: colorHex + '15' }]}>
+                <Ionicons name={resolveIcon(iconKey, 'cash-outline')} size={18} color={colorHex} />
+              </View>
+              <Text style={styles.iconSelectorText}>
+                {iconKey.replace('-outline', '').replace(/-/g, ' ')}
+              </Text>
+              <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
+            </TouchableOpacity>
+          </View>
 
-              <View style={styles.colorGrid}>
-                {CATEGORY_COLORS.slice(10, 20).map((color) => (
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Color" />
+            <View style={styles.colorRow}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.colorWrap}>
+                {CATEGORY_COLORS.map((c) => (
                   <TouchableOpacity
-                    key={color}
-                    style={[
-                      styles.colorCircle,
-                      { backgroundColor: color },
-                      colorHex === color && styles.colorCircleActive,
-                    ]}
-                    onPress={() => setColorHex(color)}
+                    key={c}
+                    activeOpacity={0.8}
+                    onPress={() => setColorHex(c)}
+                    style={[styles.colorCell, { backgroundColor: c }, colorHex === c && styles.colorCellActive]}
                   >
-                    {colorHex === color ? <Ionicons name="checkmark" size={14} color="#000" /> : null}
+                    {colorHex === c ? <Ionicons name="checkmark" size={14} color="#000" /> : null}
                   </TouchableOpacity>
                 ))}
-              </View>
+              </ScrollView>
             </View>
           </View>
 
@@ -303,12 +298,9 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
                     ]}
                     onPress={() => setStatus(s)}
                   >
-                    <Typography
-                      variant="label"
-                      color={status === s ? colors.background : colors.textMuted}
-                    >
+                    <Text style={[styles.chipText, { color: status === s ? colors.background : colors.textMuted }]}>
                       {s}
-                    </Typography>
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -319,12 +311,20 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button
-          title={isEditMode ? 'Update loan' : 'Create loan'}
+        <TouchableOpacity
+          activeOpacity={0.9}
+          style={[styles.saveBtn, !canSubmit && styles.saveBtnDisabled]}
           onPress={handleSave}
-          isLoading={isSubmitting}
-          size="lg"
-        />
+          disabled={!canSubmit}
+        >
+          {isSubmitting ? (
+            <ActivityIndicator size="small" color={colors.onPrimary} />
+          ) : (
+            <Text style={styles.saveBtnText}>
+              {isEditMode ? 'Update loan' : 'Create loan'}
+            </Text>
+          )}
+        </TouchableOpacity>
       </View>
 
       {showStartDatePicker && (
@@ -377,7 +377,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   content: {
     paddingHorizontal: theme.layout.screenPadding,
-    paddingTop: theme.spacing[16],
+    paddingTop: theme.spacing[24],
     paddingBottom: 120,
   },
   formBody: {
@@ -394,6 +394,11 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing[12],
+  },
+  currencyLabel: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 20,
+    color: theme.colors.textMuted,
   },
   amountInput: {
     flex: 1,
@@ -413,6 +418,10 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     marginRight: theme.spacing[8],
     backgroundColor: theme.colors.surface,
   },
+  chipText: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 13,
+  },
   typeChip: {
     flex: 1,
     height: 44,
@@ -422,6 +431,10 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: theme.colors.surface,
+  },
+  typeChipText: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 13,
   },
   dateBtn: {
     height: 40,
@@ -450,36 +463,43 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     gap: theme.spacing[12],
     backgroundColor: theme.colors.surface,
   },
-  visualsRow: {
+  pickerBtnText: {
+    flex: 1,
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 14,
+  },
+  iconSelectorBtn: {
+    height: 48,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing[24],
-    padding: theme.spacing[16],
-    backgroundColor: theme.colors.surface,
+    gap: theme.spacing[12],
+    paddingHorizontal: theme.spacing[16],
     borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
-  iconBtn: {
-    alignItems: 'center',
-    gap: theme.spacing[8],
-  },
-  iconBox: {
-    width: 56,
-    height: 56,
-    borderRadius: theme.radius.md,
+  iconPreview: {
+    width: 32,
+    height: 32,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
   },
-  colorGrid: {
+  iconSelectorText: {
     flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing[8],
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 14,
+    color: theme.colors.text,
+    textTransform: 'capitalize',
   },
-  colorCircle: {
+  colorRow: {
+    marginHorizontal: -theme.layout.screenPadding,
+  },
+  colorWrap: {
+    paddingHorizontal: theme.layout.screenPadding,
+  },
+  colorCell: {
     width: 44,
     height: 44,
     borderRadius: theme.radius.full,
@@ -487,8 +507,9 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
+    marginRight: theme.spacing[12],
   },
-  colorCircleActive: {
+  colorCellActive: {
     borderColor: theme.colors.text,
   },
   footer: {
@@ -496,5 +517,21 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     bottom: 34,
     left: theme.layout.screenPadding,
     right: theme.layout.screenPadding,
+  },
+  saveBtn: {
+    height: 56,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...theme.shadow.md,
+  },
+  saveBtnDisabled: {
+    opacity: 0.5,
+  },
+  saveBtnText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 16,
+    color: theme.colors.onPrimary,
   },
 });

@@ -10,18 +10,21 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header } from '../../../components/ui/Header';
+import { Header, Input, SectionLabel } from '../../../components/ui';
+import { PersonPickerDialog } from '../../../components/ui/PersonPickerDialog';
+import { PlacePickerDialog } from '../../../components/ui/PlacePickerDialog';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { TransactionType } from '../../../types';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useBudgets } from '../../budgets/api/budgets';
 import { useCategories } from '../../categories/hooks/categories';
+import { useGoalById } from '../../goals/api/goals';
+import { useLoanById } from '../../loans/api/loans';
 import { TransactionAccountPicker } from '../components/TransactionAccountPicker';
 import { TransactionAmountInput } from '../components/TransactionAmountInput';
 import { TransactionBudgetPicker } from '../components/TransactionBudgetPicker';
@@ -29,10 +32,6 @@ import { TransactionCategoryPicker } from '../components/TransactionCategoryPick
 import { TransactionGoalPicker } from '../components/TransactionGoalPicker';
 import { TransactionLoanPicker } from '../components/TransactionLoanPicker';
 import { TransactionTypePicker } from '../components/TransactionTypePicker';
-import { PersonPickerDialog } from '../../../components/ui/PersonPickerDialog';
-import { useGoalById } from '../../goals/api/goals';
-import { useLoanById } from '../../loans/api/loans';
-import { PlacePickerDialog } from '../../../components/ui/PlacePickerDialog';
 import {
   useCreateTransaction,
   useTransactionById,
@@ -66,7 +65,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
   const transactionByIdQuery = useTransactionById(isEditMode ? transactionId ?? null : null);
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
-  
+
   const { data: paramGoal } = useGoalById(params.goalId ? parseInt(params.goalId, 10) : null);
   const { data: paramLoan } = useLoanById(params.loanId ? parseInt(params.loanId, 10) : null);
 
@@ -84,10 +83,10 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
   const [selectedToAccountId, setSelectedToAccountId] = React.useState<number | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = React.useState<number | null>(null);
   const [selectedBudgetId, setSelectedBudgetId] = React.useState<number | null>(null);
-  const [selectedGoalId, setSelectedGoalId] = React.useState<number | null>(() => 
+  const [selectedGoalId, setSelectedGoalId] = React.useState<number | null>(() =>
     params.goalId ? parseInt(params.goalId, 10) : null
   );
-  const [selectedLoanId, setSelectedLoanId] = React.useState<number | null>(() => 
+  const [selectedLoanId, setSelectedLoanId] = React.useState<number | null>(() =>
     params.loanId ? parseInt(params.loanId, 10) : null
   );
   const [selectedPersonId, setSelectedPersonId] = React.useState<number | null>(null);
@@ -116,7 +115,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
     setSelectedPlaceId(editingTransaction.placeId ?? null);
   }, [isEditMode, editingTransaction]);
 
-  // Auto-select account from Goal/Loan param
   React.useEffect(() => {
     if (!isEditMode) {
       if (paramGoal?.accountId) {
@@ -132,13 +130,11 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
     [categories, type]
   );
 
-  // Reset toAccount when switching away from transfer
   React.useEffect(() => {
     if (type !== 'TRANSFER') {
       setSelectedToAccountId(null);
     }
   }, [type]);
-
 
   React.useEffect(() => {
     if (accounts.length === 0) {
@@ -173,10 +169,8 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
     );
   }, [accounts, selectedAccountId, selectedAccount]);
 
-  // Reset toAccount when from account changes (currency might not match)
   React.useEffect(() => {
     if (type === 'TRANSFER' && selectedToAccountId !== null) {
-      // Check if the currently selected toAccount is still valid for the new from account
       const isStillValid = eligibleToAccounts.some((acc) => acc.id === selectedToAccountId);
       if (!isStillValid) {
         setSelectedToAccountId(null);
@@ -252,7 +246,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
       return;
     }
 
-    // Validate same currency for transfers
     if (type === 'TRANSFER' && selectedAccount && selectedToAccount) {
       if (selectedAccount.currency !== selectedToAccount.currency) {
         Alert.alert(
@@ -262,7 +255,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
         return;
       }
 
-      // Validate sufficient balance for transfer
       if (amountValue > selectedAccount.balance) {
         Alert.alert(
           'Insufficient balance',
@@ -314,31 +306,37 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
       <Header title={isEditMode ? 'Edit entry' : 'New entry'} showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <View style={{ marginTop: 24, marginBottom: 16 }}>
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Note</Text>
-            <View style={styles.noteContainer}>
-              <TextInput
-                style={styles.noteInput}
-                value={note}
-                onChangeText={setNote}
-                placeholder="Optional context"
-                placeholderTextColor={colors.textMuted + '80'}
-                multiline
-              />
-            </View>
-          </View>
-        </View>
+
+
+
 
         <TransactionTypePicker value={type} onChange={setType} disabled={isEditMode} />
 
-        <TransactionAmountInput
-          value={amountInput}
-          onChange={setAmountInput}
-          currency={selectedAccount?.currency ?? profile.defaultCurrency}
-        />
+
+
+
 
         <View style={styles.formBody}>
+
+          <View style={styles.amountWrap}>
+            <TransactionAmountInput
+              value={amountInput}
+              onChange={setAmountInput}
+              currency={selectedAccount?.currency ?? profile.defaultCurrency}
+            />
+          </View>
+
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Note" />
+            <Input
+              value={note}
+              onChangeText={setNote}
+              placeholder="Optional context"
+              multiline
+              numberOfLines={3}
+              style={styles.noteInput}
+            />
+          </View>
           <TransactionAccountPicker
             accounts={accounts}
             selectedId={selectedAccountId}
@@ -359,7 +357,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
                 />
               ) : (
                 <View style={styles.section}>
-                  <Text style={styles.sectionLabel}>To account</Text>
+                  <SectionLabel size="sm" text="To account" />
                   <View style={styles.disabledCard}>
                     <Text style={styles.disabledText}>
                       {!selectedAccount
@@ -387,52 +385,52 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
             />
           )}
 
-          <TransactionGoalPicker 
-            selectedId={selectedGoalId} 
-            onSelect={setSelectedGoalId} 
+          <TransactionGoalPicker
+            selectedId={selectedGoalId}
+            onSelect={setSelectedGoalId}
             accountId={selectedAccountId}
             type={type}
           />
 
-          <TransactionLoanPicker 
-            selectedId={selectedLoanId} 
-            onSelect={setSelectedLoanId} 
+          <TransactionLoanPicker
+            selectedId={selectedLoanId}
+            onSelect={setSelectedLoanId}
             accountId={selectedAccountId}
             type={type}
           />
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Person (optional)</Text>
-            <TouchableOpacity 
-              style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: theme.spacing[16] }]} 
+            <SectionLabel size="sm" text="Person (optional)" />
+            <TouchableOpacity
+              style={styles.pickerBtn}
               onPress={() => setShowPersonPicker(true)}
               activeOpacity={0.7}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing[8] }}>
-                <Ionicons name="person-outline" size={18} color={colors.primary} />
-                <Text style={styles.dateTimeText}>{selectedPersonId ? 'Selected' : 'Link person'}</Text>
-              </View>
-              <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
+              <Ionicons name="person-outline" size={18} color={colors.primary} />
+              <Text style={[styles.pickerBtnText, { color: selectedPersonId ? colors.text : colors.textMuted }]}>
+                {selectedPersonId ? 'Person linked' : 'Link a person'}
+              </Text>
+              <Ionicons name="chevron-down" size={14} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Place (optional)</Text>
-            <TouchableOpacity 
-              style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: theme.spacing[16] }]} 
+            <SectionLabel size="sm" text="Place (optional)" />
+            <TouchableOpacity
+              style={styles.pickerBtn}
               onPress={() => setShowPlacePicker(true)}
               activeOpacity={0.7}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing[8] }}>
-                <Ionicons name="location-outline" size={18} color={colors.primary} />
-                <Text style={styles.dateTimeText}>{selectedPlaceId ? 'Selected' : 'Link place'}</Text>
-              </View>
-              <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
+              <Ionicons name="location-outline" size={18} color={colors.primary} />
+              <Text style={[styles.pickerBtnText, { color: selectedPlaceId ? colors.text : colors.textMuted }]}>
+                {selectedPlaceId ? 'Place linked' : 'Link a place'}
+              </Text>
+              <Ionicons name="chevron-down" size={14} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Date & time</Text>
+            <SectionLabel size="sm" text="Date & time" />
             <View style={styles.dateTimeRow}>
               <TouchableOpacity style={styles.dateTimeBtn} onPress={() => setShowDatePicker(true)} activeOpacity={0.7}>
                 <Ionicons name="calendar-outline" size={18} color={colors.primary} />
@@ -468,7 +466,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           )}
         </TouchableOpacity>
       </View>
-      
+
       <PersonPickerDialog
         visible={showPersonPicker}
         onClose={() => setShowPersonPicker(false)}
@@ -503,6 +501,9 @@ const createStyles = (theme: Theme) =>
     content: {
       paddingBottom: 140,
     },
+    amountWrap: {
+      paddingHorizontal: theme.layout.screenPadding,
+    },
     formBody: {
       gap: theme.spacing[16],
     },
@@ -510,10 +511,8 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: theme.layout.screenPadding,
       gap: theme.spacing[12],
     },
-    sectionLabel: {
-      fontFamily: theme.fontFamilies.sansMedium,
-      fontSize: 12,
-      color: theme.colors.textMuted,
+    noteInput: {
+      textAlignVertical: 'top',
     },
     dateTimeRow: {
       flexDirection: 'row',
@@ -521,9 +520,9 @@ const createStyles = (theme: Theme) =>
     },
     dateTimeBtn: {
       flex: 1,
-      height: 52,
+      height: 48,
       borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
       borderColor: theme.colors.border,
       flexDirection: 'row',
@@ -533,22 +532,24 @@ const createStyles = (theme: Theme) =>
     },
     dateTimeText: {
       fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 13,
+      fontSize: 12,
       color: theme.colors.text,
     },
-    noteContainer: {
+    pickerBtn: {
+      height: 48,
       borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.card,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      padding: theme.spacing[16],
-      minHeight: 120,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing[16],
+      gap: theme.spacing[12],
+      backgroundColor: theme.colors.surface,
     },
-    noteInput: {
-      fontFamily: theme.fontFamilies.sans,
-      fontSize: 15,
-      color: theme.colors.text,
-      textAlignVertical: 'top',
+    pickerBtnText: {
+      flex: 1,
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 14,
     },
     footer: {
       position: 'absolute',
@@ -573,9 +574,9 @@ const createStyles = (theme: Theme) =>
       color: theme.colors.onPrimary,
     },
     disabledCard: {
-      height: 52,
+      height: 48,
       borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
       borderColor: theme.colors.border,
       alignItems: 'center',

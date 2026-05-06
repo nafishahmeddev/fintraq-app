@@ -6,14 +6,16 @@ import {
   Alert,
   ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Header, IconPickerDialog, Input, SectionLabel } from '../../../components/ui';
+import { Header, IconPickerDialog, Input, SectionLabel } from '../../../components/ui';
 import { CATEGORY_COLORS } from '../../../constants/picker';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { fromDbColor, toDbColor } from '../../../utils/format';
+import { resolveIcon } from '../../../utils/icons';
 import { useCreatePerson, usePersonById, useUpdatePerson } from '../api/people';
 
 type Props = {
@@ -127,33 +129,37 @@ export const PersonFormPage = React.memo(function PersonFormPage({ mode, personI
           </View>
 
           <View style={styles.section}>
-            <SectionLabel size="sm" text="Appearance" />
-            <View style={styles.visualsRow}>
-              <TouchableOpacity
-                style={styles.iconBtn}
-                onPress={() => setShowIconPicker(true)}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.iconBox, { backgroundColor: colorHex + '20' }]}>
-                  <Ionicons name={iconKey as any} size={24} color={colorHex} />
-                </View>
-              </TouchableOpacity>
+            <SectionLabel size="sm" text="Icon" />
+            <TouchableOpacity
+              style={styles.iconSelectorBtn}
+              onPress={() => setShowIconPicker(true)}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.iconPreview, { backgroundColor: colorHex + '15' }]}>
+                <Ionicons name={resolveIcon(iconKey, 'person-outline')} size={18} color={colorHex} />
+              </View>
+              <Text style={styles.iconSelectorText}>
+                {iconKey.replace('-outline', '').replace(/-/g, ' ')}
+              </Text>
+              <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
+            </TouchableOpacity>
+          </View>
 
-              <View style={styles.colorGrid}>
-                {CATEGORY_COLORS.slice(0, 12).map((c) => (
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Color" />
+            <View style={styles.colorRow}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.colorWrap}>
+                {CATEGORY_COLORS.map((c) => (
                   <TouchableOpacity
                     key={c}
-                    style={[
-                      styles.colorCircle,
-                      { backgroundColor: c },
-                      colorHex === c && styles.colorCircleActive,
-                    ]}
+                    activeOpacity={0.8}
                     onPress={() => setColorHex(c)}
+                    style={[styles.colorCell, { backgroundColor: c }, colorHex === c && styles.colorCellActive]}
                   >
                     {colorHex === c ? <Ionicons name="checkmark" size={14} color="#000" /> : null}
                   </TouchableOpacity>
                 ))}
-              </View>
+              </ScrollView>
             </View>
           </View>
 
@@ -161,12 +167,20 @@ export const PersonFormPage = React.memo(function PersonFormPage({ mode, personI
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button
-          title={isEditMode ? 'Update person' : 'Add person'}
+        <TouchableOpacity
+          activeOpacity={0.9}
+          style={[styles.saveBtn, (!name.trim() || isSubmitting) && styles.saveBtnDisabled]}
           onPress={handleSave}
-          isLoading={isSubmitting}
-          size="lg"
-        />
+          disabled={!name.trim() || isSubmitting}
+        >
+          {isSubmitting ? (
+            <ActivityIndicator size="small" color={colors.onPrimary} />
+          ) : (
+            <Text style={styles.saveBtnText}>
+              {isEditMode ? 'Update person' : 'Add person'}
+            </Text>
+          )}
+        </TouchableOpacity>
       </View>
 
       <IconPickerDialog
@@ -193,7 +207,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   content: {
     paddingHorizontal: theme.layout.screenPadding,
-    paddingTop: theme.spacing[16],
+    paddingTop: theme.spacing[24],
     paddingBottom: 120,
   },
   formBody: {
@@ -202,33 +216,38 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   section: {
     gap: theme.spacing[12],
   },
-  visualsRow: {
+  iconSelectorBtn: {
+    height: 48,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing[16],
-    padding: theme.spacing[16],
-    backgroundColor: theme.colors.surface,
+    gap: theme.spacing[12],
+    paddingHorizontal: theme.spacing[16],
     borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
-  iconBtn: {
-    alignItems: 'center',
-  },
-  iconBox: {
-    width: 56,
-    height: 56,
+  iconPreview: {
+    width: 32,
+    height: 32,
     borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  colorGrid: {
+  iconSelectorText: {
     flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing[8],
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 14,
+    color: theme.colors.text,
+    textTransform: 'capitalize',
   },
-  colorCircle: {
+  colorRow: {
+    marginHorizontal: -theme.layout.screenPadding,
+  },
+  colorWrap: {
+    paddingHorizontal: theme.layout.screenPadding,
+  },
+  colorCell: {
     width: 44,
     height: 44,
     borderRadius: theme.radius.full,
@@ -236,8 +255,9 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
+    marginRight: theme.spacing[12],
   },
-  colorCircleActive: {
+  colorCellActive: {
     borderColor: theme.colors.text,
   },
   footer: {
@@ -245,5 +265,21 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     bottom: 34,
     left: theme.layout.screenPadding,
     right: theme.layout.screenPadding,
+  },
+  saveBtn: {
+    height: 56,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...theme.shadow.md,
+  },
+  saveBtnDisabled: {
+    opacity: 0.5,
+  },
+  saveBtnText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 16,
+    color: theme.colors.onPrimary,
   },
 });
