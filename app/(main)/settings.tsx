@@ -20,7 +20,7 @@ import { NotificationService } from '../../src/services/notification.service';
 export default function SettingsScreen() {
   const theme = useTheme();
   const { colors } = theme;
-  const { isPremium, resetPremium } = usePremium();
+  const { isPremium } = usePremium();
   const { profile, updateProfile } = useSettings();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function SettingsScreen() {
   const [showEditNameModal, setShowEditNameModal] = React.useState(false);
   const [showTimePicker, setShowTimePicker] = React.useState(false);
   const [nameInput, setNameInput] = React.useState('');
-  const [devClickCount, setDevClickCount] = React.useState(0);
+
 
   const themeOptions: { label: string; value: 'light' | 'dark' | 'system'; icon: keyof typeof Ionicons.glyphMap }[] = [
     { label: 'Light mode', value: 'light', icon: 'sunny-outline' },
@@ -93,16 +93,6 @@ export default function SettingsScreen() {
     }
   };
 
-  const handleFooterClick = () => {
-    const nextCount = devClickCount + 1;
-    if (nextCount === 7) {
-      router.push('/developer');
-      setDevClickCount(0);
-    } else {
-      setDevClickCount(nextCount);
-    }
-  };
-
   type PreferenceRowProps = {
     icon: IoniconName;
     title: string;
@@ -143,7 +133,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container}>
 
-      <Header title="Settings" subtitle="System preferences" showBack />
+      <Header title="Settings" />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.heroPanel}>
@@ -195,19 +185,19 @@ export default function SettingsScreen() {
             <PreferenceRow
               icon="people-outline"
               title="People"
-              subtitle="Manage contacts & relationships"
+             
               onPress={() => router.push('/people')}
             />
             <PreferenceRow
               icon="sync-outline"
               title="Recurring"
-              subtitle="Manage automatic transactions"
+             
               onPress={() => router.push('/recurring')}
             />
             <PreferenceRow
               icon="pie-chart-outline"
               title="Budgets"
-              subtitle="Track your spending limits"
+             
               onPress={() => router.push('/budgets')}
               isLast
             />
@@ -235,14 +225,14 @@ export default function SettingsScreen() {
               icon="notifications-outline"
               title="Daily reminder"
               value={profile.reminderEnabled ? 'On' : 'Off'}
-              subtitle="Get notified to track your daily spend"
+             
               onPress={handleToggleReminders}
             />
             <PreferenceRow
               icon="time-outline"
               title="Reminder time"
               value={profile.reminderTime}
-              subtitle="Preferred time for daily alert"
+             
               onPress={() => setShowTimePicker(true)}
               isLast
             />
@@ -273,13 +263,13 @@ export default function SettingsScreen() {
               icon="contrast-outline"
               title="Appearance"
               value={activeTheme}
-              subtitle="Dark mode or high-contrast theme"
+             
               onPress={handleThemeChange}
             />
             <PreferenceRow
               icon="grid-outline"
               title="Categories"
-              subtitle="Customize income and expense tags"
+             
               onPress={() => router.push('/categories')}
               isLast
             />
@@ -290,22 +280,10 @@ export default function SettingsScreen() {
           <Text style={styles.sectionLabel}>Data</Text>
           <View style={styles.card}>
             <PreferenceRow
-              icon="download-outline"
-              title="Export CSV"
-              subtitle="Download transactions as spreadsheet"
-              onPress={() => router.push('/export')}
-            />
-            <PreferenceRow
-              icon="cloud-outline"
-              title="Backup & restore"
-              subtitle="Full data backup and restore"
-              onPress={() => router.push('/backup')}
-            />
-            <PreferenceRow
               icon="trash-bin-outline"
               title="Factory reset"
               destructive
-              subtitle="Permanently wipe all local data"
+             
               onPress={handleResetData}
               isLast
             />
@@ -313,22 +291,10 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.footer}>
-          <TouchableOpacity onPress={handleFooterClick} activeOpacity={1}>
+          <TouchableOpacity onLongPress={() => router.push('/developer')} activeOpacity={1}>
             <Text style={styles.footerBrand}>LUNO / CORE</Text>
           </TouchableOpacity>
           <Text style={styles.footerCopy}>All data is encrypted and stored locally by default.</Text>
-
-          {devClickCount > 0 && (
-            <TouchableOpacity
-              style={{ marginTop: 20, padding: 10 }}
-              onPress={async () => {
-                await resetPremium();
-                Alert.alert("Premium Reset", "Account downgraded to Free.");
-              }}
-            >
-              <Text style={{ color: colors.danger, fontFamily: theme.fontFamilies.sansSemiBold, fontSize: 10 }}>Reset subscription ({7 - devClickCount})</Text>
-            </TouchableOpacity>
-          )}
         </View>
       </ScrollView>
 
@@ -336,7 +302,7 @@ export default function SettingsScreen() {
         visible={showAppearanceDialog}
         onClose={() => setShowAppearanceDialog(false)}
         title="Appearance"
-        subtitle="Set your preferred interface style"
+       
         options={themeOptions.map((option) => ({
           key: option.value,
           label: option.label,

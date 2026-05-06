@@ -30,24 +30,24 @@ export const SectionLabel = React.memo(function SectionLabel({
       case 'sm':
         return {
           fontSize: 10,
-          letterSpacing: 0.5,
-          marginBottom: 8,
+          letterSpacing: 0.3,
+          fontFamily: theme.fontFamilies.sansSemiBold,
         };
       case 'lg':
         return {
           fontSize: 14,
           letterSpacing: -0.2,
-          marginBottom: 16,
+          fontFamily: theme.fontFamilies.sansMedium,
         };
       case 'md':
       default:
         return {
           fontSize: 12,
           letterSpacing: 0,
-          marginBottom: 12,
+          fontFamily: theme.fontFamilies.sansMedium,
         };
     }
-  }, [size]);
+  }, [size, theme.fontFamilies]);
 
   return (
     <View style={[styles.container, style]}>
@@ -57,6 +57,7 @@ export const SectionLabel = React.memo(function SectionLabel({
           {
             fontSize: dimensions.fontSize,
             letterSpacing: letterSpacing ?? dimensions.letterSpacing,
+            fontFamily: dimensions.fontFamily,
             textTransform: uppercase ? 'uppercase' : 'none',
             color: colors.textMuted,
           },
@@ -76,9 +77,7 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       justifyContent: 'space-between',
     },
-    label: {
-      fontFamily: theme.fontFamilies.sansMedium,
-    },
+    label: {},
   });
 
 export default SectionLabel;

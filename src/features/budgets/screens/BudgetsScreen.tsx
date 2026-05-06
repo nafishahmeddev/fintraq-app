@@ -138,7 +138,7 @@ export const BudgetsScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Budgets" subtitle="Track spending limits" showBack />
+      <Header title="Budgets" showBack />
 
       {(loadingBudgets || loadingProgress) ? (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />

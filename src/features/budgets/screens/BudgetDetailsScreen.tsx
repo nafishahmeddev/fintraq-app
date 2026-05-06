@@ -41,7 +41,7 @@ export const BudgetDetailsScreen = React.memo(function BudgetDetailsScreen() {
         <Header title="Error" showBack />
         <EmptyState
           title="Budget not found"
-          subtitle="The budget you're looking for doesn't exist or was deleted."
+         
           icon="alert-circle-outline"
         />
       </SafeAreaView>
@@ -144,7 +144,7 @@ export const BudgetDetailsScreen = React.memo(function BudgetDetailsScreen() {
           !loadingTransactions ? (
             <EmptyState
               title="No transactions"
-              subtitle="No transactions are linked to this budget yet."
+             
               icon="receipt-outline"
             />
           ) : null

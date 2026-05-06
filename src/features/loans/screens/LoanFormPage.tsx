@@ -2,25 +2,26 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Platform,
   ScrollView,
   StyleSheet,
-  View,
+  Text,
   TouchableOpacity,
-  ActivityIndicator,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, Input, Button, IconPickerDialog, PersonPickerDialog, Typography } from '../../../components/ui';
+import { Button, Header, IconPickerDialog, Input, PersonPickerDialog, SectionLabel, Typography } from '../../../components/ui';
+import { CATEGORY_COLORS } from '../../../constants/picker';
+import { LoanStatus, LoanType } from '../../../db/schema';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
-import { CATEGORY_COLORS } from '../../../constants/picker';
-import { toDbColor, parseAmount } from '../../../utils/format';
-import { useCreateLoan, useUpdateLoan, useLoanById } from '../api/loans';
+import { parseAmount, toDbColor } from '../../../utils/format';
 import { useAccounts } from '../../accounts/hooks/accounts';
-import { LoanType, LoanStatus } from '../../../db/schema';
+import { useCreateLoan, useLoanById, useUpdateLoan } from '../api/loans';
 
 type Props = {
   mode: 'create' | 'edit';
@@ -98,24 +99,20 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
         await createLoan(payload);
       }
       router.back();
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to save loan. Please try again.');
     }
   }, [name, totalAmount, loanType, startDate, endDate, accountId, selectedPersonId, iconKey, colorHex, status, isEditMode, loanId, createLoan, updateLoan, router]);
 
-  const onStartDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+  const onStartDateChange = useCallback((_event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowStartDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setStartDate(selectedDate);
-    }
-  };
+    if (selectedDate) setStartDate(selectedDate);
+  }, []);
 
-  const onEndDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+  const onEndDateChange = useCallback((_event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowEndDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setEndDate(selectedDate);
-    }
-  };
+    if (selectedDate) setEndDate(selectedDate);
+  }, []);
 
   const isSubmitting = creating || updating;
 
@@ -129,191 +126,196 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header 
-        title={isEditMode ? 'Edit loan' : 'New loan'} 
-        subtitle={isEditMode ? 'Update debt details' : 'Track money lent or borrowed'} 
-        showBack 
-      />
+      <Header title={isEditMode ? 'Edit loan' : 'New loan'} showBack />
 
-      <ScrollView 
-        contentContainerStyle={styles.content} 
+      <ScrollView
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.section}>
-          <Typography variant="label">Loan name</Typography>
-          <Input
-            value={name}
-            onChangeText={setName}
-            placeholder="e.g. Loan from Mom, Bank Loan"
-            autoFocus={!isEditMode}
-          />
-        </View>
+        <View style={styles.formBody}>
 
-        <View style={styles.section}>
-          <Typography variant="label">Total amount</Typography>
-          <View style={styles.amountContainer}>
-            <Typography variant="h3" color={colors.textMuted}>{currency}</Typography>
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Loan name" />
             <Input
-              value={totalAmount}
-              onChangeText={setTotalAmount}
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-              style={styles.amountInput}
+              value={name}
+              onChangeText={setName}
+              placeholder="e.g. Loan from Mom, Bank Loan"
+              autoFocus={!isEditMode}
             />
           </View>
-        </View>
 
-        <View style={styles.section}>
-          <Typography variant="label">Loan type</Typography>
-          <View style={styles.typeRow}>
-            {(['BORROW', 'LEND'] as LoanType[]).map((t) => (
-              <TouchableOpacity
-                key={t}
-                style={[
-                  styles.typeChip,
-                  loanType === t && { backgroundColor: t === 'BORROW' ? colors.danger : colors.success, borderColor: 'transparent' }
-                ]}
-                onPress={() => setLoanType(t)}
-              >
-                <Typography 
-                  variant="label" 
-                  color={loanType === t ? '#FFF' : colors.textMuted}
-                >
-                  {t === 'BORROW' ? 'Borrowing' : 'Lending'}
-                </Typography>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Typography variant="label">Linked account</Typography>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.accountsRow}>
-            {accountsList?.map((account) => (
-              <TouchableOpacity
-                key={account.id}
-                style={[
-                  styles.accountChip,
-                  accountId === account.id && { backgroundColor: colors.text, borderColor: colors.text }
-                ]}
-                onPress={() => {
-                  setAccountId(account.id);
-                  setCurrency(account.currency);
-                }}
-              >
-                <Typography 
-                  variant="label" 
-                  color={accountId === account.id ? colors.background : colors.text}
-                >
-                  {account.name}
-                </Typography>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
-        <View style={styles.row}>
-          <View style={[styles.section, { flex: 1 }]}>
-            <Typography variant="label">Start date</Typography>
-            <TouchableOpacity 
-              style={styles.pickerBtn} 
-              onPress={() => setShowStartDatePicker(true)}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="calendar-outline" size={20} color={colors.primary} />
-              <Typography variant="body">
-                {format(startDate, 'MMM d, yyyy')}
-              </Typography>
-            </TouchableOpacity>
-          </View>
-
-          <View style={[styles.section, { flex: 1 }]}>
-            <Typography variant="label">End date</Typography>
-            <TouchableOpacity 
-              style={styles.pickerBtn} 
-              onPress={() => setShowEndDatePicker(true)}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="calendar-outline" size={20} color={colors.primary} />
-              <Typography variant="body">
-                {endDate ? format(endDate, 'MMM d, yyyy') : 'Optional'}
-              </Typography>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Typography variant="label">Person (optional)</Typography>
-          <TouchableOpacity 
-            style={styles.pickerBtn} 
-            onPress={() => setShowPersonPicker(true)}
-            activeOpacity={0.7}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
-              <Ionicons name="person-outline" size={20} color={colors.primary} />
-              <Typography variant="body" weight="sansBold" color={selectedPersonId ? colors.text : colors.textMuted}>
-                {selectedPersonId ? 'Linked person' : 'Link person'}
-              </Typography>
-            </View>
-            <Ionicons name="chevron-down" size={16} color={colors.textMuted} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <Typography variant="label">Appearance</Typography>
-          <View style={styles.visualsRow}>
-            <TouchableOpacity 
-              style={styles.iconBtn} 
-              onPress={() => setShowIconPicker(true)}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.iconBox, { backgroundColor: colorHex + '15' }]}>
-                <Ionicons name={iconKey as any} size={24} color={colorHex} />
-              </View>
-              <Typography variant="bodySm">Icon</Typography>
-            </TouchableOpacity>
-
-            <View style={styles.colorGrid}>
-              {CATEGORY_COLORS.slice(10, 20).map((color) => (
-                <TouchableOpacity
-                  key={color}
-                  style={[
-                    styles.colorCircle,
-                    { backgroundColor: color },
-                    colorHex === color && { borderColor: colors.text, borderWidth: 2 }
-                  ]}
-                  onPress={() => setColorHex(color)}
-                />
-              ))}
-            </View>
-          </View>
-        </View>
-
-        {isEditMode && (
           <View style={styles.section}>
-            <Typography variant="label">Status</Typography>
-            <View style={styles.statusRow}>
-              {(['ACTIVE', 'PAID', 'OVERDUE'] as LoanStatus[]).map((s) => (
+            <SectionLabel size="sm" text="Total amount" />
+            <View style={styles.amountRow}>
+              <Typography variant="h3" color={colors.textMuted}>{currency}</Typography>
+              <Input
+                value={totalAmount}
+                onChangeText={setTotalAmount}
+                placeholder="0.00"
+                keyboardType="decimal-pad"
+                style={styles.amountInput}
+              />
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Loan type" />
+            <View style={styles.chipRow}>
+              {(['BORROW', 'LEND'] as LoanType[]).map((t) => (
                 <TouchableOpacity
-                  key={s}
+                  key={t}
                   style={[
-                    styles.statusChip,
-                    status === s && { backgroundColor: colors.text, borderColor: colors.text }
+                    styles.typeChip,
+                    loanType === t && {
+                      backgroundColor: t === 'BORROW' ? colors.danger : colors.success,
+                      borderColor: 'transparent',
+                    },
                   ]}
-                  onPress={() => setStatus(s)}
+                  onPress={() => setLoanType(t)}
                 >
-                  <Typography 
-                    variant="label" 
-                    color={status === s ? colors.background : colors.textMuted}
+                  <Typography
+                    variant="label"
+                    color={loanType === t ? '#FFF' : colors.textMuted}
                   >
-                    {s}
+                    {t === 'BORROW' ? 'Borrowing' : 'Lending'}
                   </Typography>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
-        )}
+
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Linked account" />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {accountsList?.map((account) => (
+                <TouchableOpacity
+                  key={account.id}
+                  style={[
+                    styles.chip,
+                    accountId === account.id && { backgroundColor: colors.text, borderColor: colors.text },
+                  ]}
+                  onPress={() => {
+                    setAccountId(account.id);
+                    setCurrency(account.currency);
+                  }}
+                >
+                  <Typography
+                    variant="label"
+                    color={accountId === account.id ? colors.background : colors.text}
+                  >
+                    {account.name}
+                  </Typography>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+
+          <View style={styles.row}>
+            <View style={[styles.section, { flex: 1 }]}>
+              <SectionLabel size="sm" text="Start date" />
+              <TouchableOpacity
+                style={styles.dateBtn}
+                onPress={() => setShowStartDatePicker(true)}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="calendar-outline" size={16} color={colors.primary} />
+                <Text style={styles.dateBtnText}>{format(startDate, 'd MMM yy')}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={[styles.section, { flex: 1 }]}>
+              <SectionLabel size="sm" text="End date" />
+              <TouchableOpacity
+                style={styles.dateBtn}
+                onPress={() => setShowEndDatePicker(true)}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="calendar-outline" size={16} color={colors.primary} />
+                <Text style={styles.dateBtnText}>
+                  {endDate ? format(endDate, 'd MMM yy') : 'Optional'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Person (optional)" />
+            <TouchableOpacity
+              style={styles.pickerBtn}
+              onPress={() => setShowPersonPicker(true)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="person-outline" size={18} color={colors.primary} />
+              <Typography
+                variant="body"
+                color={selectedPersonId ? colors.text : colors.textMuted}
+                style={{ flex: 1 }}
+              >
+                {selectedPersonId ? 'Person linked' : 'Link a person'}
+              </Typography>
+              <Ionicons name="chevron-down" size={14} color={colors.textMuted} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Appearance" />
+            <View style={styles.visualsRow}>
+              <TouchableOpacity
+                style={styles.iconBtn}
+                onPress={() => setShowIconPicker(true)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.iconBox, { backgroundColor: colorHex + '15' }]}>
+                  <Ionicons name={iconKey as any} size={24} color={colorHex} />
+                </View>
+                <Typography variant="bodySm" color={colors.textMuted}>Icon</Typography>
+              </TouchableOpacity>
+
+              <View style={styles.colorGrid}>
+                {CATEGORY_COLORS.slice(10, 20).map((color) => (
+                  <TouchableOpacity
+                    key={color}
+                    style={[
+                      styles.colorCircle,
+                      { backgroundColor: color },
+                      colorHex === color && styles.colorCircleActive,
+                    ]}
+                    onPress={() => setColorHex(color)}
+                  >
+                    {colorHex === color ? <Ionicons name="checkmark" size={14} color="#000" /> : null}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </View>
+
+          {isEditMode && (
+            <View style={styles.section}>
+              <SectionLabel size="sm" text="Status" />
+              <View style={styles.chipRow}>
+                {(['ACTIVE', 'PAID', 'OVERDUE'] as LoanStatus[]).map((s) => (
+                  <TouchableOpacity
+                    key={s}
+                    style={[
+                      styles.chip,
+                      status === s && { backgroundColor: colors.text, borderColor: colors.text },
+                    ]}
+                    onPress={() => setStatus(s)}
+                  >
+                    <Typography
+                      variant="label"
+                      color={status === s ? colors.background : colors.textMuted}
+                    >
+                      {s}
+                    </Typography>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
+
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -321,7 +323,6 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
           title={isEditMode ? 'Update loan' : 'Create loan'}
           onPress={handleSave}
           isLoading={isSubmitting}
-          shadow="none"
           size="lg"
         />
       </View>
@@ -372,60 +373,88 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: theme.colors.background,
   },
   content: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 48,
-    gap: 24,
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
+    paddingBottom: 120,
+  },
+  formBody: {
+    gap: theme.spacing[24],
   },
   section: {
-    gap: 8,
+    gap: theme.spacing[12],
   },
   row: {
     flexDirection: 'row',
-    gap: 16,
+    gap: theme.spacing[16],
   },
-  amountContainer: {
+  amountRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: theme.spacing[12],
   },
   amountInput: {
     flex: 1,
     fontSize: 28,
     fontFamily: theme.fontFamilies.sansBold,
   },
-  typeRow: {
+  chipRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: theme.spacing[8],
+  },
+  chip: {
+    paddingHorizontal: theme.spacing[16],
+    paddingVertical: theme.spacing[8],
+    borderRadius: theme.radius.full,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginRight: theme.spacing[8],
+    backgroundColor: theme.colors.surface,
   },
   typeChip: {
     flex: 1,
-    height: 48,
-    borderRadius: theme.radius.md,
+    height: 44,
+    borderRadius: theme.radius.full,
     borderWidth: 1,
     borderColor: theme.colors.border,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: theme.colors.surface,
   },
+  dateBtn: {
+    height: 40,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing[8],
+  },
+  dateBtnText: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 12,
+    color: theme.colors.text,
+  },
   pickerBtn: {
-    height: 56,
+    height: 48,
     borderRadius: theme.radius.lg,
     borderWidth: 1,
     borderColor: theme.colors.border,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    gap: 12,
+    paddingHorizontal: theme.spacing[16],
+    gap: theme.spacing[12],
     backgroundColor: theme.colors.surface,
   },
   visualsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 24,
-    padding: 16,
+    gap: theme.spacing[24],
+    padding: theme.spacing[16],
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.lg,
     borderWidth: 1,
@@ -433,7 +462,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   iconBtn: {
     alignItems: 'center',
-    gap: 8,
+    gap: theme.spacing[8],
   },
   iconBox: {
     width: 56,
@@ -448,40 +477,24 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: theme.spacing[8],
   },
   colorCircle: {
-    width: 32,
-    height: 32,
+    width: 44,
+    height: 44,
     borderRadius: theme.radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
-  statusRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  statusChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: theme.radius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  accountsRow: {
-    paddingVertical: 8,
-  },
-  accountChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: theme.radius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginRight: 8,
-    backgroundColor: theme.colors.surface,
+  colorCircleActive: {
+    borderColor: theme.colors.text,
   },
   footer: {
-    paddingHorizontal: 24,
-    paddingBottom: 24,
-    paddingTop: 8,
-    backgroundColor: theme.colors.background,
+    position: 'absolute',
+    bottom: 34,
+    left: theme.layout.screenPadding,
+    right: theme.layout.screenPadding,
   },
 });

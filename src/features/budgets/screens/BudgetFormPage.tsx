@@ -10,12 +10,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header } from '../../../components/ui/Header';
+import { Header, Input, SectionLabel } from '../../../components/ui';
 import { ACCOUNT_COLORS } from '../../../constants/picker';
 import { BudgetMode, BudgetPeriod, BudgetScope } from '../../../db/schema';
 import { usePremium } from '../../../providers/PremiumProvider';
@@ -209,21 +208,17 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
   return (
     <SafeAreaView style={styles.container}>
 
-      <Header title={isEditMode ? 'Edit budget' : 'New budget'} subtitle="Set your spending limit" showBack />
+      <Header title={isEditMode ? 'Edit budget' : 'New budget'} showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <View style={{ marginTop: 24, marginBottom: 16 }}>
+        <View style={{ marginTop: theme.spacing[24], marginBottom: theme.spacing[16] }}>
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Name</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.textInput}
-                value={name}
-                onChangeText={setName}
-                placeholder="e.g. Groceries Budget"
-                placeholderTextColor={colors.textMuted + '80'}
-              />
-            </View>
+            <SectionLabel size="sm" text="Name" />
+            <Input
+              value={name}
+              onChangeText={setName}
+              placeholder="e.g. Groceries Budget"
+            />
           </View>
         </View>
 
@@ -237,7 +232,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
 
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Period</Text>
+            <SectionLabel size="sm" text="Period" />
             <View style={styles.grid}>
               {PERIODS.map((p) => (
                 <TouchableOpacity
@@ -274,7 +269,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Mode</Text>
+            <SectionLabel size="sm" text="Mode" />
             <View style={styles.optionsGrid}>
               {MODES.map((m) => (
                 <TouchableOpacity
@@ -293,7 +288,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Scope</Text>
+            <SectionLabel size="sm" text="Scope" />
             <View style={styles.optionsGrid}>
               {SCOPES.map((s) => (
                 <TouchableOpacity
@@ -312,9 +307,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>
-              {scope === 'OVERALL' ? 'Excluded categories' : 'Included categories'}
-            </Text>
+            <SectionLabel size="sm" text={scope === 'OVERALL' ? 'Excluded categories' : 'Included categories'} />
             <View style={styles.categoriesWrap}>
               {categories.map(cat => {
                 const isSelected = selectedCategories.includes(cat.id);
@@ -347,7 +340,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Accounts (optional)</Text>
+            <SectionLabel size="sm" text="Accounts (optional)" />
             <View style={styles.categoriesWrap}>
               {accounts.map(acc => {
                 const isSelected = selectedAccounts.includes(acc.id);
@@ -380,7 +373,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Color</Text>
+            <SectionLabel size="sm" text="Color" />
             <View style={styles.colorRow}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.colorWrap}>
                 {ACCOUNT_COLORS.map((item) => (
@@ -402,7 +395,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Advanced</Text>
+            <SectionLabel size="sm" text="Advanced" />
             <TouchableOpacity
               style={[styles.optionCard, isRolling && { borderColor: colors.text }]}
               onPress={() => setIsRolling(!isRolling)}
@@ -441,7 +434,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           value={startDate}
           mode="date"
           display="default"
-          onChange={(event, date) => {
+          onChange={(_event, date) => {
             setShowStartDatePicker(Platform.OS === 'ios');
             if (date) setStartDate(date);
           }}
@@ -452,7 +445,7 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
           value={endDate}
           mode="date"
           display="default"
-          onChange={(event, date) => {
+          onChange={(_event, date) => {
             setShowEndDatePicker(Platform.OS === 'ios');
             if (date) setEndDate(date);
           }}
@@ -475,45 +468,23 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background,
     },
     content: {
+      paddingHorizontal: theme.layout.screenPadding,
       paddingBottom: 120,
     },
     formBody: {
-      gap: 16,
+      gap: theme.spacing[16],
     },
-
     section: {
-      paddingHorizontal: 24,
-      gap: 12,
-    },
-    sectionLabel: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 10,
-      color: theme.colors.textMuted,
-      letterSpacing: 1.5,
-      textTransform: 'uppercase',
-    },
-    inputContainer: {
-      height: 48,
-      borderRadius: theme.radius.xl,
-      backgroundColor: theme.colors.surface,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      paddingHorizontal: 16,
-      justifyContent: 'center',
-    },
-    textInput: {
-      fontFamily: theme.fontFamilies.sansMedium,
-      fontSize: 15,
-      color: theme.colors.text,
+      gap: theme.spacing[12],
     },
     grid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 8,
+      gap: theme.spacing[8],
     },
     gridBtn: {
-      paddingHorizontal: 16,
-      paddingVertical: 10,
+      paddingHorizontal: theme.spacing[16],
+      paddingVertical: theme.spacing[8],
       borderRadius: theme.radius.full,
       backgroundColor: theme.colors.surface,
       borderWidth: 1,
@@ -524,33 +495,30 @@ const createStyles = (theme: Theme) =>
       fontSize: 13,
       color: theme.colors.text,
     },
-    optionsList: {
-      gap: 12,
-    },
     optionsGrid: {
       flexDirection: 'row',
-      gap: 12,
+      gap: theme.spacing[12],
     },
     optionCard: {
-      borderRadius: theme.radius.xl,
+      borderRadius: theme.radius.lg,
       backgroundColor: theme.colors.surface,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      padding: 16,
+      padding: theme.spacing[16],
     },
     optionCardHalf: {
       flex: 1,
-      borderRadius: theme.radius.xl,
+      borderRadius: theme.radius.lg,
       backgroundColor: theme.colors.surface,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      padding: 16,
+      padding: theme.spacing[16],
     },
     optionHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 4,
+      marginBottom: theme.spacing[4],
     },
     optionTitle: {
       fontFamily: theme.fontFamilies.sansSemiBold,
@@ -566,15 +534,15 @@ const createStyles = (theme: Theme) =>
     categoriesWrap: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 8,
+      gap: theme.spacing[8],
     },
     catChip: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: theme.radius.full,
+      gap: theme.spacing[8],
+      paddingHorizontal: theme.spacing[12],
+      paddingVertical: theme.spacing[8],
+      borderRadius: theme.radius.md,
       backgroundColor: theme.colors.surface,
       borderWidth: 1,
       borderColor: theme.colors.border,
@@ -590,16 +558,16 @@ const createStyles = (theme: Theme) =>
       color: theme.colors.textMuted,
     },
     colorRow: {
-      marginHorizontal: -24,
+      marginHorizontal: -theme.layout.screenPadding,
     },
     colorWrap: {
-      paddingHorizontal: 24,
+      paddingHorizontal: theme.layout.screenPadding,
     },
     colorCell: {
       width: 44,
       height: 44,
       borderRadius: theme.radius.full,
-      marginRight: 12,
+      marginRight: theme.spacing[12],
       justifyContent: 'center',
       alignItems: 'center',
       borderWidth: 2,
@@ -611,8 +579,8 @@ const createStyles = (theme: Theme) =>
     footer: {
       position: 'absolute',
       bottom: 34,
-      left: 24,
-      right: 24,
+      left: theme.layout.screenPadding,
+      right: theme.layout.screenPadding,
     },
     saveBtn: {
       height: 56,
@@ -633,19 +601,19 @@ const createStyles = (theme: Theme) =>
     customDateRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8,
-      marginTop: 12,
+      gap: theme.spacing[8],
+      marginTop: theme.spacing[12],
     },
     dateBtn: {
       height: 40,
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius.md,
       backgroundColor: theme.colors.surface,
       borderWidth: 1,
       borderColor: theme.colors.border,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 6,
+      gap: theme.spacing[8],
     },
     dateBtnText: {
       fontFamily: theme.fontFamilies.sansMedium,

@@ -21,7 +21,7 @@ export default function CreateBudgetRoute() {
     return (
       <View style={{ flex: 1, backgroundColor: colors.background }}>
 
-        <Header title="New Budget" subtitle="Plan limit reached" showBack />
+        <Header title="New Budget" showBack />
         <View style={{ flex: 1, padding: 24, justifyContent: 'center' }}>
           <PremiumGuard label="Unlimited Budgets" size="large">
             <View />

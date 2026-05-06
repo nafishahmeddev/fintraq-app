@@ -22,7 +22,7 @@ export default function CreateRecurringRoute() {
     return (
       <View style={{ flex: 1, backgroundColor: colors.background }}>
 
-        <Header title="New Recurring" subtitle="Plan limit reached" showBack />
+        <Header title="New Recurring" showBack />
         <View style={{ flex: 1, padding: 24, justifyContent: 'center' }}>
           <PremiumGuard label="Unlimited Recurring" size="large">
             <View />

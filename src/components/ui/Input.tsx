@@ -41,10 +41,10 @@ export const Input = React.memo(function Input({
       case 'sm':
         return { height: 40, paddingHorizontal: 12, borderRadius: theme.radius.md, fontSize: 14 };
       case 'lg':
-        return { height: 64, paddingHorizontal: 16, borderRadius: theme.radius.lg, fontSize: 18 };
+        return { height: 56, paddingHorizontal: 16, borderRadius: theme.radius.lg, fontSize: 18 };
       case 'md':
       default:
-        return { height: 56, paddingHorizontal: 16, borderRadius: theme.radius.lg, fontSize: 16 };
+        return { height: 48, paddingHorizontal: 16, borderRadius: theme.radius.lg, fontSize: 15 };
     }
   }, [size, theme.radius]);
 
@@ -71,7 +71,7 @@ export const Input = React.memo(function Input({
         };
       case 'default':
       default:
-        return { ...base, backgroundColor: colors.card };
+        return { ...base, backgroundColor: colors.surface };
     }
   }, [variant, borderColor, focused, colors.card]);
 
@@ -161,7 +161,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontFamily: theme.fontFamilies.sans,
+    fontFamily: theme.fontFamilies.sansMedium,
     textAlignVertical: 'center',
   },
   trailingElement: {

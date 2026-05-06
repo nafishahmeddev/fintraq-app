@@ -41,7 +41,7 @@ export const LoanDetailsScreen = React.memo(function LoanDetailsScreen() {
         <Header title="Error" showBack />
         <EmptyState
           title="Loan not found"
-          subtitle="The loan you're looking for doesn't exist."
+         
           icon="alert-circle-outline"
         />
       </SafeAreaView>
@@ -150,7 +150,7 @@ export const LoanDetailsScreen = React.memo(function LoanDetailsScreen() {
           !loadingTransactions ? (
             <EmptyState
               title="No repayments yet"
-              subtitle="Record payments to this loan to see your repayment history here."
+             
               icon="receipt-outline"
             />
           ) : null

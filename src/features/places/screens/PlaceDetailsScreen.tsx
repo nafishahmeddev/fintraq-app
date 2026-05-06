@@ -101,7 +101,7 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
         <Header title="Place not found" showBack />
         <EmptyState 
           title="Not found" 
-          subtitle="This place could not be found." 
+          
           icon="alert-circle-outline"
         />
       </SafeAreaView>
@@ -126,7 +126,7 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
           !loadingTransactions ? (
             <EmptyState
               title="No transactions"
-              subtitle="No transactions linked to this place."
+             
               icon="receipt-outline"
             />
           ) : null

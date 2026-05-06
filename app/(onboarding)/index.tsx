@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { File } from 'expo-file-system';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -18,7 +17,6 @@ import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
 import { getDeviceCurrencyCode } from '../../src/constants/currency';
 import { ACCOUNT_COLORS } from '../../src/constants/picker';
 import { useCreateAccount } from '../../src/features/accounts/hooks/accounts';
-import { BackupService } from '../../src/features/backup/api/backup.service';
 import { useCreateCategory } from '../../src/features/categories/hooks/categories';
 import { ProfileStep } from '../../src/features/onboarding/components/ProfileStep';
 import { WelcomeStep } from '../../src/features/onboarding/components/WelcomeStep';
@@ -46,20 +44,6 @@ export default function OnboardingScreen() {
   const [stepIndex, setStepIndex] = useState(0);
   const currentStep = ONBOARDING_STEPS[stepIndex];
 
-  // Import from backup state
-  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
-  const [selectedBackupFile, setSelectedBackupFile] = useState<File | null>(null);
-  const [backupSummary, setBackupSummary] = useState<{
-    version: string;
-    exportedAt: string;
-    accountsCount: number;
-    categoriesCount: number;
-    transactionsCount: number;
-    hasProfile: boolean;
-  } | null>(null);
-  const [isImporting, setIsImporting] = useState(false);
-
-  // Reminder activation dialog state
   const [showReminderDialog, setShowReminderDialog] = useState(false);
 
   const methods = useForm<OnboardingFormValues>({
@@ -72,64 +56,7 @@ export default function OnboardingScreen() {
 
   const { trigger, getValues } = methods;
 
-  const isPending = accountPending || categoryPending || isImporting;
-
-  const handleImportFromBackup = useCallback(async () => {
-    try {
-      setIsImporting(true);
-      const file = await BackupService.pickBackupFile();
-
-      if (!file) {
-        setIsImporting(false);
-        return;
-      }
-
-      const summary = await BackupService.getBackupSummary(file);
-      setBackupSummary(summary);
-      setSelectedBackupFile(file);
-      setShowRestoreDialog(true);
-    } catch (error) {
-      Alert.alert(
-        'Invalid Backup',
-        error instanceof Error ? error.message : 'Failed to read backup file'
-      );
-    } finally {
-      setIsImporting(false);
-    }
-  }, []);
-
-  const handleConfirmRestore = useCallback(async () => {
-    if (!selectedBackupFile) return;
-
-    try {
-      setIsImporting(true);
-      setShowRestoreDialog(false);
-
-      const data = await BackupService.readBackupFile(selectedBackupFile);
-      await BackupService.restoreBackup(data);
-      await completeOnboarding();
-
-      Alert.alert(
-        'Restore Complete',
-        'Your data has been restored successfully. Welcome back!',
-        [
-          {
-            text: 'Continue',
-            onPress: () => router.replace('/(main)'),
-          },
-        ]
-      );
-    } catch (error) {
-      Alert.alert(
-        'Restore Failed',
-        error instanceof Error ? error.message : 'Failed to restore backup'
-      );
-    } finally {
-      setIsImporting(false);
-      setSelectedBackupFile(null);
-      setBackupSummary(null);
-    }
-  }, [selectedBackupFile, completeOnboarding, router]);
+  const isPending = accountPending || categoryPending;
 
   const handleEnableReminders = useCallback(async () => {
     setShowReminderDialog(false);
@@ -280,7 +207,7 @@ export default function OnboardingScreen() {
   const renderStepContent = () => {
     switch (currentStep.id) {
       case 'welcome':
-        return <WelcomeStep onImportPress={handleImportFromBackup} />;
+        return <WelcomeStep />;
       case 'profile':
         return <ProfileStep />;
       default:
@@ -337,36 +264,6 @@ export default function OnboardingScreen() {
           </View>
         </KeyboardAvoidingView>
       </FormProvider>
-
-      <ConfirmDialog
-        visible={showRestoreDialog}
-        onClose={() => {
-          setShowRestoreDialog(false);
-          setSelectedBackupFile(null);
-          setBackupSummary(null);
-        }}
-        title="Restore from Backup"
-        confirmLabel="Restore"
-        destructive
-        message={
-          backupSummary
-            ? `This backup contains:\n\n` +
-            `• ${backupSummary.accountsCount} account${backupSummary.accountsCount !== 1 ? 's' : ''}\n` +
-            `• ${backupSummary.categoriesCount} categor${backupSummary.categoriesCount !== 1 ? 'ies' : 'y'}\n` +
-            `• ${backupSummary.transactionsCount} transaction${backupSummary.transactionsCount !== 1 ? 's' : ''}\n` +
-            `• ${backupSummary.hasProfile ? 'Settings & profile' : 'No settings'}\n\n` +
-            `Exported: ${new Date(backupSummary.exportedAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}\n\n` +
-            `This will replace any existing data.`
-            : 'Are you sure you want to restore this backup?'
-        }
-        onConfirm={handleConfirmRestore}
-      />
 
       <ConfirmDialog
         visible={showReminderDialog}

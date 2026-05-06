@@ -21,4 +21,6 @@ export { PremiumGuard } from './PremiumGuard';
 export { SectionLabel } from './SectionLabel';
 export { TransactionRow } from './TransactionRow';
 export { Typography } from './Typography';
+export { EntityPickerSheet, type EntityPickerItem } from './EntityPickerSheet';
 export { PersonPickerDialog } from './PersonPickerDialog';
+export { PlacePickerDialog } from './PlacePickerDialog';

@@ -1,20 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
-  View,
   TouchableOpacity,
-  ActivityIndicator,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, Input, Button, IconPickerDialog, Typography } from '../../../components/ui';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { Button, Header, IconPickerDialog, Input, SectionLabel } from '../../../components/ui';
 import { CATEGORY_COLORS } from '../../../constants/picker';
-import { toDbColor, fromDbColor } from '../../../utils/format';
-import { useCreatePerson, useUpdatePerson, usePersonById } from '../api/people';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { fromDbColor, toDbColor } from '../../../utils/format';
+import { useCreatePerson, usePersonById, useUpdatePerson } from '../api/people';
 
 type Props = {
   mode: 'create' | 'edit';
@@ -90,79 +90,73 @@ export const PersonFormPage = React.memo(function PersonFormPage({ mode, personI
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      <Header 
-        title={isEditMode ? 'Edit person' : 'New person'} 
-        showBack 
-      />
-      
-      <ScrollView 
-        style={styles.scrollView}
+      <Header title={isEditMode ? 'Edit person' : 'New person'} showBack />
+
+      <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.section}>
-          <Typography variant="label">Name</Typography>
-          <Input
-            placeholder="e.g. John Doe"
-            value={name}
-            onChangeText={setName}
-            autoFocus={!isEditMode}
-          />
-        </View>
+        <View style={styles.formBody}>
 
-        <View style={styles.section}>
-          <Typography variant="label">Contact info (optional)</Typography>
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <Input
-                placeholder="Email address"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Name" />
+            <Input
+              placeholder="e.g. John Doe"
+              value={name}
+              onChangeText={setName}
+              autoFocus={!isEditMode}
+            />
           </View>
-          <View style={[styles.row, { marginTop: 8 }]}>
-            <View style={{ flex: 1 }}>
-              <Input
-                placeholder="Phone number"
-                value={phone}
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
-              />
-            </View>
-          </View>
-        </View>
 
-        <View style={styles.section}>
-          <Typography variant="label">Appearance</Typography>
-          <View style={styles.visualsRow}>
-            <TouchableOpacity 
-              style={styles.iconBtn} 
-              onPress={() => setShowIconPicker(true)}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.iconBox, { backgroundColor: colorHex + '20' }]}>
-                <Ionicons name={iconKey as any} size={24} color={colorHex} />
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Contact info (optional)" />
+            <Input
+              placeholder="Email address"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <Input
+              placeholder="Phone number"
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+            />
+          </View>
+
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Appearance" />
+            <View style={styles.visualsRow}>
+              <TouchableOpacity
+                style={styles.iconBtn}
+                onPress={() => setShowIconPicker(true)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.iconBox, { backgroundColor: colorHex + '20' }]}>
+                  <Ionicons name={iconKey as any} size={24} color={colorHex} />
+                </View>
+              </TouchableOpacity>
+
+              <View style={styles.colorGrid}>
+                {CATEGORY_COLORS.slice(0, 12).map((c) => (
+                  <TouchableOpacity
+                    key={c}
+                    style={[
+                      styles.colorCircle,
+                      { backgroundColor: c },
+                      colorHex === c && styles.colorCircleActive,
+                    ]}
+                    onPress={() => setColorHex(c)}
+                  >
+                    {colorHex === c ? <Ionicons name="checkmark" size={14} color="#000" /> : null}
+                  </TouchableOpacity>
+                ))}
               </View>
-              <Typography variant="bodySm" color={colors.textMuted}>Icon</Typography>
-            </TouchableOpacity>
-
-            <View style={styles.colorGrid}>
-              {CATEGORY_COLORS.slice(0, 10).map((c) => (
-                <TouchableOpacity
-                  key={c}
-                  style={[
-                    styles.colorCircle,
-                    { backgroundColor: c },
-                    colorHex === c && { borderWidth: 2, borderColor: colors.text }
-                  ]}
-                  onPress={() => setColorHex(c)}
-                />
-              ))}
             </View>
           </View>
+
         </View>
       </ScrollView>
 
@@ -195,28 +189,24 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  scrollView: {
-    flex: 1,
+    backgroundColor: theme.colors.background,
   },
   content: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 48,
-    gap: 24,
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
+    paddingBottom: 120,
+  },
+  formBody: {
+    gap: theme.spacing[24],
   },
   section: {
-    gap: 8,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 16,
+    gap: theme.spacing[12],
   },
   visualsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 24,
-    padding: 16,
+    gap: theme.spacing[16],
+    padding: theme.spacing[16],
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.lg,
     borderWidth: 1,
@@ -224,12 +214,11 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   iconBtn: {
     alignItems: 'center',
-    gap: 8,
   },
   iconBox: {
     width: 56,
     height: 56,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -237,17 +226,24 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: theme.spacing[8],
   },
   colorCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  colorCircleActive: {
+    borderColor: theme.colors.text,
   },
   footer: {
-    paddingHorizontal: 24,
-    paddingBottom: 24,
-    paddingTop: 8,
-    backgroundColor: theme.colors.background,
+    position: 'absolute',
+    bottom: 34,
+    left: theme.layout.screenPadding,
+    right: theme.layout.screenPadding,
   },
 });

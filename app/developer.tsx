@@ -1,16 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Notifications from 'expo-notifications';
 import React from 'react';
-import { Alert, DevSettings, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, DevSettings, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
-import { Header } from '../../src/components/ui/Header';
-import { Input } from '../../src/components/ui/Input';
-import { usePremium } from '../../src/providers/PremiumProvider';
-import { Theme, useTheme } from '../../src/providers/ThemeProvider';
-import { NotificationService } from '../../src/services/notification.service';
-import { toErrorMessage } from '../../src/utils/errors';
-import { seedDummyData } from '../../src/utils/seed';
+import { ConfirmDialog } from '@/src/components/ui/ConfirmDialog';
+import { Header } from '@/src/components/ui/Header';
+import { usePremium } from '@/src/providers/PremiumProvider';
+import { Theme, useTheme } from '@/src/providers/ThemeProvider';
+import { NotificationService } from '@/src/services/notification.service';
+import { toErrorMessage } from '@/src/utils/errors';
+import { seedDummyData } from '@/src/utils/seed';
 
 export default function DeveloperScreen() {
   const theme = useTheme();
@@ -18,9 +17,6 @@ export default function DeveloperScreen() {
   const { devOverride, setDevOverride } = usePremium();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-  const [pin, setPin] = React.useState('');
-  const [error, setError] = React.useState('');
   const [showSeedConfirm, setShowSeedConfirm] = React.useState(false);
   const [isSeeding, setIsSeeding] = React.useState(false);
   const [scheduledNotifs, setScheduledNotifs] = React.useState<Notifications.NotificationRequest[]>([]);
@@ -33,19 +29,6 @@ export default function DeveloperScreen() {
   React.useEffect(() => {
     fetchScheduled();
   }, [fetchScheduled]);
-
-  const handlePinChange = (val: string) => {
-    setPin(val);
-    setError('');
-
-    if (val === '32159') {
-      setIsAuthenticated(true);
-    } else if (val.length >= 5) {
-      setError('Invalid Access Token');
-      // Clear after a short delay for feedback
-      setTimeout(() => setPin(''), 1000);
-    }
-  };
 
   const handleRunSeed = async () => {
     try {
@@ -64,54 +47,10 @@ export default function DeveloperScreen() {
     }
   };
 
-  if (!isAuthenticated) {
-    return (
-      <SafeAreaView style={styles.container}>
-
-        <Header title="Restricted" subtitle="Authentication required" showBack />
-
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.keyboardContent}
-        >
-          <View style={styles.lockContainer}>
-            <View style={[styles.lockIconBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <Ionicons name="lock-closed" size={32} color={colors.text} />
-            </View>
-
-            <View style={styles.lockInfo}>
-              <Text style={styles.lockTitle}>SYSTEM LOCK</Text>
-              <Text style={styles.lockSubtitle}>Enter the 5-digit authorization key to proceed.</Text>
-            </View>
-
-            <View style={styles.inputWrap}>
-              <Input
-                placeholder="•••••"
-                value={pin}
-                onChangeText={handlePinChange}
-                keyboardType="numeric"
-                maxLength={5}
-                secureTextEntry
-                textAlign="center"
-                style={styles.pinInput}
-                autoFocus
-                error={error}
-              />
-            </View>
-
-            <View style={styles.securityBranding}>
-              <Text style={styles.securityText}>LUNO / SECURITY_LAYER_ACTIVE</Text>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
 
-      <Header title="Developer" subtitle="Secret system tools" showBack />
+      <Header title="Developer" showBack />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
@@ -248,62 +187,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 8,
     paddingBottom: 48,
-  },
-  keyboardContent: {
-    flex: 1,
-  },
-  lockContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-    paddingBottom: 80,
-  },
-  lockIconBox: {
-    width: 80,
-    height: 80,
-    borderRadius: theme.radius['2xl'],
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    marginBottom: 24,
-  },
-  lockInfo: {
-    alignItems: 'center',
-    marginBottom: 32,
-    gap: 8,
-  },
-  lockTitle: {
-    fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 12,
-    color: theme.colors.text,
-    letterSpacing: 4,
-  },
-  lockSubtitle: {
-    fontFamily: theme.fontFamilies.sans,
-    fontSize: 14,
-    color: theme.colors.textMuted,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  inputWrap: {
-    width: '100%',
-    maxWidth: 200,
-  },
-  pinInput: {
-    fontSize: 24,
-    fontFamily: theme.fontFamilies.sansBold,
-    letterSpacing: 10,
-  },
-  securityBranding: {
-    marginTop: 48,
-  },
-  securityText: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 9,
-    color: theme.colors.textMuted,
-    letterSpacing: 1.5,
-    opacity: 0.5,
   },
   section: {
     marginBottom: 28,

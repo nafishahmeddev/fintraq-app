@@ -1,13 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 
-interface WelcomeStepProps {
-  onImportPress?: () => void;
-}
-
-export function WelcomeStep({ onImportPress }: WelcomeStepProps) {
+export function WelcomeStep() {
   const theme = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -34,18 +30,7 @@ export function WelcomeStep({ onImportPress }: WelcomeStepProps) {
         </View>
       </View>
 
-      {onImportPress && (
-        <TouchableOpacity style={styles.importButton} onPress={onImportPress} activeOpacity={0.7}>
-          <View style={styles.importIconBox}>
-            <Ionicons name="cloud-download-outline" size={18} color={theme.colors.primary} />
-          </View>
-          <View style={styles.importTextContainer}>
-            <Text style={styles.importTitle}>Restore from backup</Text>
-            <Text style={styles.importSubtitle}>Import your existing data</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={16} color={theme.colors.textMuted} />
-        </TouchableOpacity>
-      )}
+
     </View>
   );
 }
@@ -110,39 +95,5 @@ const createStyles = (theme: Theme) =>
       fontSize: theme.fontSizes.sm,
       color: theme.colors.text,
       lineHeight: 18,
-    },
-    importButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginTop: theme.spacing[24],
-      padding: theme.spacing[16],
-      backgroundColor: theme.colors.card,
-      borderRadius: theme.radius.lg,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      ...theme.shadow.xs,
-    },
-    importIconBox: {
-      width: 40,
-      height: 40,
-      borderRadius: theme.radius.md,
-      backgroundColor: theme.colors.primary + '15',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: theme.spacing[12],
-    },
-    importTextContainer: {
-      flex: 1,
-    },
-    importTitle: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: theme.fontSizes.md,
-      color: theme.colors.text,
-      marginBottom: 2,
-    },
-    importSubtitle: {
-      fontFamily: theme.fontFamilies.sans,
-      fontSize: theme.fontSizes.sm,
-      color: theme.colors.textMuted,
     },
   });

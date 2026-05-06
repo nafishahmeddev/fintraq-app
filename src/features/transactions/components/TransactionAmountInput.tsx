@@ -46,7 +46,7 @@ export const TransactionAmountInput = ({ value, onChange, currency }: Props) => 
 
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
-    paddingHorizontal: 24,
+
     paddingVertical: 12,
   },
   label: {
@@ -67,6 +67,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     fontSize: 48,
     fontFamily: theme.fontFamilies.sansBold,
-    letterSpacing: -1,
+
   },
 });

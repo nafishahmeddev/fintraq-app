@@ -43,11 +43,11 @@ export const CategoriesScreen = () => {
   );
 
   const handleCreate = () => {
-    router.push('/category/create');
+    router.push('/categories/create');
   };
 
   const handleEdit = (category: Category) => {
-    router.push(`/category/edit/${category.id}`);
+    router.push(`/categories/edit/${category.id}`);
   };
 
   const handleDelete = (id: number) => {
@@ -82,7 +82,7 @@ export const CategoriesScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Categories" subtitle="Organize your spending" showBack />
+      <Header title="Categories" showBack />
 
       {isLoading ? (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />

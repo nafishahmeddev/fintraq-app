@@ -18,50 +18,60 @@ export type ThemePalette = {
 };
 
 /**
- * Wise Absolute Color Palette
- * Based on official wise.design foundations (2024)
- * 
- * Primary brand values:
- * Bright Green: #9FE870
- * Forest Green: #163300
+ * Navy Luxury — Final (Fixed Contrast Layers)
+ * Clear separation: background < card < surface
  */
 
 export const DARK_THEME: ThemePalette = {
-  background: '#163300', // Forest Green (Primary Brand)
-  card: '#1E4000',
-  surface: '#264D00',
-  primary: '#9FE870', // Bright Green
-  primaryLight: '#B5EE8D',
-  primaryDark: '#163300',
-  onPrimary: '#163300', // Forest Green text on Bright Green bg
-  backgroundNeutral: '#264D00',
-  secondary: '#FFFFFF',
-  text: '#FFFFFF',
-  textMuted: '#A6B399',
-  border: '#2E4D1A',
-  success: '#9FE870',
-  danger: '#F1404B',
-  warning: '#F2BB05',
-  info: '#2ED3F2',
+  background: '#080A0F',        // deep blue-black for navy feel
+  card: '#0E1218',              // +1 level
+  surface: '#161B24',           // +2 level — inputs, chips
+
+  primary: '#2347C5',           // richer navy blue
+  primaryLight: '#4B7FFF',      // vibrant interactive blue
+  primaryDark: '#1A3899',
+
+  onPrimary: '#FFFFFF',
+
+  backgroundNeutral: '#161B24',
+
+  secondary: '#D4AF5A',         // richer gold
+
+  text: '#EFF1F5',              // slightly warm white
+  textMuted: '#8891A0',
+
+  border: '#1E2530',            // stronger — brutalist separation
+
+  success: '#22C55E',           // proper emerald (income / positive)
+  danger: '#F87171',            // clean red (expense / negative)
+  warning: '#D4AF5A',           // gold — matches secondary
+  info: '#60A5FA',              // sky blue — distinct from success
 };
 
 export const LIGHT_THEME: ThemePalette = {
-  background: '#FFFFFF',
-  card: '#F2F5F7', // Background Neutral (8% Forest Green tint)
-  surface: '#E8EDF1',
-  primary: '#9FE870', // Bright Green (Interactive Accent)
-  primaryLight: '#B5EE8D',
-  primaryDark: '#163300', // Forest Green
-  onPrimary: '#163300', // Forest Green text on Bright Green bg
-  backgroundNeutral: '#16330014', // 8% Forest Green tint per Wise spec
-  secondary: '#163300',
-  text: '#163300', // Content Primary (Forest Green based)
-  textMuted: '#5D7079', // Content Secondary
-  border: '#E2E8ED', // Separator
-  success: '#007D44', // Accessible Success Green (for text on white)
-  danger: '#D92D20', // Accessible Error Red
-  warning: '#F79009', // Accessible Warning Orange
-  info: '#00B9FF',
+  background: '#F6F8FC',        // cool off-white page
+  card: '#FFFFFF',              // pure white cards
+  surface: '#EEF1F7',          // cool grey — inputs, chips
+
+  primary: '#2347C5',           // same navy
+  primaryLight: '#4B7FFF',
+  primaryDark: '#1A3899',
+
+  onPrimary: '#FFFFFF',
+
+  backgroundNeutral: '#EEF1F7',
+
+  secondary: '#CA9F2E',         // rich amber gold
+
+  text: '#080A0F',              // near-black
+  textMuted: '#616978',
+
+  border: '#DDE3EC',            // clean editorial border
+
+  success: '#16A34A',           // dark green for light bg (income)
+  danger: '#DC2626',            // clean red (expense)
+  warning: '#CA9F2E',           // matches secondary
+  info: '#3B82F6',              // medium blue — distinct from success
 };
 
 export type ThemeColors = ThemePalette;

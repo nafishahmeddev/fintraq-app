@@ -273,7 +273,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
   return (
     <SafeAreaView style={styles.container}>
 
-      <Header title={isEditMode ? 'Edit recurring' : 'New recurring'} subtitle="Automate your flow" showBack />
+      <Header title={isEditMode ? 'Edit recurring' : 'New recurring'} showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <TransactionTypePicker
@@ -308,7 +308,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
             accounts={accounts}
             selectedId={selectedAccountId}
             onSelect={setSelectedAccountId}
-            onAdd={() => router.push('/account/create')}
+            onAdd={() => router.push('/accounts/create')}
             label="Account"
           />
 
@@ -316,7 +316,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
             categories={filteredCategories}
             selectedId={selectedCategoryId}
             onSelect={setSelectedCategoryId}
-            onAdd={() => router.push('/category/create')}
+            onAdd={() => router.push('/categories/create')}
           />
 
           <View style={styles.section}>
@@ -416,7 +416,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
             </View>
 
             {endCondition === 'AFTER_OCCURRENCES' && (
-              <View style={[styles.inputContainer, { marginTop: 12 }]}>
+              <View style={[styles.inputContainer, { marginTop: theme.spacing[12] }]}>
                 <TextInput
                   style={styles.textInput}
                   value={endValue}
@@ -429,7 +429,7 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
             )}
 
             {endCondition === 'ON_DATE' && (
-              <TouchableOpacity style={[styles.dateBtn, { marginTop: 12 }]} onPress={() => setShowEndDatePicker(true)}>
+              <TouchableOpacity style={[styles.dateBtn, { marginTop: theme.spacing[12] }]} onPress={() => setShowEndDatePicker(true)}>
                 <Ionicons name="calendar-outline" size={18} color={colors.primary} />
                 <Text style={styles.dateBtnText}>
                   {endValue ? format(new Date(endValue), 'EEE, d MMM yyyy') : 'Select Date'}
@@ -532,11 +532,11 @@ const createStyles = (theme: Theme) =>
       paddingBottom: 120,
     },
     formBody: {
-      gap: 16,
+      gap: theme.spacing[16],
     },
     section: {
-      paddingHorizontal: 24,
-      gap: 12,
+      paddingHorizontal: theme.layout.screenPadding,
+      gap: theme.spacing[12],
     },
     sectionLabel: {
       fontFamily: theme.fontFamilies.sansMedium,
@@ -549,7 +549,7 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.surface,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      paddingHorizontal: 16,
+      paddingHorizontal: theme.spacing[16],
       justifyContent: 'center',
     },
     textInput: {
@@ -560,10 +560,10 @@ const createStyles = (theme: Theme) =>
     grid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 8,
+      gap: theme.spacing[8],
     },
     gridBtn: {
-      paddingHorizontal: 16,
+      paddingHorizontal: theme.spacing[16],
       paddingVertical: 10,
       borderRadius: theme.radius.full,
       backgroundColor: theme.colors.surface,
@@ -584,7 +584,7 @@ const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 8,
+      gap: theme.spacing[8],
     },
     dateBtnText: {
       fontFamily: theme.fontFamilies.sansMedium,
@@ -594,7 +594,7 @@ const createStyles = (theme: Theme) =>
     appearanceRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 16,
+      gap: theme.spacing[16],
     },
     appearanceBtn: {
       width: 72,
@@ -613,8 +613,8 @@ const createStyles = (theme: Theme) =>
     },
     colorScroll: {
       alignItems: 'center',
-      gap: 12,
-      paddingRight: 24,
+      gap: theme.spacing[12],
+      paddingRight: theme.layout.screenPadding,
     },
     colorCell: {
       width: 40,
@@ -634,7 +634,7 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.surface,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      padding: 16,
+      padding: theme.spacing[16],
       minHeight: 100,
     },
     noteInput: {
@@ -646,8 +646,8 @@ const createStyles = (theme: Theme) =>
     footer: {
       position: 'absolute',
       bottom: 34,
-      left: 24,
-      right: 24,
+      left: theme.layout.screenPadding,
+      right: theme.layout.screenPadding,
     },
     saveBtn: {
       height: 56,
@@ -667,8 +667,8 @@ const createStyles = (theme: Theme) =>
     },
     customFreqRow: {
       flexDirection: 'row',
-      gap: 12,
-      marginTop: 8,
+      gap: theme.spacing[12],
+      marginTop: theme.spacing[8],
       alignItems: 'center',
     },
     intervalUnitGrid: {
@@ -679,7 +679,7 @@ const createStyles = (theme: Theme) =>
     },
     unitBtn: {
       paddingHorizontal: 8,
-      paddingVertical: 6,
+      paddingVertical: theme.spacing[4],
       borderRadius: theme.radius.md,
       backgroundColor: theme.colors.surface,
       borderWidth: 1,

@@ -111,7 +111,7 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
     <SafeAreaView style={styles.container}>
       <Header 
         title="Places" 
-        subtitle="Manage locations & hotspots" 
+        
         showBack 
         rightAction={
           <TouchableOpacity onPress={handleCreate} style={styles.headerBtn}>
@@ -138,7 +138,7 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
           ListEmptyComponent={
             <EmptyState
               title="No places found"
-              subtitle="Add places to track your spending at specific locations."
+             
               icon="location-outline"
               actionLabel="Add first place"
               onAction={handleCreate}

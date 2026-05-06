@@ -473,7 +473,7 @@ export function TransactionsScreen() {
 
       <Header
         title="Transactions"
-        subtitle={`${transactions.length} records`}
+       
         showBack
         rightAction={(
           <View style={styles.headerActions}>

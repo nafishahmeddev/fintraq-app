@@ -1,155 +1,99 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Text } from 'react-native';
-import { usePeople, Person } from '../../people/api/people';
+import React, { useMemo } from 'react';
+import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { usePeople } from '../../people/api/people';
+import { useTransactions } from '../../transactions/hooks/transactions';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
-import { SectionHeader } from './SectionHeader';
-import { fromDbColor } from '../../../utils/format';
+import { useSettings } from '../../../providers/SettingsProvider';
+import { MoneyText } from '../../../components/ui/MoneyText';
 
 export const PeopleSummaryCard = React.memo(function PeopleSummaryCard() {
   const theme = useTheme();
+  const { colors } = theme;
+  const { profile } = useSettings();
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
-  const { data: people, isLoading } = usePeople();
+  const { data: people } = usePeople();
+  const { data: transactions } = useTransactions(200);
 
-  const hasPeople = people && people.length > 0;
-
-  if (isLoading) return null;
+  const summary = useMemo(() => {
+    if (!people || people.length === 0) return null;
+    const spent = (transactions ?? [])
+      .filter(tx => tx.type === 'DR' && tx.person && tx.account.currency === profile.defaultCurrency)
+      .reduce((s, tx) => s + tx.amount, 0);
+    return { count: people.length, spent };
+  }, [people, transactions, profile.defaultCurrency]);
 
   return (
-    <View style={styles.container}>
-      <SectionHeader 
-        title="CONTACTS" 
-        rightText={hasPeople ? "See all" : "New"} 
-        onPressRight={() => router.push(hasPeople ? '/people' : '/people/create')} 
-      />
-
-      {hasPeople ? (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {people.slice(0, 8).map((person: Person) => (
-            <TouchableOpacity
-              key={person.id}
-              style={styles.personItem}
-              onPress={() => router.push(`/people/details/${person.id}`)}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.avatar, { backgroundColor: fromDbColor(person.color) + '15' }]}>
-                <Ionicons name={(person.icon as any) || 'person-outline'} size={24} color={fromDbColor(person.color)} />
-              </View>
-              <Text style={styles.name} numberOfLines={1}>
-                {person.name.split(' ')[0]}
-              </Text>
-            </TouchableOpacity>
-          ))}
-          
-          <TouchableOpacity
-            style={styles.addBtn}
-            onPress={() => router.push('/people/create')}
-            activeOpacity={0.7}
-          >
-            <View style={styles.addIcon}>
-              <Ionicons name="add" size={24} color={theme.colors.textMuted} />
-            </View>
-            <Text style={styles.addText}>Add</Text>
-          </TouchableOpacity>
-        </ScrollView>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => router.push(summary ? '/people' : '/people/create')}
+      activeOpacity={0.7}
+    >
+      <Text style={styles.label}>People</Text>
+      {summary ? (
+        <>
+          <View style={styles.countRow}>
+            <Text style={styles.countNum}>{summary.count}</Text>
+            <Ionicons name="people-outline" size={16} color={colors.textMuted} />
+          </View>
+          <View style={styles.spendRow}>
+            <MoneyText amount={summary.spent} currency={profile.defaultCurrency} type="DR" style={styles.spend} weight="sansBold" />
+            <Text style={styles.spendLabel}>spent</Text>
+          </View>
+        </>
       ) : (
-        <TouchableOpacity 
-          style={styles.emptyCard} 
-          onPress={() => router.push('/people/create')}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.emptyText}>
-            Link transactions and loans to people to track balances.
-          </Text>
-          <Text style={styles.emptyAction}>
-            + Add Person
-          </Text>
-        </TouchableOpacity>
+        <Text style={styles.empty}>No contacts yet</Text>
       )}
-    </View>
+    </TouchableOpacity>
   );
 });
 
 const createStyles = (theme: Theme) => StyleSheet.create({
-  container: {
-    marginBottom: theme.spacing[24],
-  },
-  scrollContent: {
-    paddingLeft: theme.layout.screenPadding,
-    paddingRight: theme.layout.screenPadding - theme.spacing[16],
-    gap: theme.spacing[16],
-  },
-  personItem: {
-    alignItems: 'center',
-    width: 64,
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: theme.radius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: theme.spacing[8],
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  name: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 10,
-    color: theme.colors.text,
-    textAlign: 'center',
-  },
-  addBtn: {
-    alignItems: 'center',
-    width: 64,
-  },
-  addIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: theme.spacing[8],
-    backgroundColor: theme.colors.card,
-  },
-  addText: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 10,
-    color: theme.colors.textMuted,
-    textAlign: 'center',
-  },
-  emptyCard: {
-    marginHorizontal: theme.layout.screenPadding,
-    padding: theme.spacing[24],
+  card: {
+    flex: 1,
+    padding: theme.spacing[16],
     borderRadius: theme.radius.xl,
     backgroundColor: theme.colors.card,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
+    gap: theme.spacing[8],
   },
-  emptyText: {
-    fontFamily: theme.fontFamilies.sans,
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.textMuted,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  emptyAction: {
+  label: {
     fontFamily: theme.fontFamilies.sansBold,
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.primaryDark,
-    marginTop: theme.spacing[12],
+    fontSize: 10,
+    color: theme.colors.textMuted,
+    letterSpacing: 1,
+  },
+  countRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: theme.spacing[4],
+  },
+  countNum: {
+    fontFamily: theme.fontFamilies.heading,
+    fontSize: 28,
+    color: theme.colors.text,
+    letterSpacing: -0.5,
+  },
+  spendRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: theme.spacing[4],
+  },
+  spend: {
+    fontSize: 14,
+  },
+  spendLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
+  empty: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
   },
 });

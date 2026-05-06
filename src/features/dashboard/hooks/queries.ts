@@ -4,6 +4,7 @@ import * as api from '../api/dashboard';
 export const DASHBOARD_KEYS = {
   stats: (currency: string) => ['dashboard', 'stats', currency] as const,
   topCategories: (currency: string) => ['dashboard', 'top-categories', currency] as const,
+  monthlyComparison: (currency: string) => ['dashboard', 'monthly', currency] as const,
 };
 
 export const useDashboardStats = (currency: string) => {
@@ -18,6 +19,14 @@ export const useTopExpenseCategories = (currency: string) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.topCategories(currency),
     queryFn: () => api.getTopExpenseCategories(currency),
+    enabled: !!currency,
+  });
+};
+
+export const useMonthlyComparison = (currency: string) => {
+  return useQuery({
+    queryKey: DASHBOARD_KEYS.monthlyComparison(currency),
+    queryFn: () => api.getMonthlyComparison(currency),
     enabled: !!currency,
   });
 };

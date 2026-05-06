@@ -311,7 +311,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title={isEditMode ? 'Edit entry' : 'New entry'} subtitle="Record flow with precision" showBack />
+      <Header title={isEditMode ? 'Edit entry' : 'New entry'} showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={{ marginTop: 24, marginBottom: 16 }}>
@@ -343,7 +343,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
             accounts={accounts}
             selectedId={selectedAccountId}
             onSelect={setSelectedAccountId}
-            onAdd={() => router.push('/account/create')}
+            onAdd={() => router.push('/accounts/create')}
             label={type === 'TRANSFER' ? 'From Account' : 'Account'}
           />
 
@@ -354,7 +354,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
                   accounts={eligibleToAccounts}
                   selectedId={selectedToAccountId}
                   onSelect={setSelectedToAccountId}
-                  onAdd={() => router.push('/account/create')}
+                  onAdd={() => router.push('/accounts/create')}
                   label="To Account"
                 />
               ) : (
@@ -376,7 +376,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
             categories={filteredCategories}
             selectedId={selectedCategoryId}
             onSelect={setSelectedCategoryId}
-            onAdd={() => router.push('/category/create')}
+            onAdd={() => router.push('/categories/create')}
           />
 
           {type === 'DR' && manualBudgets.length > 0 && (
@@ -404,11 +404,11 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Person (optional)</Text>
             <TouchableOpacity 
-              style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: 16 }]} 
+              style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: theme.spacing[16] }]} 
               onPress={() => setShowPersonPicker(true)}
               activeOpacity={0.7}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing[8] }}>
                 <Ionicons name="person-outline" size={18} color={colors.primary} />
                 <Text style={styles.dateTimeText}>{selectedPersonId ? 'Selected' : 'Link person'}</Text>
               </View>
@@ -419,11 +419,11 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Place (optional)</Text>
             <TouchableOpacity 
-              style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: 16 }]} 
+              style={[styles.dateTimeBtn, { justifyContent: 'space-between', paddingHorizontal: theme.spacing[16] }]} 
               onPress={() => setShowPlacePicker(true)}
               activeOpacity={0.7}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing[8] }}>
                 <Ionicons name="location-outline" size={18} color={colors.primary} />
                 <Text style={styles.dateTimeText}>{selectedPlaceId ? 'Selected' : 'Link place'}</Text>
               </View>
@@ -507,7 +507,7 @@ const createStyles = (theme: Theme) =>
       gap: theme.spacing[16],
     },
     section: {
-      paddingHorizontal: 24,
+      paddingHorizontal: theme.layout.screenPadding,
       gap: theme.spacing[12],
     },
     sectionLabel: {
@@ -522,7 +522,7 @@ const createStyles = (theme: Theme) =>
     dateTimeBtn: {
       flex: 1,
       height: 52,
-      borderRadius: theme.radius['3xl'],
+      borderRadius: theme.radius.lg,
       backgroundColor: theme.colors.card,
       borderWidth: 1,
       borderColor: theme.colors.border,
@@ -537,7 +537,7 @@ const createStyles = (theme: Theme) =>
       color: theme.colors.text,
     },
     noteContainer: {
-      borderRadius: theme.radius['3xl'],
+      borderRadius: theme.radius.lg,
       backgroundColor: theme.colors.card,
       borderWidth: 1,
       borderColor: theme.colors.border,
@@ -553,8 +553,8 @@ const createStyles = (theme: Theme) =>
     footer: {
       position: 'absolute',
       bottom: 34,
-      left: 24,
-      right: 24,
+      left: theme.layout.screenPadding,
+      right: theme.layout.screenPadding,
     },
     saveBtn: {
       height: 56,
@@ -574,7 +574,7 @@ const createStyles = (theme: Theme) =>
     },
     disabledCard: {
       height: 52,
-      borderRadius: theme.radius['3xl'],
+      borderRadius: theme.radius.lg,
       backgroundColor: theme.colors.card,
       borderWidth: 1,
       borderColor: theme.colors.border,

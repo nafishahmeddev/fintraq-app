@@ -41,7 +41,7 @@ export const GoalDetailsScreen = React.memo(function GoalDetailsScreen() {
         <Header title="Error" showBack />
         <EmptyState
           title="Goal not found"
-          subtitle="The goal you're looking for doesn't exist."
+         
           icon="alert-circle-outline"
         />
       </SafeAreaView>
@@ -151,7 +151,7 @@ export const GoalDetailsScreen = React.memo(function GoalDetailsScreen() {
           !loadingTransactions ? (
             <EmptyState
               title="No contributions yet"
-              subtitle="Add transactions to this goal to track your savings progress."
+             
               icon="receipt-outline"
             />
           ) : null

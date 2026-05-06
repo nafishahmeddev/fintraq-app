@@ -303,7 +303,7 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
   return (
     <SafeAreaView style={styles.container}>
 
-      <Header title="Recurring" subtitle="Manage automatic entries" showBack />
+      <Header title="Recurring" showBack />
 
       <View style={styles.tabBar}>
         {(['ACTIVE', 'DUE', 'ARCHIVED'] as const).map((tab) => (

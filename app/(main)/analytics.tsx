@@ -4,13 +4,13 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header } from '../../../src/components/ui/Header';
-import { MoneyText } from '../../../src/components/ui/MoneyText';
-import { PremiumGuard } from '../../../src/components/ui/PremiumGuard';
-import { DEFAULT_CURRENCY } from '../../../src/constants/currency';
-import { useAccounts } from '../../../src/features/accounts/hooks/accounts';
-import { useTransactions } from '../../../src/features/transactions/hooks/transactions';
-import { Theme, useTheme } from '../../../src/providers/ThemeProvider';
+import { Header } from '../../src/components/ui/Header';
+import { MoneyText } from '../../src/components/ui/MoneyText';
+import { PremiumGuard } from '../../src/components/ui/PremiumGuard';
+import { DEFAULT_CURRENCY } from '../../src/constants/currency';
+import { useAccounts } from '../../src/features/accounts/hooks/accounts';
+import { useTransactions } from '../../src/features/transactions/hooks/transactions';
+import { Theme, useTheme } from '../../src/providers/ThemeProvider';
 
 const RANGE_OPTIONS = [
   { label: '7D', value: 7 },
@@ -190,7 +190,7 @@ const AnalyticsScreen = React.memo(function AnalyticsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Analytics" subtitle="Data-driven financial review" showBack />
+      <Header title="Analytics" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Controls */}

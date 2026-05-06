@@ -1,6 +1,8 @@
 import { CurrencyPickerModal } from '@/src/components/ui/CurrencyPickerModal';
 import { Header } from '@/src/components/ui/Header';
 import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
+import { Input } from '@/src/components/ui/Input';
+import { SectionLabel } from '@/src/components/ui/SectionLabel';
 import { ACCOUNT_COLORS } from '@/src/constants/picker';
 import { ACCOUNT_TYPES, AccountType } from '@/src/db/schema';
 import { useAccountById, useUpdateAccount } from '@/src/features/accounts/hooks/accounts';
@@ -17,9 +19,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -69,7 +70,7 @@ export default function AccountEditPage() {
     control,
     handleSubmit,
     reset,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = useForm<AccountFormValues>({
     mode: 'onChange',
     defaultValues: { name: '', holderName: '', accountNumber: '' },
@@ -84,18 +85,16 @@ export default function AccountEditPage() {
       });
       setCurrency(account.currency);
       setColorHex(`#${account.color.toString(16).padStart(6, '0').toUpperCase()}`);
-      const matchedIcon = account.icon ? `${account.icon}-outline` : 'wallet-outline';
-      setIconKey(matchedIcon);
+      setIconKey(account.icon ? `${account.icon}-outline` : 'wallet-outline');
       setAccountType(account.type);
     }
   }, [account, reset]);
 
   const handleSave = handleSubmit(async (data) => {
-    const accountNum = data.accountNumber.trim();
     const payload = {
       name: data.name.trim(),
       holderName: data.holderName.trim(),
-      accountNumber: accountNum || null,
+      accountNumber: data.accountNumber.trim() || null,
       type: accountType,
       currency,
       color: toDbColor(colorHex),
@@ -113,7 +112,7 @@ export default function AccountEditPage() {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
+        <View style={styles.center}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
@@ -122,40 +121,37 @@ export default function AccountEditPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Edit account" subtitle="Update your account details" showBack />
+      <Header title="Edit account" showBack />
 
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.formSection}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Account name</Text>
-            <View style={styles.card}>
-              <Controller
-                control={control}
-                name="name"
-                rules={{ required: 'Account name is required' }}
-                render={({ field }) => (
-                  <TextInput
-                    value={field.value}
-                    onChangeText={field.onChange}
-                    onBlur={field.onBlur}
-                    placeholder="e.g. Daily Spending"
-                    placeholderTextColor={colors.textMuted + '80'}
-                    style={styles.input}
-                    autoCapitalize="words"
-                    autoCorrect={false}
-                  />
-                )}
-              />
-            </View>
+        <View style={styles.formBody}>
+
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Account name" />
+            <Controller
+              control={control}
+              name="name"
+              rules={{ required: true }}
+              render={({ field }) => (
+                <Input
+                  value={field.value}
+                  onChangeText={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder="e.g. Daily Spending"
+                  autoCapitalize="words"
+                  autoCorrect={false}
+                />
+              )}
+            />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Account type</Text>
-            <View style={styles.typeGrid}>
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Account type" />
+            <View style={styles.chipGrid}>
               {ACCOUNT_TYPES.map((type: AccountType) => {
                 const isSelected = accountType === type;
                 return (
@@ -164,22 +160,16 @@ export default function AccountEditPage() {
                     activeOpacity={0.7}
                     onPress={() => setAccountType(type)}
                     style={[
-                      styles.typeCell,
+                      styles.chip,
                       isSelected && { backgroundColor: colorHex, borderColor: colorHex },
                     ]}
                   >
                     <Ionicons
                       name={ACCOUNT_TYPE_ICONS[type] as any}
-                      size={16}
+                      size={14}
                       color={isSelected ? colors.background : colors.text}
                     />
-                    <Text
-                      style={[
-                        styles.typeLabel,
-                        { color: isSelected ? colors.background : colors.text },
-                        isSelected && { fontFamily: theme.fontFamilies.sansBold }
-                      ]}
-                    >
+                    <Text style={[styles.chipText, { color: isSelected ? colors.background : colors.text }]}>
                       {ACCOUNT_TYPE_LABELS[type]}
                     </Text>
                   </TouchableOpacity>
@@ -188,98 +178,96 @@ export default function AccountEditPage() {
             </View>
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Visuals</Text>
-            <View style={styles.visualsRow}>
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Icon & currency" />
+            <View style={styles.row}>
               <TouchableOpacity
-                style={styles.visualBtn}
+                style={[styles.iconSelectorBtn, { flex: 1 }]}
                 onPress={() => setShowIconPicker(true)}
                 activeOpacity={0.7}
               >
-                <View style={[styles.iconBox, { backgroundColor: colorHex + '15' }]}>
-                  <Ionicons name={resolveIcon(iconKey, 'wallet-outline')} size={20} color={colorHex} />
+                <View style={[styles.iconPreview, { backgroundColor: colorHex + '15' }]}>
+                  <Ionicons name={resolveIcon(iconKey, 'wallet-outline')} size={18} color={colorHex} />
                 </View>
-                <Text style={styles.visualBtnText}>Icon</Text>
+                <Text style={styles.iconSelectorText}>
+                  {iconKey.replace('-outline', '').replace(/-/g, ' ')}
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.visualBtn}
+                style={[styles.iconSelectorBtn, { flex: 1 }]}
                 onPress={() => setShowCurrencyPicker(true)}
                 activeOpacity={0.7}
               >
-                <View style={styles.iconBox}>
+                <View style={styles.iconPreview}>
                   <Text style={styles.currencyInitial}>{currency}</Text>
                 </View>
-                <Text style={styles.visualBtnText}>Currency</Text>
+                <Text style={styles.iconSelectorText}>Currency</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Pick a color</Text>
-            <View style={styles.colorGrid}>
-              {ACCOUNT_COLORS.map((item: string) => (
-                <TouchableOpacity
-                  key={item}
-                  activeOpacity={0.7}
-                  onPress={() => setColorHex(item)}
-                  style={[
-                    styles.colorCell,
-                    { backgroundColor: item },
-                    colorHex === item && styles.colorCellActive,
-                  ]}
-                >
-                  {colorHex === item ? <Ionicons name="checkmark" size={16} color={colors.background} /> : null}
-                </TouchableOpacity>
-              ))}
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Color" />
+            <View style={styles.colorRow}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.colorWrap}>
+                {ACCOUNT_COLORS.map((item: string) => (
+                  <TouchableOpacity
+                    key={item}
+                    activeOpacity={0.8}
+                    onPress={() => setColorHex(item)}
+                    style={[
+                      styles.colorCell,
+                      { backgroundColor: item },
+                      colorHex === item && styles.colorCellActive,
+                    ]}
+                  >
+                    {colorHex === item ? <Ionicons name="checkmark" size={14} color="#000" /> : null}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </View>
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Extended details (optional)</Text>
-            <View style={styles.card}>
-              <Controller
-                control={control}
-                name="holderName"
-                render={({ field }) => (
-                  <TextInput
-                    value={field.value}
-                    onChangeText={field.onChange}
-                    onBlur={field.onBlur}
-                    placeholder="Holder Name"
-                    placeholderTextColor={colors.textMuted + '80'}
-                    style={[styles.input, styles.subInput]}
-                  />
-                )}
-              />
-              <View style={styles.divider} />
-              <Controller
-                control={control}
-                name="accountNumber"
-                render={({ field }) => (
-                  <TextInput
-                    value={field.value}
-                    onChangeText={field.onChange}
-                    onBlur={field.onBlur}
-                    placeholder="Account Number / IBAN"
-                    placeholderTextColor={colors.textMuted + '80'}
-                    style={[styles.input, styles.subInput]}
-                  />
-                )}
-              />
-            </View>
+          <View style={styles.section}>
+            <SectionLabel size="sm" text="Extended details (optional)" />
+            <Controller
+              control={control}
+              name="holderName"
+              render={({ field }) => (
+                <Input
+                  value={field.value}
+                  onChangeText={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder="Holder name"
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="accountNumber"
+              render={({ field }) => (
+                <Input
+                  value={field.value}
+                  onChangeText={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder="Account number / IBAN"
+                />
+              )}
+            />
           </View>
+
         </View>
       </ScrollView>
 
       <View style={styles.footer}>
         <TouchableOpacity
           activeOpacity={0.9}
-          style={[styles.primaryBtn, (!isValid || isPending) && styles.primaryBtnDisabled]}
+          style={[styles.saveBtn, (!isValid || isPending) && styles.saveBtnDisabled]}
           onPress={handleSave}
           disabled={!isValid || isPending}
         >
-          <Text style={styles.primaryBtnText}>
+          <Text style={styles.saveBtnText}>
             {isPending ? 'Saving...' : 'Save changes'}
           </Text>
         </TouchableOpacity>
@@ -297,7 +285,7 @@ export default function AccountEditPage() {
         onClose={() => setShowIconPicker(false)}
         selectedIcon={iconKey}
         onSelect={setIconKey}
-        title="Select Account Icon"
+        title="Account icon"
       />
     </SafeAreaView>
   );
@@ -309,125 +297,103 @@ const createStyles = (theme: Theme) =>
       flex: 1,
       backgroundColor: theme.colors.background,
     },
-    loadingContainer: {
+    center: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
     },
     content: {
-      paddingHorizontal: 24,
-      paddingTop: 24,
-      paddingBottom: 140,
+      paddingHorizontal: theme.layout.screenPadding,
+      paddingTop: theme.spacing[24],
+      paddingBottom: 120,
     },
-    formSection: {
+    formBody: {
       gap: theme.spacing[24],
     },
-    inputGroup: {
+    section: {
       gap: theme.spacing[12],
     },
-    label: {
-      fontFamily: theme.fontFamilies.sansMedium,
-      fontSize: 12,
-      color: theme.colors.textMuted,
+    row: {
+      flexDirection: 'row',
+      gap: theme.spacing[12],
     },
-    card: {
-      backgroundColor: theme.colors.card,
-      borderRadius: theme.radius['3xl'],
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      padding: theme.spacing[16],
-    },
-    input: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 16,
-      color: theme.colors.text,
-      paddingVertical: 0,
-    },
-    subInput: {
-      fontSize: 14,
-      fontFamily: theme.fontFamilies.sans,
-    },
-    divider: {
-      height: 1,
-      backgroundColor: theme.colors.border,
-      marginVertical: theme.spacing[12],
-    },
-    typeGrid: {
+    chipGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       gap: theme.spacing[8],
     },
-    typeCell: {
+    chip: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: theme.spacing[8],
-      paddingHorizontal: theme.spacing[12],
-      height: 40,
+      paddingHorizontal: theme.spacing[16],
+      paddingVertical: theme.spacing[8],
       borderRadius: theme.radius.full,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.surface,
     },
-    typeLabel: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      fontSize: 12,
+    chipText: {
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 13,
     },
-    visualsRow: {
-      flexDirection: 'row',
-      gap: theme.spacing[12],
-    },
-    visualBtn: {
-      flex: 1,
+    iconSelectorBtn: {
+      height: 48,
       flexDirection: 'row',
       alignItems: 'center',
       gap: theme.spacing[12],
-      padding: theme.spacing[12],
-      backgroundColor: theme.colors.card,
-      borderRadius: theme.radius['3xl'],
+      paddingHorizontal: theme.spacing[16],
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
       borderColor: theme.colors.border,
     },
-    iconBox: {
-      width: 40,
-      height: 40,
+    iconPreview: {
+      width: 32,
+      height: 32,
       borderRadius: theme.radius.full,
-      alignItems: 'center',
       justifyContent: 'center',
+      alignItems: 'center',
       backgroundColor: theme.colors.background,
     },
-    visualBtnText: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
+    iconSelectorText: {
+      flex: 1,
+      fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 14,
       color: theme.colors.text,
+      textTransform: 'capitalize',
     },
     currencyInitial: {
       fontFamily: theme.fontFamilies.sansBold,
-      fontSize: 14,
+      fontSize: 12,
       color: theme.colors.textMuted,
     },
-    colorGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: theme.spacing[12],
+    colorRow: {
+      marginHorizontal: -theme.layout.screenPadding,
+    },
+    colorWrap: {
+      paddingHorizontal: theme.layout.screenPadding,
     },
     colorCell: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      width: 44,
+      height: 44,
+      borderRadius: theme.radius.full,
       justifyContent: 'center',
       alignItems: 'center',
+      borderWidth: 2,
+      borderColor: 'transparent',
+      marginRight: theme.spacing[12],
     },
     colorCellActive: {
-      borderWidth: 2,
-      borderColor: theme.colors.primary,
+      borderColor: theme.colors.text,
     },
     footer: {
       position: 'absolute',
       bottom: 34,
-      left: 24,
-      right: 24,
+      left: theme.layout.screenPadding,
+      right: theme.layout.screenPadding,
     },
-    primaryBtn: {
+    saveBtn: {
       height: 56,
       borderRadius: theme.radius.full,
       backgroundColor: theme.colors.primary,
@@ -435,10 +401,10 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       ...theme.shadow.md,
     },
-    primaryBtnDisabled: {
+    saveBtnDisabled: {
       opacity: 0.5,
     },
-    primaryBtnText: {
+    saveBtnText: {
       fontFamily: theme.fontFamilies.sansBold,
       fontSize: 16,
       color: theme.colors.onPrimary,

@@ -137,7 +137,7 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
     <SafeAreaView style={styles.container}>
       <Header 
         title="Goals" 
-        subtitle="Save for what matters" 
+        
         showBack 
         rightAction={
           <TouchableOpacity onPress={handleCreate} style={styles.headerBtn}>
@@ -160,7 +160,7 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
           ListEmptyComponent={
             <EmptyState
               title="No goals yet"
-              subtitle="Set a savings target and track your progress here."
+             
               icon="flag-outline"
               actionLabel="Create first goal"
               onAction={handleCreate}

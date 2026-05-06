@@ -1,183 +1,108 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import { useLoansProgress } from '../../loans/api/loans';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { SectionHeader } from './SectionHeader';
-import { formatCurrency } from '../../../utils/format';
+import { MoneyText } from '../../../components/ui/MoneyText';
 
 export const LoansSummaryCard = React.memo(function LoansSummaryCard() {
   const theme = useTheme();
+  const { colors } = theme;
   const { profile } = useSettings();
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
-  const { data: progressData, isLoading } = useLoansProgress();
+  const { data: progressData } = useLoansProgress();
 
-  if (isLoading) {
-    return null;
-  }
-
-  const hasLoans = progressData && progressData.length > 0;
+  const summary = useMemo(() => {
+    if (!progressData || progressData.length === 0) return null;
+    const borrows = progressData.filter(l => l.type === 'BORROW');
+    const lends = progressData.filter(l => l.type === 'LEND');
+    const balance = progressData.reduce((s, l) => s + l.remaining, 0);
+    return { total: progressData.length, borrows: borrows.length, lends: lends.length, balance };
+  }, [progressData]);
 
   return (
-    <View style={styles.container}>
-      <SectionHeader 
-        title="LOANS" 
-        rightText={hasLoans ? "See all" : "New"} 
-        onPressRight={() => router.push(hasLoans ? '/loans' : '/loans/create')} 
-      />
-
-      {hasLoans ? (
-        <View style={styles.card}>
-          {([...progressData]
-            .sort((a, b) => b.remaining - a.remaining)
-            .slice(0, 2)).map((loan, index, arr) => {
-            const statusColor = loan.type === 'BORROW' ? theme.colors.danger : theme.colors.success;
-
-            return (
-              <View
-                key={loan.loanId}
-                style={[styles.loanItem, index < arr.length - 1 && styles.borderBottom]}
-              >
-                <TouchableOpacity
-                  onPress={() => router.push(`/loans/details/${loan.loanId}`)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.loanHeader}>
-                    <View style={styles.loanInfo}>
-                      <Text style={styles.loanName} numberOfLines={1}>
-                        {loan.name}
-                      </Text>
-                      <Text style={[styles.loanType, { color: statusColor }]}>{loan.type}</Text>
-                    </View>
-                    <Text style={styles.loanAmount}>
-                      {formatCurrency(loan.remaining, profile.defaultCurrency)}{' '}
-                      <Text style={styles.amountLabel}>left</Text>
-                    </Text>
-                  </View>
-
-                  <View style={styles.progressBar}>
-                    <View 
-                      style={[
-                        styles.progressFill, 
-                        { 
-                          width: `${Math.min(loan.percentage, 100)}%`, 
-                          backgroundColor: statusColor 
-                        }
-                      ]} 
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
-        </View>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => router.push(summary ? '/loans' : '/loans/create')}
+      activeOpacity={0.7}
+    >
+      <Text style={styles.label}>Loans</Text>
+      {summary ? (
+        <>
+          <View style={styles.countsRow}>
+            <View style={styles.countBlock}>
+              <Text style={[styles.countNum, { color: colors.danger }]}>{summary.borrows}</Text>
+              <Text style={styles.countLabel}>Borrowing</Text>
+            </View>
+            <View style={styles.countBlock}>
+              <Text style={[styles.countNum, { color: colors.success }]}>{summary.lends}</Text>
+              <Text style={styles.countLabel}>Lending</Text>
+            </View>
+          </View>
+          <View style={styles.balanceRow}>
+            <MoneyText amount={summary.balance} currency={profile.defaultCurrency} type="DR" style={styles.balance} weight="sansBold" />
+            <Text style={styles.balanceLabel}>outstanding</Text>
+          </View>
+        </>
       ) : (
-        <TouchableOpacity 
-          style={styles.emptyCard} 
-          onPress={() => router.push('/loans/create')}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.emptyText}>
-            Keep track of money you owe or are owed by others.
-          </Text>
-          <Text style={styles.emptyAction}>
-            + Create Loan
-          </Text>
-        </TouchableOpacity>
+        <Text style={styles.empty}>No active loans</Text>
       )}
-    </View>
+    </TouchableOpacity>
   );
 });
 
 const createStyles = (theme: Theme) => StyleSheet.create({
-  container: {
-    marginBottom: theme.spacing[24],
-  },
   card: {
-    marginHorizontal: theme.layout.screenPadding,
+    flex: 1,
     padding: theme.spacing[16],
     borderRadius: theme.radius.xl,
     backgroundColor: theme.colors.card,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    ...theme.shadow.xs,
+    gap: theme.spacing[8],
   },
-  loanItem: {
-    paddingVertical: theme.spacing[4],
-  },
-  borderBottom: {
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-    borderStyle: 'dashed',
-    marginBottom: theme.spacing[12],
-    paddingBottom: theme.spacing[12],
-  },
-  loanHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing[12],
-  },
-  loanInfo: {
-    flex: 1,
-  },
-  loanName: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: theme.fontSizes.md,
-    color: theme.colors.text,
-  },
-  loanType: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 9,
+  label: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 10,
+    color: theme.colors.textMuted,
     letterSpacing: 1,
-    marginTop: 2,
-    textTransform: 'uppercase',
   },
-  loanAmount: {
-    fontFamily: theme.fontFamilies.monoBold,
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.text,
+  countsRow: {
+    flexDirection: 'row',
+    gap: theme.spacing[16],
   },
-  amountLabel: {
+  countBlock: {
+    gap: 2,
+  },
+  countNum: {
+    fontFamily: theme.fontFamilies.heading,
+    fontSize: 28,
+    letterSpacing: -0.5,
+  },
+  countLabel: {
     fontFamily: theme.fontFamilies.sans,
     fontSize: 10,
     color: theme.colors.textMuted,
   },
-  progressBar: {
-    height: 6,
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.radius.full,
-    overflow: 'hidden',
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: theme.spacing[4],
   },
-  progressFill: {
-    height: '100%',
-    borderRadius: theme.radius.full,
+  balance: {
+    fontSize: 14,
   },
-  emptyCard: {
-    marginHorizontal: theme.layout.screenPadding,
-    padding: theme.spacing[24],
-    borderRadius: theme.radius.xl,
-    backgroundColor: theme.colors.card,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
+  balanceLabel: {
     fontFamily: theme.fontFamilies.sans,
-    fontSize: theme.fontSizes.sm,
+    fontSize: 11,
     color: theme.colors.textMuted,
-    textAlign: 'center',
-    lineHeight: 20,
   },
-  emptyAction: {
-    fontFamily: theme.fontFamilies.sansBold,
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.primaryDark,
-    marginTop: theme.spacing[12],
+  empty: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
   },
 });

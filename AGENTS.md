@@ -83,8 +83,8 @@ Use `@/` prefix for imports: `import { useTheme } from '@/src/providers/ThemePro
 ### 6. Form Pages Pattern
 
 Account and Category forms are now **page-based** (not modals):
-- Navigate with `router.push('/account/create')` or `router.push('/category/create')`
-- Edit pages use `[id]` dynamic route: `router.push(`/account/edit/${id}`)`
+- Navigate with `router.push('/accounts/create')` or `router.push('/categories/create')`
+- Edit pages use `[id]` dynamic route: `router.push(`/accounts/edit/${id}`)`
 - Icon selection uses `IconPickerDialog` component with grouped icons
 
 ## Design System
@@ -307,10 +307,10 @@ import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
 
 ### Navigation to Form Pages
 ```typescript
-router.push('/account/create');
-router.push(`/account/edit/${accountId}`);
-router.push('/category/create');
-router.push(`/category/edit/${categoryId}`);
+router.push('/accounts/create');
+router.push(`/accounts/edit/${accountId}`);
+router.push('/categories/create');
+router.push(`/categories/edit/${categoryId}`);
 ```
 
 ### Premium Route Gating

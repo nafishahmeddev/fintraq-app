@@ -111,7 +111,7 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
     <SafeAreaView style={styles.container}>
       <Header 
         title="People" 
-        subtitle="Manage contacts & relationships" 
+        
         showBack 
         rightAction={
           <TouchableOpacity onPress={handleCreate} style={styles.headerBtn}>
@@ -138,7 +138,7 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
           ListEmptyComponent={
             <EmptyState
               title="No contacts found"
-              subtitle="Add people to track money lent or borrowed from them."
+             
               icon="people-outline"
               actionLabel="Add first person"
               onAction={handleCreate}

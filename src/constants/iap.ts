@@ -20,6 +20,5 @@ export const FEATURES: ProFeature[] = [
   { icon: 'infinite', title: 'Absolute Runway', description: 'Real-time calculation of exactly how long your capital will last.' },
   { icon: 'trending-up', title: 'Burn Analytics', description: 'Identify spending velocity and anomalies before they become a problem.' },
   { icon: 'git-compare', title: 'Performance Deltas', description: 'Objective growth and burn metrics: current vs. previous period.' },
-  { icon: 'cloud-outline', title: 'Backup & Restore', description: 'Export your full data to a file and restore it on any device.' },
-  { icon: 'download-outline', title: 'CSV Export', description: 'Export transactions as a spreadsheet for accounting or analysis.' },
+
 ];

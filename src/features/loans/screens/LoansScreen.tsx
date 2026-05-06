@@ -139,7 +139,7 @@ export const LoansScreen = React.memo(function LoansScreen() {
     <SafeAreaView style={styles.container}>
       <Header 
         title="Loans" 
-        subtitle="Manage debts & receivables" 
+        
         showBack 
         rightAction={
           <TouchableOpacity onPress={handleCreate} style={styles.headerBtn}>
@@ -162,7 +162,7 @@ export const LoansScreen = React.memo(function LoansScreen() {
           ListEmptyComponent={
             <EmptyState
               title="No loans found"
-              subtitle="Keep track of money you've lent or borrowed."
+             
               icon="cash-outline"
               actionLabel="Add first loan"
               onAction={handleCreate}

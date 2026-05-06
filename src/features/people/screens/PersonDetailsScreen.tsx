@@ -145,7 +145,7 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
         <Header title="Person not found" showBack />
         <EmptyState
           title="Not found"
-          subtitle="This person could not be found."
+         
           icon="alert-circle-outline"
         />
       </SafeAreaView>
@@ -170,7 +170,7 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
           !loadingTransactions ? (
             <EmptyState
               title="No transactions"
-              subtitle="No transactions linked to this person."
+             
               icon="receipt-outline"
             />
           ) : null
