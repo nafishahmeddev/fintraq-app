@@ -288,7 +288,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   loanTypeBadge: {
     paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius.full,
   },
   loanTypeText: {
     fontFamily: theme.fontFamilies.sansBold,

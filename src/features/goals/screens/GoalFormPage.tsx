@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, IconPickerDialog, Input, SectionLabel } from '../../../components/ui';
+import { Chip, Header, IconPickerDialog, Input, SectionLabel } from '../../../components/ui';
 import { CATEGORY_COLORS } from '../../../constants/picker';
 import { GoalStatus } from '../../../db/schema';
 import { useSettings } from '../../../providers/SettingsProvider';
@@ -158,21 +158,19 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
             <SectionLabel size="sm" text="Linked account" />
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {accountsList?.map((account) => (
-                <TouchableOpacity
+                <Chip
                   key={account.id}
-                  style={[
-                    styles.chip,
-                    accountId === account.id && { backgroundColor: colors.text, borderColor: colors.text },
-                  ]}
+                  label={account.name}
+                  selected={accountId === account.id}
                   onPress={() => {
                     setAccountId(account.id);
                     setCurrency(account.currency);
                   }}
-                >
-                  <Text style={[styles.chipText, { color: accountId === account.id ? colors.background : colors.text }]}>
-                    {account.name}
-                  </Text>
-                </TouchableOpacity>
+                  style={{
+                    marginRight: 8,
+                    ...(accountId === account.id ? { backgroundColor: colors.text, borderColor: colors.text } : {}),
+                  }}
+                />
               ))}
             </ScrollView>
           </View>
@@ -245,18 +243,13 @@ export const GoalFormPage = React.memo(function GoalFormPage({ mode, goalId }: P
               <SectionLabel size="sm" text="Status" />
               <View style={styles.chipRow}>
                 {(['ACTIVE', 'PAUSED', 'REACHED'] as GoalStatus[]).map((s) => (
-                  <TouchableOpacity
+                  <Chip
                     key={s}
-                    style={[
-                      styles.chip,
-                      status === s && { backgroundColor: colors.text, borderColor: colors.text },
-                    ]}
+                    label={s}
+                    selected={status === s}
                     onPress={() => setStatus(s)}
-                  >
-                    <Text style={[styles.chipText, { color: status === s ? colors.background : colors.textMuted }]}>
-                      {s}
-                    </Text>
-                  </TouchableOpacity>
+                    style={status === s ? { backgroundColor: colors.text, borderColor: colors.text } : undefined}
+                  />
                 ))}
               </View>
             </View>
@@ -351,19 +344,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     fontSize: 28,
     fontFamily: theme.fontFamilies.sansBold,
-  },
-  chip: {
-    paddingHorizontal: theme.spacing[16],
-    paddingVertical: theme.spacing[8],
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginRight: theme.spacing[8],
-    backgroundColor: theme.colors.surface,
-  },
-  chipText: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 13,
   },
   chipRow: {
     flexDirection: 'row',

@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, IconPickerDialog, Input, PersonPickerDialog, SectionLabel } from '../../../components/ui';
+import { Chip, Header, IconPickerDialog, Input, PersonPickerDialog, SectionLabel } from '../../../components/ui';
 import { CATEGORY_COLORS } from '../../../constants/picker';
 import { LoanStatus, LoanType } from '../../../db/schema';
 import { useSettings } from '../../../providers/SettingsProvider';
@@ -165,21 +165,14 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
             <SectionLabel size="sm" text="Loan type" />
             <View style={styles.chipRow}>
               {(['BORROW', 'LEND'] as LoanType[]).map((t) => (
-                <TouchableOpacity
+                <Chip
                   key={t}
-                  style={[
-                    styles.typeChip,
-                    loanType === t && {
-                      backgroundColor: t === 'BORROW' ? colors.danger : colors.success,
-                      borderColor: 'transparent',
-                    },
-                  ]}
+                  label={t === 'BORROW' ? 'Borrowing' : 'Lending'}
+                  selected={loanType === t}
+                  variant={t === 'BORROW' ? 'danger' : 'success'}
                   onPress={() => setLoanType(t)}
-                >
-                  <Text style={[styles.typeChipText, { color: loanType === t ? '#FFF' : colors.textMuted }]}>
-                    {t === 'BORROW' ? 'Borrowing' : 'Lending'}
-                  </Text>
-                </TouchableOpacity>
+                  style={{ flex: 1 }}
+                />
               ))}
             </View>
           </View>
@@ -188,21 +181,19 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
             <SectionLabel size="sm" text="Linked account" />
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {accountsList?.map((account) => (
-                <TouchableOpacity
+                <Chip
                   key={account.id}
-                  style={[
-                    styles.chip,
-                    accountId === account.id && { backgroundColor: colors.text, borderColor: colors.text },
-                  ]}
+                  label={account.name}
+                  selected={accountId === account.id}
                   onPress={() => {
                     setAccountId(account.id);
                     setCurrency(account.currency);
                   }}
-                >
-                  <Text style={[styles.chipText, { color: accountId === account.id ? colors.background : colors.text }]}>
-                    {account.name}
-                  </Text>
-                </TouchableOpacity>
+                  style={{
+                    marginRight: 8,
+                    ...(accountId === account.id ? { backgroundColor: colors.text, borderColor: colors.text } : {}),
+                  }}
+                />
               ))}
             </ScrollView>
           </View>
@@ -290,18 +281,13 @@ export const LoanFormPage = React.memo(function LoanFormPage({ mode, loanId }: P
               <SectionLabel size="sm" text="Status" />
               <View style={styles.chipRow}>
                 {(['ACTIVE', 'PAID', 'OVERDUE'] as LoanStatus[]).map((s) => (
-                  <TouchableOpacity
+                  <Chip
                     key={s}
-                    style={[
-                      styles.chip,
-                      status === s && { backgroundColor: colors.text, borderColor: colors.text },
-                    ]}
+                    label={s}
+                    selected={status === s}
                     onPress={() => setStatus(s)}
-                  >
-                    <Text style={[styles.chipText, { color: status === s ? colors.background : colors.textMuted }]}>
-                      {s}
-                    </Text>
-                  </TouchableOpacity>
+                    style={status === s ? { backgroundColor: colors.text, borderColor: colors.text } : undefined}
+                  />
                 ))}
               </View>
             </View>
@@ -408,33 +394,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   chipRow: {
     flexDirection: 'row',
     gap: theme.spacing[8],
-  },
-  chip: {
-    paddingHorizontal: theme.spacing[16],
-    paddingVertical: theme.spacing[8],
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginRight: theme.spacing[8],
-    backgroundColor: theme.colors.surface,
-  },
-  chipText: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 13,
-  },
-  typeChip: {
-    flex: 1,
-    height: 44,
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-  },
-  typeChipText: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 13,
   },
   dateBtn: {
     height: 40,

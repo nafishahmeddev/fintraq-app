@@ -1,3 +1,4 @@
+import { Chip } from '../../../components/ui/Chip';
 import { Header } from '../../../components/ui/Header';
 import { IconPickerDialog } from '../../../components/ui/IconPickerDialog';
 import { Input } from '../../../components/ui/Input';
@@ -146,24 +147,14 @@ export const CategoryFormPage = React.memo(function CategoryFormPage({ mode, cat
             <View style={styles.section}>
               <SectionLabel size="sm" text="Type" />
               <View style={styles.chipRow}>
-                {CATEGORY_TYPES.map((catType) => {
-                  const isSelected = type === catType.value;
-                  return (
-                    <TouchableOpacity
-                      key={catType.value}
-                      activeOpacity={0.7}
-                      onPress={() => setType(catType.value)}
-                      style={[
-                        styles.chip,
-                        isSelected && { backgroundColor: colors.primary, borderColor: colors.primary },
-                      ]}
-                    >
-                      <Text style={[styles.chipText, { color: isSelected ? colors.onPrimary : colors.text }]}>
-                        {catType.label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
+                {CATEGORY_TYPES.map((catType) => (
+                  <Chip
+                    key={catType.value}
+                    label={catType.label}
+                    selected={type === catType.value}
+                    onPress={() => setType(catType.value)}
+                  />
+                ))}
               </View>
             </View>
           )}
@@ -255,18 +246,6 @@ const createStyles = (theme: Theme) =>
     chipRow: {
       flexDirection: 'row',
       gap: theme.spacing[8],
-    },
-    chip: {
-      paddingHorizontal: theme.spacing[16],
-      paddingVertical: theme.spacing[8],
-      borderRadius: theme.radius.full,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      backgroundColor: theme.colors.surface,
-    },
-    chipText: {
-      fontFamily: theme.fontFamilies.sansMedium,
-      fontSize: 13,
     },
     iconSelectorBtn: {
       height: 48,

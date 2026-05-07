@@ -1,3 +1,4 @@
+import { Chip } from '../../../components/ui/Chip';
 import { CurrencyPickerModal } from '../../../components/ui/CurrencyPickerModal';
 import { Header } from '../../../components/ui/Header';
 import { IconPickerDialog } from '../../../components/ui/IconPickerDialog';
@@ -176,24 +177,14 @@ export const AccountFormPage = React.memo(function AccountFormPage({ mode, accou
               {ACCOUNT_TYPES.map((type: AccountType) => {
                 const isSelected = accountType === type;
                 return (
-                  <TouchableOpacity
+                  <Chip
                     key={type}
-                    activeOpacity={0.7}
+                    label={ACCOUNT_TYPE_LABELS[type]}
+                    icon={ACCOUNT_TYPE_ICONS[type]}
+                    selected={isSelected}
                     onPress={() => setAccountType(type)}
-                    style={[
-                      styles.chip,
-                      isSelected && { backgroundColor: colorHex, borderColor: colorHex },
-                    ]}
-                  >
-                    <Ionicons
-                      name={ACCOUNT_TYPE_ICONS[type]}
-                      size={14}
-                      color={isSelected ? colors.background : colors.text}
-                    />
-                    <Text style={[styles.chipText, { color: isSelected ? colors.background : colors.text }]}>
-                      {ACCOUNT_TYPE_LABELS[type]}
-                    </Text>
-                  </TouchableOpacity>
+                    style={isSelected ? { backgroundColor: colorHex, borderColor: colorHex } : undefined}
+                  />
                 );
               })}
             </View>
@@ -378,22 +369,6 @@ const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       flexWrap: 'wrap',
       gap: theme.spacing[8],
-    },
-    chip: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: theme.spacing[8],
-      height: 40,
-      paddingHorizontal: theme.spacing[16],
-      paddingVertical: theme.spacing[8],
-      borderRadius: theme.radius.md,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      backgroundColor: theme.colors.surface,
-    },
-    chipText: {
-      fontFamily: theme.fontFamilies.sansMedium,
-      fontSize: 13,
     },
     balanceRow: {
       flexDirection: 'row',

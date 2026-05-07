@@ -100,7 +100,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   typeBadge: {
     height: 22,
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius.full,
     paddingHorizontal: 8,
     justifyContent: 'center',
     alignItems: 'center',

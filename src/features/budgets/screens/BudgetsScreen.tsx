@@ -238,7 +238,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     backgroundColor: theme.colors.primarySubtle,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius.full,
   },
   rollingBadgeText: {
     fontFamily: theme.fontFamilies.sansBold,

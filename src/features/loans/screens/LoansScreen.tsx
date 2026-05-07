@@ -230,7 +230,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     alignSelf: 'flex-start',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius.full,
   },
   typeBadgeText: {
     fontFamily: theme.fontFamilies.sansBold,
