@@ -12,11 +12,116 @@ import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { formatCurrency } from '../../../utils/format';
 import { useBudgets, useBudgetsProgress, useDeleteBudget } from '../api/budgets';
+import { BudgetProgress } from '../services/budgetQueries';
 
-export const BudgetsScreen = React.memo(function BudgetsScreen() {
+type BudgetRow = typeof budgets.$inferSelect & { progress?: BudgetProgress };
+
+function statusOf(pct: number): { label: string; color: (c: ReturnType<typeof useTheme>['colors']) => string } {
+  if (pct >= 100) return { label: 'Exceeded', color: (c) => c.danger };
+  if (pct >= 80) return { label: 'Caution', color: (c) => c.warning };
+  return { label: 'On track', color: (c) => c.success };
+}
+
+// ─── Card ────────────────────────────────────────────────────────────────────
+const BudgetCard = React.memo(function BudgetCard({
+  item,
+  onPress,
+  onLongPress,
+}: {
+  item: BudgetRow;
+  onPress: () => void;
+  onLongPress: () => void;
+}) {
   const theme = useTheme();
   const { colors } = theme;
   const { profile } = useSettings();
+  const styles = useMemo(() => createCardStyles(theme), [theme]);
+
+  const p = item.progress;
+  const spent = p?.spent ?? 0;
+  const total = p?.total ?? item.amount;
+  const remaining = p?.remaining ?? Math.max(0, total - spent);
+  const pct = Math.min(p?.percentage ?? 0, 100);
+  const rawPct = p?.percentage ?? 0;
+  const adjustment = p?.adjustment ?? 0;
+
+  const status = statusOf(rawPct);
+  const statusColor = status.color(colors);
+
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={280}
+      activeOpacity={0.82}
+    >
+      {/* Left accent bar */}
+      <View style={[styles.accentBar, { backgroundColor: statusColor }]} />
+
+      <View style={styles.inner}>
+        {/* Row 1: name + status */}
+        <View style={styles.topRow}>
+          <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+          <View style={[styles.statusPill, { backgroundColor: statusColor + '18' }]}>
+            <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+            <Text style={[styles.statusLabel, { color: statusColor }]}>{status.label}</Text>
+          </View>
+        </View>
+
+        {/* Row 2: meta */}
+        <View style={styles.metaRow}>
+          <Text style={styles.meta}>
+            {item.period.charAt(0) + item.period.slice(1).toLowerCase()} · {item.mode.charAt(0) + item.mode.slice(1).toLowerCase()}
+          </Text>
+          {item.isRolling && (
+            <View style={styles.rollingChip}>
+              <Ionicons name="repeat" size={10} color={colors.primary} />
+              <Text style={styles.rollingChipText}>Rolling</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Remaining amount */}
+        <View style={styles.amountBlock}>
+          <MoneyText
+            amount={remaining}
+            currency={profile.defaultCurrency}
+            weight="sansBold"
+            style={styles.remainingAmount}
+          />
+          <Text style={styles.remainingLabel}>remaining</Text>
+        </View>
+
+        {/* Progress bar */}
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: statusColor }]} />
+        </View>
+
+        {/* Spent + pct row */}
+        <View style={styles.progressMeta}>
+          <Text style={styles.spentText}>
+            {formatCurrency(spent, profile.defaultCurrency)} spent
+          </Text>
+          <Text style={[styles.pctText, { color: statusColor }]}>
+            {Math.round(rawPct)}% of {formatCurrency(total, profile.defaultCurrency)}
+          </Text>
+        </View>
+
+        {adjustment !== 0 && (
+          <Text style={[styles.adjustText, { color: adjustment > 0 ? colors.success : colors.danger }]}>
+            {adjustment > 0 ? '+' : ''}{formatCurrency(adjustment, profile.defaultCurrency)} carried forward
+          </Text>
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+});
+
+// ─── Screen ──────────────────────────────────────────────────────────────────
+export const BudgetsScreen = React.memo(function BudgetsScreen() {
+  const theme = useTheme();
+  const { colors } = theme;
   const styles = useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
 
@@ -28,9 +133,15 @@ export const BudgetsScreen = React.memo(function BudgetsScreen() {
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const handleCreate = useCallback(() => {
-    router.push('/budgets/create');
-  }, [router]);
+  const mergedData = useMemo<BudgetRow[]>(() => {
+    if (!budgetsData) return [];
+    return budgetsData.map((b) => ({
+      ...b,
+      progress: progressData?.find((p) => p.budgetId === b.id),
+    }));
+  }, [budgetsData, progressData]);
+
+  const handleCreate = useCallback(() => router.push('/budgets/create'), [router]);
 
   const manageOptions = useMemo(() => {
     if (!selectedItem) return [];
@@ -57,69 +168,18 @@ export const BudgetsScreen = React.memo(function BudgetsScreen() {
     ];
   }, [selectedItem, router]);
 
-  const renderItem = useCallback(({ item }: { item: typeof budgets.$inferSelect }) => {
-    const progress = progressData?.find((p) => p.budgetId === item.id);
-    const spent = progress?.spent || 0;
-    const total = progress?.total || item.amount;
-    const remaining = progress?.remaining || Math.max(0, total - spent);
-    const percentage = Math.min(progress?.percentage || 0, 100);
-    const adjustment = progress?.adjustment || 0;
+  const renderItem = useCallback(({ item }: { item: BudgetRow }) => (
+    <BudgetCard
+      item={item}
+      onPress={() => router.push(`/budgets/details/${item.id}`)}
+      onLongPress={() => {
+        setSelectedItem(item);
+        setShowManageDialog(true);
+      }}
+    />
+  ), [router]);
 
-    const isExceeded = percentage >= 100;
-    const isWarning = percentage >= 80 && !isExceeded;
-    const statusColor = isExceeded ? colors.danger : isWarning ? colors.warning : colors.primary;
-
-    return (
-      <TouchableOpacity
-        style={styles.card}
-        activeOpacity={0.8}
-        onLongPress={() => {
-          setSelectedItem(item);
-          setShowManageDialog(true);
-        }}
-        onPress={() => router.push(`/budgets/details/${item.id}`)}
-      >
-        <View style={styles.cardHeader}>
-          <View style={styles.cardInfo}>
-            <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
-            <View style={styles.badgeRow}>
-              <Text style={styles.cardMeta}>{item.period.toLowerCase()} · {item.mode.toLowerCase()}</Text>
-              {item.isRolling && (
-                <View style={styles.rollingBadge}>
-                  <Ionicons name="repeat" size={10} color={colors.primary} />
-                  <Text style={styles.rollingBadgeText}>Rolling</Text>
-                </View>
-              )}
-            </View>
-          </View>
-          <View style={styles.cardRight}>
-            <MoneyText
-              amount={remaining}
-              currency={profile.defaultCurrency}
-              weight="sansBold"
-              style={styles.cardAmount}
-            />
-            <Text style={styles.cardSubLabel}>left</Text>
-          </View>
-        </View>
-
-        <View style={styles.progressRow}>
-          <Text style={styles.progressLabel}>Spent {formatCurrency(spent, profile.defaultCurrency)}</Text>
-          <Text style={styles.progressLabel}>{formatCurrency(total, profile.defaultCurrency)}</Text>
-        </View>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${percentage}%`, backgroundColor: statusColor }]} />
-        </View>
-        {adjustment !== 0 && (
-          <Text style={[styles.adjustmentText, { color: adjustment > 0 ? colors.success : colors.danger }]}>
-            {adjustment > 0 ? '+' : ''}{formatCurrency(adjustment, profile.defaultCurrency)} carried forward
-          </Text>
-        )}
-      </TouchableOpacity>
-    );
-  }, [colors, profile.defaultCurrency, styles, progressData, router]);
-
-  const keyExtractor = useCallback((item: typeof budgets.$inferSelect) => item.id.toString(), []);
+  const keyExtractor = useCallback((item: BudgetRow) => item.id.toString(), []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -139,14 +199,14 @@ export const BudgetsScreen = React.memo(function BudgetsScreen() {
         </View>
       ) : (
         <FlatList
-          data={budgetsData}
+          data={mergedData}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="pie-chart-outline" size={32} color={colors.textMuted} />
+            <View style={styles.empty}>
+              <Ionicons name="pie-chart-outline" size={36} color={colors.textMuted} />
               <Text style={styles.emptyTitle}>No budgets yet</Text>
               <Text style={styles.emptyText}>Set spending limits to stay on track.</Text>
               <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate} activeOpacity={0.8}>
@@ -184,6 +244,125 @@ export const BudgetsScreen = React.memo(function BudgetsScreen() {
   );
 });
 
+// ─── Styles ──────────────────────────────────────────────────────────────────
+const createCardStyles = (theme: Theme) => StyleSheet.create({
+  card: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    overflow: 'hidden',
+  },
+  accentBar: {
+    width: 4,
+  },
+  inner: {
+    flex: 1,
+    padding: theme.spacing[20],
+    gap: theme.spacing[8],
+  },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 2,
+  },
+  name: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+    letterSpacing: -0.3,
+    flex: 1,
+    marginRight: theme.spacing[8],
+  },
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: theme.radius.full,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: theme.radius.full,
+  },
+  statusLabel: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 10,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[8],
+    marginBottom: theme.spacing[4],
+  },
+  meta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  rollingChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: theme.colors.primarySubtle,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: theme.radius.full,
+  },
+  rollingChipText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 9,
+    color: theme.colors.primary,
+  },
+  amountBlock: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: theme.spacing[8],
+    marginTop: theme.spacing[4],
+    marginBottom: theme.spacing[4],
+  },
+  remainingAmount: {
+    fontSize: 28,
+    letterSpacing: -0.8,
+  },
+  remainingLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 13,
+    color: theme.colors.textMuted,
+  },
+  progressTrack: {
+    height: 6,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.overlay,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: theme.radius.full,
+  },
+  progressMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  spentText: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  pctText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 12,
+  },
+  adjustText: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
+    textAlign: 'right',
+  },
+});
+
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
@@ -200,92 +379,8 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     paddingBottom: 40,
     gap: theme.spacing[12],
   },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius['3xl'],
-    padding: theme.spacing[20],
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: theme.spacing[16],
-  },
-  cardInfo: {
-    flex: 1,
-    gap: theme.spacing[4],
-  },
-  cardName: {
-    fontFamily: theme.fontFamilies.sansBold,
-    fontSize: theme.fontSizes.md,
-    color: theme.colors.text,
-    letterSpacing: -0.3,
-  },
-  cardMeta: {
-    fontFamily: theme.fontFamilies.sans,
-    fontSize: 12,
-    color: theme.colors.textMuted,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing[8],
-  },
-  rollingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: theme.colors.primarySubtle,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: theme.radius.full,
-  },
-  rollingBadgeText: {
-    fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 9,
-    color: theme.colors.primary,
-  },
-  cardRight: {
-    alignItems: 'flex-end',
-    gap: 2,
-  },
-  cardAmount: {
-    fontSize: 22,
-    letterSpacing: -0.5,
-  },
-  cardSubLabel: {
-    fontFamily: theme.fontFamilies.sans,
-    fontSize: 11,
-    color: theme.colors.textMuted,
-  },
-  progressRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing[8],
-  },
-  progressLabel: {
-    fontFamily: theme.fontFamilies.sans,
-    fontSize: 12,
-    color: theme.colors.textMuted,
-  },
-  progressBar: {
-    height: 4,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.overlay,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: theme.radius.full,
-  },
-  adjustmentText: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 11,
-    marginTop: theme.spacing[8],
-    textAlign: 'right',
-  },
-  emptyContainer: {
-    paddingVertical: 64,
+  empty: {
+    paddingVertical: 72,
     alignItems: 'center',
     gap: theme.spacing[8],
   },

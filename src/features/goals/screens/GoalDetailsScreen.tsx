@@ -1,19 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { Header } from '../../../components/ui/Header';
 import { MoneyText } from '../../../components/ui/MoneyText';
+import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { formatCurrency, fromDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
 import { TransactionListItem } from '../../transactions/api/transactions';
 import { useTransactions } from '../../transactions/hooks/transactions';
-import { useGoalById, useGoalProgress } from '../api/goals';
+import { useDeleteGoal, useGoalById, useGoalProgress } from '../api/goals';
 
 // ─── Local transaction row ────────────────────────────────────────────────────
 const TxRow = React.memo(function TxRow({
@@ -76,6 +78,32 @@ export const GoalDetailsScreen = React.memo(function GoalDetailsScreen() {
   const { data: goal, isLoading: loadingGoal } = useGoalById(goalId);
   const { data: progress, isLoading: loadingProgress } = useGoalProgress(goalId);
   const { data: transactions, isLoading: loadingTransactions } = useTransactions(50, { goalId });
+  const { mutate: deleteGoal } = useDeleteGoal();
+
+  const [showOptions, setShowOptions] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const menuOptions = useMemo(() => [
+    {
+      key: 'add-tx',
+      label: 'Add contribution',
+      icon: 'add-circle-outline' as const,
+      onPress: () => { setShowOptions(false); router.push(`/transactions/create?goalId=${goalId}`); },
+    },
+    {
+      key: 'edit',
+      label: 'Edit goal',
+      icon: 'create-outline' as const,
+      onPress: () => { setShowOptions(false); router.push(`/goals/edit/${goalId}`); },
+    },
+    {
+      key: 'delete',
+      label: 'Delete goal',
+      icon: 'trash-outline' as const,
+      destructive: true,
+      onPress: () => { setShowOptions(false); setShowDeleteConfirm(true); },
+    },
+  ], [goalId, router]);
 
   const handleTxPress = useCallback((txId: number) => {
     router.push(`/transactions/edit/${txId}`);
@@ -173,11 +201,8 @@ export const GoalDetailsScreen = React.memo(function GoalDetailsScreen() {
         title={goal.name}
         showBack
         rightAction={
-          <TouchableOpacity
-            onPress={() => router.push(`/transactions/create?goalId=${goalId}`)}
-            activeOpacity={0.75}
-          >
-            <Ionicons name="add" size={26} color={colors.text} />
+          <TouchableOpacity onPress={() => setShowOptions(true)} activeOpacity={0.75}>
+            <Ionicons name="ellipsis-horizontal" size={22} color={colors.text} />
           </TouchableOpacity>
         }
       />
@@ -193,6 +218,27 @@ export const GoalDetailsScreen = React.memo(function GoalDetailsScreen() {
         }
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+      />
+
+      <OptionsDialog
+        visible={showOptions}
+        onClose={() => setShowOptions(false)}
+        title="Goal options"
+        subtitle={goal.name}
+        options={menuOptions}
+      />
+      <ConfirmDialog
+        visible={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title="Delete goal"
+        message="Delete this goal? Linked transactions will remain but won't be associated with it."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => {
+          deleteGoal(goalId);
+          setShowDeleteConfirm(false);
+          router.back();
+        }}
       />
     </SafeAreaView>
   );

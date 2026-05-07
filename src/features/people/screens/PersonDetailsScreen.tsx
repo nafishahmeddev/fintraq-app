@@ -1,12 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { Header } from '../../../components/ui/Header';
 import { MoneyText } from '../../../components/ui/MoneyText';
+import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { fromDbColor } from '../../../utils/format';
@@ -14,9 +16,8 @@ import { resolveIcon } from '../../../utils/icons';
 import { TransactionListItem } from '../../transactions/api/transactions';
 import { useTransactions } from '../../transactions/hooks/transactions';
 import { useLoans } from '../../loans/api/loans';
-import { usePersonById, usePersonSummary } from '../api/people';
+import { useDeletePerson, usePersonById, usePersonSummary } from '../api/people';
 
-// ─── Local transaction row ────────────────────────────────────────────────────
 const TxRow = React.memo(function TxRow({
   tx,
   onPress,
@@ -58,13 +59,12 @@ const TxRow = React.memo(function TxRow({
           weight="sansBold"
           style={styles.amount}
         />
-        <Text style={styles.time}>{format(new Date(tx.datetime), 'HH:mm')}</Text>
+        <Text style={styles.time}>{format(new Date(tx.datetime), 'MMM d')}</Text>
       </View>
     </TouchableOpacity>
   );
 });
 
-// ─── Screen ──────────────────────────────────────────────────────────────────
 export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const personId = parseInt(id, 10);
@@ -78,6 +78,26 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
   const { data: summary, isLoading: loadingSummary } = usePersonSummary(personId);
   const { data: transactions, isLoading: loadingTransactions } = useTransactions(50, { personId });
   const { data: loans } = useLoans(personId);
+  const { mutate: deletePerson } = useDeletePerson();
+
+  const [showOptions, setShowOptions] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const menuOptions = useMemo(() => [
+    {
+      key: 'edit',
+      label: 'Edit person',
+      icon: 'create-outline' as const,
+      onPress: () => { setShowOptions(false); router.push(`/people/edit/${personId}`); },
+    },
+    {
+      key: 'delete',
+      label: 'Delete person',
+      icon: 'trash-outline' as const,
+      destructive: true,
+      onPress: () => { setShowOptions(false); setShowDeleteConfirm(true); },
+    },
+  ], [personId, router]);
 
   const handleTxPress = useCallback((txId: number) => {
     router.push(`/transactions/edit/${txId}`);
@@ -92,11 +112,14 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
   const renderHeader = useMemo(() => {
     if (!person || !summary) return null;
     const personColor = fromDbColor(person.color);
+    const net = summary.netPosition;
+    const netColor = net >= 0 ? colors.success : colors.danger;
+    const netLabel = net === 0 ? 'Settled' : net > 0 ? 'They owe you' : 'You owe them';
+
     return (
       <View style={styles.headerContent}>
-        {/* Hero card */}
         <View style={styles.heroCard}>
-          <View style={styles.heroTop}>
+          <View style={styles.heroIdentity}>
             <View style={[styles.avatar, { backgroundColor: personColor + '20' }]}>
               <Ionicons name={resolveIcon(person.icon, 'person-outline')} size={32} color={personColor} />
             </View>
@@ -105,12 +128,23 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
               {person.phone && <Text style={styles.heroMeta}>{person.phone}</Text>}
               {person.email && <Text style={styles.heroMeta}>{person.email}</Text>}
             </View>
-            <TouchableOpacity
-              onPress={() => router.push(`/people/edit/${personId}`)}
-              activeOpacity={0.75}
-            >
-              <Ionicons name="create-outline" size={22} color={colors.textMuted} />
-            </TouchableOpacity>
+          </View>
+
+          <View style={styles.sep} />
+
+          <View style={styles.netRow}>
+            <View>
+              <Text style={styles.netLabel}>Net position</Text>
+              <MoneyText
+                amount={Math.abs(net)}
+                currency={profile.defaultCurrency}
+                style={[styles.netAmount, { color: netColor }]}
+                weight="sansBold"
+              />
+            </View>
+            <View style={[styles.netBadge, { backgroundColor: netColor + '18' }]}>
+              <Text style={[styles.netBadgeText, { color: netColor }]}>{netLabel}</Text>
+            </View>
           </View>
 
           <View style={styles.sep} />
@@ -133,19 +167,9 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
                 style={[styles.statAmount, { color: colors.danger }]}
               />
             </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Net</Text>
-              <MoneyText
-                amount={summary.netPosition}
-                currency={profile.defaultCurrency}
-                style={styles.statAmount}
-              />
-            </View>
           </View>
         </View>
 
-        {/* Active loans */}
         {loans && loans.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Active loans</Text>
@@ -163,7 +187,7 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
                   </View>
                   <View style={styles.loanInfo}>
                     <Text style={styles.loanName}>{loan.name}</Text>
-                    <Text style={styles.loanType}>{loan.type}</Text>
+                    <Text style={styles.loanType}>{loan.type === 'LEND' ? 'Lent' : 'Borrowed'}</Text>
                   </View>
                   <MoneyText
                     amount={loan.remainingAmount}
@@ -180,7 +204,7 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
         <Text style={styles.sectionLabel}>Transactions</Text>
       </View>
     );
-  }, [person, summary, loans, colors, profile, styles, router, personId]);
+  }, [person, summary, loans, colors, profile, styles, router]);
 
   if (loadingPerson || loadingSummary) {
     return (
@@ -201,7 +225,15 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title={person.name} showBack />
+      <Header
+        title={person.name}
+        showBack
+        rightAction={
+          <TouchableOpacity onPress={() => setShowOptions(true)} activeOpacity={0.75}>
+            <Ionicons name="ellipsis-horizontal" size={22} color={colors.text} />
+          </TouchableOpacity>
+        }
+      />
       <FlatList
         data={transactions}
         keyExtractor={keyExtractor}
@@ -218,6 +250,26 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
             <EmptyState title="No transactions" icon="receipt-outline" />
           ) : null
         }
+      />
+      <OptionsDialog
+        visible={showOptions}
+        onClose={() => setShowOptions(false)}
+        title="Person options"
+        subtitle={person.name}
+        options={menuOptions}
+      />
+      <ConfirmDialog
+        visible={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title="Delete person"
+        message="Delete this person? Linked transactions and loans will remain but won't be associated with them."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => {
+          deletePerson(personId);
+          setShowDeleteConfirm(false);
+          router.back();
+        }}
       />
     </SafeAreaView>
   );
@@ -292,8 +344,9 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius['3xl'],
     padding: theme.spacing[20],
+    gap: theme.spacing[16],
   },
-  heroTop: {
+  heroIdentity: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing[16],
@@ -323,7 +376,30 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   sep: {
     height: 1,
     backgroundColor: theme.colors.overlay,
-    marginVertical: theme.spacing[16],
+  },
+  netRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  netLabel: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    marginBottom: 4,
+  },
+  netAmount: {
+    fontSize: 32,
+    letterSpacing: -1,
+  },
+  netBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: theme.radius.full,
+  },
+  netBadgeText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 12,
   },
   statsGrid: {
     flexDirection: 'row',

@@ -3,70 +3,160 @@ import { useQueryClient } from '@tanstack/react-query';
 import { format, isSameDay, parseISO } from 'date-fns';
 import { eq } from 'drizzle-orm';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  Badge,
-  Card,
-  ConfirmDialog,
-  Header,
-  IconBox,
-  OptionsDialog,
-  OptionsDialogOption,
-  Typography,
-} from '../../../components/ui';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import { Header } from '../../../components/ui/Header';
+import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { db } from '../../../db/client';
 import { RecurringEndCondition, RecurringFrequency, RecurringIntervalUnit, payments, recurringTransactions as recurringTransactionsTable } from '../../../db/schema';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { NotificationService } from '../../../services/notification.service';
 import { TransactionType } from '../../../types';
-import { formatCurrency } from '../../../utils/format';
+import { formatCurrency, fromDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
 import { RecurringTransactionWithRelations, useDeleteRecurring, useRecurringTransactions, useToggleRecurringPause } from '../api/recurring';
 import { calculateNextOccurrenceDate, hasMetEndCondition } from '../services/syncRecurring';
 
-const toHexColor = (value: number | null) => {
-  if (value === null) return '#808080';
-  return `#${value.toString(16).padStart(6, '0')}`;
+type TabKey = 'ACTIVE' | 'DUE' | 'PAUSED';
+
+const getFrequencyText = (item: RecurringTransactionWithRelations) => {
+  if (item.frequency === 'CUSTOM') {
+    const unit = item.intervalUnit?.toLowerCase() || 'days';
+    return `Every ${item.interval} ${unit}`;
+  }
+  if (item.frequency === 'BI_WEEKLY') return 'Every 2 weeks';
+  return item.frequency.charAt(0) + item.frequency.slice(1).toLowerCase();
 };
+
+const RecurringCard = React.memo(function RecurringCard({
+  item,
+  isDue,
+  showActions,
+  onPress,
+  onLongPress,
+  onProcess,
+  onSkip,
+}: {
+  item: RecurringTransactionWithRelations;
+  isDue: boolean;
+  showActions: boolean;
+  onPress: () => void;
+  onLongPress: () => void;
+  onProcess: () => void;
+  onSkip: () => void;
+}) {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createCardStyles(theme), [theme]);
+
+  const isCR = item.type === 'CR';
+  const stripColor = isCR ? colors.success : colors.danger;
+  const itemColor = fromDbColor(item.color);
+  const nextDate = parseISO(item.nextDate);
+  const dateLabel = isDue ? 'Due' : 'Next';
+  const dateColor = isDue ? colors.danger : colors.textMuted;
+
+  return (
+    <View style={[styles.card, item.isPaused && styles.cardPaused]}>
+      <View style={[styles.accentStrip, { backgroundColor: stripColor }]} />
+      <TouchableOpacity
+        style={styles.cardBody}
+        activeOpacity={0.8}
+        onPress={onPress}
+        onLongPress={onLongPress}
+      >
+        <View style={[styles.iconBox, { backgroundColor: itemColor + '20' }]}>
+          <Ionicons name={resolveIcon(item.icon, 'sync-outline')} size={20} color={itemColor} />
+        </View>
+        <View style={styles.mainInfo}>
+          <View style={styles.topRow}>
+            <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
+            <Text style={[styles.cardAmount, { color: isCR ? colors.success : colors.text }]}>
+              {isCR ? '+' : '−'}{formatCurrency(item.amount, item.account?.currency || 'USD')}
+            </Text>
+          </View>
+          <View style={styles.metaRow}>
+            <View style={styles.freqPill}>
+              <Text style={styles.freqText}>{getFrequencyText(item)}</Text>
+            </View>
+            {item.category?.name && (
+              <Text style={styles.categoryText} numberOfLines={1}>{item.category.name}</Text>
+            )}
+          </View>
+          <View style={styles.footerRow}>
+            <Ionicons name="time-outline" size={12} color={dateColor} />
+            <Text style={[styles.dateLabel, { color: dateColor }]}>{dateLabel}: </Text>
+            <Text style={[styles.dateValue, { color: dateColor }]}>
+              {format(nextDate, 'MMM d, yyyy')}
+            </Text>
+            {item.isPaused && (
+              <View style={styles.pausedBadge}>
+                <Text style={styles.pausedBadgeText}>Paused</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
+
+      {showActions && (
+        <View style={styles.actionRow}>
+          <TouchableOpacity style={styles.skipBtn} onPress={onSkip} activeOpacity={0.8}>
+            <Text style={styles.skipBtnText}>Skip</Text>
+          </TouchableOpacity>
+          <View style={styles.actionDivider} />
+          <TouchableOpacity style={styles.processBtn} onPress={onProcess} activeOpacity={0.8}>
+            <Ionicons name="checkmark" size={14} color={colors.primary} />
+            <Text style={styles.processBtnText}>Process</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>
+  );
+});
 
 export const RecurringScreen = React.memo(function RecurringScreen() {
   const theme = useTheme();
   const { colors } = theme;
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
 
   const { data: recurringTransactions, isLoading } = useRecurringTransactions();
   const { mutate: deleteRecurring } = useDeleteRecurring();
   const { mutate: togglePause } = useToggleRecurringPause();
-
   const queryClient = useQueryClient();
 
-  const [selectedTab, setSelectedTab] = useState<'ACTIVE' | 'DUE' | 'ARCHIVED'>('ACTIVE');
+  const [selectedTab, setSelectedTab] = useState<TabKey>('ACTIVE');
   const [selectedTemplate, setSelectedTemplate] = useState<RecurringTransactionWithRelations | null>(null);
-  const [isManageDialogOpen, setIsManageDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const currentDate = React.useMemo(() => new Date(), []);
+  const currentDate = useMemo(() => new Date(), []);
 
-  const visibleRecurringTransactions = React.useMemo(() => {
+  const dueCount = useMemo(() => {
+    if (!recurringTransactions) return 0;
+    return recurringTransactions.filter(t => {
+      if (t.isPaused) return false;
+      const d = parseISO(t.nextDate);
+      return d <= currentDate || isSameDay(d, currentDate);
+    }).length;
+  }, [recurringTransactions, currentDate]);
+
+  const visibleItems = useMemo(() => {
     if (!recurringTransactions) return [];
-
-    return recurringTransactions.filter(template => {
-      const scheduledDate = parseISO(template.nextDate);
+    return recurringTransactions.filter(t => {
+      const scheduledDate = parseISO(t.nextDate);
       const isDueToday = scheduledDate <= currentDate || isSameDay(scheduledDate, currentDate);
-
-      if (selectedTab === 'ARCHIVED') return template.isPaused;
-      if (template.isPaused) return false;
+      if (selectedTab === 'PAUSED') return t.isPaused;
+      if (t.isPaused) return false;
       if (selectedTab === 'DUE') return isDueToday;
       return !isDueToday;
     });
   }, [recurringTransactions, selectedTab, currentDate]);
 
-  const handleProcessTransaction = React.useCallback(async (template: RecurringTransactionWithRelations) => {
+  const handleProcess = useCallback(async (template: RecurringTransactionWithRelations) => {
     try {
-      // 1. Insert payment record
       await db.insert(payments).values({
         amount: template.amount,
         type: template.type as TransactionType,
@@ -77,7 +167,6 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
         recurringId: template.id,
       });
 
-      // 2. Calculate next scheduled date
       const nextDate = calculateNextOccurrenceDate(
         template.nextDate,
         template.frequency as RecurringFrequency,
@@ -85,29 +174,23 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
         template.intervalUnit as RecurringIntervalUnit
       );
 
-      // 3. Update template state
-      const updatedOccurrencesCount = template.occurrencesCount + 1;
-      const isTemplateCompleted = hasMetEndCondition(
+      const updatedCount = template.occurrencesCount + 1;
+      const isCompleted = hasMetEndCondition(
         template.endCondition as RecurringEndCondition,
         template.endValue,
-        updatedOccurrencesCount,
+        updatedCount,
         nextDate
       );
 
       await db.update(recurringTransactionsTable)
-        .set({
-          nextDate: nextDate,
-          occurrencesCount: updatedOccurrencesCount,
-          isPaused: isTemplateCompleted ? true : template.isPaused,
-        })
+        .set({ nextDate, occurrencesCount: updatedCount, isPaused: isCompleted ? true : template.isPaused })
         .where(eq(recurringTransactionsTable.id, template.id));
 
       queryClient.invalidateQueries({ queryKey: ['recurringTransactions'] });
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
 
-      // 4. Reschedule reminders
-      if (!isTemplateCompleted) {
+      if (!isCompleted) {
         await NotificationService.scheduleRecurringReminder(
           template.id,
           template.name,
@@ -116,13 +199,12 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
           template.reminderDays
         );
       }
-    } catch (error) {
-      console.error('[handleProcessTransaction] Error:', error);
-      Alert.alert('Processing Failed', 'Could not record the recurring transaction.');
+    } catch {
+      Alert.alert('Processing failed', 'Could not record the recurring transaction.');
     }
   }, [queryClient]);
 
-  const handleSkipOccurrence = React.useCallback(async (template: RecurringTransactionWithRelations) => {
+  const handleSkip = useCallback(async (template: RecurringTransactionWithRelations) => {
     try {
       const nextDate = calculateNextOccurrenceDate(
         template.nextDate,
@@ -131,25 +213,20 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
         template.intervalUnit as RecurringIntervalUnit
       );
 
-      // 2. Update template state
-      const isTemplateCompleted = hasMetEndCondition(
+      const isCompleted = hasMetEndCondition(
         template.endCondition as RecurringEndCondition,
         template.endValue,
-        template.occurrencesCount, // Skipping doesn't increment occurrence count
+        template.occurrencesCount,
         nextDate
       );
 
       await db.update(recurringTransactionsTable)
-        .set({
-          nextDate: nextDate,
-          isPaused: isTemplateCompleted ? true : template.isPaused,
-        })
+        .set({ nextDate, isPaused: isCompleted ? true : template.isPaused })
         .where(eq(recurringTransactionsTable.id, template.id));
 
       queryClient.invalidateQueries({ queryKey: ['recurringTransactions'] });
 
-      // 3. Reschedule reminders
-      if (!isTemplateCompleted) {
+      if (!isCompleted) {
         await NotificationService.scheduleRecurringReminder(
           template.id,
           template.name,
@@ -158,193 +235,126 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
           template.reminderDays
         );
       }
-    } catch (error) {
-      console.error('[handleSkipOccurrence] Error:', error);
-      Alert.alert('Skip Failed', 'Could not skip the recurring transaction.');
+    } catch {
+      Alert.alert('Skip failed', 'Could not skip the recurring transaction.');
     }
   }, [queryClient]);
 
-  const onNavigateToCreate = () => {
-    router.push('/recurring/create');
-  };
-
-  const manageOptions: OptionsDialogOption[] = React.useMemo(() => {
+  const menuOptions = useMemo(() => {
     if (!selectedTemplate) return [];
-
     return [
       {
-        key: 'edit-recurring',
+        key: 'edit',
         label: 'Edit details',
         icon: 'create-outline' as const,
-        onPress: () => router.push(`/recurring/edit/${selectedTemplate.id}`),
+        onPress: () => { setShowOptions(false); router.push(`/recurring/edit/${selectedTemplate.id}`); },
       },
       {
-        key: 'pause-recurring',
+        key: 'pause',
         label: selectedTemplate.isPaused ? 'Resume recurring' : 'Pause recurring',
         icon: (selectedTemplate.isPaused ? 'play-outline' : 'pause-outline') as React.ComponentProps<typeof Ionicons>['name'],
-        onPress: () => togglePause({ id: selectedTemplate.id, isPaused: !selectedTemplate.isPaused }),
+        onPress: () => {
+          setShowOptions(false);
+          togglePause({ id: selectedTemplate.id, isPaused: !selectedTemplate.isPaused });
+        },
       },
       {
-        key: 'delete-recurring',
+        key: 'delete',
         label: 'Delete recurring',
         icon: 'trash-outline' as const,
         destructive: true,
-        onPress: () => setIsDeleteDialogOpen(true),
+        onPress: () => { setShowOptions(false); setShowDeleteConfirm(true); },
       },
     ];
   }, [selectedTemplate, router, togglePause]);
 
-  const renderItem = React.useCallback(({ item }: { item: RecurringTransactionWithRelations }) => {
+  const renderItem = useCallback(({ item }: { item: RecurringTransactionWithRelations }) => {
     const nextDate = parseISO(item.nextDate);
-    const formattedNextDate = format(nextDate, 'MMM d, yyyy');
-    const isDue = nextDate <= currentDate || isSameDay(nextDate, currentDate);
-
-    const getFrequencyText = () => {
-      if (item.frequency === 'CUSTOM') {
-        const unit = item.intervalUnit?.toLowerCase() || 'days';
-        return `Every ${item.interval} ${unit}`;
-      }
-      if (item.frequency === 'BI_WEEKLY') return 'Every 2 weeks';
-      return item.frequency.charAt(0) + item.frequency.slice(1).toLowerCase();
-    };
-
-    const color = toHexColor(item.color);
-
+    const isDue = !item.isPaused && (nextDate <= currentDate || isSameDay(nextDate, currentDate));
     return (
-      <Card
-        style={item.isPaused ? styles.cardPaused : undefined}
-        variant="filled"
-      >
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onLongPress={() => {
-            setSelectedTemplate(item);
-            setIsManageDialogOpen(true);
-          }}
-          onPress={() => router.push(`/recurring/edit/${item.id}`)}
-        >
-          <View style={styles.vStackGap3}>
-            <View style={styles.hStackGap3AlignCenter}>
-              <IconBox
-                icon={resolveIcon(item.icon, 'sync-outline')}
-                iconColor={color}
-                backgroundColor={color + '20'}
-                size="md"
-              />
-              <View style={styles.vStackFlex1Gap1}>
-                <Typography variant="body" weight="sansSemiBold" numberOfLines={1}>
-                  {item.name}
-                </Typography>
-                <View style={styles.hStackGap2AlignCenter}>
-                  <Badge
-                    label={item.category?.name || 'Uncategorized'}
-                    variant="default"
-                  />
-                  <Typography variant="label">•</Typography>
-                  <Typography variant="bodySm" color={colors.textMuted}>
-                    {getFrequencyText()}
-                  </Typography>
-                  </View>
-                </View>
-              <Typography
-                variant="mono"
-                weight="sansBold"
-                color={item.type === 'CR' ? colors.success : colors.text}
-              >
-                {item.type === 'CR' ? '+' : '-'}{formatCurrency(item.amount, item.account?.currency || 'USD')}
-              </Typography>
-            </View>
-
-            <View style={[styles.hStackGap1_5AlignCenter, styles.cardFooter]}>
-              <View style={styles.hStackGap1_5AlignCenter}>
-                <Ionicons name="time-outline" size={12} color={colors.textMuted} />
-                <Typography variant="label">
-                  {isDue ? 'Due date:' : 'Next run:'}
-                </Typography>
-                <Typography
-                  variant="monoSm"
-                  color={isDue ? colors.danger : colors.textMuted}
-                >
-                  {formattedNextDate}
-                </Typography>
-              </View>
-
-              {item.isPaused && (
-                <Badge
-                  label="Paused"
-                  variant="default"
-                  style={{ borderStyle: 'dashed' }}
-                />
-              )}
-            </View>
-          </View>
-        </TouchableOpacity>
-
-        {selectedTab === 'DUE' && (
-          <View style={styles.actionRow}>
-            <TouchableOpacity
-              style={[styles.actionBtn, styles.skipBtn]}
-              onPress={() => handleSkipOccurrence(item)}
-            >
-              <Text style={styles.skipBtnText}>Skip</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionBtn, styles.processBtn]}
-              onPress={() => handleProcessTransaction(item)}
-            >
-              <Text style={styles.processBtnText}>Process</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </Card>
+      <RecurringCard
+        item={item}
+        isDue={isDue}
+        showActions={selectedTab === 'DUE'}
+        onPress={() => router.push(`/recurring/edit/${item.id}`)}
+        onLongPress={() => { setSelectedTemplate(item); setShowOptions(true); }}
+        onProcess={() => handleProcess(item)}
+        onSkip={() => handleSkip(item)}
+      />
     );
-  }, [colors, router, styles, selectedTab, currentDate, handleProcessTransaction, handleSkipOccurrence]);
+  }, [selectedTab, currentDate, router, handleProcess, handleSkip]);
+
+  const keyExtractor = useCallback((item: RecurringTransactionWithRelations) => item.id.toString(), []);
+
+  const tabs: { key: TabKey; label: string }[] = [
+    { key: 'ACTIVE', label: 'Upcoming' },
+    { key: 'DUE', label: 'Due' },
+    { key: 'PAUSED', label: 'Paused' },
+  ];
+
+  const emptyMessages: Record<TabKey, { title: string; subtitle: string }> = {
+    ACTIVE: { title: 'No upcoming entries', subtitle: 'Automate your fixed income and expenses.' },
+    DUE: { title: 'All caught up', subtitle: 'No transactions due right now.' },
+    PAUSED: { title: 'Nothing paused', subtitle: 'Paused recurring entries will appear here.' },
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-
-      <Header title="Recurring" showBack />
+      <Header
+        title="Recurring"
+        showBack
+        rightAction={
+          <TouchableOpacity onPress={() => router.push('/recurring/create')} activeOpacity={0.75}>
+            <Ionicons name="add" size={26} color={colors.text} />
+          </TouchableOpacity>
+        }
+      />
 
       <View style={styles.tabBar}>
-        {(['ACTIVE', 'DUE', 'ARCHIVED'] as const).map((tab) => (
+        {tabs.map(tab => (
           <TouchableOpacity
-            key={tab}
-            style={[styles.tab, selectedTab === tab && styles.activeTab]}
-            onPress={() => setSelectedTab(tab)}
+            key={tab.key}
+            style={[styles.tab, selectedTab === tab.key && styles.activeTab]}
+            onPress={() => setSelectedTab(tab.key)}
+            activeOpacity={0.75}
           >
-            <Text style={[styles.tabText, selectedTab === tab && styles.activeTabText]}>
-              {tab.charAt(0) + tab.slice(1).toLowerCase()}
+            <Text style={[styles.tabText, selectedTab === tab.key && styles.activeTabText]}>
+              {tab.label}
             </Text>
-            {tab === 'DUE' && recurringTransactions?.some(t => {
-              const d = parseISO(t.nextDate);
-              return !t.isPaused && (d <= currentDate || isSameDay(d, currentDate));
-            }) && (
-                <View style={styles.dotIndicator} />
-              )}
+            {tab.key === 'DUE' && dueCount > 0 && (
+              <View style={styles.dueBadge}>
+                <Text style={styles.dueBadgeText}>{dueCount}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         ))}
       </View>
 
       {isLoading ? (
-        <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
       ) : (
         <FlatList
-          data={visibleRecurringTransactions}
-          keyExtractor={(item) => item.id.toString()}
+          data={visibleItems}
+          keyExtractor={keyExtractor}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={5}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Ionicons name="sync-outline" size={32} color={colors.textMuted} />
-              <Text style={styles.emptyTitle}>
-                {selectedTab === 'DUE' ? 'No entries due' : selectedTab === 'ARCHIVED' ? 'No archived entries' : 'No recurring entries'}
-              </Text>
-              <Text style={styles.emptyText}>
-                {selectedTab === 'DUE' ? 'You are all caught up!' : 'Automate your fixed income and expenses.'}
-              </Text>
+              <Text style={styles.emptyTitle}>{emptyMessages[selectedTab].title}</Text>
+              <Text style={styles.emptyText}>{emptyMessages[selectedTab].subtitle}</Text>
               {selectedTab === 'ACTIVE' && (
-                <TouchableOpacity style={styles.emptyBtn} onPress={onNavigateToCreate}>
+                <TouchableOpacity
+                  style={styles.emptyBtn}
+                  onPress={() => router.push('/recurring/create')}
+                  activeOpacity={0.8}
+                >
                   <Text style={styles.emptyBtnText}>Create recurring</Text>
                 </TouchableOpacity>
               )}
@@ -353,21 +363,17 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
         />
       )}
 
-      <TouchableOpacity style={styles.fab} onPress={onNavigateToCreate}>
-        <Ionicons name="add" size={28} color={colors.onPrimary} />
-      </TouchableOpacity>
-
       <OptionsDialog
-        visible={isManageDialogOpen}
-        onClose={() => setIsManageDialogOpen(false)}
-        title="Manage recurring"
+        visible={showOptions}
+        onClose={() => setShowOptions(false)}
+        title="Recurring options"
         subtitle={selectedTemplate?.name}
-        options={manageOptions}
+        options={menuOptions}
       />
 
       <ConfirmDialog
-        visible={isDeleteDialogOpen}
-        onClose={() => setIsDeleteDialogOpen(false)}
+        visible={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
         title="Delete recurring"
         message="This will stop future automatic entries. Past entries will remain."
         confirmLabel="Delete"
@@ -377,10 +383,141 @@ export const RecurringScreen = React.memo(function RecurringScreen() {
             deleteRecurring(selectedTemplate.id);
             setSelectedTemplate(null);
           }
+          setShowDeleteConfirm(false);
         }}
       />
     </SafeAreaView>
   );
+});
+
+const createCardStyles = (theme: Theme) => StyleSheet.create({
+  card: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    overflow: 'hidden',
+    flexDirection: 'column',
+  },
+  cardPaused: {
+    opacity: 0.55,
+  },
+  accentStrip: {
+    height: 4,
+    width: '100%',
+  },
+  cardBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: theme.spacing[16],
+    gap: theme.spacing[12],
+  },
+  iconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mainInfo: {
+    flex: 1,
+    gap: theme.spacing[4],
+  },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: theme.spacing[8],
+  },
+  cardName: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+    flex: 1,
+  },
+  cardAmount: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.md,
+    letterSpacing: -0.3,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[8],
+  },
+  freqPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.overlay,
+  },
+  freqText: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
+  categoryText: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    flex: 1,
+  },
+  footerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  dateLabel: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
+  },
+  dateValue: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 11,
+    flex: 1,
+  },
+  pausedBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.overlay,
+  },
+  pausedBadgeText: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 10,
+    color: theme.colors.textMuted,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.overlay,
+  },
+  skipBtn: {
+    flex: 1,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  skipBtnText: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 13,
+    color: theme.colors.textMuted,
+  },
+  actionDivider: {
+    width: 1,
+    backgroundColor: theme.colors.overlay,
+  },
+  processBtn: {
+    flex: 1,
+    height: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing[4],
+  },
+  processBtnText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 13,
+    color: theme.colors.primary,
+  },
 });
 
 const createStyles = (theme: Theme) => StyleSheet.create({
@@ -388,93 +525,29 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  listContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 120,
-    gap: 12,
-  },
-  card: {
-    borderRadius: theme.radius['2xl'],
-    backgroundColor: theme.colors.surface,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    ...theme.shadow.sm,
-  },
-  cardPaused: {
-    opacity: 0.6,
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-    borderStyle: 'dashed',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 34,
-    right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.primary,
+  center: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    ...theme.shadow.md,
-  },
-  emptyContainer: {
-    paddingVertical: 80,
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  emptyTitle: {
-    fontFamily: theme.fontFamilies.sansBold,
-    color: theme.colors.text,
-    fontSize: 24,
-    marginTop: 16,
-    textAlign: 'center',
-  },
-  emptyText: {
-    fontFamily: theme.fontFamilies.sans,
-    color: theme.colors.textMuted,
-    fontSize: 15,
-    marginTop: 8,
-    marginBottom: 32,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  emptyBtn: {
-    height: 48,
-    borderRadius: theme.radius.full,
-    paddingHorizontal: 24,
-    backgroundColor: theme.colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyBtnText: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 15,
-    color: theme.colors.onPrimary,
   },
   tabBar: {
     flexDirection: 'row',
-    paddingHorizontal: 24,
-    backgroundColor: theme.colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[4],
+    gap: theme.spacing[4],
+    marginBottom: theme.spacing[4],
   },
   tab: {
     flex: 1,
-    paddingVertical: 16,
+    flexDirection: 'row',
     alignItems: 'center',
-    position: 'relative',
+    justifyContent: 'center',
+    paddingVertical: theme.spacing[8],
+    borderRadius: theme.radius.full,
+    gap: theme.spacing[8],
   },
   activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: theme.colors.primary,
+    backgroundColor: theme.colors.surface,
   },
   tabText: {
     fontFamily: theme.fontFamilies.sansMedium,
@@ -482,78 +555,61 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     color: theme.colors.textMuted,
   },
   activeTabText: {
-    color: theme.colors.primary,
-  },
-  dotIndicator: {
-    position: 'absolute',
-    top: 12,
-    right: '25%',
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: theme.colors.danger,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-  },
-  actionBtn: {
-    flex: 1,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  skipBtn: {
-    borderRightWidth: 1,
-    borderRightColor: theme.colors.border,
-  },
-  skipBtnText: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 14,
-    color: theme.colors.textMuted,
-  },
-  processBtn: {
-    backgroundColor: theme.colors.primary + '10',
-  },
-  processBtnText: {
+    color: theme.colors.text,
     fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 14,
-    color: theme.colors.primary,
   },
-  vStackGap3: {
-    gap: 12,
-  },
-  hStackGap3AlignCenter: {
-    flexDirection: 'row',
-    gap: 12,
+  dueBadge: {
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 5,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.danger,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  vStackFlex1Gap1: {
-    flex: 1,
-    gap: 4,
+  dueBadgeText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 10,
+    color: '#fff',
   },
-  hStackGap2AlignCenter: {
-    flexDirection: 'row',
-    gap: 8,
+  listContent: {
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[8],
+    paddingBottom: 40,
+    gap: theme.spacing[12],
+  },
+  emptyContainer: {
+    paddingVertical: 64,
+    alignItems: 'center',
+    gap: theme.spacing[8],
+    paddingHorizontal: 40,
+  },
+  emptyTitle: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.lg,
+    color: theme.colors.text,
+    marginTop: theme.spacing[8],
+    textAlign: 'center',
+  },
+  emptyText: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 13,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+    maxWidth: 260,
+  },
+  emptyBtn: {
+    marginTop: theme.spacing[8],
+    height: 40,
+    paddingHorizontal: theme.spacing[20],
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.overlay,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  hStackGap4AlignCenter: {
-    flexDirection: 'row',
-    gap: 16,
-    alignItems: 'center',
-  },
-  vStackGap1: {
-    gap: 4,
-  },
-  vStackFlex1AlignEndGap1: {
-    flex: 1,
-    alignItems: 'flex-end',
-    gap: 4,
-  },
-  hStackGap1_5AlignCenter: {
-    flexDirection: 'row',
-    gap: 6,
-    alignItems: 'center',
+  emptyBtnText: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 13,
+    color: theme.colors.text,
   },
 });

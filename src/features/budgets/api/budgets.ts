@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { db } from '../../../db/client';
-import { budgets } from '../../../db/schema';
+import { budgets, TransactionType } from '../../../db/schema';
 import { eq } from 'drizzle-orm';
-import { getAllBudgetsProgress } from '../services/budgetQueries';
+import { getAllBudgetsProgress, getPeriodDates } from '../services/budgetQueries';
+import { getTransactions } from '../../transactions/api/transactions';
 
 export function useBudgetsProgress() {
   return useQuery({
@@ -31,6 +32,29 @@ export function useBudgetById(id: number | null) {
       return results[0] ?? null;
     },
     enabled: !!id,
+  });
+}
+
+export function useTransactionsForBudget(budget: typeof budgets.$inferSelect | null | undefined) {
+  return useQuery({
+    queryKey: ['budgetTransactions', budget?.id, budget?.mode],
+    enabled: !!budget,
+    queryFn: async () => {
+      if (!budget) return [];
+      if (budget.mode === 'MANUAL') {
+        return getTransactions(100, { budgetId: budget.id });
+      }
+      const { start, end } = getPeriodDates(budget.period, budget.startDate, budget.endDate);
+      const categoryIds: number[] = budget.categoryIds ? JSON.parse(budget.categoryIds) : [];
+      const accountIds: number[] = budget.accountIds ? JSON.parse(budget.accountIds) : [];
+      return getTransactions(100, {
+        type: budget.type as TransactionType,
+        dateFrom: start,
+        dateTo: end,
+        ...(categoryIds.length > 0 ? { categoryIds } : {}),
+        ...(accountIds.length > 0 ? { accountIds } : {}),
+      });
+    },
   });
 }
 

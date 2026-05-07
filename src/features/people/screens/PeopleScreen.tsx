@@ -21,6 +21,44 @@ type Person = {
   phone?: string | null;
 };
 
+const PersonCard = React.memo(function PersonCard({
+  item,
+  onPress,
+  onLongPress,
+}: {
+  item: Person;
+  onPress: () => void;
+  onLongPress: () => void;
+}) {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createCardStyles(theme), [theme]);
+  const personColor = fromDbColor(item.color);
+
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.8}
+      onPress={onPress}
+      onLongPress={onLongPress}
+    >
+      <View style={[styles.accentStrip, { backgroundColor: personColor }]} />
+      <View style={styles.cardBody}>
+        <View style={[styles.avatar, { backgroundColor: personColor + '20' }]}>
+          <Ionicons name={resolveIcon(item.icon, 'person-outline')} size={22} color={personColor} />
+        </View>
+        <View style={styles.personInfo}>
+          <Text style={styles.personName} numberOfLines={1}>{item.name}</Text>
+          {(item.email || item.phone) && (
+            <Text style={styles.personMeta} numberOfLines={1}>{item.email || item.phone}</Text>
+          )}
+        </View>
+        <Ionicons name="chevron-forward" size={16} color={colors.textFaint} />
+      </View>
+    </TouchableOpacity>
+  );
+});
+
 export const PeopleScreen = React.memo(function PeopleScreen() {
   const theme = useTheme();
   const { colors } = theme;
@@ -86,31 +124,13 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
     },
   ], [selectedPerson, handlePersonPress, router]);
 
-  const renderItem = useCallback(({ item }: { item: Person }) => {
-    const personColor = fromDbColor(item.color);
-    return (
-      <TouchableOpacity
-        style={styles.card}
-        activeOpacity={0.8}
-        onPress={() => handlePersonPress(item.id)}
-        onLongPress={() => {
-          setSelectedPerson(item);
-          setShowOptions(true);
-        }}
-      >
-        <View style={[styles.avatar, { backgroundColor: personColor + '20' }]}>
-          <Ionicons name={resolveIcon(item.icon, 'person-outline')} size={24} color={personColor} />
-        </View>
-        <View style={styles.personInfo}>
-          <Text style={styles.personName} numberOfLines={1}>{item.name}</Text>
-          {(item.email || item.phone) && (
-            <Text style={styles.personMeta} numberOfLines={1}>{item.email || item.phone}</Text>
-          )}
-        </View>
-        <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
-      </TouchableOpacity>
-    );
-  }, [colors, styles, handlePersonPress]);
+  const renderItem = useCallback(({ item }: { item: Person }) => (
+    <PersonCard
+      item={item}
+      onPress={() => handlePersonPress(item.id)}
+      onLongPress={() => { setSelectedPerson(item); setShowOptions(true); }}
+    />
+  ), [handlePersonPress]);
 
   const keyExtractor = useCallback((item: Person) => item.id.toString(), []);
 
@@ -178,6 +198,47 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
   );
 });
 
+const createCardStyles = (theme: Theme) => StyleSheet.create({
+  card: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    overflow: 'hidden',
+  },
+  accentStrip: {
+    height: 3,
+    width: '100%',
+    opacity: 0.7,
+  },
+  cardBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: theme.spacing[16],
+    gap: theme.spacing[12],
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  personInfo: {
+    flex: 1,
+    gap: 3,
+  },
+  personName: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+    letterSpacing: -0.2,
+  },
+  personMeta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+});
+
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
@@ -193,35 +254,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     paddingTop: theme.spacing[16],
     paddingBottom: 40,
     gap: theme.spacing[12],
-  },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius['3xl'],
-    padding: theme.spacing[16],
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing[16],
-  },
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: theme.radius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  personInfo: {
-    flex: 1,
-    gap: 3,
-  },
-  personName: {
-    fontFamily: theme.fontFamilies.sansBold,
-    fontSize: theme.fontSizes.md,
-    color: theme.colors.text,
-  },
-  personMeta: {
-    fontFamily: theme.fontFamilies.sans,
-    fontSize: 12,
-    color: theme.colors.textMuted,
   },
   emptyContainer: {
     paddingVertical: 64,

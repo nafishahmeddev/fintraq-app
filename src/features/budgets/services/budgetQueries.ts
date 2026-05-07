@@ -15,7 +15,7 @@ export type BudgetProgress = {
   isRolling: boolean;
 };
 
-function getPeriodDates(period: string, startDateStr: string | null, endDateStr: string | null): { start: string; end: string } {
+export function getPeriodDates(period: string, startDateStr: string | null, endDateStr: string | null): { start: string; end: string } {
   const now = new Date();
   
   if (period === 'CUSTOM' && startDateStr && endDateStr) {

@@ -1,21 +1,22 @@
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { Header } from '../../../components/ui/Header';
 import { MoneyText } from '../../../components/ui/MoneyText';
+import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { fromDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
 import { TransactionListItem } from '../../transactions/api/transactions';
 import { useTransactions } from '../../transactions/hooks/transactions';
-import { usePlaceById, usePlaceSummary } from '../api/places';
+import { useDeletePlace, usePlaceById, usePlaceSummary } from '../api/places';
 
-// ─── Local transaction row ────────────────────────────────────────────────────
 const TxRow = React.memo(function TxRow({
   tx,
   onPress,
@@ -57,13 +58,12 @@ const TxRow = React.memo(function TxRow({
           weight="sansBold"
           style={styles.amount}
         />
-        <Text style={styles.time}>{format(new Date(tx.datetime), 'HH:mm')}</Text>
+        <Text style={styles.time}>{format(new Date(tx.datetime), 'MMM d')}</Text>
       </View>
     </TouchableOpacity>
   );
 });
 
-// ─── Screen ──────────────────────────────────────────────────────────────────
 export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const placeId = parseInt(id, 10);
@@ -76,6 +76,26 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
   const { data: place, isLoading: loadingPlace } = usePlaceById(placeId);
   const { data: summary, isLoading: loadingSummary } = usePlaceSummary(placeId);
   const { data: transactions, isLoading: loadingTransactions } = useTransactions(50, { placeId });
+  const { mutate: deletePlace } = useDeletePlace();
+
+  const [showOptions, setShowOptions] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const menuOptions = useMemo(() => [
+    {
+      key: 'edit',
+      label: 'Edit place',
+      icon: 'create-outline' as const,
+      onPress: () => { setShowOptions(false); router.push(`/places/edit/${placeId}`); },
+    },
+    {
+      key: 'delete',
+      label: 'Delete place',
+      icon: 'trash-outline' as const,
+      destructive: true,
+      onPress: () => { setShowOptions(false); setShowDeleteConfirm(true); },
+    },
+  ], [placeId, router]);
 
   const handleTxPress = useCallback((txId: number) => {
     router.push(`/transactions/edit/${txId}`);
@@ -90,10 +110,11 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
   const renderHeader = useMemo(() => {
     if (!place || !summary) return null;
     const placeColor = fromDbColor(place.color);
+
     return (
       <View style={styles.headerContent}>
         <View style={styles.heroCard}>
-          <View style={styles.heroTop}>
+          <View style={styles.heroIdentity}>
             <View style={[styles.avatar, { backgroundColor: placeColor + '20' }]}>
               <Ionicons name={resolveIcon(place.icon, 'location-outline')} size={32} color={placeColor} />
             </View>
@@ -101,29 +122,23 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
               <Text style={styles.heroName}>{place.name}</Text>
               {place.description && <Text style={styles.heroMeta}>{place.description}</Text>}
             </View>
-            <TouchableOpacity
-              onPress={() => router.push(`/places/edit/${placeId}`)}
-              activeOpacity={0.75}
-            >
-              <Ionicons name="create-outline" size={22} color={colors.textMuted} />
-            </TouchableOpacity>
           </View>
 
           <View style={styles.sep} />
 
-          <View style={styles.statsGrid}>
-            <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Total spent</Text>
+          <View style={styles.spentRow}>
+            <View>
+              <Text style={styles.spentLabel}>Total spent</Text>
               <MoneyText
                 amount={summary.totalSpent}
                 currency={profile.defaultCurrency}
-                style={[styles.statAmount, { color: colors.danger }]}
+                style={[styles.spentAmount, { color: colors.danger }]}
+                weight="sansBold"
               />
             </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Entries</Text>
-              <Text style={styles.statCount}>{summary.transactionCount}</Text>
+            <View style={styles.countBox}>
+              <Text style={styles.countNum}>{summary.transactionCount}</Text>
+              <Text style={styles.countLabel}>entries</Text>
             </View>
           </View>
         </View>
@@ -131,7 +146,7 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
         <Text style={styles.sectionLabel}>Transactions</Text>
       </View>
     );
-  }, [place, summary, colors, profile, styles, router, placeId]);
+  }, [place, summary, colors, profile, styles]);
 
   if (loadingPlace || loadingSummary) {
     return (
@@ -152,7 +167,15 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title={place.name} showBack />
+      <Header
+        title={place.name}
+        showBack
+        rightAction={
+          <TouchableOpacity onPress={() => setShowOptions(true)} activeOpacity={0.75}>
+            <Ionicons name="ellipsis-horizontal" size={22} color={colors.text} />
+          </TouchableOpacity>
+        }
+      />
       <FlatList
         data={transactions}
         keyExtractor={keyExtractor}
@@ -169,6 +192,26 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
             <EmptyState title="No transactions" icon="receipt-outline" />
           ) : null
         }
+      />
+      <OptionsDialog
+        visible={showOptions}
+        onClose={() => setShowOptions(false)}
+        title="Place options"
+        subtitle={place.name}
+        options={menuOptions}
+      />
+      <ConfirmDialog
+        visible={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title="Delete place"
+        message="Delete this place? Linked transactions will remain but won't be associated with it."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => {
+          deletePlace(placeId);
+          setShowDeleteConfirm(false);
+          router.back();
+        }}
       />
     </SafeAreaView>
   );
@@ -243,8 +286,9 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius['3xl'],
     padding: theme.spacing[20],
+    gap: theme.spacing[16],
   },
-  heroTop: {
+  heroIdentity: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing[16],
@@ -274,34 +318,36 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   sep: {
     height: 1,
     backgroundColor: theme.colors.overlay,
-    marginVertical: theme.spacing[16],
   },
-  statsGrid: {
+  spentRow: {
     flexDirection: 'row',
-    gap: theme.spacing[8],
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
   },
-  statBox: {
-    flex: 1,
-    gap: 4,
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: theme.colors.overlay,
-    alignSelf: 'stretch',
-  },
-  statLabel: {
+  spentLabel: {
     fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 11,
+    fontSize: 12,
     color: theme.colors.textMuted,
+    marginBottom: 4,
   },
-  statAmount: {
-    fontSize: 18,
+  spentAmount: {
+    fontSize: 32,
+    letterSpacing: -1,
   },
-  statCount: {
+  countBox: {
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  countNum: {
     fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 22,
+    fontSize: 28,
     color: theme.colors.text,
     letterSpacing: -0.5,
+  },
+  countLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
   },
   sectionLabel: {
     fontFamily: theme.fontFamilies.sansMedium,

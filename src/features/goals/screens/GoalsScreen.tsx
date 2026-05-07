@@ -13,10 +13,73 @@ import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useDeleteGoal, useGoals, useGoalsProgress } from '../api/goals';
 import { GoalProgress } from '../services/goalQueries';
 
-export const GoalsScreen = React.memo(function GoalsScreen() {
+const GoalCard = React.memo(function GoalCard({
+  item,
+  onPress,
+  onLongPress,
+}: {
+  item: GoalProgress;
+  onPress: () => void;
+  onLongPress: () => void;
+}) {
   const theme = useTheme();
   const { colors } = theme;
   const { profile } = useSettings();
+  const styles = useMemo(() => createCardStyles(theme), [theme]);
+
+  const isReached = item.percentage >= 100;
+  const statusColor = isReached ? colors.success : colors.primary;
+  const pct = Math.min(item.percentage, 100);
+
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.8}
+      onPress={onPress}
+      onLongPress={onLongPress}
+    >
+      <View style={[styles.accentStrip, { backgroundColor: statusColor }]} />
+      <View style={styles.cardBody}>
+        <View style={styles.topRow}>
+          <View style={styles.nameBlock}>
+            <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
+            <Text style={styles.cardStatus}>{item.status.toLowerCase()}</Text>
+          </View>
+          <View style={styles.amountBlock}>
+            <MoneyText
+              amount={item.remaining}
+              currency={profile.defaultCurrency}
+              weight="sansBold"
+              style={styles.cardAmount}
+            />
+            <Text style={styles.cardSubLabel}>left</Text>
+          </View>
+        </View>
+
+        <View style={styles.progressInfoRow}>
+          <Text style={styles.progressLabel}>
+            Saved {item.current.toLocaleString()} of {item.target.toLocaleString()}
+          </Text>
+          <Text style={[styles.progressPct, { color: statusColor }]}>{Math.round(pct)}%</Text>
+        </View>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: statusColor }]} />
+        </View>
+
+        {isReached && (
+          <View style={[styles.reachedPill, { backgroundColor: colors.success + '18' }]}>
+            <Ionicons name="checkmark-circle" size={12} color={colors.success} />
+            <Text style={[styles.reachedText, { color: colors.success }]}>Goal reached!</Text>
+          </View>
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+});
+
+export const GoalsScreen = React.memo(function GoalsScreen() {
+  const theme = useTheme();
+  const { colors } = theme;
   const { isPremium, showAlert } = usePremium();
   const router = useRouter();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -80,49 +143,13 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
     },
   ], [selectedGoal, handleGoalPress, router]);
 
-  const renderItem = useCallback(({ item }: { item: GoalProgress }) => {
-    const isReached = item.percentage >= 100;
-    const statusColor = isReached ? colors.success : colors.primary;
-    const pct = Math.min(item.percentage, 100);
-
-    return (
-      <TouchableOpacity
-        style={styles.card}
-        activeOpacity={0.8}
-        onPress={() => handleGoalPress(item.goalId)}
-        onLongPress={() => {
-          setSelectedGoal(item);
-          setShowOptions(true);
-        }}
-      >
-        <View style={styles.cardHeader}>
-          <View style={styles.cardInfo}>
-            <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
-            <Text style={styles.cardMeta}>{item.status}</Text>
-          </View>
-          <View style={styles.cardRight}>
-            <MoneyText
-              amount={item.remaining}
-              currency={profile.defaultCurrency}
-              weight="sansBold"
-              style={styles.cardAmount}
-            />
-            <Text style={styles.cardSubLabel}>left</Text>
-          </View>
-        </View>
-
-        <View style={styles.progressInfoRow}>
-          <Text style={styles.progressLabel}>
-            Saved {profile.defaultCurrency} {item.current.toLocaleString()} of {item.target.toLocaleString()}
-          </Text>
-          <Text style={[styles.progressPct, { color: statusColor }]}>{Math.round(item.percentage)}%</Text>
-        </View>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: statusColor }]} />
-        </View>
-      </TouchableOpacity>
-    );
-  }, [colors, profile.defaultCurrency, styles, handleGoalPress]);
+  const renderItem = useCallback(({ item }: { item: GoalProgress }) => (
+    <GoalCard
+      item={item}
+      onPress={() => handleGoalPress(item.goalId)}
+      onLongPress={() => { setSelectedGoal(item); setShowOptions(true); }}
+    />
+  ), [handleGoalPress]);
 
   const keyExtractor = useCallback((item: GoalProgress) => item.goalId.toString(), []);
 
@@ -149,6 +176,9 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={5}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Ionicons name="flag-outline" size={32} color={colors.textMuted} />
@@ -186,36 +216,30 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
   );
 });
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  listContent: {
-    paddingHorizontal: theme.layout.screenPadding,
-    paddingTop: theme.spacing[16],
-    paddingBottom: 40,
-    gap: theme.spacing[12],
-  },
+const createCardStyles = (theme: Theme) => StyleSheet.create({
   card: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius['3xl'],
-    padding: theme.spacing[20],
+    overflow: 'hidden',
+    flexDirection: 'row',
   },
-  cardHeader: {
+  accentStrip: {
+    width: 4,
+  },
+  cardBody: {
+    flex: 1,
+    padding: theme.spacing[20],
+    gap: theme.spacing[12],
+  },
+  topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: theme.spacing[16],
   },
-  cardInfo: {
+  nameBlock: {
     flex: 1,
     gap: theme.spacing[4],
+    paddingRight: theme.spacing[12],
   },
   cardName: {
     fontFamily: theme.fontFamilies.sansBold,
@@ -223,13 +247,13 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     color: theme.colors.text,
     letterSpacing: -0.3,
   },
-  cardMeta: {
+  cardStatus: {
     fontFamily: theme.fontFamilies.sans,
     fontSize: 12,
     color: theme.colors.textMuted,
     textTransform: 'capitalize',
   },
-  cardRight: {
+  amountBlock: {
     alignItems: 'flex-end',
     gap: 2,
   },
@@ -246,26 +270,58 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing[8],
   },
   progressLabel: {
     fontFamily: theme.fontFamilies.sans,
     fontSize: 12,
     color: theme.colors.textMuted,
+    flex: 1,
   },
   progressPct: {
     fontFamily: theme.fontFamilies.sansBold,
     fontSize: 12,
   },
   progressBar: {
-    height: 4,
+    height: 6,
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.overlay,
     overflow: 'hidden',
+    marginTop: -theme.spacing[4],
   },
   progressFill: {
     height: '100%',
     borderRadius: theme.radius.full,
+  },
+  reachedPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[4],
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: theme.radius.full,
+  },
+  reachedText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 11,
+  },
+});
+
+const createStyles = (theme: Theme) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  listContent: {
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
+    paddingBottom: 40,
+    gap: theme.spacing[12],
   },
   emptyContainer: {
     paddingVertical: 64,

@@ -1,19 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { Header } from '../../../components/ui/Header';
 import { MoneyText } from '../../../components/ui/MoneyText';
+import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { formatCurrency, fromDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
 import { TransactionListItem } from '../../transactions/api/transactions';
 import { useTransactions } from '../../transactions/hooks/transactions';
-import { useLoanById, useLoanProgress } from '../api/loans';
+import { useDeleteLoan, useLoanById, useLoanProgress } from '../api/loans';
 
 // ─── Local transaction row ────────────────────────────────────────────────────
 const TxRow = React.memo(function TxRow({
@@ -76,6 +78,32 @@ export const LoanDetailsScreen = React.memo(function LoanDetailsScreen() {
   const { data: loan, isLoading: loadingLoan } = useLoanById(loanId);
   const { data: progress, isLoading: loadingProgress } = useLoanProgress(loanId);
   const { data: transactions, isLoading: loadingTransactions } = useTransactions(50, { loanId });
+  const { mutate: deleteLoan } = useDeleteLoan();
+
+  const [showOptions, setShowOptions] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const menuOptions = useMemo(() => [
+    {
+      key: 'add-tx',
+      label: 'Add repayment',
+      icon: 'add-circle-outline' as const,
+      onPress: () => { setShowOptions(false); router.push(`/transactions/create?loanId=${loanId}`); },
+    },
+    {
+      key: 'edit',
+      label: 'Edit loan',
+      icon: 'create-outline' as const,
+      onPress: () => { setShowOptions(false); router.push(`/loans/edit/${loanId}`); },
+    },
+    {
+      key: 'delete',
+      label: 'Delete loan',
+      icon: 'trash-outline' as const,
+      destructive: true,
+      onPress: () => { setShowOptions(false); setShowDeleteConfirm(true); },
+    },
+  ], [loanId, router]);
 
   const handleTxPress = useCallback((txId: number) => {
     router.push(`/transactions/edit/${txId}`);
@@ -174,11 +202,8 @@ export const LoanDetailsScreen = React.memo(function LoanDetailsScreen() {
         title={loan.name}
         showBack
         rightAction={
-          <TouchableOpacity
-            onPress={() => router.push(`/transactions/create?loanId=${loanId}`)}
-            activeOpacity={0.75}
-          >
-            <Ionicons name="add" size={26} color={colors.text} />
+          <TouchableOpacity onPress={() => setShowOptions(true)} activeOpacity={0.75}>
+            <Ionicons name="ellipsis-horizontal" size={22} color={colors.text} />
           </TouchableOpacity>
         }
       />
@@ -194,6 +219,26 @@ export const LoanDetailsScreen = React.memo(function LoanDetailsScreen() {
         }
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+      />
+      <OptionsDialog
+        visible={showOptions}
+        onClose={() => setShowOptions(false)}
+        title="Loan options"
+        subtitle={loan.name}
+        options={menuOptions}
+      />
+      <ConfirmDialog
+        visible={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title="Delete loan"
+        message="Delete this loan? Repayment history will remain but won't be linked to this loan."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => {
+          deleteLoan(loanId);
+          setShowDeleteConfirm(false);
+          router.back();
+        }}
       />
     </SafeAreaView>
   );

@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Alert, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
@@ -17,333 +17,381 @@ import { useSettings } from '../../src/providers/SettingsProvider';
 import { Theme, useTheme } from '../../src/providers/ThemeProvider';
 import { NotificationService } from '../../src/services/notification.service';
 
+// ─── Row component ────────────────────────────────────────────────────────────
+type RowType = 'nav' | 'toggle' | 'destructive';
+
+type RowProps = {
+  icon: IoniconName;
+  iconBg?: string;
+  title: string;
+  subtitle?: string;
+  value?: string;
+  type?: RowType;
+  toggled?: boolean;
+  onPress: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
+};
+
+function Row({ icon, iconBg, title, subtitle, value, type = 'nav', toggled, onPress, isFirst, isLast }: RowProps) {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createRowStyles(theme), [theme]);
+  const isDestructive = type === 'destructive';
+  const iconColor = isDestructive ? colors.danger : colors.text;
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.75}
+      style={[
+        styles.row,
+        isFirst && styles.rowFirst,
+        isLast && styles.rowLast,
+        !isLast && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.overlay },
+      ]}
+    >
+      <View style={[styles.iconBox, { backgroundColor: iconBg || colors.overlay }]}>
+        <Ionicons name={icon} size={18} color={iconColor} />
+      </View>
+      <View style={styles.textWrap}>
+        <Text style={[styles.title, isDestructive && { color: colors.danger }]}>{title}</Text>
+        {subtitle ? <Text style={styles.subtitle} numberOfLines={2}>{subtitle}</Text> : null}
+      </View>
+      {type === 'toggle' ? (
+        <View style={[styles.track, { backgroundColor: toggled ? colors.primary : colors.overlay }]}>
+          <View style={[styles.thumb, toggled && styles.thumbOn]} />
+        </View>
+      ) : type === 'nav' ? (
+        <View style={styles.navRight}>
+          {value ? <Text style={[styles.value, { color: colors.textMuted }]}>{value}</Text> : null}
+          <Ionicons name="chevron-forward" size={14} color={colors.textFaint} />
+        </View>
+      ) : null}
+    </TouchableOpacity>
+  );
+}
+
+const createRowStyles = (theme: Theme) => StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: theme.spacing[16],
+    paddingVertical: 14,
+    gap: theme.spacing[12],
+  },
+  rowFirst: {
+    paddingTop: theme.spacing[16],
+  },
+  rowLast: {
+    paddingBottom: theme.spacing[16],
+  },
+  iconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: theme.radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textWrap: {
+    flex: 1,
+    gap: 2,
+  },
+  title: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 15,
+    color: theme.colors.text,
+  },
+  subtitle: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  navRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[4],
+  },
+  value: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 13,
+  },
+  track: {
+    width: 44,
+    height: 26,
+    borderRadius: theme.radius.full,
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  thumb: {
+    width: 20,
+    height: 20,
+    borderRadius: theme.radius.full,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 2,
+  },
+  thumbOn: {
+    transform: [{ translateX: 18 }],
+  },
+});
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
 export default function SettingsScreen() {
   const theme = useTheme();
   const { colors } = theme;
   const { isPremium } = usePremium();
   const { profile, updateProfile } = useSettings();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
+
   const [showAppearanceDialog, setShowAppearanceDialog] = React.useState(false);
-  const [showResetConfirmDialog, setShowResetConfirmDialog] = React.useState(false);
-  const [showEditNameModal, setShowEditNameModal] = React.useState(false);
+  const [showResetConfirm, setShowResetConfirm] = React.useState(false);
+  const [showEditName, setShowEditName] = React.useState(false);
   const [showTimePicker, setShowTimePicker] = React.useState(false);
   const [nameInput, setNameInput] = React.useState('');
 
+  const appVersion = Constants.expoConfig?.version || '1.0.0';
+  const themeLabel = { light: 'Light', dark: 'Dark', system: 'System' }[profile.theme || 'system'];
+  const initials = (profile.name || '').trim().slice(0, 2).toUpperCase() || '?';
 
-  const themeOptions: { label: string; value: 'light' | 'dark' | 'system'; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { label: 'Light mode', value: 'light', icon: 'sunny-outline' },
-    { label: 'Dark mode', value: 'dark', icon: 'moon-outline' },
-    { label: 'Follow system', value: 'system', icon: 'phone-portrait-outline' },
-  ];
+  const openEditName = useCallback(() => {
+    setNameInput(profile.name || '');
+    setShowEditName(true);
+  }, [profile.name]);
 
-  const handleResetData = () => {
-    setShowResetConfirmDialog(true);
-  };
+  const saveEditName = useCallback(async () => {
+    await updateProfile({ name: nameInput.trim() });
+    setShowEditName(false);
+  }, [nameInput, updateProfile]);
 
-  const runResetData = async () => {
+  const handleToggleReminders = useCallback(async () => {
+    const next = !profile.reminderEnabled;
+    if (next) {
+      const granted = await NotificationService.requestPermissions();
+      if (!granted) {
+        Alert.alert('Permission required', 'Enable notifications in your device settings to use reminders.');
+        return;
+      }
+    }
+    await updateProfile({ reminderEnabled: next });
+  }, [profile.reminderEnabled, updateProfile]);
+
+  const onTimeChange = useCallback(async (event: DateTimePickerEvent, date?: Date) => {
+    setShowTimePicker(false);
+    if (date && event.type === 'set') {
+      const h = date.getHours().toString().padStart(2, '0');
+      const m = date.getMinutes().toString().padStart(2, '0');
+      await updateProfile({ reminderTime: `${h}:${m}` });
+    }
+  }, [updateProfile]);
+
+  const runResetData = useCallback(async () => {
     try {
       await db.delete(payments);
       await db.delete(categories);
       await db.delete(accounts);
       await AsyncStorage.clear();
-      Alert.alert("Wipe Complete", "Application state has been purged. Please restart the app.");
+      Alert.alert('Wiped', 'All data cleared. Please restart the app.');
       router.replace('/(onboarding)');
     } catch {
-      Alert.alert("Critical Error", "Failed to clear physical storage.");
+      Alert.alert('Error', 'Failed to clear app data.');
     }
-  };
+  }, [router]);
 
-  const handleThemeChange = () => setShowAppearanceDialog(true);
+  const themeOptions = useMemo(() => [
+    { key: 'light', label: 'Light mode', icon: 'sunny-outline' as IoniconName,
+      selected: (profile.theme || 'system') === 'light',
+      onPress: async () => { await updateProfile({ theme: 'light' }); } },
+    { key: 'dark', label: 'Dark mode', icon: 'moon-outline' as IoniconName,
+      selected: (profile.theme || 'system') === 'dark',
+      onPress: async () => { await updateProfile({ theme: 'dark' }); } },
+    { key: 'system', label: 'Follow system', icon: 'phone-portrait-outline' as IoniconName,
+      selected: (profile.theme || 'system') === 'system',
+      onPress: async () => { await updateProfile({ theme: 'system' }); } },
+  ], [profile.theme, updateProfile]);
 
-  const openEditName = () => {
-    setNameInput(profile.name || '');
-    setShowEditNameModal(true);
-  };
-
-  const saveEditName = async () => {
-    await updateProfile({ name: nameInput.trim() });
-    setShowEditNameModal(false);
-  };
-
-  const handleToggleReminders = async () => {
-    const nextState = !profile.reminderEnabled;
-
-    if (nextState) {
-      // If turning on, we must ensure permissions
-      const granted = await NotificationService.requestPermissions();
-      if (!granted) {
-        Alert.alert(
-          "Permission Required",
-          "Luno needs notification access to send reminders. Please enable this in your device settings."
-        );
-        return;
-      }
-    }
-
-    await updateProfile({ reminderEnabled: nextState });
-  };
-
-  const onTimeChange = async (event: DateTimePickerEvent, selectedDate?: Date) => {
-    setShowTimePicker(false);
-    if (selectedDate && event.type === 'set') {
-      const hours = selectedDate.getHours().toString().padStart(2, '0');
-      const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
-      await updateProfile({ reminderTime: `${hours}:${minutes}` });
-    }
-  };
-
-  type PreferenceRowProps = {
-    icon: IoniconName;
-    title: string;
-    value?: string;
-    subtitle?: string;
-    onPress: () => void;
-    destructive?: boolean;
-    color?: string;
-    isLast?: boolean;
-  };
-
-  const PreferenceRow = ({ icon, title, value, subtitle, onPress, destructive, color, isLast }: PreferenceRowProps) => {
-    const iconColor = color || (destructive ? colors.danger : colors.text);
-
-    return (
-      <TouchableOpacity
-        style={[styles.row, isLast && { borderBottomWidth: 0 }]}
-        onPress={onPress}
-        activeOpacity={0.7}
-      >
-        <View style={[styles.iconBox, { backgroundColor: colors.overlay }]}>
-          <Ionicons name={icon} size={18} color={iconColor} />
-        </View>
-        <View style={styles.textDetails}>
-          <Text style={[styles.rowTitle, destructive && { color: colors.danger }]}>{title}</Text>
-          {subtitle && <Text style={styles.rowSubtitle} numberOfLines={1}>{subtitle}</Text>}
-        </View>
-        <View style={styles.rowRightSide}>
-          {value ? <Text style={styles.rowValue}>{value}</Text> : null}
-          <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
-  const activeTheme = (profile.theme || 'system').toUpperCase();
+  const timePickerDate = useMemo(() => {
+    const [h, m] = (profile.reminderTime || '09:00').split(':').map(Number);
+    const d = new Date();
+    d.setHours(h, m, 0, 0);
+    return d;
+  }, [profile.reminderTime]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-
       <Header title="Settings" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.heroPanel}>
-          <View style={styles.heroHeader}>
-            <View>
-              <Text style={styles.heroKicker}>Device profile</Text>
-              <Text style={styles.heroTitle}>App configuration</Text>
-            </View>
-            <View style={styles.heroBadge}>
-              <View style={styles.heroBadgeDot} />
-              <Text style={styles.heroBadgeText}>Active</Text>
-            </View>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── Profile card ── */}
+        <TouchableOpacity style={styles.profileCard} onPress={openEditName} activeOpacity={0.85}>
+          <View style={[styles.avatar, { backgroundColor: colors.primary + '20' }]}>
+            <Text style={[styles.avatarText, { color: colors.primary }]}>{initials}</Text>
           </View>
-
-          <View style={styles.heroGrid}>
-            <View style={styles.heroGridItem}>
-              <Text style={styles.heroGridLabel}>Appearance</Text>
-              <Text style={styles.heroGridValue}>{activeTheme}</Text>
-            </View>
-            <View style={styles.heroGridDivider} />
-            <View style={styles.heroGridItem}>
-              <Text style={styles.heroGridLabel}>Version</Text>
-              <Text style={styles.heroGridValue}>v{Constants.expoConfig?.version || '1.0.0'}</Text>
-            </View>
+          <View style={styles.profileInfo}>
+            <Text style={styles.profileName}>{profile.name || 'Add your name'}</Text>
+            <Text style={styles.profileHint}>Tap to edit</Text>
           </View>
-        </View>
+          <View style={[styles.planBadge, { backgroundColor: isPremium ? colors.primary + '18' : colors.overlay }]}>
+            {isPremium && <Ionicons name="sparkles" size={11} color={colors.primary} />}
+            <Text style={[styles.planBadgeText, { color: isPremium ? colors.primary : colors.textMuted }]}>
+              {isPremium ? 'Pro' : 'Free'}
+            </Text>
+          </View>
+        </TouchableOpacity>
 
+        {/* ── Subscription ── */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Subscription</Text>
-          <View style={[styles.card, isPremium && { borderColor: colors.primary, borderWidth: 1.5 }]}>
-            <PreferenceRow
+          <View style={styles.card}>
+            <Row
               icon="sparkles"
-              title={isPremium ? 'Luno Pro (Lifetime)' : 'Upgrade to Pro'}
-              value={isPremium ? "Active" : "Free"}
-              subtitle={
-                isPremium ? "Enjoying full access to all features" :
-                  "Unlock advanced analytics & premium features"
-              }
+              iconBg={isPremium ? colors.primary + '20' : colors.overlay}
+              title={isPremium ? 'Luno Pro · Lifetime' : 'Upgrade to Pro'}
+              subtitle={isPremium ? 'Full access to all features' : 'Unlock analytics, goals, loans & more'}
+              value={isPremium ? 'Active' : undefined}
               onPress={() => router.push('/premium')}
-              color={isPremium ? colors.primary : undefined}
+              isFirst
               isLast
             />
           </View>
         </View>
 
+        {/* ── Preferences ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Features</Text>
+          <Text style={styles.sectionLabel}>Preferences</Text>
           <View style={styles.card}>
-            <PreferenceRow
-              icon="people-outline"
-              title="People"
-
-              onPress={() => router.push('/people')}
-            />
-            <PreferenceRow
-              icon="sync-outline"
-              title="Recurring"
-
-              onPress={() => router.push('/recurring')}
-            />
-            <PreferenceRow
-              icon="pie-chart-outline"
-              title="Budgets"
-
-              onPress={() => router.push('/budgets')}
+            <Row
+              icon="contrast-outline"
+              title="Appearance"
+              value={themeLabel}
+              onPress={() => setShowAppearanceDialog(true)}
+              isFirst
               isLast
             />
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Account</Text>
-          <View style={styles.card}>
-            <PreferenceRow
-              icon="person-outline"
-              title="Display name"
-              value={profile.name ? undefined : 'Not set'}
-              subtitle={profile.name || 'Personalize your dashboard'}
-              onPress={openEditName}
-              isLast
-            />
-          </View>
-        </View>
-
+        {/* ── Notifications ── */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Notifications</Text>
           <View style={styles.card}>
-            <PreferenceRow
+            <Row
               icon="notifications-outline"
               title="Daily reminder"
-              value={profile.reminderEnabled ? 'On' : 'Off'}
-
+              subtitle="Get nudged to log transactions"
+              type="toggle"
+              toggled={profile.reminderEnabled}
               onPress={handleToggleReminders}
+              isFirst
+              isLast={!profile.reminderEnabled}
             />
-            <PreferenceRow
-              icon="time-outline"
-              title="Reminder time"
-              value={profile.reminderTime}
-
-              onPress={() => setShowTimePicker(true)}
-              isLast
-            />
+            {profile.reminderEnabled && (
+              <Row
+                icon="time-outline"
+                title="Reminder time"
+                value={profile.reminderTime}
+                onPress={() => setShowTimePicker(true)}
+                isLast
+              />
+            )}
           </View>
         </View>
 
-        {showTimePicker && (() => {
-          // Convert HH:mm to a Date object for the picker
-          const [h, m] = profile.reminderTime.split(':').map(Number);
-          const date = new Date();
-          date.setHours(h, m, 0, 0);
-
-          return (
-            <DateTimePicker
-              value={date}
-              mode="time"
-              is24Hour={true}
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={onTimeChange}
-            />
-          );
-        })()}
-
+        {/* ── Manage ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>General</Text>
+          <Text style={styles.sectionLabel}>Manage</Text>
           <View style={styles.card}>
-            <PreferenceRow
-              icon="contrast-outline"
-              title="Appearance"
-              value={activeTheme}
-
-              onPress={handleThemeChange}
-            />
-            <PreferenceRow
-              icon="grid-outline"
-              title="Categories"
-
-              onPress={() => router.push('/categories')}
-              isLast
-            />
+            <Row icon="grid-outline" title="Categories" onPress={() => router.push('/categories')} isFirst />
+            <Row icon="pie-chart-outline" title="Budgets" onPress={() => router.push('/budgets')} />
+            <Row icon="sync-outline" title="Recurring" onPress={() => router.push('/recurring')} />
+            <Row icon="people-outline" title="People" onPress={() => router.push('/people')} />
+            <Row icon="location-outline" title="Places" onPress={() => router.push('/places')} isLast />
           </View>
         </View>
 
+        {/* ── Danger zone ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Data</Text>
+          <Text style={styles.sectionLabel}>Danger zone</Text>
           <View style={styles.card}>
-            <PreferenceRow
+            <Row
               icon="trash-bin-outline"
               title="Factory reset"
-              destructive
-
-              onPress={handleResetData}
+              subtitle="Wipe all data — cannot be undone"
+              type="destructive"
+              onPress={() => setShowResetConfirm(true)}
+              isFirst
               isLast
             />
           </View>
         </View>
 
+        {/* ── Footer ── */}
         <View style={styles.footer}>
           <TouchableOpacity onLongPress={() => router.push('/developer')} activeOpacity={1}>
-            <Text style={styles.footerBrand}>LUNO / CORE</Text>
+            <Text style={styles.footerBrand}>LUNO</Text>
           </TouchableOpacity>
-          <Text style={styles.footerCopy}>All data is encrypted and stored locally by default.</Text>
+          <Text style={styles.footerVersion}>v{appVersion}</Text>
+          <Text style={styles.footerCopy}>All data is encrypted and stored locally.</Text>
         </View>
       </ScrollView>
 
+      {/* ── Time picker ── */}
+      {showTimePicker && (
+        <DateTimePicker
+          value={timePickerDate}
+          mode="time"
+          is24Hour
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={onTimeChange}
+        />
+      )}
+
+      {/* ── Appearance dialog ── */}
       <OptionsDialog
         visible={showAppearanceDialog}
         onClose={() => setShowAppearanceDialog(false)}
         title="Appearance"
-
-        options={themeOptions.map((option) => ({
-          key: option.value,
-          label: option.label,
-          icon: option.icon,
-          selected: (profile.theme || 'system') === option.value,
-          onPress: async () => {
-            await updateProfile({ theme: option.value });
-          },
-        }))}
+        options={themeOptions}
       />
 
+      {/* ── Edit name modal ── */}
       <Modal
-        visible={showEditNameModal}
+        visible={showEditName}
         transparent
         animationType="fade"
         presentationStyle="overFullScreen"
         statusBarTranslucent
-        onRequestClose={() => setShowEditNameModal(false)}
+        onRequestClose={() => setShowEditName(false)}
       >
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <View style={styles.modalOverlay}>
-            <TouchableOpacity style={StyleSheet.absoluteFillObject} activeOpacity={1} onPress={() => setShowEditNameModal(false)} />
+            <TouchableOpacity style={StyleSheet.absoluteFillObject} activeOpacity={1} onPress={() => setShowEditName(false)} />
             <View style={styles.modalCard}>
               <Text style={styles.modalTitle}>Display name</Text>
-              <Text style={styles.modalSubtitle}>{"How you'll be greeted in the dashboard"}</Text>
+              <Text style={styles.modalSub}>How you'll appear in your dashboard</Text>
               <TextInput
                 style={styles.modalInput}
                 value={nameInput}
                 onChangeText={setNameInput}
-                placeholder="Name"
+                placeholder="Your name"
                 placeholderTextColor={colors.textMuted}
                 autoFocus
                 returnKeyType="done"
                 onSubmitEditing={saveEditName}
               />
               <View style={styles.modalActions}>
-                <TouchableOpacity style={styles.modalBtnCancel} onPress={() => setShowEditNameModal(false)} activeOpacity={0.8}>
-                  <Text style={styles.modalBtnCancelText}>Cancel</Text>
+                <TouchableOpacity style={styles.btnCancel} onPress={() => setShowEditName(false)} activeOpacity={0.8}>
+                  <Text style={[styles.btnText, { color: colors.text }]}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.modalBtnSave} onPress={saveEditName} activeOpacity={0.8}>
-                  <Text style={styles.modalBtnSaveText}>Save changes</Text>
+                <TouchableOpacity style={[styles.btnSave, { backgroundColor: colors.primary }]} onPress={saveEditName} activeOpacity={0.8}>
+                  <Text style={[styles.btnText, { color: colors.onPrimary }]}>Save</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -351,12 +399,13 @@ export default function SettingsScreen() {
         </KeyboardAvoidingView>
       </Modal>
 
+      {/* ── Reset confirm ── */}
       <ConfirmDialog
-        visible={showResetConfirmDialog}
-        onClose={() => setShowResetConfirmDialog(false)}
-        title="Factory Reset"
-        message="This operation is destructive and cannot be undone."
-        confirmLabel="Wipe Data"
+        visible={showResetConfirm}
+        onClose={() => setShowResetConfirm(false)}
+        title="Factory reset"
+        message="This permanently deletes all accounts, categories, and transactions. Cannot be undone."
+        confirmLabel="Wipe data"
         destructive
         onConfirm={runResetData}
       />
@@ -369,190 +418,147 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 48,
+  scroll: {
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
+    paddingBottom: theme.spacing[48],
   },
-  heroPanel: {
-    borderRadius: theme.radius['3xl'],
-    padding: 24,
-    backgroundColor: theme.colors.surface,
-    marginBottom: 28,
-  },
-  heroHeader: {
+
+  // Profile card
+  profileCard: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    marginBottom: 24,
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    padding: theme.spacing[20],
+    gap: theme.spacing[16],
+    marginBottom: theme.spacing[32],
   },
-  heroKicker: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 12,
-    color: theme.colors.primary,
-    marginBottom: 4,
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: theme.radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  heroTitle: {
-    fontFamily: theme.fontFamilies.heading,
-    fontSize: 26,
-    color: theme.colors.text,
+  avatarText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 20,
     letterSpacing: -0.5,
   },
-  heroBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    height: 24,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.overlay,
-  },
-  heroBadgeDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: theme.colors.success,
-  },
-  heroBadgeText: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 11,
-    color: theme.colors.textMuted,
-  },
-  heroGrid: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 20,
-  },
-  heroGridItem: {
+  profileInfo: {
     flex: 1,
+    gap: 3,
   },
-  heroGridLabel: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 11,
-    color: theme.colors.textMuted,
-    marginBottom: 4,
-  },
-  heroGridValue: {
-    fontFamily: theme.fontFamilies.heading,
-    fontSize: 18,
+  profileName: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.lg,
     color: theme.colors.text,
-    letterSpacing: -0.2,
+    letterSpacing: -0.3,
   },
-  heroGridDivider: {
-    width: 1,
-    height: 24,
-    backgroundColor: theme.colors.overlay,
+  profileHint: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
   },
+  planBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: theme.radius.full,
+  },
+  planBadgeText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 12,
+  },
+
+  // Sections
   section: {
-    marginBottom: 28,
+    marginBottom: theme.spacing[24],
   },
   sectionLabel: {
     fontFamily: theme.fontFamilies.sansMedium,
     fontSize: 12,
     color: theme.colors.textMuted,
-    marginBottom: 12,
+    marginBottom: theme.spacing[8],
     paddingLeft: 4,
   },
   card: {
-    borderRadius: theme.radius['3xl'],
     backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
     overflow: 'hidden',
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: theme.radius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.overlay,
-    marginRight: 14,
-  },
-  textDetails: {
-    flex: 1,
-  },
-  rowTitle: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 15,
-    color: theme.colors.text,
-  },
-  rowSubtitle: {
-    fontFamily: theme.fontFamilies.sans,
-    fontSize: 12,
-    color: theme.colors.textMuted,
-    marginTop: 2,
-  },
-  rowRightSide: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  rowValue: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 12,
-    color: theme.colors.primary,
-  },
+
+  // Footer
   footer: {
-    marginTop: 12,
+    marginTop: theme.spacing[8],
     alignItems: 'center',
-    gap: 6,
+    gap: theme.spacing[4],
+    paddingBottom: theme.spacing[8],
   },
   footerBrand: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 10,
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 11,
     color: theme.colors.text,
-    letterSpacing: 3,
+    letterSpacing: 4,
+  },
+  footerVersion: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
+    color: theme.colors.textMuted,
   },
   footerCopy: {
     fontFamily: theme.fontFamilies.sans,
-    fontSize: 9,
-    color: theme.colors.textMuted,
+    fontSize: 11,
+    color: theme.colors.textFaint,
     textAlign: 'center',
-    maxWidth: 200,
-    lineHeight: 14,
-    letterSpacing: 0.5,
+    maxWidth: 220,
+    lineHeight: 16,
+    marginTop: 2,
   },
+
+  // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.55)',
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: theme.spacing[32],
   },
   modalCard: {
     backgroundColor: theme.colors.floating,
     borderRadius: theme.radius['3xl'],
-    padding: 24,
+    padding: theme.spacing[24],
   },
   modalTitle: {
     fontFamily: theme.fontFamilies.heading,
     fontSize: 24,
     color: theme.colors.text,
-    marginBottom: 6,
+    letterSpacing: -0.5,
+    marginBottom: theme.spacing[4],
   },
-  modalSubtitle: {
+  modalSub: {
     fontFamily: theme.fontFamilies.sans,
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textMuted,
-    marginBottom: 20,
+    marginBottom: theme.spacing[20],
   },
   modalInput: {
-    height: 54,
-    borderRadius: theme.radius.lg,
+    height: 52,
+    borderRadius: theme.radius.xl,
     backgroundColor: theme.colors.overlay,
-    paddingHorizontal: 16,
+    paddingHorizontal: theme.spacing[16],
     fontSize: 16,
     color: theme.colors.text,
-    marginBottom: 20,
+    fontFamily: theme.fontFamilies.sans,
+    marginBottom: theme.spacing[20],
   },
   modalActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: theme.spacing[12],
   },
-  modalBtnCancel: {
+  btnCancel: {
     flex: 1,
     height: 44,
     borderRadius: theme.radius.full,
@@ -560,32 +566,15 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     alignItems: 'center',
     backgroundColor: theme.colors.overlay,
   },
-  modalBtnCancelText: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    color: theme.colors.text,
-  },
-  modalBtnSave: {
+  btnSave: {
     flex: 1,
     height: 44,
     borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.primary,
   },
-  modalBtnSaveText: {
+  btnText: {
     fontFamily: theme.fontFamilies.sansSemiBold,
-    color: theme.colors.onPrimary,
-  },
-  devCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 16,
-  },
-  devText: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 13,
-    color: theme.colors.text,
-    letterSpacing: 0.5,
+    fontSize: 14,
   },
 });

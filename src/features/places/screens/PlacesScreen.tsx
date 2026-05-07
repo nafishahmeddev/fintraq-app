@@ -12,6 +12,44 @@ import { fromDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
 import { useDeletePlace, usePlaces, Place } from '../api/places';
 
+const PlaceCard = React.memo(function PlaceCard({
+  item,
+  onPress,
+  onLongPress,
+}: {
+  item: Place;
+  onPress: () => void;
+  onLongPress: () => void;
+}) {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createCardStyles(theme), [theme]);
+  const placeColor = fromDbColor(item.color);
+
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.8}
+      onPress={onPress}
+      onLongPress={onLongPress}
+    >
+      <View style={[styles.accentStrip, { backgroundColor: placeColor }]} />
+      <View style={styles.cardBody}>
+        <View style={[styles.avatar, { backgroundColor: placeColor + '20' }]}>
+          <Ionicons name={resolveIcon(item.icon, 'location-outline')} size={22} color={placeColor} />
+        </View>
+        <View style={styles.placeInfo}>
+          <Text style={styles.placeName} numberOfLines={1}>{item.name}</Text>
+          {item.description && (
+            <Text style={styles.placeMeta} numberOfLines={1}>{item.description}</Text>
+          )}
+        </View>
+        <Ionicons name="chevron-forward" size={16} color={colors.textFaint} />
+      </View>
+    </TouchableOpacity>
+  );
+});
+
 export const PlacesScreen = React.memo(function PlacesScreen() {
   const theme = useTheme();
   const { colors } = theme;
@@ -77,31 +115,13 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
     },
   ], [selectedPlace, handlePlacePress, router]);
 
-  const renderItem = useCallback(({ item }: { item: Place }) => {
-    const placeColor = fromDbColor(item.color);
-    return (
-      <TouchableOpacity
-        style={styles.card}
-        activeOpacity={0.8}
-        onPress={() => handlePlacePress(item.id)}
-        onLongPress={() => {
-          setSelectedPlace(item);
-          setShowOptions(true);
-        }}
-      >
-        <View style={[styles.avatar, { backgroundColor: placeColor + '20' }]}>
-          <Ionicons name={resolveIcon(item.icon, 'location-outline')} size={24} color={placeColor} />
-        </View>
-        <View style={styles.placeInfo}>
-          <Text style={styles.placeName} numberOfLines={1}>{item.name}</Text>
-          {item.description && (
-            <Text style={styles.placeMeta} numberOfLines={1}>{item.description}</Text>
-          )}
-        </View>
-        <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
-      </TouchableOpacity>
-    );
-  }, [colors, styles, handlePlacePress]);
+  const renderItem = useCallback(({ item }: { item: Place }) => (
+    <PlaceCard
+      item={item}
+      onPress={() => handlePlacePress(item.id)}
+      onLongPress={() => { setSelectedPlace(item); setShowOptions(true); }}
+    />
+  ), [handlePlacePress]);
 
   const keyExtractor = useCallback((item: Place) => item.id.toString(), []);
 
@@ -169,6 +189,47 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
   );
 });
 
+const createCardStyles = (theme: Theme) => StyleSheet.create({
+  card: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    overflow: 'hidden',
+  },
+  accentStrip: {
+    height: 3,
+    width: '100%',
+    opacity: 0.7,
+  },
+  cardBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: theme.spacing[16],
+    gap: theme.spacing[12],
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeInfo: {
+    flex: 1,
+    gap: 3,
+  },
+  placeName: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+    letterSpacing: -0.2,
+  },
+  placeMeta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+});
+
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
@@ -184,35 +245,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     paddingTop: theme.spacing[16],
     paddingBottom: 40,
     gap: theme.spacing[12],
-  },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius['3xl'],
-    padding: theme.spacing[16],
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing[16],
-  },
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: theme.radius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  placeInfo: {
-    flex: 1,
-    gap: 3,
-  },
-  placeName: {
-    fontFamily: theme.fontFamilies.sansBold,
-    fontSize: theme.fontSizes.md,
-    color: theme.colors.text,
-  },
-  placeMeta: {
-    fontFamily: theme.fontFamilies.sans,
-    fontSize: 12,
-    color: theme.colors.textMuted,
   },
   emptyContainer: {
     paddingVertical: 64,

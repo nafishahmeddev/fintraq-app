@@ -1,4 +1,4 @@
-import { SQL, and, count, desc, eq, inArray, sql } from 'drizzle-orm';
+import { SQL, and, count, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
 import { db } from '../../../db/client';
 import { accounts, categories, payments, people, places, TransactionType } from '../../../db/schema';
 
@@ -11,7 +11,11 @@ export const PAGE_SIZE = 20;
 export type TransactionFilters = {
   type?: TransactionType;
   accountId?: number;
+  accountIds?: number[];
   categoryId?: number;
+  categoryIds?: number[];
+  dateFrom?: string;
+  dateTo?: string;
   budgetId?: number;
   goalId?: number;
   loanId?: number;
@@ -66,7 +70,11 @@ const buildWhere = (filters: TransactionFilters): SQL | undefined => {
   const conditions: SQL[] = [];
   if (filters.type) conditions.push(eq(payments.type, filters.type));
   if (filters.accountId != null) conditions.push(eq(payments.accountId, filters.accountId));
+  if (filters.accountIds && filters.accountIds.length > 0) conditions.push(inArray(payments.accountId, filters.accountIds));
   if (filters.categoryId != null) conditions.push(eq(payments.categoryId, filters.categoryId));
+  if (filters.categoryIds && filters.categoryIds.length > 0) conditions.push(inArray(payments.categoryId, filters.categoryIds));
+  if (filters.dateFrom) conditions.push(gte(payments.datetime, filters.dateFrom));
+  if (filters.dateTo) conditions.push(lte(payments.datetime, filters.dateTo));
   if (filters.budgetId != null) conditions.push(eq(payments.budgetId, filters.budgetId));
   if (filters.goalId != null) conditions.push(eq(payments.goalId, filters.goalId));
   if (filters.loanId != null) conditions.push(eq(payments.loanId, filters.loanId));

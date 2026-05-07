@@ -9,13 +9,12 @@ import { Header } from '../../../components/ui/Header';
 import { MoneyText } from '../../../components/ui/MoneyText';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
-import { fromDbColor } from '../../../utils/format';
+import { formatCurrency, fromDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
 import { TransactionListItem } from '../../transactions/api/transactions';
-import { useTransactions } from '../../transactions/hooks/transactions';
-import { useBudgetById, useBudgetsProgress } from '../api/budgets';
+import { useBudgetById, useBudgetsProgress, useTransactionsForBudget } from '../api/budgets';
 
-// ─── Local transaction row ────────────────────────────────────────────────────
+// ─── Transaction row ──────────────────────────────────────────────────────────
 const TxRow = React.memo(function TxRow({
   tx,
   onPress,
@@ -25,14 +24,12 @@ const TxRow = React.memo(function TxRow({
 }) {
   const theme = useTheme();
   const { colors } = theme;
-  const styles = useMemo(() => createTxRowStyles(theme), [theme]);
+  const styles = useMemo(() => createTxStyles(theme), [theme]);
 
   const isTransfer = tx.type === 'TRANSFER';
   const catColor = isTransfer
     ? colors.primary
-    : tx.category
-    ? fromDbColor(tx.category.color)
-    : colors.textMuted;
+    : tx.category ? fromDbColor(tx.category.color) : colors.textMuted;
   const iconName = isTransfer
     ? ('swap-horizontal-outline' as const)
     : resolveIcon(tx.category?.icon, 'pricetag-outline');
@@ -47,7 +44,7 @@ const TxRow = React.memo(function TxRow({
       </View>
       <View style={styles.info}>
         <Text style={styles.note} numberOfLines={1}>{tx.note || label}</Text>
-        <Text style={styles.meta} numberOfLines={1}>{label} · {tx.account.name}</Text>
+        <Text style={styles.meta}>{label} · {tx.account.name}</Text>
       </View>
       <View style={styles.right}>
         <MoneyText
@@ -75,7 +72,7 @@ export const BudgetDetailsScreen = React.memo(function BudgetDetailsScreen() {
 
   const { data: budget, isLoading: loadingBudget } = useBudgetById(budgetId);
   const { data: progressData, isLoading: loadingProgress } = useBudgetsProgress();
-  const { data: transactions, isLoading: loadingTransactions } = useTransactions(50, { budgetId });
+  const { data: transactions, isLoading: loadingTx } = useTransactionsForBudget(budget);
 
   const progress = useMemo(
     () => progressData?.find(p => p.budgetId === budgetId),
@@ -109,60 +106,133 @@ export const BudgetDetailsScreen = React.memo(function BudgetDetailsScreen() {
     );
   }
 
-  const spent = progress?.spent || 0;
-  const total = progress?.total || budget.amount;
-  const remaining = progress?.remaining || Math.max(0, total - spent);
-  const percentage = Math.min(progress?.percentage || 0, 100);
-  const isExceeded = percentage >= 100;
-  const isWarning = percentage >= 80 && !isExceeded;
-  const statusColor = isExceeded ? colors.danger : isWarning ? colors.warning : colors.primary;
+  const spent = progress?.spent ?? 0;
+  const total = progress?.total ?? budget.amount;
+  const remaining = progress?.remaining ?? Math.max(0, total - spent);
+  const rawPct = progress?.percentage ?? 0;
+  const pct = Math.min(rawPct, 100);
+  const adjustment = progress?.adjustment ?? 0;
+
+  const isExceeded = rawPct >= 100;
+  const isWarning = rawPct >= 80 && !isExceeded;
+  const statusColor = isExceeded ? colors.danger : isWarning ? colors.warning : colors.success;
+  const statusLabel = isExceeded ? 'Exceeded' : isWarning ? 'Caution' : 'On track';
+
+  const cap = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
   const renderHeader = () => (
     <View style={styles.headerContent}>
+
+      {/* ── Hero card ── */}
       <View style={styles.heroCard}>
-        <View style={styles.heroTop}>
-          <View>
-            <Text style={styles.heroLabel}>Remaining</Text>
-            <MoneyText
-              amount={remaining}
-              currency={profile.defaultCurrency}
-              style={styles.heroAmount}
-              weight="sansBold"
-            />
-          </View>
-          <TouchableOpacity
-            onPress={() => router.push(`/budgets/edit/${budgetId}`)}
-            activeOpacity={0.75}
-          >
-            <Ionicons name="create-outline" size={22} color={colors.textMuted} />
-          </TouchableOpacity>
-        </View>
 
-        <View style={styles.progressInfoRow}>
-          <Text style={styles.progressLabel}>
-            Spent {fmtCurrency(spent, profile.defaultCurrency)} of {fmtCurrency(total, profile.defaultCurrency)}
-          </Text>
-          <Text style={[styles.progressPct, { color: statusColor }]}>{Math.round(percentage)}%</Text>
-        </View>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${percentage}%`, backgroundColor: statusColor }]} />
-        </View>
+        {/* Status accent strip */}
+        <View style={[styles.accentStrip, { backgroundColor: statusColor }]} />
 
-        <View style={styles.sep} />
+        <View style={styles.heroBody}>
 
-        <View style={styles.metaGrid}>
-          <View style={styles.metaItem}>
-            <Text style={styles.metaLabel}>Period</Text>
-            <Text style={styles.metaValue}>{budget.period.toLowerCase()}</Text>
+          {/* Kicker row */}
+          <View style={styles.kickerRow}>
+            <Text style={styles.kicker}>
+              {cap(budget.period)} · {budget.type === 'DR' ? 'Expense' : 'Income'}
+            </Text>
+            <View style={[styles.statusPill, { backgroundColor: statusColor + '18' }]}>
+              <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+              <Text style={[styles.statusPillText, { color: statusColor }]}>{statusLabel}</Text>
+            </View>
           </View>
-          <View style={styles.metaItem}>
-            <Text style={styles.metaLabel}>Mode</Text>
-            <Text style={styles.metaValue}>{budget.mode.toLowerCase()}</Text>
+
+          {/* Large percentage display */}
+          <View style={styles.pctBlock}>
+            <Text style={[styles.pctDisplay, { color: statusColor }]}>
+              {Math.round(rawPct)}%
+            </Text>
+            <Text style={styles.pctSub}>of budget used</Text>
           </View>
-          <View style={styles.metaItem}>
-            <Text style={styles.metaLabel}>Type</Text>
-            <Text style={styles.metaValue}>{budget.type === 'DR' ? 'Expense' : 'Income'}</Text>
+
+          {/* Progress bar */}
+          <View style={styles.progressTrack}>
+            <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: statusColor }]} />
           </View>
+
+          {/* Spent · remaining row */}
+          <View style={styles.progressLabels}>
+            <Text style={styles.progressLabelText}>
+              {formatCurrency(spent, profile.defaultCurrency)} spent
+            </Text>
+            <Text style={styles.progressLabelText}>
+              {formatCurrency(total, profile.defaultCurrency)} limit
+            </Text>
+          </View>
+
+          {/* Sep */}
+          <View style={styles.sep} />
+
+          {/* Stats grid */}
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statLabel}>Spent</Text>
+              <MoneyText
+                amount={spent}
+                currency={profile.defaultCurrency}
+                weight="sansBold"
+                style={styles.statAmount}
+              />
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statLabel}>Budget</Text>
+              <MoneyText
+                amount={total}
+                currency={profile.defaultCurrency}
+                weight="sansBold"
+                style={styles.statAmount}
+              />
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statLabel}>Remaining</Text>
+              <MoneyText
+                amount={remaining}
+                currency={profile.defaultCurrency}
+                weight="sansBold"
+                style={[styles.statAmount, { color: isExceeded ? colors.danger : colors.text }]}
+              />
+            </View>
+          </View>
+
+          {/* Sep */}
+          <View style={styles.sep} />
+
+          {/* Meta grid */}
+          <View style={styles.metaGrid}>
+            <View style={styles.metaItem}>
+              <Text style={styles.metaLabel}>Period</Text>
+              <Text style={styles.metaValue}>{cap(budget.period)}</Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Text style={styles.metaLabel}>Mode</Text>
+              <Text style={styles.metaValue}>{cap(budget.mode)}</Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Text style={styles.metaLabel}>Rolling</Text>
+              <Text style={styles.metaValue}>{budget.isRolling ? 'Yes' : 'No'}</Text>
+            </View>
+          </View>
+
+          {/* Adjustment (if rolling carry-forward) */}
+          {adjustment !== 0 && (
+            <View style={[styles.adjustRow, { backgroundColor: (adjustment > 0 ? colors.success : colors.danger) + '12' }]}>
+              <Ionicons
+                name={adjustment > 0 ? 'arrow-forward-circle-outline' : 'arrow-back-circle-outline'}
+                size={14}
+                color={adjustment > 0 ? colors.success : colors.danger}
+              />
+              <Text style={[styles.adjustText, { color: adjustment > 0 ? colors.success : colors.danger }]}>
+                {adjustment > 0 ? '+' : ''}{formatCurrency(adjustment, profile.defaultCurrency)} carried forward from last period
+              </Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -172,14 +242,25 @@ export const BudgetDetailsScreen = React.memo(function BudgetDetailsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title={budget.name} showBack />
+      <Header
+        title={budget.name}
+        showBack
+        rightAction={
+          <TouchableOpacity
+            onPress={() => router.push(`/budgets/edit/${budgetId}`)}
+            activeOpacity={0.75}
+          >
+            <Ionicons name="create-outline" size={22} color={colors.text} />
+          </TouchableOpacity>
+        }
+      />
       <FlatList
         data={transactions}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={
-          !loadingTransactions ? (
+          !loadingTx ? (
             <EmptyState title="No transactions" icon="receipt-outline" />
           ) : null
         }
@@ -190,10 +271,8 @@ export const BudgetDetailsScreen = React.memo(function BudgetDetailsScreen() {
   );
 });
 
-const fmtCurrency = (amount: number, currency: string) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
-
-const createTxRowStyles = (theme: Theme) => StyleSheet.create({
+// ─── Styles ──────────────────────────────────────────────────────────────────
+const createTxStyles = (theme: Theme) => StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -258,44 +337,73 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     gap: theme.spacing[20],
     marginBottom: theme.spacing[8],
   },
+
+  // Hero card
   heroCard: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius['3xl'],
+    overflow: 'hidden',
+  },
+  accentStrip: {
+    height: 4,
+    width: '100%',
+  },
+  heroBody: {
     padding: theme.spacing[20],
+    gap: theme.spacing[16],
   },
-  heroTop: {
+
+  // Kicker
+  kickerRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: theme.spacing[20],
   },
-  heroLabel: {
+  kicker: {
     fontFamily: theme.fontFamilies.sansMedium,
     fontSize: 12,
     color: theme.colors.textMuted,
-    marginBottom: 4,
+    letterSpacing: 0.2,
   },
-  heroAmount: {
-    fontSize: 32,
-    letterSpacing: -1,
-  },
-  progressInfoRow: {
+  statusPill: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing[8],
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: theme.radius.full,
   },
-  progressLabel: {
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: theme.radius.full,
+  },
+  statusPillText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 10,
+  },
+
+  // Percentage display
+  pctBlock: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: theme.spacing[8],
+  },
+  pctDisplay: {
+    fontFamily: theme.fontFamilies.heading,
+    fontSize: 52,
+    lineHeight: 56,
+    letterSpacing: -2,
+  },
+  pctSub: {
     fontFamily: theme.fontFamilies.sans,
-    fontSize: 12,
+    fontSize: 13,
     color: theme.colors.textMuted,
   },
-  progressPct: {
-    fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 12,
-  },
-  progressBar: {
-    height: 4,
+
+  // Progress
+  progressTrack: {
+    height: 8,
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.overlay,
     overflow: 'hidden',
@@ -304,18 +412,54 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     height: '100%',
     borderRadius: theme.radius.full,
   },
+  progressLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: -theme.spacing[8],
+  },
+  progressLabelText: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+
+  // Sep
   sep: {
     height: 1,
     backgroundColor: theme.colors.overlay,
-    marginVertical: theme.spacing[20],
   },
+
+  // Stats grid
+  statsRow: {
+    flexDirection: 'row',
+    gap: theme.spacing[16],
+  },
+  statItem: {
+    flex: 1,
+    gap: theme.spacing[4],
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: theme.colors.overlay,
+  },
+  statLabel: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
+  statAmount: {
+    fontSize: 15,
+    letterSpacing: -0.3,
+  },
+
+  // Meta grid
   metaGrid: {
     flexDirection: 'row',
     gap: theme.spacing[16],
   },
   metaItem: {
     flex: 1,
-    gap: 4,
+    gap: theme.spacing[4],
   },
   metaLabel: {
     fontFamily: theme.fontFamilies.sansMedium,
@@ -324,10 +468,24 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   metaValue: {
     fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.text,
-    textTransform: 'capitalize',
   },
+
+  // Adjustment
+  adjustRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[8],
+    padding: theme.spacing[12],
+    borderRadius: theme.radius.lg,
+  },
+  adjustText: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 12,
+    flex: 1,
+  },
+
   sectionLabel: {
     fontFamily: theme.fontFamilies.sansMedium,
     fontSize: 12,
