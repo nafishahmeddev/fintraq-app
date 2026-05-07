@@ -9,6 +9,8 @@ import { MoneyText } from '../../src/components/ui/MoneyText';
 import { OptionsDialog } from '../../src/components/ui/OptionsDialog';
 import type { Account } from '../../src/features/accounts/api/accounts';
 import { useAccounts, useDeleteAccount } from '../../src/features/accounts/hooks/accounts';
+import { FREE_LIMITS } from '../../src/constants/iap';
+import { usePremium } from '../../src/providers/PremiumProvider';
 import { Theme, useTheme } from '../../src/providers/ThemeProvider';
 import { resolveIcon } from '../../src/utils/icons';
 
@@ -18,8 +20,25 @@ export default function AccountsTab() {
   const styles = useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
 
+  const { isPremium, showAlert } = usePremium();
   const { data: accounts, isLoading } = useAccounts();
   const { mutateAsync: deleteAccount } = useDeleteAccount();
+
+  const handleCreate = useCallback(() => {
+    if (!isPremium && (accounts?.length ?? 0) >= FREE_LIMITS.ACCOUNTS) {
+      showAlert({
+        title: 'Account limit reached',
+        message: `Free users can add up to ${FREE_LIMITS.ACCOUNTS} accounts. Upgrade to Pro for unlimited!`,
+        type: 'warning',
+        buttons: [
+          { text: 'Maybe later', style: 'cancel' },
+          { text: 'Upgrade now', onPress: () => router.push('/premium') },
+        ],
+      });
+      return;
+    }
+    router.push('/accounts/create');
+  }, [router, isPremium, accounts, showAlert]);
 
   const [showOptions, setShowOptions] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
@@ -78,7 +97,7 @@ export default function AccountsTab() {
         <Header
           title="Accounts"
           rightAction={(
-            <TouchableOpacity onPress={() => router.push('/accounts/create')} activeOpacity={0.75}>
+            <TouchableOpacity onPress={handleCreate} activeOpacity={0.75}>
               <Ionicons name="add" size={26} color={colors.text} />
             </TouchableOpacity>
           )}
@@ -137,7 +156,7 @@ export default function AccountsTab() {
 
           <TouchableOpacity
             style={styles.addCard}
-            onPress={() => router.push('/accounts/create')}
+            onPress={handleCreate}
             activeOpacity={0.88}
           >
             <View style={styles.addIcon}>

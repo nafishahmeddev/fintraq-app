@@ -5,7 +5,7 @@ import { Theme, useTheme } from '@/src/providers/ThemeProvider';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
@@ -17,14 +17,13 @@ export default function PremiumScreen() {
   const { colors } = theme;
   const { products, purchasePremium, restorePurchase, isPremium, isLoading } = usePremium();
   const router = useRouter();
-  const { width: screenWidth } = useWindowDimensions();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const lifetimeProduct = useMemo(() => {
     return products.find(p => p.id === SKU_LIFETIME);
   }, [products]);
 
-  const styles = useMemo(() => createStyles(theme, screenWidth), [theme, screenWidth]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const handlePurchase = useCallback(async () => {
     setIsProcessing(true);
@@ -89,9 +88,9 @@ export default function PremiumScreen() {
 
         {/* ── Editorial Hero ── */}
         <View style={styles.heroSection}>
-          <Text style={styles.heroKicker}>One-time upgrade</Text>
-          <Text style={styles.heroTitle}>Unlock peak financial clarity.</Text>
-          <Text style={styles.heroSubtitle}>No subscriptions. One payment for permanent access to all professional tools.</Text>
+          <Text style={styles.heroKicker}>One-time · Lifetime</Text>
+          <Text style={styles.heroTitle}>The full picture,{'\n'}unlocked forever.</Text>
+          <Text style={styles.heroSubtitle}>No subscriptions. One payment for permanent access to every professional tool.</Text>
         </View>
 
         {/* ── Main Offer Card (Primary CTA) ── */}
@@ -142,7 +141,7 @@ export default function PremiumScreen() {
 
         {/* ── Detailed Features (Settings Pattern) ── */}
         <View style={styles.featuresSection}>
-          <Text style={styles.sectionLabel}>Pro capabilities</Text>
+          <Text style={styles.sectionLabel}>Everything unlocked</Text>
           <View style={styles.settingsCard}>
             {FEATURES.map((feature, index) => (
               <View key={index} style={[styles.settingsRow, index === FEATURES.length - 1 && { borderBottomWidth: 0 }]}>
@@ -151,10 +150,16 @@ export default function PremiumScreen() {
                 </View>
                 <View style={styles.textDetails}>
                   <Text style={styles.rowTitle}>{feature.title}</Text>
-                  <Text style={styles.rowSubtitle} numberOfLines={1}>{feature.description}</Text>
+                  <Text style={styles.rowSubtitle} numberOfLines={2}>{feature.description}</Text>
                 </View>
                 <View style={styles.rowRightSide}>
-                  <Ionicons name="sparkles" size={14} color={colors.primary} />
+                  {feature.freeLimit ? (
+                    <View style={styles.limitBadge}>
+                      <Text style={styles.limitBadgeText}>Free: {feature.freeLimit}</Text>
+                    </View>
+                  ) : (
+                    <Ionicons name="sparkles" size={14} color={colors.primary} />
+                  )}
                 </View>
               </View>
             ))}
@@ -198,7 +203,7 @@ export default function PremiumScreen() {
   );
 }
 
-const createStyles = (theme: Theme, screenWidth: number) => StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
 
@@ -284,6 +289,18 @@ const createStyles = (theme: Theme, screenWidth: number) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+
+  limitBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.dangerSubtle,
+  },
+  limitBadgeText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 9,
+    color: theme.colors.danger,
   },
 
   brandingBox: { alignItems: 'center', marginTop: 10, marginBottom: 0 },

@@ -6,7 +6,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Header } from '../../../components/ui/Header';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
+import { FREE_LIMITS } from '../../../constants/iap';
 import { CategoryType } from '../../../db/schema';
+import { usePremium } from '../../../providers/PremiumProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { fromDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
@@ -60,6 +62,7 @@ export const CategoriesScreen = React.memo(function CategoriesScreen() {
   const router = useRouter();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
+  const { isPremium, showAlert } = usePremium();
   const { data: categories, isLoading } = useCategories();
   const { mutateAsync: deleteCategory } = useDeleteCategory();
 
@@ -80,8 +83,20 @@ export const CategoriesScreen = React.memo(function CategoriesScreen() {
   }, [categories, activeType, query]);
 
   const handleCreate = useCallback(() => {
+    if (!isPremium && (categories?.length ?? 0) >= FREE_LIMITS.CATEGORIES) {
+      showAlert({
+        title: 'Category limit reached',
+        message: `Free users can create up to ${FREE_LIMITS.CATEGORIES} categories. Upgrade to Pro for unlimited!`,
+        type: 'warning',
+        buttons: [
+          { text: 'Maybe later', style: 'cancel' },
+          { text: 'Upgrade now', onPress: () => router.push('/premium') },
+        ],
+      });
+      return;
+    }
     router.push('/categories/create');
-  }, [router]);
+  }, [router, isPremium, categories, showAlert]);
 
   const handleEdit = useCallback((category: Category) => {
     router.push(`/categories/edit/${category.id}`);
