@@ -15,6 +15,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Chip } from '../../../components/ui/Chip';
 import { Header } from '../../../components/ui/Header';
 import { PremiumGuard } from '../../../components/ui/PremiumGuard';
 import { IconPickerDialog } from '../../../components/ui/IconPickerDialog';
@@ -338,15 +339,13 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
             <Text style={styles.sectionLabel}>Frequency</Text>
             <View style={styles.grid}>
               {FREQUENCIES.map((f) => (
-                <TouchableOpacity
+                <Chip
                   key={f.value}
-                  style={[styles.gridBtn, frequency === f.value && { backgroundColor: colors.text, borderColor: colors.text }]}
+                  label={f.label}
+                  selected={frequency === f.value}
                   onPress={() => setFrequency(f.value)}
-                >
-                  <Text style={[styles.gridBtnText, frequency === f.value && { color: colors.background }]}>
-                    {f.label}
-                  </Text>
-                </TouchableOpacity>
+                  size="sm"
+                />
               ))}
             </View>
 
@@ -364,18 +363,13 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
                 </View>
                 <View style={styles.intervalUnitGrid}>
                   {RECURRING_INTERVAL_UNITS.map((unit) => (
-                    <TouchableOpacity
+                    <Chip
                       key={unit}
-                      style={[
-                         styles.unitBtn,
-                         intervalUnit === unit && { backgroundColor: colors.text, borderColor: colors.text }
-                      ]}
+                      label={unit.toLowerCase()}
+                      selected={intervalUnit === unit}
                       onPress={() => setIntervalUnit(unit)}
-                    >
-                      <Text style={[styles.unitBtnText, intervalUnit === unit && { color: colors.background }]}>
-                        {unit.toLowerCase()}
-                      </Text>
-                    </TouchableOpacity>
+                      size="sm"
+                    />
                   ))}
                 </View>
               </View>
@@ -386,18 +380,13 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
             <Text style={styles.sectionLabel}>Reminder</Text>
             <View style={styles.grid}>
               {[0, 1, 3, 7].map((dayOption) => (
-                <TouchableOpacity
+                <Chip
                   key={dayOption}
-                  style={[
-                    styles.gridBtn,
-                    reminderDays === dayOption && { backgroundColor: colors.text, borderColor: colors.text }
-                  ]}
+                  label={dayOption === 0 ? 'No reminder' : `${dayOption} day${dayOption > 1 ? 's' : ''} before`}
+                  selected={reminderDays === dayOption}
                   onPress={() => setReminderDays(dayOption)}
-                >
-                  <Text style={[styles.gridBtnText, reminderDays === dayOption && { color: colors.background }]}>
-                    {dayOption === 0 ? 'No reminder' : `${dayOption} day${dayOption > 1 ? 's' : ''} before`}
-                  </Text>
-                </TouchableOpacity>
+                  size="sm"
+                />
               ))}
             </View>
           </View>
@@ -414,19 +403,17 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
             <Text style={styles.sectionLabel}>End condition</Text>
             <View style={styles.grid}>
               {END_CONDITIONS.map((c) => (
-                <TouchableOpacity
+                <Chip
                   key={c.value}
-                  style={[styles.gridBtn, endCondition === c.value && { backgroundColor: colors.text, borderColor: colors.text }]}
+                  label={c.label}
+                  selected={endCondition === c.value}
                   onPress={() => {
                     setEndCondition(c.value);
                     if (c.value === 'AFTER_OCCURRENCES') setEndValue('10');
                     if (c.value === 'ON_DATE') setEndValue(new Date().toISOString());
                   }}
-                >
-                  <Text style={[styles.gridBtnText, endCondition === c.value && { color: colors.background }]}>
-                    {c.label}
-                  </Text>
-                </TouchableOpacity>
+                  size="sm"
+                />
               ))}
             </View>
 
@@ -552,6 +539,7 @@ const createStyles = (theme: Theme) =>
       paddingBottom: 120,
     },
     formBody: {
+      marginTop: theme.spacing[16],
       gap: theme.spacing[16],
     },
     section: {
@@ -581,19 +569,6 @@ const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       flexWrap: 'wrap',
       gap: theme.spacing[8],
-    },
-    gridBtn: {
-      paddingHorizontal: theme.spacing[16],
-      paddingVertical: 10,
-      borderRadius: theme.radius.full,
-      backgroundColor: theme.colors.surface,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
-    gridBtnText: {
-      fontFamily: theme.fontFamilies.sansMedium,
-      fontSize: 13,
-      color: theme.colors.text,
     },
     dateBtn: {
       height: 48,
@@ -696,19 +671,5 @@ const createStyles = (theme: Theme) =>
       flexWrap: 'wrap',
       gap: 4,
       flex: 2,
-    },
-    unitBtn: {
-      paddingHorizontal: 8,
-      paddingVertical: theme.spacing[4],
-      borderRadius: theme.radius.md,
-      backgroundColor: theme.colors.surface,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
-    unitBtnText: {
-      fontFamily: theme.fontFamilies.sansMedium,
-      fontSize: 11,
-      color: theme.colors.text,
-      textTransform: 'capitalize',
     },
   });

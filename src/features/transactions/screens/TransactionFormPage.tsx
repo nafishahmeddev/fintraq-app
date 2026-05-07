@@ -343,15 +343,13 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <TransactionTypePicker value={type} onChange={setType} disabled={isEditMode} />
 
-        <View style={styles.formBody}>
+        <TransactionAmountInput
+          value={amountInput}
+          onChange={setAmountInput}
+          currency={selectedAccount?.currency ?? profile.defaultCurrency}
+        />
 
-          <View style={styles.amountWrap}>
-            <TransactionAmountInput
-              value={amountInput}
-              onChange={setAmountInput}
-              currency={selectedAccount?.currency ?? profile.defaultCurrency}
-            />
-          </View>
+        <View style={styles.formBody}>
 
           <View style={styles.section}>
             <SectionLabel size="sm" text="Note" />
@@ -620,9 +618,6 @@ const createStyles = (theme: Theme) =>
     },
     content: {
       paddingBottom: 140,
-    },
-    amountWrap: {
-      paddingHorizontal: theme.layout.screenPadding,
     },
     formBody: {
       gap: theme.spacing[16],
