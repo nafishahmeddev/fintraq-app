@@ -23,7 +23,7 @@ export const TransactionBudgetPicker = ({ budgetsList, selectedId, onSelect }: P
         <TouchableOpacity
           style={[
             styles.pill,
-            { backgroundColor: theme.colors.card, borderColor: theme.colors.border },
+            { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
             selectedId === null && { backgroundColor: theme.colors.textMuted + '15', borderColor: theme.colors.textMuted },
           ]}
           onPress={() => onSelect(null)}
@@ -47,8 +47,8 @@ export const TransactionBudgetPicker = ({ budgetsList, selectedId, onSelect }: P
               key={budget.id}
               style={[
                 styles.pill,
-                { backgroundColor: theme.colors.card, borderColor: theme.colors.border },
-                selected && { backgroundColor: theme.colors.primaryDark, borderColor: theme.colors.primaryDark },
+                { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                selected && { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
               ]}
               onPress={() => onSelect(budget.id)}
               activeOpacity={0.7}

@@ -113,7 +113,7 @@ export default function SettingsScreen() {
         onPress={onPress}
         activeOpacity={0.7}
       >
-        <View style={[styles.iconBox, { backgroundColor: colors.background, borderColor: colors.border }]}>
+        <View style={[styles.iconBox, { backgroundColor: colors.overlay }]}>
           <Ionicons name={icon} size={18} color={iconColor} />
         </View>
         <View style={styles.textDetails}>
@@ -131,7 +131,7 @@ export default function SettingsScreen() {
   const activeTheme = (profile.theme || 'system').toUpperCase();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
 
       <Header title="Settings" />
 
@@ -185,19 +185,19 @@ export default function SettingsScreen() {
             <PreferenceRow
               icon="people-outline"
               title="People"
-             
+
               onPress={() => router.push('/people')}
             />
             <PreferenceRow
               icon="sync-outline"
               title="Recurring"
-             
+
               onPress={() => router.push('/recurring')}
             />
             <PreferenceRow
               icon="pie-chart-outline"
               title="Budgets"
-             
+
               onPress={() => router.push('/budgets')}
               isLast
             />
@@ -225,14 +225,14 @@ export default function SettingsScreen() {
               icon="notifications-outline"
               title="Daily reminder"
               value={profile.reminderEnabled ? 'On' : 'Off'}
-             
+
               onPress={handleToggleReminders}
             />
             <PreferenceRow
               icon="time-outline"
               title="Reminder time"
               value={profile.reminderTime}
-             
+
               onPress={() => setShowTimePicker(true)}
               isLast
             />
@@ -263,13 +263,13 @@ export default function SettingsScreen() {
               icon="contrast-outline"
               title="Appearance"
               value={activeTheme}
-             
+
               onPress={handleThemeChange}
             />
             <PreferenceRow
               icon="grid-outline"
               title="Categories"
-             
+
               onPress={() => router.push('/categories')}
               isLast
             />
@@ -283,7 +283,7 @@ export default function SettingsScreen() {
               icon="trash-bin-outline"
               title="Factory reset"
               destructive
-             
+
               onPress={handleResetData}
               isLast
             />
@@ -302,7 +302,7 @@ export default function SettingsScreen() {
         visible={showAppearanceDialog}
         onClose={() => setShowAppearanceDialog(false)}
         title="Appearance"
-       
+
         options={themeOptions.map((option) => ({
           key: option.value,
           label: option.label,
@@ -377,7 +377,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   heroPanel: {
     borderRadius: theme.radius['3xl'],
     padding: 24,
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.surface,
     marginBottom: 28,
   },
   heroHeader: {
@@ -405,7 +405,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     paddingHorizontal: 10,
     height: 24,
     borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.overlay,
   },
   heroBadgeDot: {
     width: 6,
@@ -441,7 +441,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   heroGridDivider: {
     width: 1,
     height: 24,
-    backgroundColor: theme.colors.text + '08',
+    backgroundColor: theme.colors.overlay,
   },
   section: {
     marginBottom: 28,
@@ -455,7 +455,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   card: {
     borderRadius: theme.radius['3xl'],
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.surface,
     overflow: 'hidden',
   },
   row: {
@@ -469,7 +469,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.overlay,
     marginRight: 14,
   },
   textDetails: {
@@ -523,14 +523,9 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     paddingHorizontal: 32,
   },
   modalCard: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.floating,
     borderRadius: theme.radius['3xl'],
     padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
   },
   modalTitle: {
     fontFamily: theme.fontFamilies.heading,
@@ -547,13 +542,11 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   modalInput: {
     height: 54,
     borderRadius: theme.radius.lg,
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.overlay,
     paddingHorizontal: 16,
     fontSize: 16,
     color: theme.colors.text,
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   modalActions: {
     flexDirection: 'row',
@@ -565,9 +558,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.card,
-    borderWidth: 1.5,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.overlay,
   },
   modalBtnCancelText: {
     fontFamily: theme.fontFamilies.sansSemiBold,

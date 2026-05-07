@@ -21,19 +21,35 @@ function calcChange(current: number, previous: number): { diff: number; pct: num
 
 function ChangeBadge({ change, inverse }: { change: { diff: number; pct: number } | null; inverse?: boolean }) {
   const theme = useTheme();
-  const { colors, fontFamilies } = theme;
+  const styles = useMemo(() => createBadgeStyles(theme), [theme]);
   if (!change || change.diff === 0) return null;
   const isGood = inverse ? change.diff < 0 : change.diff > 0;
-  const c = isGood ? colors.success : colors.danger;
+  const c = isGood ? theme.colors.success : theme.colors.danger;
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, paddingHorizontal: 5, paddingVertical: 2, borderRadius: 3, backgroundColor: c + '20' }}>
+    <View style={[styles.badge, { backgroundColor: c + '25' }]}>
       <Ionicons name={isGood ? 'arrow-up' : 'arrow-down'} size={8} color={c} />
-      <Text style={{ fontFamily: fontFamilies.sansBold, fontSize: 8, letterSpacing: 0.2, color: c }}>
-        {change.pct >= 0 ? '+' : ''}{change.pct.toFixed(0)}%
+      <Text style={[styles.badgeText, { color: c }]}>
+        {Math.abs(change.pct).toFixed(0)}%
       </Text>
     </View>
   );
 }
+
+const createBadgeStyles = (theme: Theme) => StyleSheet.create({
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    paddingHorizontal: theme.spacing[4],
+    paddingVertical: 2,
+    borderRadius: theme.radius.full,
+  },
+  badgeText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 9,
+    letterSpacing: 0.2,
+  },
+});
 
 export const HeroBalanceCard = React.memo(function HeroBalanceCard({
   balancesByCurrency,
@@ -43,9 +59,7 @@ export const HeroBalanceCard = React.memo(function HeroBalanceCard({
   onCurrencySelect,
 }: HeroBalanceCardProps) {
   const theme = useTheme();
-  const { colors } = theme;
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const white = '#FFFFFF';
 
   const thisMonth = monthlyData?.thisMonth ?? { income: 0, expense: 0 };
   const lastMonth = monthlyData?.lastMonth ?? { income: 0, expense: 0 };
@@ -53,118 +67,152 @@ export const HeroBalanceCard = React.memo(function HeroBalanceCard({
   const expenseChange = useMemo(() => calcChange(thisMonth.expense, lastMonth.expense), [thisMonth.expense, lastMonth.expense]);
 
   return (
-    <View style={[styles.heroCard, { backgroundColor: colors.primary }]}>
+    <View style={styles.card}>
       {currencyKeys.length > 1 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.currencyTabsRow}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
           {currencyKeys.map(curr => (
             <TouchableOpacity
               key={curr}
-               style={selectedCurrency === curr ? { paddingHorizontal: 10, paddingVertical: 5, borderRadius: theme.radius.full, backgroundColor: colors.primary, borderWidth: 1, borderColor: colors.primary } : { paddingHorizontal: 10, paddingVertical: 5, borderRadius: theme.radius.full, backgroundColor: white + '15', borderWidth: 1, borderColor: 'transparent' }}
+              style={[styles.tab, selectedCurrency === curr && styles.tabActive]}
               onPress={() => onCurrencySelect(curr)}
               activeOpacity={0.8}
             >
-              <Text style={selectedCurrency === curr ? { fontFamily: theme.fontFamilies.sansSemiBold, fontSize: 9, color: white } : { fontFamily: theme.fontFamilies.sansSemiBold, fontSize: 9, color: white + 'B3' }}>{curr}</Text>
+              <Text style={[styles.tabText, selectedCurrency === curr && styles.tabTextActive]}>{curr}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       )}
 
-      <Text style={[styles.heroBadge, { color: white + 'B3' }]}>Total balance</Text>
+      <Text style={styles.balanceLabel}>Total balance</Text>
       <MoneyText
         amount={balancesByCurrency[selectedCurrency] || 0}
         currency={selectedCurrency}
-        style={[styles.heroBalance, { color: white }]}
+        style={styles.balance}
         weight="sansBold"
         display
       />
 
-      <Text style={[styles.sectionLabel, { color: white + 'B3' }]}>This month</Text>
+      <View style={styles.divider} />
 
-      <View style={styles.splitRow}>
-        <View style={styles.splitHalf}>
-          <View style={styles.splitBody}>
-            <View style={styles.splitTop}>
-              <Text style={[styles.splitLabel, { color: white + 'B3' }]}>Income</Text>
-              <ChangeBadge change={incomeChange} />
-            </View>
-            <MoneyText amount={thisMonth.income} currency={selectedCurrency} type="CR" style={[styles.splitValue, { color: white }]} weight="sansBold" />
+      <Text style={styles.monthLabel}>THIS MONTH</Text>
+
+      <View style={styles.statsRow}>
+        <View style={styles.statItem}>
+          <View style={styles.statTop}>
+            <Text style={styles.statLabel}>Income</Text>
+            <ChangeBadge change={incomeChange} />
           </View>
+          <MoneyText
+            amount={thisMonth.income}
+            currency={selectedCurrency}
+            type="CR"
+            style={styles.statValue}
+            weight="sansBold"
+          />
         </View>
 
-        <View style={[styles.splitDivider, { backgroundColor: white + '30' }]} />
+        <View style={styles.verticalDivider} />
 
-        <View style={styles.splitHalf}>
-          <View style={styles.splitBody}>
-            <View style={styles.splitTop}>
-              <Text style={[styles.splitLabel, { color: white + 'B3' }]}>Expense</Text>
-              <ChangeBadge change={expenseChange} inverse />
-            </View>
-            <MoneyText amount={thisMonth.expense} currency={selectedCurrency} type="DR" style={[styles.splitValue, { color: white }]} weight="sansBold" />
+        <View style={styles.statItem}>
+          <View style={styles.statTop}>
+            <Text style={styles.statLabel}>Expenses</Text>
+            <ChangeBadge change={expenseChange} inverse />
           </View>
+          <MoneyText
+            amount={thisMonth.expense}
+            currency={selectedCurrency}
+            type="DR"
+            style={styles.statValue}
+            weight="sansBold"
+          />
         </View>
       </View>
     </View>
   );
 });
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  heroCard: {
-    marginHorizontal: theme.layout.screenPadding,
-    marginTop: theme.spacing[12],
-    marginBottom: theme.spacing[32],
-    padding: theme.spacing[20],
-    borderRadius: theme.radius['3xl'],
-    backgroundColor: theme.colors.card,
-  },
-  currencyTabsRow: {
-    flexDirection: 'row',
-    gap: theme.spacing[4],
-    marginBottom: theme.spacing[16],
-  },
-  heroBadge: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 11,
-    color: theme.colors.textMuted,
-    marginBottom: theme.spacing[4],
-  },
-  heroBalance: {
-    fontSize: 32,
-    letterSpacing: -0.8,
-  },
-  sectionLabel: {
-    fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 9,
-    color: theme.colors.textMuted,
-    marginBottom: theme.spacing[12],
-    marginTop: theme.spacing[12],
-  },
-  splitRow: {
-    flexDirection: 'row',
-    gap: theme.spacing[12],
-  },
-  splitHalf: {
-    flex: 1,
-    flexDirection: 'row',
-    gap: theme.spacing[8],
-  },
-  splitBody: {
-    flex: 1,
-  },
-  splitTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 2,
-  },
-  splitLabel: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 11,
-    color: theme.colors.textMuted,
-  },
-  splitValue: {
-    fontSize: 17,
-  },
-  splitDivider: {
-    width: 1,
-  },
-});
+const createStyles = (theme: Theme) => {
+  const op = theme.colors.onPrimary;
+  return StyleSheet.create({
+    card: {
+      marginHorizontal: theme.layout.screenPadding,
+      marginTop: theme.spacing[12],
+      marginBottom: theme.spacing[24],
+      padding: theme.spacing[20],
+      borderRadius: theme.radius['3xl'],
+      backgroundColor: theme.colors.primary,
+    },
+    tabsRow: {
+      flexDirection: 'row',
+      gap: theme.spacing[4],
+      marginBottom: theme.spacing[16],
+    },
+    tab: {
+      paddingHorizontal: theme.spacing[12],
+      paddingVertical: theme.spacing[4],
+      borderRadius: theme.radius.full,
+      backgroundColor: op + '18',
+    },
+    tabActive: {
+      backgroundColor: op + '30',
+    },
+    tabText: {
+      fontFamily: theme.fontFamilies.sansSemiBold,
+      fontSize: 10,
+      color: op + 'B0',
+    },
+    tabTextActive: {
+      color: op,
+    },
+    balanceLabel: {
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 11,
+      color: op + 'B0',
+      marginBottom: theme.spacing[4],
+    },
+    balance: {
+      fontSize: 40,
+      letterSpacing: -1,
+      color: op,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: op + '20',
+      marginVertical: theme.spacing[16],
+    },
+    monthLabel: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 10,
+      letterSpacing: 1,
+      color: op + '70',
+      marginBottom: theme.spacing[12],
+    },
+    statsRow: {
+      flexDirection: 'row',
+      gap: theme.spacing[16],
+    },
+    statItem: {
+      flex: 1,
+      gap: theme.spacing[4],
+    },
+    statTop: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing[4],
+      marginBottom: 2,
+    },
+    statLabel: {
+      fontFamily: theme.fontFamilies.sansMedium,
+      fontSize: 11,
+      color: op + 'B0',
+    },
+    statValue: {
+      fontSize: 18,
+      color: op,
+    },
+    verticalDivider: {
+      width: 1,
+      backgroundColor: op + '20',
+    },
+  });
+};

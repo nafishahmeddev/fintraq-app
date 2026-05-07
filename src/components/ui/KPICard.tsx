@@ -118,7 +118,7 @@ const createStyles = (theme: Theme) =>
   StyleSheet.create({
     kpiCard: {
       borderRadius: theme.radius['3xl'],
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.surface,
       overflow: 'hidden',
     },
     kpiTabsWrap: {

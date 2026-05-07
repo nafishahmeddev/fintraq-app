@@ -1,13 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState, useMemo, useCallback } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, Card, Typography, MoneyText, OptionsDialog, ConfirmDialog, EmptyState } from '../../../components/ui';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
-import { useSettings } from '../../../providers/SettingsProvider';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import { Header } from '../../../components/ui/Header';
+import { MoneyText } from '../../../components/ui/MoneyText';
+import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { usePremium } from '../../../providers/PremiumProvider';
-import { useGoals, useGoalsProgress, useDeleteGoal } from '../api/goals';
+import { useSettings } from '../../../providers/SettingsProvider';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { useDeleteGoal, useGoals, useGoalsProgress } from '../api/goals';
 import { GoalProgress } from '../services/goalQueries';
 
 export const GoalsScreen = React.memo(function GoalsScreen() {
@@ -34,8 +37,8 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
         type: 'warning',
         buttons: [
           { text: 'Maybe later', style: 'cancel' },
-          { text: 'Upgrade now', onPress: () => router.push('/premium') }
-        ]
+          { text: 'Upgrade now', onPress: () => router.push('/premium') },
+        ],
       });
       return;
     }
@@ -46,11 +49,6 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
     router.push(`/goals/details/${goalId}`);
   }, [router]);
 
-  const handleGoalLongPress = useCallback((goal: GoalProgress) => {
-    setSelectedGoal(goal);
-    setShowOptions(true);
-  }, []);
-
   const options = useMemo(() => [
     {
       key: 'view',
@@ -59,7 +57,7 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
       onPress: () => {
         setShowOptions(false);
         if (selectedGoal) handleGoalPress(selectedGoal.goalId);
-      }
+      },
     },
     {
       key: 'edit',
@@ -68,7 +66,7 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
       onPress: () => {
         setShowOptions(false);
         if (selectedGoal) router.push(`/goals/edit/${selectedGoal.goalId}`);
-      }
+      },
     },
     {
       key: 'delete',
@@ -78,70 +76,64 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
       onPress: () => {
         setShowOptions(false);
         setShowDeleteConfirm(true);
-      }
-    }
+      },
+    },
   ], [selectedGoal, handleGoalPress, router]);
 
   const renderItem = useCallback(({ item }: { item: GoalProgress }) => {
     const isReached = item.percentage >= 100;
     const statusColor = isReached ? colors.success : colors.primary;
+    const pct = Math.min(item.percentage, 100);
 
     return (
-      <Card size="lg" variant="outlined" shadow="none" style={styles.card}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => handleGoalPress(item.goalId)}
-          onLongPress={() => handleGoalLongPress(item)}
-        >
-          <View style={styles.cardHeader}>
-            <View style={styles.cardInfo}>
-              <Typography variant="h3" numberOfLines={1}>{item.name}</Typography>
-              <Typography variant="label" color={colors.textMuted}>{item.status}</Typography>
-            </View>
-            <View style={styles.cardRight}>
-              <MoneyText 
-                amount={item.remaining} 
-                currency={profile.defaultCurrency} 
-                weight="sansBold" 
-                style={styles.remainingAmount}
-              />
-              <Typography variant="label" color={colors.textMuted}>left</Typography>
-            </View>
+      <TouchableOpacity
+        style={styles.card}
+        activeOpacity={0.8}
+        onPress={() => handleGoalPress(item.goalId)}
+        onLongPress={() => {
+          setSelectedGoal(item);
+          setShowOptions(true);
+        }}
+      >
+        <View style={styles.cardHeader}>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
+            <Text style={styles.cardMeta}>{item.status}</Text>
           </View>
+          <View style={styles.cardRight}>
+            <MoneyText
+              amount={item.remaining}
+              currency={profile.defaultCurrency}
+              weight="sansBold"
+              style={styles.cardAmount}
+            />
+            <Text style={styles.cardSubLabel}>left</Text>
+          </View>
+        </View>
 
-          <View style={styles.progressSection}>
-            <View style={styles.progressInfo}>
-              <Typography variant="bodySm" color={colors.textMuted}>
-                Saved {profile.defaultCurrency} {item.current.toLocaleString()} of {item.target.toLocaleString()}
-              </Typography>
-              <Typography variant="monoSm" weight="sansBold">{Math.round(item.percentage)}%</Typography>
-            </View>
-            <View style={styles.progressBar}>
-              <View 
-                style={[
-                  styles.progressFill, 
-                  { 
-                    width: `${Math.min(item.percentage, 100)}%`, 
-                    backgroundColor: statusColor 
-                  }
-                ]} 
-              />
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Card>
+        <View style={styles.progressInfoRow}>
+          <Text style={styles.progressLabel}>
+            Saved {profile.defaultCurrency} {item.current.toLocaleString()} of {item.target.toLocaleString()}
+          </Text>
+          <Text style={[styles.progressPct, { color: statusColor }]}>{Math.round(item.percentage)}%</Text>
+        </View>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: statusColor }]} />
+        </View>
+      </TouchableOpacity>
     );
-  }, [colors, profile.defaultCurrency, styles, handleGoalPress, handleGoalLongPress]);
+  }, [colors, profile.defaultCurrency, styles, handleGoalPress]);
+
+  const keyExtractor = useCallback((item: GoalProgress) => item.goalId.toString(), []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header 
-        title="Goals" 
-        
-        showBack 
+      <Header
+        title="Goals"
+        showBack
         rightAction={
-          <TouchableOpacity onPress={handleCreate} style={styles.headerBtn}>
-            <Ionicons name="add" size={24} color={colors.primary} />
+          <TouchableOpacity onPress={handleCreate} activeOpacity={0.75}>
+            <Ionicons name="add" size={26} color={colors.text} />
           </TouchableOpacity>
         }
       />
@@ -153,18 +145,19 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
       ) : (
         <FlatList
           data={progressData}
-          keyExtractor={(item) => item.goalId.toString()}
+          keyExtractor={keyExtractor}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <EmptyState
-              title="No goals yet"
-             
-              icon="flag-outline"
-              actionLabel="Create first goal"
-              onAction={handleCreate}
-            />
+            <View style={styles.emptyContainer}>
+              <Ionicons name="flag-outline" size={32} color={colors.textMuted} />
+              <Text style={styles.emptyTitle}>No goals yet</Text>
+              <Text style={styles.emptyText}>Set a savings target and track your progress.</Text>
+              <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate} activeOpacity={0.8}>
+                <Text style={styles.emptyBtnText}>Create first goal</Text>
+              </TouchableOpacity>
+            </View>
           }
         />
       )}
@@ -181,7 +174,7 @@ export const GoalsScreen = React.memo(function GoalsScreen() {
         visible={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         title="Delete goal"
-        message={`Are you sure you want to delete "${selectedGoal?.name}"? Linked transactions will remain but won't be associated with this goal.`}
+        message={`Delete "${selectedGoal?.name}"? Linked transactions will remain but won't be associated with this goal.`}
         confirmLabel="Delete"
         destructive
         onConfirm={() => {
@@ -203,50 +196,107 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  headerBtn: {
-    padding: 8,
-  },
   listContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
     paddingBottom: 40,
-    gap: 16,
+    gap: theme.spacing[12],
   },
   card: {
-    padding: 20,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    padding: theme.spacing[20],
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 20,
+    marginBottom: theme.spacing[16],
   },
   cardInfo: {
     flex: 1,
-    gap: 4,
+    gap: theme.spacing[4],
+  },
+  cardName: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+    letterSpacing: -0.3,
+  },
+  cardMeta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    textTransform: 'capitalize',
   },
   cardRight: {
     alignItems: 'flex-end',
+    gap: 2,
   },
-  remainingAmount: {
-    fontSize: 20,
+  cardAmount: {
+    fontSize: 22,
+    letterSpacing: -0.5,
   },
-  progressSection: {
-    gap: 8,
+  cardSubLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 11,
+    color: theme.colors.textMuted,
   },
-  progressInfo: {
+  progressInfoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: theme.spacing[8],
+  },
+  progressLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  progressPct: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 12,
   },
   progressBar: {
-    height: 6,
-    backgroundColor: theme.colors.border + '40',
+    height: 4,
     borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.overlay,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     borderRadius: theme.radius.full,
+  },
+  emptyContainer: {
+    paddingVertical: 64,
+    alignItems: 'center',
+    gap: theme.spacing[8],
+  },
+  emptyTitle: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.lg,
+    color: theme.colors.text,
+    marginTop: theme.spacing[8],
+  },
+  emptyText: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 13,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+    maxWidth: 240,
+  },
+  emptyBtn: {
+    marginTop: theme.spacing[8],
+    height: 40,
+    paddingHorizontal: theme.spacing[20],
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.overlay,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyBtnText: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 13,
+    color: theme.colors.text,
   },
 });

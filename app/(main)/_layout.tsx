@@ -2,7 +2,7 @@ import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { useOnboarding } from '../../src/providers/OnboardingProvider';
-import { Theme, useTheme } from '../../src/providers/ThemeProvider';
+import { useTheme } from '../../src/providers/ThemeProvider';
 
 export default function TabLayout() {
   const { hasOnboarded } = useOnboarding();
@@ -49,12 +49,7 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="transactions"
-        options={{
-          title: 'Transactions',
-          tabBarIcon: ({ color, size }) => (
-            <TabIcon name="receipt-outline" color={color} size={size} />
-          ),
-        }}
+        options={{ href: null }}
       />
       <Tabs.Screen
         name="analytics"

@@ -12,7 +12,6 @@ import {
   View,
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Header } from '../../../components/ui/Header';
 import { KPICard } from '../../../components/ui/KPICard';
@@ -468,20 +467,20 @@ export function TransactionsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
 
 
       <Header
         title="Transactions"
-       
+
         showBack
         rightAction={(
           <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.headerBtn} onPress={() => router.push('/search')} activeOpacity={0.85}>
-              <Ionicons name="search-outline" size={19} color={colors.text} />
+            <TouchableOpacity style={styles.headerBtn} onPress={() => router.push('/search')} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Ionicons name="search-outline" color={colors.text} size={26} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.headerBtn} onPress={() => setShowAdvancedFilterSheet(true)} activeOpacity={0.9}>
-              <Ionicons name="filter-outline" size={19} color={colors.text} />
+            <TouchableOpacity style={styles.headerBtn} onPress={() => setShowAdvancedFilterSheet(true)} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Ionicons name="filter-outline" color={colors.text} size={26} />
               {activeFilterCount > 0 && (
                 <View style={styles.filterBadge}>
                   <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
@@ -577,7 +576,7 @@ export function TransactionsScreen() {
         categories={categoriesQuery.data ?? []}
         resultCount={transactions.length}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -599,12 +598,9 @@ const createStyles = (theme: Theme) =>
       gap: theme.spacing[8],
     },
     headerBtn: {
-      width: 40,
-      height: 40,
-      borderRadius: theme.radius.full,
-      backgroundColor: theme.colors.card,
       alignItems: 'center',
       justifyContent: 'center',
+
     },
     filterBadge: {
       position: 'absolute',
@@ -620,7 +616,7 @@ const createStyles = (theme: Theme) =>
       borderColor: theme.colors.background,
     },
     filterBadgeText: {
-      color: theme.colors.primaryDark,
+      color: theme.colors.primary,
       fontFamily: theme.fontFamilies.sansBold,
       fontSize: 10,
     },

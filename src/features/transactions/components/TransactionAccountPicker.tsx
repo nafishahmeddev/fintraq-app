@@ -35,7 +35,7 @@ export const TransactionAccountPicker = ({ accounts, selectedId, onSelect, onAdd
               key={acc.id}
               style={[
                 styles.pill,
-                { backgroundColor: theme.colors.card, borderColor: theme.colors.border },
+                { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
                 selected && { backgroundColor: accColor, borderColor: accColor },
               ]}
               onPress={() => onSelect(acc.id)}

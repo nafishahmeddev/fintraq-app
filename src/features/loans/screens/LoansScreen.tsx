@@ -1,11 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Card, ConfirmDialog, EmptyState, Header, MoneyText, OptionsDialog, Typography } from '../../../components/ui';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import { Header } from '../../../components/ui/Header';
+import { MoneyText } from '../../../components/ui/MoneyText';
+import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { usePremium } from '../../../providers/PremiumProvider';
-import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useDeleteLoan, useLoans, useLoansProgress } from '../api/loans';
 import { LoanProgress } from '../services/loanQueries';
@@ -13,7 +15,6 @@ import { LoanProgress } from '../services/loanQueries';
 export const LoansScreen = React.memo(function LoansScreen() {
   const theme = useTheme();
   const { colors } = theme;
-  const { profile } = useSettings();
   const { isPremium, showAlert } = usePremium();
   const router = useRouter();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -34,8 +35,8 @@ export const LoansScreen = React.memo(function LoansScreen() {
         type: 'warning',
         buttons: [
           { text: 'Maybe later', style: 'cancel' },
-          { text: 'Upgrade now', onPress: () => router.push('/premium') }
-        ]
+          { text: 'Upgrade now', onPress: () => router.push('/premium') },
+        ],
       });
       return;
     }
@@ -46,11 +47,6 @@ export const LoansScreen = React.memo(function LoansScreen() {
     router.push(`/loans/details/${loanId}`);
   }, [router]);
 
-  const handleLoanLongPress = useCallback((loan: LoanProgress) => {
-    setSelectedLoan(loan);
-    setShowOptions(true);
-  }, []);
-
   const options = useMemo(() => [
     {
       key: 'view',
@@ -59,7 +55,7 @@ export const LoansScreen = React.memo(function LoansScreen() {
       onPress: () => {
         setShowOptions(false);
         if (selectedLoan) handleLoanPress(selectedLoan.loanId);
-      }
+      },
     },
     {
       key: 'edit',
@@ -68,7 +64,7 @@ export const LoansScreen = React.memo(function LoansScreen() {
       onPress: () => {
         setShowOptions(false);
         if (selectedLoan) router.push(`/loans/edit/${selectedLoan.loanId}`);
-      }
+      },
     },
     {
       key: 'delete',
@@ -78,72 +74,69 @@ export const LoansScreen = React.memo(function LoansScreen() {
       onPress: () => {
         setShowOptions(false);
         setShowDeleteConfirm(true);
-      }
-    }
+      },
+    },
   ], [selectedLoan, handleLoanPress, router]);
 
   const renderItem = useCallback(({ item }: { item: LoanProgress }) => {
     const isPaid = item.percentage >= 100;
-    const statusColor = item.type === 'BORROW' ? colors.danger : colors.success;
+    const isBorrow = item.type === 'BORROW';
+    const statusColor = isBorrow ? colors.danger : colors.success;
+    const pct = Math.min(item.percentage, 100);
 
     return (
-      <Card size="lg" variant="outlined" shadow="none" style={styles.card}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => handleLoanPress(item.loanId)}
-          onLongPress={() => handleLoanLongPress(item)}
-        >
-          <View style={styles.cardHeader}>
-            <View style={styles.cardInfo}>
-              <Typography variant="h3" numberOfLines={1}>{item.name}</Typography>
-              <View style={styles.typeBadge}>
-                <Typography variant="label" color={statusColor}>{item.type}</Typography>
-              </View>
-            </View>
-            <View style={styles.cardRight}>
-              <MoneyText 
-                amount={item.remaining} 
-                currency={item.currency} 
-                weight="sansBold" 
-                style={styles.remainingAmount}
-              />
-              <Typography variant="label" color={colors.textMuted}>remaining</Typography>
+      <TouchableOpacity
+        style={styles.card}
+        activeOpacity={0.8}
+        onPress={() => handleLoanPress(item.loanId)}
+        onLongPress={() => {
+          setSelectedLoan(item);
+          setShowOptions(true);
+        }}
+      >
+        <View style={styles.cardHeader}>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
+            <View style={[styles.typeBadge, { backgroundColor: statusColor + '18' }]}>
+              <Text style={[styles.typeBadgeText, { color: statusColor }]}>
+                {isBorrow ? 'Borrowed' : 'Lent'}
+              </Text>
             </View>
           </View>
+          <View style={styles.cardRight}>
+            <MoneyText
+              amount={item.remaining}
+              currency={item.currency}
+              weight="sansBold"
+              style={styles.cardAmount}
+            />
+            <Text style={styles.cardSubLabel}>remaining</Text>
+          </View>
+        </View>
 
-          <View style={styles.progressSection}>
-            <View style={styles.progressInfo}>
-               <Typography variant="bodySm" color={colors.textMuted}>
-                {isPaid ? 'Paid in full' : `Paid ${item.currency} ${item.paid.toLocaleString()} of ${item.total.toLocaleString()}`}
-              </Typography>
-              <Typography variant="monoSm" weight="sansBold">{Math.round(item.percentage)}%</Typography>
-            </View>
-            <View style={styles.progressBar}>
-              <View 
-                style={[
-                  styles.progressFill, 
-                  { 
-                    width: `${Math.min(item.percentage, 100)}%`, 
-                    backgroundColor: statusColor 
-                  }
-                ]} 
-              />
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Card>
+        <View style={styles.progressInfoRow}>
+          <Text style={styles.progressLabel}>
+            {isPaid ? 'Paid in full' : `Paid ${item.currency} ${item.paid.toLocaleString()} of ${item.total.toLocaleString()}`}
+          </Text>
+          <Text style={[styles.progressPct, { color: statusColor }]}>{Math.round(item.percentage)}%</Text>
+        </View>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: statusColor }]} />
+        </View>
+      </TouchableOpacity>
     );
-  }, [colors, styles, handleLoanPress, handleLoanLongPress]);
+  }, [colors, styles, handleLoanPress]);
+
+  const keyExtractor = useCallback((item: LoanProgress) => item.loanId.toString(), []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header 
-        title="Loans" 
-        
-        showBack 
+      <Header
+        title="Loans"
+        showBack
         rightAction={
-          <TouchableOpacity onPress={handleCreate} style={styles.headerBtn}>
-            <Ionicons name="add" size={24} color={colors.primary} />
+          <TouchableOpacity onPress={handleCreate} activeOpacity={0.75}>
+            <Ionicons name="add" size={26} color={colors.text} />
           </TouchableOpacity>
         }
       />
@@ -155,18 +148,19 @@ export const LoansScreen = React.memo(function LoansScreen() {
       ) : (
         <FlatList
           data={progressData}
-          keyExtractor={(item) => item.loanId.toString()}
+          keyExtractor={keyExtractor}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <EmptyState
-              title="No loans found"
-             
-              icon="cash-outline"
-              actionLabel="Add first loan"
-              onAction={handleCreate}
-            />
+            <View style={styles.emptyContainer}>
+              <Ionicons name="cash-outline" size={32} color={colors.textMuted} />
+              <Text style={styles.emptyTitle}>No loans yet</Text>
+              <Text style={styles.emptyText}>Track money you lend or borrow.</Text>
+              <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate} activeOpacity={0.8}>
+                <Text style={styles.emptyBtnText}>Add first loan</Text>
+              </TouchableOpacity>
+            </View>
           }
         />
       )}
@@ -183,7 +177,7 @@ export const LoansScreen = React.memo(function LoansScreen() {
         visible={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         title="Delete loan"
-        message={`Are you sure you want to delete "${selectedLoan?.name}"? Repayment history will remain but won't be linked to this loan.`}
+        message={`Delete "${selectedLoan?.name}"? Repayment history will remain but won't be linked to this loan.`}
         confirmLabel="Delete"
         destructive
         onConfirm={() => {
@@ -205,54 +199,111 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  headerBtn: {
-    padding: 8,
-  },
   listContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
     paddingBottom: 40,
-    gap: 16,
+    gap: theme.spacing[12],
   },
   card: {
-    padding: 20,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    padding: theme.spacing[20],
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 20,
+    marginBottom: theme.spacing[16],
   },
   cardInfo: {
     flex: 1,
-    gap: 4,
+    gap: theme.spacing[4],
+  },
+  cardName: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+    letterSpacing: -0.3,
   },
   typeBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: 'transparent',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.radius.xl,
+  },
+  typeBadgeText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 10,
   },
   cardRight: {
     alignItems: 'flex-end',
+    gap: 2,
   },
-  remainingAmount: {
-    fontSize: 20,
+  cardAmount: {
+    fontSize: 22,
+    letterSpacing: -0.5,
   },
-  progressSection: {
-    gap: 8,
+  cardSubLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 11,
+    color: theme.colors.textMuted,
   },
-  progressInfo: {
+  progressInfoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: theme.spacing[8],
+  },
+  progressLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  progressPct: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 12,
   },
   progressBar: {
-    height: 6,
-    backgroundColor: theme.colors.border + '40',
+    height: 4,
     borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.overlay,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     borderRadius: theme.radius.full,
+  },
+  emptyContainer: {
+    paddingVertical: 64,
+    alignItems: 'center',
+    gap: theme.spacing[8],
+  },
+  emptyTitle: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.lg,
+    color: theme.colors.text,
+    marginTop: theme.spacing[8],
+  },
+  emptyText: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 13,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+    maxWidth: 240,
+  },
+  emptyBtn: {
+    marginTop: theme.spacing[8],
+    height: 40,
+    paddingHorizontal: theme.spacing[20],
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.overlay,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyBtnText: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 13,
+    color: theme.colors.text,
   },
 });

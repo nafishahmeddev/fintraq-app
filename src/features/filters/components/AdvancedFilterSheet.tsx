@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Modal,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -517,14 +516,10 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'flex-end',
     },
     sheet: {
-      backgroundColor: Platform.OS === 'ios' ? theme.colors.background + 'F5' : theme.colors.background,
+      backgroundColor: theme.colors.floating,
       borderTopLeftRadius: theme.radius['3xl'],
       borderTopRightRadius: theme.radius['3xl'],
-      borderWidth: 1,
-      borderColor: theme.colors.text + '15',
-      borderBottomWidth: 0,
       maxHeight: '88%',
-      ...theme.shadow.lg,
     },
     handle: {
       width: 36,
@@ -602,9 +597,7 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       height: 44,
       borderRadius: theme.radius.full,
-      backgroundColor: theme.colors.card,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.overlay,
       paddingHorizontal: 12,
       gap: 8,
     },
@@ -634,7 +627,7 @@ const createStyles = (theme: Theme) =>
 
     // ─── Shared card surface ─────────────────────────────────────────────────
     card: {
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.overlay,
       borderRadius: theme.radius['3xl'],
       overflow: 'hidden',
     },
@@ -650,7 +643,7 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       height: 60,
       borderRadius: theme.radius['3xl'],
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.overlay,
       overflow: 'hidden',
     },
     typeAccentBar: {
@@ -710,7 +703,7 @@ const createStyles = (theme: Theme) =>
     dateClearBtn: {
       width: 26,
       height: 26,
-      borderRadius: theme.radius.sm,
+      borderRadius: theme.radius.full,
       backgroundColor: theme.colors.text + '10',
       alignItems: 'center',
       justifyContent: 'center',
@@ -777,8 +770,8 @@ const createStyles = (theme: Theme) =>
       gap: 12,
     },
     listRowDivider: {
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.text + '08',
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.text + '12',
     },
     listRowActive: {
       backgroundColor: theme.colors.text + '05',
@@ -822,7 +815,7 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: 12,
       height: 34,
       borderRadius: theme.radius.full,
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.overlay,
       gap: 4,
     },
     chipText: {
@@ -883,9 +876,7 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: 24,
       paddingTop: 16,
       paddingBottom: 36,
-      backgroundColor: theme.colors.background,
-      borderTopWidth: 1,
-      borderTopColor: theme.colors.text + '08',
+      backgroundColor: theme.colors.floating,
     },
     applyBtn: {
       height: 52,

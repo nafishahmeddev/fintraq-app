@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../../../components/ui/Header';
+import { PremiumGuard } from '../../../components/ui/PremiumGuard';
 import { IconPickerDialog } from '../../../components/ui/IconPickerDialog';
 import { ACCOUNT_COLORS } from '../../../constants/picker';
 import { RECURRING_INTERVAL_UNITS, RecurringEndCondition, RecurringFrequency, RecurringIntervalUnit } from '../../../db/schema';
@@ -270,8 +271,22 @@ export function RecurringFormPage({ mode, recurringId }: Props) {
     );
   }
 
+  const recurringCount = recurringTransactionsQuery.data?.length ?? 0;
+  if (!isEditMode && !isPremium && recurringCount >= 3) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <Header title="New recurring" showBack />
+        <View style={styles.premiumWall}>
+          <PremiumGuard label="Unlimited Recurring" size="large">
+            <View />
+          </PremiumGuard>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
 
       <Header title={isEditMode ? 'Edit recurring' : 'New recurring'} showBack />
 
@@ -527,6 +542,11 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: theme.colors.background,
+    },
+    premiumWall: {
+      flex: 1,
+      padding: 24,
+      justifyContent: 'center',
     },
     content: {
       paddingBottom: 120,

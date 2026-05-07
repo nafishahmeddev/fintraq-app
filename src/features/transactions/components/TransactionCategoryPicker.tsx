@@ -34,7 +34,7 @@ export const TransactionCategoryPicker = ({ categories, selectedId, onSelect, on
               key={cat.id}
               style={[
                 styles.pill,
-                { backgroundColor: theme.colors.card, borderColor: theme.colors.border },
+                { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
                 selected && { backgroundColor: catColor, borderColor: catColor },
               ]}
               onPress={() => onSelect(cat.id)}

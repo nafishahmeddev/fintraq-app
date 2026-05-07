@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { resolveIcon } from '../../../utils/icons';
-import React, { useMemo, useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { Theme } from '../../../providers/ThemeProvider';
+import { resolveIcon } from '../../../utils/icons';
 import { Category } from '../api/categories';
 
 interface CategoryCardProps {
@@ -22,157 +22,106 @@ export const CategoryCard = React.memo(function CategoryCard({
 }: CategoryCardProps) {
   const { colors } = theme;
   const styles = useMemo(() => createStyles(theme), [theme]);
-  
-  const catColor = useMemo(() =>
-    item.color ? '#' + item.color.toString(16).padStart(6, '0') : colors.primary,
+
+  const catColor = useMemo(
+    () => item.color ? '#' + item.color.toString(16).padStart(6, '0') : colors.primary,
     [item.color, colors.primary]
   );
 
-  const handlePress = useCallback(() => {
-    onPress(item);
-  }, [onPress, item]);
+  const handlePress = useCallback(() => onPress(item), [onPress, item]);
+  const handleLongPress = useCallback(() => onLongPress(item), [onLongPress, item]);
 
-  const handleLongPress = useCallback(() => {
-    onLongPress(item);
-  }, [onLongPress, item]);
-
-  const cardStyle = useMemo(() => [
-    styles.categoryCard,
-    index % 2 === 0 ? styles.categoryCardLeft : styles.categoryCardRight,
-  ], [styles, index]);
+  const isExpense = item.type === 'DR';
 
   return (
     <TouchableOpacity
-      style={cardStyle}
+      style={[styles.card, index % 2 === 0 ? styles.cardLeft : styles.cardRight]}
       onPress={handlePress}
       onLongPress={handleLongPress}
       delayLongPress={280}
-      activeOpacity={0.92}
+      activeOpacity={0.85}
     >
-      <View style={[styles.cardGlow, { backgroundColor: catColor + '15' }]} />
+      <View style={[styles.glow, { backgroundColor: catColor + '18' }]} />
 
-      <View style={styles.cardTopRow}>
-        <View style={[styles.categoryIconBox, { backgroundColor: catColor + '15' }]}>
+      <View style={styles.topRow}>
+        <View style={[styles.iconBox, { backgroundColor: catColor + '20' }]}>
           <Ionicons name={resolveIcon(item.icon, 'grid-outline')} size={20} color={catColor} />
         </View>
-        <View style={[styles.typeBadge, item.type === 'DR' ? styles.typeBadgeDanger : styles.typeBadgeSuccess]}>
-          <Text style={[styles.typeBadgeText, item.type === 'DR' ? styles.typeBadgeTextDanger : styles.typeBadgeTextSuccess]}>
-            {item.type === 'DR' ? 'Expense' : 'Income'}
+        <View style={[styles.typeBadge, { backgroundColor: isExpense ? colors.dangerSubtle : colors.successSubtle }]}>
+          <Text style={[styles.typeBadgeText, { color: isExpense ? colors.danger : colors.success }]}>
+            {isExpense ? 'Expense' : 'Income'}
           </Text>
         </View>
       </View>
 
-      <View style={styles.cardMainRow}>
-        <View style={styles.cardInfo}>
-          <Text style={styles.categoryName} numberOfLines={2}>{item.name}</Text>
-          <Text style={styles.categorySubtext}>Tap to edit</Text>
-        </View>
-      </View>
-
-      <View style={styles.cardFooter}>
-        <Text style={styles.cardFooterText}>Hold for options</Text>
-        <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
-      </View>
+      <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
+      <Text style={styles.hint}>Hold for options</Text>
     </TouchableOpacity>
   );
 });
 
 const createStyles = (theme: Theme) => StyleSheet.create({
-  categoryCard: {
+  card: {
     position: 'relative',
     flex: 1,
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.xl,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderRadius: theme.radius['3xl'],
+    padding: 16,
     marginBottom: 12,
     overflow: 'hidden',
-    minHeight: 156,
+    minHeight: 148,
   },
-  categoryCardLeft: {
+  cardLeft: {
     marginRight: 6,
   },
-  categoryCardRight: {
+  cardRight: {
     marginLeft: 6,
   },
-  cardGlow: {
+  glow: {
     position: 'absolute',
-    right: -24,
-    top: -24,
-    width: 88,
-    height: 88,
+    right: -20,
+    top: -20,
+    width: 80,
+    height: 80,
     borderRadius: theme.radius.full,
   },
-  cardTopRow: {
+  topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
-  categoryIconBox: {
+  iconBox: {
     width: 42,
     height: 42,
     borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   typeBadge: {
     height: 22,
-    borderRadius: theme.radius.full,
+    borderRadius: theme.radius.xl,
     paddingHorizontal: 8,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  typeBadgeDanger: {
-    backgroundColor: theme.colors.danger + '15',
-  },
-  typeBadgeSuccess: {
-    backgroundColor: theme.colors.success + '15',
   },
   typeBadgeText: {
     fontFamily: theme.fontFamilies.sansBold,
     fontSize: 10,
   },
-  typeBadgeTextDanger: {
-    color: theme.colors.danger,
-  },
-  typeBadgeTextSuccess: {
-    color: theme.colors.success,
-  },
-  cardMainRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  cardInfo: {
-    flex: 1,
-  },
-  categoryName: {
+  name: {
     fontFamily: theme.fontFamilies.sansBold,
     color: theme.colors.text,
     fontSize: 18,
     letterSpacing: -0.5,
     lineHeight: 22,
+    flex: 1,
   },
-  categorySubtext: {
-    fontFamily: theme.fontFamilies.sans,
-    color: theme.colors.textMuted,
-    fontSize: 11,
-    marginTop: 4,
-  },
-  cardFooter: {
-    marginTop: 'auto',
-    paddingTop: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  cardFooterText: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
+  hint: {
+    fontFamily: theme.fontFamilies.sansMedium,
     fontSize: 10,
-    color: theme.colors.textMuted,
+    color: theme.colors.textFaint,
+    marginTop: 'auto',
+    paddingTop: 10,
   },
 });

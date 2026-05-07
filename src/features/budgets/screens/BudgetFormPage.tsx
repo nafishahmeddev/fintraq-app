@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, Input, SectionLabel } from '../../../components/ui';
+import { Header, Input, PremiumGuard, SectionLabel } from '../../../components/ui';
 import { ACCOUNT_COLORS } from '../../../constants/picker';
 import { BudgetMode, BudgetPeriod, BudgetScope } from '../../../db/schema';
 import { usePremium } from '../../../providers/PremiumProvider';
@@ -205,8 +205,22 @@ export function BudgetFormPage({ mode: formMode, budgetId }: Props) {
     );
   }
 
+  const budgetCount = budgetsQuery.data?.length ?? 0;
+  if (!isEditMode && !isPremium && budgetCount >= 1) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <Header title="New budget" showBack />
+        <View style={styles.premiumWall}>
+          <PremiumGuard label="Unlimited Budgets" size="large">
+            <View />
+          </PremiumGuard>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
 
       <Header title={isEditMode ? 'Edit budget' : 'New budget'} showBack />
 
@@ -466,6 +480,11 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: theme.colors.background,
+    },
+    premiumWall: {
+      flex: 1,
+      padding: 24,
+      justifyContent: 'center',
     },
     content: {
       paddingHorizontal: theme.layout.screenPadding,

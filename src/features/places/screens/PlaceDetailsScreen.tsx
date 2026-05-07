@@ -1,15 +1,69 @@
 import { Ionicons } from '@expo/vector-icons';
+import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useCallback } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, View, Platform } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { ActivityIndicator, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, Card, Typography, MoneyText, SectionLabel, TransactionRow, EmptyState, IconButton, Divider } from '../../../components/ui';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { EmptyState } from '../../../components/ui/EmptyState';
+import { Header } from '../../../components/ui/Header';
+import { MoneyText } from '../../../components/ui/MoneyText';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { usePlaceById, usePlaceSummary } from '../api/places';
-import { useTransactions } from '../../transactions/hooks/transactions';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { fromDbColor } from '../../../utils/format';
+import { resolveIcon } from '../../../utils/icons';
+import { TransactionListItem } from '../../transactions/api/transactions';
+import { useTransactions } from '../../transactions/hooks/transactions';
+import { usePlaceById, usePlaceSummary } from '../api/places';
 
+// ─── Local transaction row ────────────────────────────────────────────────────
+const TxRow = React.memo(function TxRow({
+  tx,
+  onPress,
+}: {
+  tx: TransactionListItem;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createTxRowStyles(theme), [theme]);
+
+  const isTransfer = tx.type === 'TRANSFER';
+  const catColor = isTransfer
+    ? colors.primary
+    : tx.category
+    ? fromDbColor(tx.category.color)
+    : colors.textMuted;
+  const iconName = isTransfer
+    ? ('swap-horizontal-outline' as const)
+    : resolveIcon(tx.category?.icon, 'pricetag-outline');
+  const label = isTransfer
+    ? (tx.toAccount?.name ?? 'Transfer')
+    : (tx.category?.name ?? 'Transaction');
+
+  return (
+    <TouchableOpacity style={styles.row} onPress={onPress} activeOpacity={0.75}>
+      <View style={[styles.iconBox, { backgroundColor: catColor + '20' }]}>
+        <Ionicons name={iconName} size={20} color={catColor} />
+      </View>
+      <View style={styles.info}>
+        <Text style={styles.note} numberOfLines={1}>{tx.note || label}</Text>
+        <Text style={styles.meta} numberOfLines={1}>{label} · {tx.account.name}</Text>
+      </View>
+      <View style={styles.right}>
+        <MoneyText
+          amount={tx.amount}
+          currency={tx.account.currency}
+          type={tx.type}
+          weight="sansBold"
+          style={styles.amount}
+        />
+        <Text style={styles.time}>{format(new Date(tx.datetime), 'HH:mm')}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+});
+
+// ─── Screen ──────────────────────────────────────────────────────────────────
 export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const placeId = parseInt(id, 10);
@@ -23,73 +77,65 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
   const { data: summary, isLoading: loadingSummary } = usePlaceSummary(placeId);
   const { data: transactions, isLoading: loadingTransactions } = useTransactions(50, { placeId });
 
-  const handleEdit = useCallback(() => {
-    router.push(`/places/edit/${placeId}`);
-  }, [router, placeId]);
+  const handleTxPress = useCallback((txId: number) => {
+    router.push(`/transactions/edit/${txId}`);
+  }, [router]);
+
+  const renderItem = useCallback(({ item }: { item: TransactionListItem }) => (
+    <TxRow tx={item} onPress={() => handleTxPress(item.id)} />
+  ), [handleTxPress]);
+
+  const keyExtractor = useCallback((item: TransactionListItem) => item.id.toString(), []);
 
   const renderHeader = useMemo(() => {
     if (!place || !summary) return null;
+    const placeColor = fromDbColor(place.color);
     return (
       <View style={styles.headerContent}>
-        <Card variant="outlined" size="lg" style={styles.heroCard}>
+        <View style={styles.heroCard}>
           <View style={styles.heroTop}>
-            <View style={[styles.avatar, { backgroundColor: fromDbColor(place.color) + '20' }]}>
-              <Ionicons name={(place.icon as any) || 'location'} size={32} color={fromDbColor(place.color)} />
+            <View style={[styles.avatar, { backgroundColor: placeColor + '20' }]}>
+              <Ionicons name={resolveIcon(place.icon, 'location-outline')} size={32} color={placeColor} />
             </View>
             <View style={styles.heroInfo}>
-              <Typography variant="h2">{place.name}</Typography>
-              {place.description && (
-                <Typography variant="bodySm" color={colors.textMuted}>{place.description}</Typography>
-              )}
+              <Text style={styles.heroName}>{place.name}</Text>
+              {place.description && <Text style={styles.heroMeta}>{place.description}</Text>}
             </View>
-            <IconButton
-              icon="create-outline"
-              onPress={handleEdit}
-              variant="ghost"
-              size="md"
-            />
+            <TouchableOpacity
+              onPress={() => router.push(`/places/edit/${placeId}`)}
+              activeOpacity={0.75}
+            >
+              <Ionicons name="create-outline" size={22} color={colors.textMuted} />
+            </TouchableOpacity>
           </View>
 
-          <Divider style={{ marginVertical: 16 }} />
+          <View style={styles.sep} />
 
           <View style={styles.statsGrid}>
             <View style={styles.statBox}>
-              <Typography variant="bodySm" color={colors.textMuted}>Total spent</Typography>
-              <MoneyText 
-                amount={summary.totalSpent} 
-                currency={profile.defaultCurrency} 
+              <Text style={styles.statLabel}>Total spent</Text>
+              <MoneyText
+                amount={summary.totalSpent}
+                currency={profile.defaultCurrency}
                 style={[styles.statAmount, { color: colors.danger }]}
               />
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
-              <Typography variant="bodySm" color={colors.textMuted}>Entries</Typography>
-              <Typography variant="h3" weight="sansBold">
-                {summary.transactionCount}
-              </Typography>
+              <Text style={styles.statLabel}>Entries</Text>
+              <Text style={styles.statCount}>{summary.transactionCount}</Text>
             </View>
           </View>
-        </Card>
-
-        <View style={styles.section}>
-          <SectionLabel text="Recent transactions" />
         </View>
+
+        <Text style={styles.sectionLabel}>Transactions</Text>
       </View>
     );
-  }, [place, summary, colors, profile, styles, handleEdit]);
-
-  const renderItem = useCallback(({ item }: { item: any }) => (
-    <TransactionRow 
-      tx={item} 
-      onPress={(tx) => router.push(`/transactions/edit/${tx.id}`)}
-    />
-  ), [theme, router]);
-
-  const keyExtractor = useCallback((item: any) => item.id.toString(), []);
+  }, [place, summary, colors, profile, styles, router, placeId]);
 
   if (loadingPlace || loadingSummary) {
     return (
-      <View style={styles.center}>
+      <View style={styles.loading}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -99,18 +145,14 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <Header title="Place not found" showBack />
-        <EmptyState 
-          title="Not found" 
-          
-          icon="alert-circle-outline"
-        />
+        <EmptyState title="Not found" icon="alert-circle-outline" />
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Place details" showBack />
+      <Header title={place.name} showBack />
       <FlatList
         data={transactions}
         keyExtractor={keyExtractor}
@@ -124,11 +166,7 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
         removeClippedSubviews={Platform.OS === 'android'}
         ListEmptyComponent={
           !loadingTransactions ? (
-            <EmptyState
-              title="No transactions"
-             
-              icon="receipt-outline"
-            />
+            <EmptyState title="No transactions" icon="receipt-outline" />
           ) : null
         }
       />
@@ -136,32 +174,80 @@ export const PlaceDetailsScreen = React.memo(function PlaceDetailsScreen() {
   );
 });
 
+const createTxRowStyles = (theme: Theme) => StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: theme.spacing[16],
+    gap: theme.spacing[12],
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+  },
+  iconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  info: {
+    flex: 1,
+    gap: theme.spacing[2],
+  },
+  note: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: theme.fontSizes.sm,
+    color: theme.colors.text,
+  },
+  meta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: theme.fontSizes.xs,
+    color: theme.colors.textMuted,
+  },
+  right: {
+    alignItems: 'flex-end',
+    gap: theme.spacing[4],
+  },
+  amount: {
+    fontSize: theme.fontSizes.sm,
+  },
+  time: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
+});
+
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  center: {
+  loading: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: theme.colors.background,
   },
   listContent: {
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
     paddingBottom: 40,
+    gap: theme.spacing[8],
   },
   headerContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    gap: 24,
-    marginBottom: 16,
+    gap: theme.spacing[16],
+    marginBottom: theme.spacing[8],
   },
   heroCard: {
-    padding: 20,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    padding: theme.spacing[20],
   },
   heroTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: theme.spacing[16],
   },
   avatar: {
     width: 56,
@@ -174,10 +260,25 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     gap: 2,
   },
+  heroName: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.lg,
+    color: theme.colors.text,
+    letterSpacing: -0.3,
+  },
+  heroMeta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 13,
+    color: theme.colors.textMuted,
+  },
+  sep: {
+    height: 1,
+    backgroundColor: theme.colors.overlay,
+    marginVertical: theme.spacing[16],
+  },
   statsGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
+    gap: theme.spacing[8],
   },
   statBox: {
     flex: 1,
@@ -185,15 +286,27 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    height: '60%',
-    backgroundColor: theme.colors.border,
-    alignSelf: 'center',
+    backgroundColor: theme.colors.overlay,
+    alignSelf: 'stretch',
+  },
+  statLabel: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
+    color: theme.colors.textMuted,
   },
   statAmount: {
-    fontSize: 16,
-    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 18,
   },
-  section: {
-    gap: 12,
+  statCount: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 22,
+    color: theme.colors.text,
+    letterSpacing: -0.5,
+  },
+  sectionLabel: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    paddingLeft: 4,
   },
 });

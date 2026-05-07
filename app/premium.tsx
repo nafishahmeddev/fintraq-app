@@ -209,7 +209,7 @@ const createStyles = (theme: Theme, screenWidth: number) => StyleSheet.create({
 
   offerSection: { marginBottom: 28 },
   lifetimeCard: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.radius['3xl'],
     padding: 22,
     borderWidth: 1.5,
@@ -245,7 +245,7 @@ const createStyles = (theme: Theme, screenWidth: number) => StyleSheet.create({
   featuresSection: { marginBottom: 32 },
   settingsCard: {
     borderRadius: theme.radius['3xl'],
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.surface,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: theme.colors.border,
@@ -289,7 +289,7 @@ const createStyles = (theme: Theme, screenWidth: number) => StyleSheet.create({
   brandingBox: { alignItems: 'center', marginTop: 10, marginBottom: 0 },
   brandingText: { fontFamily: theme.fontFamilies.sansBold, fontSize: 10, color: theme.colors.text + '20', letterSpacing: 3, textTransform: 'uppercase' },
 
-  footer: { padding: 24, paddingBottom: Platform.OS === 'ios' ? 40 : 32, backgroundColor: theme.colors.card, borderTopWidth: 1, borderTopColor: theme.colors.primary + '10' },
+  footer: { padding: 24, paddingBottom: Platform.OS === 'ios' ? 40 : 32, backgroundColor: theme.colors.surface, borderTopWidth: 1, borderTopColor: theme.colors.primary + '10' },
   buyBtn: { backgroundColor: theme.colors.primary, height: 56, borderRadius: theme.radius.full, justifyContent: 'center', alignItems: 'center', marginBottom: 20, ...theme.shadow.md },
   buyBtnText: { fontFamily: theme.fontFamilies.sansBold, fontSize: 16, color: theme.colors.onPrimary },
   legalRows: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16 },
@@ -311,7 +311,7 @@ const createStyles = (theme: Theme, screenWidth: number) => StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: theme.colors.primary + '30',
   },

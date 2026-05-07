@@ -61,7 +61,7 @@ export const Input = React.memo(function Input({
     };
     switch (variant) {
       case 'filled':
-        return { ...base, backgroundColor: colors.card };
+        return { ...base, backgroundColor: colors.overlay };
       case 'minimal':
         return {
           backgroundColor: 'transparent',
@@ -71,9 +71,9 @@ export const Input = React.memo(function Input({
         };
       case 'default':
       default:
-        return { ...base, backgroundColor: colors.surface };
+        return { ...base, backgroundColor: colors.overlay };
     }
-  }, [variant, borderColor, focused, colors.card]);
+  }, [variant, borderColor, focused, colors.overlay]);
 
   const handleFocus = useCallback((e: Parameters<NonNullable<TextInputProps['onFocus']>>[0]) => {
     setFocused(true);

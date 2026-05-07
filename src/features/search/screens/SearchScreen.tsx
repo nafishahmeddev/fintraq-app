@@ -56,7 +56,7 @@ const AccountRow = React.memo(function AccountRow({
   const styles = useMemo(() => accountRowStyles(theme), [theme]);
 
   const containerStyle = useMemo(() => ({
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     borderTopLeftRadius: isFirst ? theme.radius['3xl'] : 0,
     borderTopRightRadius: isFirst ? theme.radius['3xl'] : 0,
     borderBottomLeftRadius: isLast ? theme.radius['3xl'] : 0,
@@ -146,7 +146,7 @@ const CategoryRow = React.memo(function CategoryRow({
   const styles = useMemo(() => categoryRowStyles(theme), [theme]);
 
   const containerStyle = useMemo(() => ({
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     borderTopLeftRadius: isFirst ? theme.radius['3xl'] : 0,
     borderTopRightRadius: isFirst ? theme.radius['3xl'] : 0,
     borderBottomLeftRadius: isLast ? theme.radius['3xl'] : 0,
@@ -427,7 +427,7 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       height: 48,
       borderRadius: theme.radius.full,
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
       borderColor: theme.colors.border,
       paddingHorizontal: 16,

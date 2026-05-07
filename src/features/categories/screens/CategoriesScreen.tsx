@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
@@ -8,16 +8,58 @@ import { Header } from '../../../components/ui/Header';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { CategoryType } from '../../../db/schema';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { fromDbColor } from '../../../utils/format';
+import { resolveIcon } from '../../../utils/icons';
 import { Category } from '../api/categories';
-import { CategoryCard } from '../components/CategoryCard';
 import { CategoryTypeSelector } from '../components/CategoryTypeSelector';
 import { useCategories, useDeleteCategory } from '../hooks/categories';
 
-export const CategoriesScreen = () => {
+// ─── Local row ───────────────────────────────────────────────────────────────
+const CategoryRow = React.memo(function CategoryRow({
+  item,
+  onPress,
+  onLongPress,
+}: {
+  item: Category;
+  onPress: (item: Category) => void;
+  onLongPress: (item: Category) => void;
+}) {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createRowStyles(theme), [theme]);
+
+  const catColor = useMemo(
+    () => (item.color != null ? fromDbColor(item.color) : colors.primary),
+    [item.color, colors.primary]
+  );
+
+  const handlePress = useCallback(() => onPress(item), [onPress, item]);
+  const handleLongPress = useCallback(() => onLongPress(item), [onLongPress, item]);
+
+  return (
+    <TouchableOpacity
+      style={styles.row}
+      onPress={handlePress}
+      onLongPress={handleLongPress}
+      delayLongPress={280}
+      activeOpacity={0.8}
+    >
+      <View style={[styles.iconBox, { backgroundColor: catColor + '20' }]}>
+        <Ionicons name={resolveIcon(item.icon, 'grid-outline')} size={22} color={catColor} />
+      </View>
+      <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+      <Ionicons name="chevron-forward" size={16} color={colors.textFaint} />
+    </TouchableOpacity>
+  );
+});
+
+// ─── Screen ──────────────────────────────────────────────────────────────────
+export const CategoriesScreen = React.memo(function CategoriesScreen() {
   const theme = useTheme();
   const { colors } = theme;
   const router = useRouter();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   const { data: categories, isLoading } = useCategories();
   const { mutateAsync: deleteCategory } = useDeleteCategory();
 
@@ -27,39 +69,44 @@ export const CategoriesScreen = () => {
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const filteredCategories = React.useMemo(() => {
+  const filteredCategories = useMemo(() => {
     const q = query.trim().toLowerCase();
     return (
       categories
         ?.filter((cat) => cat.type === activeType)
         .filter((cat) => (q ? cat.name.toLowerCase().includes(q) : true))
-        .sort((a, b) => a.name.localeCompare(b.name)) || []
+        .sort((a, b) => a.name.localeCompare(b.name)) ?? []
     );
   }, [categories, activeType, query]);
 
-  const totalByType = React.useMemo(
-    () => categories?.filter((cat) => cat.type === activeType).length ?? 0,
-    [categories, activeType]
-  );
-
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     router.push('/categories/create');
-  };
+  }, [router]);
 
-  const handleEdit = (category: Category) => {
+  const handleEdit = useCallback((category: Category) => {
     router.push(`/categories/edit/${category.id}`);
-  };
+  }, [router]);
 
-  const handleDelete = (id: number) => {
+  const handleLongPress = useCallback((cat: Category) => {
+    setSelectedCategory(cat);
+    setShowManageDialog(true);
+  }, []);
+
+  const handleDelete = useCallback((id: number) => {
     deleteCategory(id);
-  };
+  }, [deleteCategory]);
 
-  const manageOptions = React.useMemo(() => {
+  const renderItem = useCallback(({ item }: { item: Category }) => (
+    <CategoryRow item={item} onPress={handleEdit} onLongPress={handleLongPress} />
+  ), [handleEdit, handleLongPress]);
+
+  const keyExtractor = useCallback((item: Category) => item.id.toString(), []);
+
+  const manageOptions = useMemo(() => {
     if (!selectedCategory) return [];
-
     return [
       {
-        key: 'edit-category',
+        key: 'edit',
         label: 'Edit category',
         icon: 'create-outline' as const,
         onPress: () => {
@@ -68,7 +115,7 @@ export const CategoriesScreen = () => {
         },
       },
       {
-        key: 'delete-category',
+        key: 'delete',
         label: 'Delete category',
         icon: 'trash-outline' as const,
         destructive: true,
@@ -78,83 +125,76 @@ export const CategoriesScreen = () => {
         },
       },
     ];
-  }, [selectedCategory]);
+  }, [selectedCategory, handleEdit]);
+
+  const typeLabel = activeType === 'DR' ? 'expense' : activeType === 'CR' ? 'income' : 'transfer';
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Categories" showBack />
+      <Header
+        title="Categories"
+        showBack
+        rightAction={
+          <TouchableOpacity onPress={handleCreate} activeOpacity={0.75}>
+            <Ionicons name="add" size={26} color={colors.text} />
+          </TouchableOpacity>
+        }
+      />
+
+      <View style={styles.filtersWrap}>
+        <CategoryTypeSelector
+          activeType={activeType}
+          onTypeChange={setActiveType}
+          theme={theme}
+        />
+        <View style={styles.searchWrap}>
+          <Ionicons name="search-outline" size={16} color={colors.textMuted} />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search categories"
+            placeholderTextColor={colors.textMuted}
+            style={styles.searchInput}
+          />
+          {query.length > 0 && (
+            <TouchableOpacity onPress={() => setQuery('')} activeOpacity={0.85}>
+              <Ionicons name="close-circle" size={16} color={colors.textMuted} />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
 
       {isLoading ? (
-        <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color={colors.primary} style={styles.loader} />
       ) : (
-        <View style={{ flex: 1 }}>
-          <View style={styles.filtersWrap}>
-            <CategoryTypeSelector
-              activeType={activeType}
-              onTypeChange={setActiveType}
-              theme={theme}
-            />
-
-            <View style={styles.searchWrap}>
-              <Ionicons name="search-outline" size={16} color={colors.textMuted} />
-              <TextInput
-                value={query}
-                onChangeText={setQuery}
-                placeholder="Search categories"
-                placeholderTextColor={colors.textMuted}
-                style={styles.searchInput}
-              />
-              {query.length > 0 ? (
-                <TouchableOpacity onPress={() => setQuery('')} activeOpacity={0.85}>
-                  <Ionicons name="close-circle" size={16} color={colors.textMuted} />
-                </TouchableOpacity>
-              ) : null}
-            </View>
-
-            <View style={styles.filterMetaRow}>
-              <Text style={styles.filterMetaText}>{filteredCategories.length} shown</Text>
-              <Text style={styles.filterMetaText}>{totalByType} total</Text>
-            </View>
-          </View>
-
-          <FlatList
-            data={filteredCategories}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item, index }) => (
-              <CategoryCard
-                item={item}
-                index={index}
-                theme={theme}
-                onPress={handleEdit}
-                onLongPress={(cat) => {
-                  setSelectedCategory(cat);
-                  setShowManageDialog(true);
-                }}
-              />
-            )}
-            numColumns={2}
-            contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
-            key={`${activeType}-list`}
-            ListEmptyComponent={
-              <View style={styles.emptyContainer}>
-                <Ionicons name="sparkles-outline" size={22} color={colors.textMuted} />
-                <Text style={styles.emptyTitle}>Nothing here yet</Text>
-                <Text style={styles.emptyText}>
-                  No {activeType === 'DR' ? 'expense' : activeType === 'CR' ? 'income' : 'transfer'} categories match your current filter.
-                </Text>
-                <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate}>
+        <FlatList
+          data={filteredCategories}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          initialNumToRender={15}
+          maxToRenderPerBatch={10}
+          windowSize={5}
+          key={activeType}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="grid-outline" size={32} color={colors.textMuted} />
+              <Text style={styles.emptyTitle}>No categories</Text>
+              <Text style={styles.emptyText}>
+                {query
+                  ? 'No matches for your search.'
+                  : `No ${typeLabel} categories yet.`}
+              </Text>
+              {!query && (
+                <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate} activeOpacity={0.8}>
                   <Text style={styles.emptyBtnText}>Create category</Text>
                 </TouchableOpacity>
-              </View>
-            }
-          />
-        </View>
+              )}
+            </View>
+          }
+        />
       )}
-
-      <TouchableOpacity style={styles.fab} onPress={handleCreate}>
-        <Ionicons name="add" size={28} color={colors.onPrimary} />
-      </TouchableOpacity>
 
       <OptionsDialog
         visible={showManageDialog}
@@ -170,6 +210,7 @@ export const CategoriesScreen = () => {
         title="Delete category"
         message="This will delete the category and associated transactions."
         confirmLabel="Delete"
+        destructive
         onConfirm={() => {
           if (!selectedCategory) return;
           handleDelete(selectedCategory.id);
@@ -178,36 +219,52 @@ export const CategoriesScreen = () => {
       />
     </SafeAreaView>
   );
-};
+});
+
+const createRowStyles = (theme: Theme) => StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    padding: theme.spacing[16],
+    gap: theme.spacing[16],
+  },
+  iconBox: {
+    width: 48,
+    height: 48,
+    borderRadius: theme.radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  name: {
+    flex: 1,
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+    letterSpacing: -0.2,
+  },
+});
 
 const createStyles = (theme: Theme) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background, overflow: 'hidden' },
-
-  listContent: {
-    paddingHorizontal: 20,
-    paddingTop: 6,
-    paddingBottom: 100,
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
   },
-
   filtersWrap: {
-    marginHorizontal: 20,
-    marginTop: 6,
-    marginBottom: 8,
-    gap: 12,
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingBottom: theme.spacing[12],
+    gap: theme.spacing[8],
   },
-
   searchWrap: {
     height: 44,
     borderRadius: theme.radius.full,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.card,
-    paddingHorizontal: 12,
+    backgroundColor: theme.colors.overlay,
+    paddingHorizontal: theme.spacing[12],
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: theme.spacing[8],
   },
-
   searchInput: {
     flex: 1,
     height: '100%',
@@ -215,66 +272,45 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     fontSize: 14,
     color: theme.colors.text,
   },
-
-  filterMetaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 2,
+  loader: {
+    marginTop: 40,
   },
-
-  filterMetaText: {
-    fontFamily: theme.fontFamilies.sansMedium,
-    fontSize: 11,
-    color: theme.colors.textMuted,
+  listContent: {
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[4],
+    paddingBottom: 40,
+    gap: theme.spacing[8],
   },
-
   emptyContainer: {
-    paddingVertical: 60,
+    paddingVertical: 64,
     alignItems: 'center',
-    paddingHorizontal: 24,
+    gap: theme.spacing[8],
   },
-
   emptyTitle: {
     fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.lg,
     color: theme.colors.text,
-    fontSize: 20,
-    marginTop: 10,
+    marginTop: theme.spacing[8],
   },
-
   emptyText: {
     fontFamily: theme.fontFamilies.sans,
-    color: theme.colors.textMuted,
     fontSize: 13,
-    marginTop: 4,
-    marginBottom: 16,
+    color: theme.colors.textMuted,
     textAlign: 'center',
-    maxWidth: 260,
+    maxWidth: 240,
   },
-
   emptyBtn: {
+    marginTop: theme.spacing[8],
     height: 40,
+    paddingHorizontal: theme.spacing[20],
     borderRadius: theme.radius.full,
-    paddingHorizontal: 16,
-    backgroundColor: theme.colors.primary,
+    backgroundColor: theme.colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
   emptyBtnText: {
     fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 13,
-    color: theme.colors.onPrimary,
-  },
-
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...theme.shadow.md,
+    color: theme.colors.text,
   },
 });

@@ -58,8 +58,8 @@ export const Chip = React.memo(function Chip({
   }, [size]);
 
   const getBackgroundColor = () => {
-    if (disabled) return theme.colors.surface;
-    if (!selected) return theme.colors.card;
+    if (disabled) return theme.colors.overlay;
+    if (!selected) return theme.colors.overlay;
 
     switch (variant) {
       case 'primary': return theme.colors.primary;

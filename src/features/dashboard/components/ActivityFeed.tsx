@@ -66,7 +66,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     padding: theme.spacing[32],
     alignItems: 'center',
     gap: theme.spacing[12],
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.radius['3xl'],
     borderWidth: 1.5,
     borderColor: theme.colors.border,

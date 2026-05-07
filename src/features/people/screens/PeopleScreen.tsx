@@ -1,13 +1,25 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, View, Platform } from 'react-native';
+import { ActivityIndicator, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Card, ConfirmDialog, EmptyState, Header, OptionsDialog, Typography } from '../../../components/ui';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import { Header } from '../../../components/ui/Header';
+import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { usePremium } from '../../../providers/PremiumProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
-import { useDeletePerson, usePeople } from '../api/people';
 import { fromDbColor } from '../../../utils/format';
+import { resolveIcon } from '../../../utils/icons';
+import { useDeletePerson, usePeople } from '../api/people';
+
+type Person = {
+  id: number;
+  name: string;
+  icon: string;
+  color: number;
+  email?: string | null;
+  phone?: string | null;
+};
 
 export const PeopleScreen = React.memo(function PeopleScreen() {
   const theme = useTheme();
@@ -19,7 +31,7 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
   const { data: people, isLoading: loadingPeople } = usePeople();
   const { mutate: deletePerson } = useDeletePerson();
 
-  const [selectedPerson, setSelectedPerson] = useState<any | null>(null);
+  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [showOptions, setShowOptions] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -31,8 +43,8 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
         type: 'warning',
         buttons: [
           { text: 'Maybe later', style: 'cancel' },
-          { text: 'Upgrade now', onPress: () => router.push('/premium') }
-        ]
+          { text: 'Upgrade now', onPress: () => router.push('/premium') },
+        ],
       });
       return;
     }
@@ -43,11 +55,6 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
     router.push(`/people/details/${id}`);
   }, [router]);
 
-  const handlePersonLongPress = useCallback((person: any) => {
-    setSelectedPerson(person);
-    setShowOptions(true);
-  }, []);
-
   const options = useMemo(() => [
     {
       key: 'view',
@@ -56,7 +63,7 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
       onPress: () => {
         setShowOptions(false);
         if (selectedPerson) handlePersonPress(selectedPerson.id);
-      }
+      },
     },
     {
       key: 'edit',
@@ -65,7 +72,7 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
       onPress: () => {
         setShowOptions(false);
         if (selectedPerson) router.push(`/people/edit/${selectedPerson.id}`);
-      }
+      },
     },
     {
       key: 'delete',
@@ -75,47 +82,46 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
       onPress: () => {
         setShowOptions(false);
         setShowDeleteConfirm(true);
-      }
-    }
+      },
+    },
   ], [selectedPerson, handlePersonPress, router]);
 
-  const renderItem = useCallback(({ item }: { item: any }) => {
+  const renderItem = useCallback(({ item }: { item: Person }) => {
+    const personColor = fromDbColor(item.color);
     return (
-      <Card size="lg" variant="outlined" shadow="none" style={styles.card}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => handlePersonPress(item.id)}
-          onLongPress={() => handlePersonLongPress(item)}
-          style={styles.cardContent}
-        >
-          <View style={[styles.avatar, { backgroundColor: fromDbColor(item.color) + '20' }]}>
-            <Ionicons name={item.icon || 'person'} size={24} color={fromDbColor(item.color)} />
-          </View>
-          <View style={styles.personInfo}>
-            <Typography variant="h3" numberOfLines={1}>{item.name}</Typography>
-            {(item.email || item.phone) && (
-              <Typography variant="bodySm" color={colors.textMuted} numberOfLines={1}>
-                {item.email || item.phone}
-              </Typography>
-            )}
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={colors.border} />
-        </TouchableOpacity>
-      </Card>
+      <TouchableOpacity
+        style={styles.card}
+        activeOpacity={0.8}
+        onPress={() => handlePersonPress(item.id)}
+        onLongPress={() => {
+          setSelectedPerson(item);
+          setShowOptions(true);
+        }}
+      >
+        <View style={[styles.avatar, { backgroundColor: personColor + '20' }]}>
+          <Ionicons name={resolveIcon(item.icon, 'person-outline')} size={24} color={personColor} />
+        </View>
+        <View style={styles.personInfo}>
+          <Text style={styles.personName} numberOfLines={1}>{item.name}</Text>
+          {(item.email || item.phone) && (
+            <Text style={styles.personMeta} numberOfLines={1}>{item.email || item.phone}</Text>
+          )}
+        </View>
+        <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
+      </TouchableOpacity>
     );
-  }, [colors, styles, handlePersonPress, handlePersonLongPress]);
+  }, [colors, styles, handlePersonPress]);
 
-  const keyExtractor = useCallback((item: any) => item.id.toString(), []);
+  const keyExtractor = useCallback((item: Person) => item.id.toString(), []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header 
-        title="People" 
-        
-        showBack 
+      <Header
+        title="People"
+        showBack
         rightAction={
-          <TouchableOpacity onPress={handleCreate} style={styles.headerBtn}>
-            <Ionicons name="person-add" size={24} color={colors.primary} />
+          <TouchableOpacity onPress={handleCreate} activeOpacity={0.75}>
+            <Ionicons name="add" size={26} color={colors.text} />
           </TouchableOpacity>
         }
       />
@@ -126,7 +132,7 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
         </View>
       ) : (
         <FlatList
-          data={people}
+          data={people as Person[]}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
@@ -136,13 +142,14 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
           showsVerticalScrollIndicator={false}
           removeClippedSubviews={Platform.OS === 'android'}
           ListEmptyComponent={
-            <EmptyState
-              title="No contacts found"
-             
-              icon="people-outline"
-              actionLabel="Add first person"
-              onAction={handleCreate}
-            />
+            <View style={styles.emptyContainer}>
+              <Ionicons name="people-outline" size={32} color={colors.textMuted} />
+              <Text style={styles.emptyTitle}>No contacts yet</Text>
+              <Text style={styles.emptyText}>Track transactions with people you know.</Text>
+              <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate} activeOpacity={0.8}>
+                <Text style={styles.emptyBtnText}>Add first person</Text>
+              </TouchableOpacity>
+            </View>
           }
         />
       )}
@@ -159,7 +166,7 @@ export const PeopleScreen = React.memo(function PeopleScreen() {
         visible={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         title="Delete person"
-        message={`Are you sure you want to delete "${selectedPerson?.name}"? Linked transactions and loans will remain but won't be associated with this person.`}
+        message={`Delete "${selectedPerson?.name}"? Linked transactions and loans will remain but won't be associated with this person.`}
         confirmLabel="Delete"
         destructive
         onConfirm={() => {
@@ -181,34 +188,71 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  headerBtn: {
-    padding: 8,
-  },
   listContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
     paddingBottom: 40,
-    gap: 16,
+    gap: theme.spacing[12],
   },
   card: {
-    padding: 0,
-    overflow: 'hidden',
-  },
-  cardContent: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    padding: theme.spacing[16],
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    gap: 16,
+    gap: theme.spacing[16],
   },
   avatar: {
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
   personInfo: {
     flex: 1,
-    gap: 2,
+    gap: 3,
+  },
+  personName: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+  },
+  personMeta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  emptyContainer: {
+    paddingVertical: 64,
+    alignItems: 'center',
+    gap: theme.spacing[8],
+  },
+  emptyTitle: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.lg,
+    color: theme.colors.text,
+    marginTop: theme.spacing[8],
+  },
+  emptyText: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 13,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+    maxWidth: 240,
+  },
+  emptyBtn: {
+    marginTop: theme.spacing[8],
+    height: 40,
+    paddingHorizontal: theme.spacing[20],
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.overlay,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyBtnText: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 13,
+    color: theme.colors.text,
   },
 });

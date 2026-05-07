@@ -42,7 +42,7 @@ export const ListItem = React.memo(function ListItem({
   const containerStyle = [
     styles.container,
     {
-      backgroundColor: selected ? colors.primary + '15' : colors.card,
+      backgroundColor: selected ? colors.primary + '15' : colors.surface,
       borderBottomColor: showDivider && !isLast ? colors.border : 'transparent',
       borderBottomWidth: showDivider && !isLast ? 1 : 0,
     },

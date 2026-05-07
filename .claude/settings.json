@@ -4,7 +4,22 @@
       "WebFetch(domain:wise.design)",
       "Bash(sed -i '' 's/letterSpacing: 1.5,//' /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/features/transactions/components/TransactionCategoryPicker.tsx)",
       "Bash(sed -i '' 's/fontSize: 10,/fontSize: 12,/' /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/features/transactions/components/TransactionCategoryPicker.tsx)",
-      "Bash(sed -i '' \"s/fontFamily: theme.fontFamilies.sansSemiBold,\\\\n      fontSize: 12,//\" /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/features/transactions/components/TransactionCategoryPicker.tsx)"
+      "Bash(sed -i '' \"s/fontFamily: theme.fontFamilies.sansSemiBold,\\\\n      fontSize: 12,//\" /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/features/transactions/components/TransactionCategoryPicker.tsx)",
+      "WebSearch",
+      "WebFetch(domain:www.radix-ui.com)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "WebFetch(domain:www.smashingmagazine.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:colors.id)",
+      "WebFetch(domain:tailcolors.com)",
+      "Bash(xargs sed *)",
+      "Bash(sed -i '' 's/backgroundColor: colors\\\\.surface/backgroundColor: colors.overlay/g' /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/components/ui/Input.tsx)",
+      "Bash(sed -i '' 's/colors\\\\.surface\\\\]/colors.overlay]/g' /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/components/ui/Input.tsx)",
+      "Bash(sed -i '' 's/colors\\\\.surface/colors.overlay/g' /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/components/ui/Chip.tsx)",
+      "Bash(sed -i '' 's/return colors\\\\.surface/return colors.overlay/g' /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/components/ui/Button.tsx)",
+      "Bash(sed -i '' 's/return colors\\\\.surface/return colors.overlay/g' /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/components/ui/IconBox.tsx)",
+      "Bash(sed -i '' 's/backgroundColor: colors\\\\.floating }/backgroundColor: colors.overlay }/g' /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/components/ui/EntityPickerSheet.tsx)",
+      "Bash(sed -i '' \"s/colors\\\\.floating;$/colors.overlay;/\" /Users/ahmed/Documents/Projects/ReactNative/luno-react-native/src/components/ui/EntityPickerSheet.tsx)"
     ]
   }
 }

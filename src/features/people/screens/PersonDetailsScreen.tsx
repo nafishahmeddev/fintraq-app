@@ -1,16 +1,70 @@
 import { Ionicons } from '@expo/vector-icons';
+import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
-import { ActivityIndicator, FlatList, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Card, Divider, EmptyState, Header, IconButton, MoneyText, SectionLabel, TransactionRow, Typography } from '../../../components/ui';
+import { EmptyState } from '../../../components/ui/EmptyState';
+import { Header } from '../../../components/ui/Header';
+import { MoneyText } from '../../../components/ui/MoneyText';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { fromDbColor } from '../../../utils/format';
-import { useLoans } from '../../loans/api/loans';
+import { resolveIcon } from '../../../utils/icons';
+import { TransactionListItem } from '../../transactions/api/transactions';
 import { useTransactions } from '../../transactions/hooks/transactions';
+import { useLoans } from '../../loans/api/loans';
 import { usePersonById, usePersonSummary } from '../api/people';
 
+// ─── Local transaction row ────────────────────────────────────────────────────
+const TxRow = React.memo(function TxRow({
+  tx,
+  onPress,
+}: {
+  tx: TransactionListItem;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createTxRowStyles(theme), [theme]);
+
+  const isTransfer = tx.type === 'TRANSFER';
+  const catColor = isTransfer
+    ? colors.primary
+    : tx.category
+    ? fromDbColor(tx.category.color)
+    : colors.textMuted;
+  const iconName = isTransfer
+    ? ('swap-horizontal-outline' as const)
+    : resolveIcon(tx.category?.icon, 'pricetag-outline');
+  const label = isTransfer
+    ? (tx.toAccount?.name ?? 'Transfer')
+    : (tx.category?.name ?? 'Transaction');
+
+  return (
+    <TouchableOpacity style={styles.row} onPress={onPress} activeOpacity={0.75}>
+      <View style={[styles.iconBox, { backgroundColor: catColor + '20' }]}>
+        <Ionicons name={iconName} size={20} color={catColor} />
+      </View>
+      <View style={styles.info}>
+        <Text style={styles.note} numberOfLines={1}>{tx.note || label}</Text>
+        <Text style={styles.meta} numberOfLines={1}>{label} · {tx.account.name}</Text>
+      </View>
+      <View style={styles.right}>
+        <MoneyText
+          amount={tx.amount}
+          currency={tx.account.currency}
+          type={tx.type}
+          weight="sansBold"
+          style={styles.amount}
+        />
+        <Text style={styles.time}>{format(new Date(tx.datetime), 'HH:mm')}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+});
+
+// ─── Screen ──────────────────────────────────────────────────────────────────
 export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const personId = parseInt(id, 10);
@@ -25,41 +79,45 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
   const { data: transactions, isLoading: loadingTransactions } = useTransactions(50, { personId });
   const { data: loans } = useLoans(personId);
 
-  const handleEdit = useCallback(() => {
-    router.push(`/people/edit/${personId}`);
-  }, [router, personId]);
+  const handleTxPress = useCallback((txId: number) => {
+    router.push(`/transactions/edit/${txId}`);
+  }, [router]);
+
+  const renderItem = useCallback(({ item }: { item: TransactionListItem }) => (
+    <TxRow tx={item} onPress={() => handleTxPress(item.id)} />
+  ), [handleTxPress]);
+
+  const keyExtractor = useCallback((item: TransactionListItem) => item.id.toString(), []);
 
   const renderHeader = useMemo(() => {
     if (!person || !summary) return null;
+    const personColor = fromDbColor(person.color);
     return (
       <View style={styles.headerContent}>
-        <Card variant="outlined" size="lg" style={styles.heroCard}>
+        {/* Hero card */}
+        <View style={styles.heroCard}>
           <View style={styles.heroTop}>
-            <View style={[styles.avatar, { backgroundColor: fromDbColor(person.color) + '20' }]}>
-              <Ionicons name={(person.icon as any) || 'person'} size={32} color={fromDbColor(person.color)} />
+            <View style={[styles.avatar, { backgroundColor: personColor + '20' }]}>
+              <Ionicons name={resolveIcon(person.icon, 'person-outline')} size={32} color={personColor} />
             </View>
             <View style={styles.heroInfo}>
-              <Typography variant="h2">{person.name}</Typography>
-              {person.phone && (
-                <Typography variant="bodySm" color={colors.textMuted}>{person.phone}</Typography>
-              )}
-              {person.email && (
-                <Typography variant="bodySm" color={colors.textMuted}>{person.email}</Typography>
-              )}
+              <Text style={styles.heroName}>{person.name}</Text>
+              {person.phone && <Text style={styles.heroMeta}>{person.phone}</Text>}
+              {person.email && <Text style={styles.heroMeta}>{person.email}</Text>}
             </View>
-            <IconButton
-              icon="create-outline"
-              onPress={handleEdit}
-              variant="ghost"
-              size="md"
-            />
+            <TouchableOpacity
+              onPress={() => router.push(`/people/edit/${personId}`)}
+              activeOpacity={0.75}
+            >
+              <Ionicons name="create-outline" size={22} color={colors.textMuted} />
+            </TouchableOpacity>
           </View>
 
-          <Divider style={{ marginVertical: 16 }} />
+          <View style={styles.sep} />
 
           <View style={styles.statsGrid}>
             <View style={styles.statBox}>
-              <Typography variant="bodySm" color={colors.textMuted}>Lent</Typography>
+              <Text style={styles.statLabel}>Lent</Text>
               <MoneyText
                 amount={summary.remainingLent}
                 currency={profile.defaultCurrency}
@@ -68,7 +126,7 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
-              <Typography variant="bodySm" color={colors.textMuted}>Borrowed</Typography>
+              <Text style={styles.statLabel}>Borrowed</Text>
               <MoneyText
                 amount={summary.remainingBorrowed}
                 currency={profile.defaultCurrency}
@@ -77,7 +135,7 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
-              <Typography variant="bodySm" color={colors.textMuted}>Net</Typography>
+              <Text style={styles.statLabel}>Net</Text>
               <MoneyText
                 amount={summary.netPosition}
                 currency={profile.defaultCurrency}
@@ -85,55 +143,48 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
               />
             </View>
           </View>
-        </Card>
+        </View>
 
+        {/* Active loans */}
         {loans && loans.length > 0 && (
           <View style={styles.section}>
-            <SectionLabel text="Active loans" />
-            {loans.map(loan => (
-              <Card key={loan.id} variant="outlined" size="sm" style={styles.loanItem}>
+            <Text style={styles.sectionLabel}>Active loans</Text>
+            {loans.map(loan => {
+              const loanColor = fromDbColor(loan.color);
+              return (
                 <TouchableOpacity
-                  activeOpacity={0.7}
+                  key={loan.id}
+                  style={styles.loanRow}
                   onPress={() => router.push(`/loans/details/${loan.id}`)}
-                  style={styles.loanContent}
+                  activeOpacity={0.8}
                 >
-                  <View style={[styles.loanIcon, { backgroundColor: fromDbColor(loan.color) + '20' }]}>
-                    <Ionicons name={(loan.icon as any) || 'cash'} size={16} color={fromDbColor(loan.color)} />
+                  <View style={[styles.loanIcon, { backgroundColor: loanColor + '20' }]}>
+                    <Ionicons name={resolveIcon(loan.icon, 'cash-outline')} size={16} color={loanColor} />
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <Typography variant="body" weight="sansSemiBold">{loan.name}</Typography>
-                    <Typography variant="bodySm" color={colors.textMuted}>{loan.type}</Typography>
+                  <View style={styles.loanInfo}>
+                    <Text style={styles.loanName}>{loan.name}</Text>
+                    <Text style={styles.loanType}>{loan.type}</Text>
                   </View>
                   <MoneyText
                     amount={loan.remainingAmount}
                     currency={loan.account?.currency || profile.defaultCurrency}
                     weight="sansBold"
+                    style={styles.loanAmount}
                   />
                 </TouchableOpacity>
-              </Card>
-            ))}
+              );
+            })}
           </View>
         )}
 
-        <View style={styles.section}>
-          <SectionLabel text="Recent transactions" />
-        </View>
+        <Text style={styles.sectionLabel}>Transactions</Text>
       </View>
     );
-  }, [person, summary, loans, colors, profile, styles, handleEdit, router]);
-
-  const renderItem = useCallback(({ item }: { item: any }) => (
-    <TransactionRow
-      tx={item}
-      onPress={(tx) => router.push(`/transactions/edit/${tx.id}`)}
-    />
-  ), [router]);
-
-  const keyExtractor = useCallback((item: any) => item.id.toString(), []);
+  }, [person, summary, loans, colors, profile, styles, router, personId]);
 
   if (loadingPerson || loadingSummary) {
     return (
-      <View style={styles.center}>
+      <View style={styles.loading}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -143,18 +194,14 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <Header title="Person not found" showBack />
-        <EmptyState
-          title="Not found"
-         
-          icon="alert-circle-outline"
-        />
+        <EmptyState title="Not found" icon="alert-circle-outline" />
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Contact details" showBack />
+      <Header title={person.name} showBack />
       <FlatList
         data={transactions}
         keyExtractor={keyExtractor}
@@ -168,11 +215,7 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
         removeClippedSubviews={Platform.OS === 'android'}
         ListEmptyComponent={
           !loadingTransactions ? (
-            <EmptyState
-              title="No transactions"
-             
-              icon="receipt-outline"
-            />
+            <EmptyState title="No transactions" icon="receipt-outline" />
           ) : null
         }
       />
@@ -180,32 +223,80 @@ export const PersonDetailsScreen = React.memo(function PersonDetailsScreen() {
   );
 });
 
+const createTxRowStyles = (theme: Theme) => StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: theme.spacing[16],
+    gap: theme.spacing[12],
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+  },
+  iconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  info: {
+    flex: 1,
+    gap: theme.spacing[2],
+  },
+  note: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: theme.fontSizes.sm,
+    color: theme.colors.text,
+  },
+  meta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: theme.fontSizes.xs,
+    color: theme.colors.textMuted,
+  },
+  right: {
+    alignItems: 'flex-end',
+    gap: theme.spacing[4],
+  },
+  amount: {
+    fontSize: theme.fontSizes.sm,
+  },
+  time: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
+});
+
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  center: {
+  loading: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: theme.colors.background,
   },
   listContent: {
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
     paddingBottom: 40,
+    gap: theme.spacing[8],
   },
   headerContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    gap: 24,
-    marginBottom: 16,
+    gap: theme.spacing[16],
+    marginBottom: theme.spacing[8],
   },
   heroCard: {
-    padding: 20,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    padding: theme.spacing[20],
   },
   heroTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: theme.spacing[16],
   },
   avatar: {
     width: 56,
@@ -218,10 +309,25 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     gap: 2,
   },
+  heroName: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.lg,
+    color: theme.colors.text,
+    letterSpacing: -0.3,
+  },
+  heroMeta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 13,
+    color: theme.colors.textMuted,
+  },
+  sep: {
+    height: 1,
+    backgroundColor: theme.colors.overlay,
+    marginVertical: theme.spacing[16],
+  },
   statsGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
+    gap: theme.spacing[8],
   },
   statBox: {
     flex: 1,
@@ -229,30 +335,56 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    height: '60%',
-    backgroundColor: theme.colors.border,
-    alignSelf: 'center',
+    backgroundColor: theme.colors.overlay,
+    alignSelf: 'stretch',
+  },
+  statLabel: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
+    color: theme.colors.textMuted,
   },
   statAmount: {
-    fontSize: 16,
-    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 15,
   },
   section: {
-    gap: 12,
+    gap: theme.spacing[8],
   },
-  loanItem: {
-    marginBottom: 8,
+  sectionLabel: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    paddingLeft: 4,
   },
-  loanContent: {
+  loanRow: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    padding: theme.spacing[16],
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: theme.spacing[12],
   },
   loanIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: theme.radius.md,
+    width: 36,
+    height: 36,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loanInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  loanName: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 14,
+    color: theme.colors.text,
+  },
+  loanType: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  loanAmount: {
+    fontSize: 14,
   },
 });

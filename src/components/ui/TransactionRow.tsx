@@ -56,10 +56,10 @@ export const TransactionRow = React.memo(function TransactionRow({
 
   const isTransfer = tx.type === 'TRANSFER';
   const categoryColor = useMemo(() => {
-    if (isTransfer) return colors.primaryDark;
+    if (isTransfer) return colors.primary;
     if (!tx.category) return colors.textMuted;
     return fromDbColor(tx.category.color);
-  }, [tx.category, isTransfer, colors.primaryDark, colors.textMuted]);
+  }, [tx.category, isTransfer, colors.primary, colors.textMuted]);
 
   const iconName: keyof typeof Ionicons.glyphMap = useMemo(() => {
     if (isTransfer) return 'swap-horizontal-outline';
@@ -76,12 +76,12 @@ export const TransactionRow = React.memo(function TransactionRow({
   const containerStyle = useMemo(() => ({
     borderBottomWidth: isLast ? 0 : 1,
     borderBottomColor: colors.border,
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     borderTopLeftRadius: isFirst ? theme.radius.xl : 0,
     borderTopRightRadius: isFirst ? theme.radius.xl : 0,
     borderBottomLeftRadius: isLast ? theme.radius.xl : 0,
     borderBottomRightRadius: isLast ? theme.radius.xl : 0,
-  }), [isFirst, isLast, colors.border, colors.card, theme.radius.xl]);
+  }), [isFirst, isLast, colors.border, colors.surface, theme.radius.xl]);
 
   const categoryName = isTransfer
     ? (tx.toAccount?.name ?? 'Transfer')

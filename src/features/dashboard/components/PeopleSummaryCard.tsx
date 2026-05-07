@@ -55,17 +55,16 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   card: {
     flex: 1,
     padding: theme.spacing[16],
-    borderRadius: theme.radius.xl,
-    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius['3xl'],
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: theme.colors.border,
     gap: theme.spacing[8],
   },
   label: {
     fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 10,
+    fontSize: 12,
     color: theme.colors.textMuted,
-    letterSpacing: 1,
   },
   countRow: {
     flexDirection: 'row',

@@ -26,63 +26,72 @@ export const BudgetSummaryCard = React.memo(function BudgetSummaryCard() {
     return { count: progressData.length, totalSpent, totalBudgeted, totalRemaining, percentage: overallPct, exceeded };
   }, [progressData]);
 
+  const isOver = (summary?.percentage ?? 0) >= 100;
+
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => router.push(summary ? '/budgets' : '/budgets/create')}
-        activeOpacity={0.7}
-      >
-        <View style={styles.topRow}>
-          <Text style={styles.label}>Budgets</Text>
-          {summary && <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />}
-        </View>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => router.push(summary ? '/budgets' : '/budgets/create')}
+      activeOpacity={0.7}
+    >
+      <View style={styles.topRow}>
+        <Text style={styles.label}>Budgets</Text>
+        <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
+      </View>
 
-        {summary ? (
-          <>
-            <View style={styles.statRow}>
-              <View style={styles.stat}>
-                <Text style={styles.statNum}>{summary.count}</Text>
-                <Text style={styles.statLabel}>Active</Text>
-              </View>
-              <View style={styles.stat}>
-                <MoneyText amount={summary.totalSpent} currency={profile.defaultCurrency} type="DR" style={styles.statAmount} weight="sansBold" />
-                <Text style={styles.statLabel}>Spent</Text>
-              </View>
-              <View style={styles.stat}>
-                <MoneyText amount={summary.totalRemaining} currency={profile.defaultCurrency} style={styles.statAmount} weight="sansBold" />
-                <Text style={styles.statLabel}>Left</Text>
-              </View>
+      {summary ? (
+        <>
+          <View style={styles.statRow}>
+            <View style={styles.stat}>
+              <Text style={styles.statNum}>{summary.count}</Text>
+              <Text style={styles.statLabel}>Active</Text>
             </View>
-
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${Math.min(summary.percentage, 100)}%`, backgroundColor: summary.percentage >= 100 ? colors.danger : colors.primary }]} />
+            <View style={styles.statDivider} />
+            <View style={styles.stat}>
+              <MoneyText amount={summary.totalSpent} currency={profile.defaultCurrency} type="DR" style={styles.statAmount} weight="sansBold" />
+              <Text style={styles.statLabel}>Spent</Text>
             </View>
+            <View style={styles.statDivider} />
+            <View style={styles.stat}>
+              <MoneyText amount={summary.totalRemaining} currency={profile.defaultCurrency} style={[styles.statAmount, isOver && { color: colors.danger }]} weight="sansBold" />
+              <Text style={styles.statLabel}>Remaining</Text>
+            </View>
+          </View>
 
+          <View style={styles.progressTrack}>
+            <View style={[
+              styles.progressFill,
+              {
+                width: `${Math.min(summary.percentage, 100)}%`,
+                backgroundColor: isOver ? colors.danger : colors.primary,
+              }
+            ]} />
+          </View>
+
+          <View style={styles.progressMeta}>
+            <Text style={styles.progressPct}>{summary.percentage.toFixed(0)}% used</Text>
             {summary.exceeded > 0 && (
-              <Text style={styles.warning}>{summary.exceeded} budget{summary.exceeded > 1 ? 's' : ''} exceeded</Text>
+              <Text style={styles.warning}>{summary.exceeded} exceeded</Text>
             )}
-          </>
-        ) : (
-          <Text style={styles.empty}>Set your first budget to track spending limits.</Text>
-        )}
-      </TouchableOpacity>
-    </View>
+          </View>
+        </>
+      ) : (
+        <Text style={styles.empty}>Set spending limits with budgets.</Text>
+      )}
+    </TouchableOpacity>
   );
 });
 
 const createStyles = (theme: Theme) => StyleSheet.create({
-  container: {
-    marginBottom: theme.spacing[20],
-  },
   card: {
     marginHorizontal: theme.layout.screenPadding,
-    padding: theme.spacing[16],
-    borderRadius: theme.radius.xl,
-    backgroundColor: theme.colors.card,
+    marginBottom: theme.spacing[12],
+    padding: theme.spacing[20],
+    borderRadius: theme.radius['3xl'],
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    gap: theme.spacing[12],
+    gap: theme.spacing[16],
   },
   topRow: {
     flexDirection: 'row',
@@ -91,21 +100,26 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   label: {
     fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 10,
+    fontSize: 12,
     color: theme.colors.textMuted,
-    letterSpacing: 1,
   },
   statRow: {
     flexDirection: 'row',
-    gap: theme.spacing[12],
+    alignItems: 'center',
+    gap: theme.spacing[16],
   },
   stat: {
     flex: 1,
-    gap: 2,
+    gap: 3,
+  },
+  statDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: theme.colors.border,
   },
   statNum: {
     fontFamily: theme.fontFamilies.heading,
-    fontSize: 22,
+    fontSize: 24,
     color: theme.colors.text,
     letterSpacing: -0.5,
   },
@@ -118,7 +132,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     color: theme.colors.textMuted,
   },
   progressTrack: {
-    height: 4,
+    height: 6,
     backgroundColor: theme.colors.background,
     borderRadius: theme.radius.full,
     overflow: 'hidden',
@@ -127,6 +141,17 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     height: '100%',
     borderRadius: theme.radius.full,
   },
+  progressMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: -theme.spacing[8],
+  },
+  progressPct: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
   warning: {
     fontFamily: theme.fontFamilies.sansSemiBold,
     fontSize: 11,
@@ -134,7 +159,8 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   empty: {
     fontFamily: theme.fontFamilies.sans,
-    fontSize: 12,
+    fontSize: 13,
     color: theme.colors.textMuted,
+    lineHeight: 20,
   },
 });

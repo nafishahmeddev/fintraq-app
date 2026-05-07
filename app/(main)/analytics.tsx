@@ -182,14 +182,14 @@ const AnalyticsScreen = React.memo(function AnalyticsScreen() {
 
   if (txLoading || accountsLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <SafeAreaView style={styles.loadingContainer} edges={['top']}>
         <ActivityIndicator size="large" color={colors.primary} />
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <Header title="Analytics" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -456,7 +456,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    overflow: 'hidden',
   },
   loadingContainer: {
     flex: 1,
@@ -470,17 +469,14 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   controlCard: {
     padding: 16,
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius['3xl'],
     backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
     marginBottom: 14,
   },
   cardLabel: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontFamily: theme.fontFamilies.sansBold,
     color: theme.colors.textMuted,
-    fontSize: 10,
-    letterSpacing: 1.2,
+    fontSize: 11,
     marginBottom: 8,
   },
   segmentRow: {
@@ -493,41 +489,37 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     height: 34,
     paddingHorizontal: 12,
     borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.background + '80',
+    backgroundColor: theme.colors.overlay,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     gap: 4,
   },
   segmentPillActive: {
-    backgroundColor: theme.colors.text,
+    backgroundColor: theme.colors.primary,
   },
   segmentPillLocked: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
   segmentText: {
     fontFamily: theme.fontFamilies.sansSemiBold,
     color: theme.colors.textMuted,
     fontSize: 11,
-    letterSpacing: 0.6,
   },
   segmentTextActive: {
-    color: theme.colors.background,
+    color: theme.colors.onPrimary,
   },
   heroSection: {
     marginBottom: 28,
     paddingVertical: 24,
     paddingHorizontal: 20,
     borderRadius: theme.radius['3xl'],
-    backgroundColor: theme.colors.card,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
   heroKicker: {
     fontFamily: theme.fontFamilies.sansBold,
-    fontSize: 10,
+    fontSize: 11,
     color: theme.colors.primary,
-    letterSpacing: 2,
     marginBottom: 8,
   },
   heroTitle: {
@@ -568,18 +560,15 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   kpiCard: {
     width: '47%',
-    padding: 14,
-    borderRadius: theme.radius.xl,
+    padding: 16,
+    borderRadius: theme.radius['3xl'],
     backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
     gap: 8,
   },
   kpiLabel: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 10,
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 11,
     color: theme.colors.textMuted,
-    letterSpacing: 0.8,
   },
   kpiValue: {
     fontSize: 16,
@@ -593,10 +582,9 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     marginBottom: 28,
   },
   sectionLabel: {
-    fontFamily: theme.fontFamilies.sansSemiBold,
-    fontSize: 10,
-    color: theme.colors.textMuted,
-    letterSpacing: 1.2,
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 12,
+    color: theme.colors.text,
     marginBottom: 2,
   },
   sectionHint: {
@@ -606,17 +594,13 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     marginBottom: 10,
   },
   card: {
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius['3xl'],
     backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    padding: 14,
+    padding: 16,
   },
   deltaCard: {
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius['3xl'],
     backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
     overflow: 'hidden',
   },
   deltaRow: {
@@ -624,9 +608,9 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 12,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    borderBottomColor: theme.colors.overlay,
   },
   deltaMeta: {
     flexDirection: 'row',
@@ -636,8 +620,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   deltaLabel: {
     fontFamily: theme.fontFamilies.sansSemiBold,
     color: theme.colors.textMuted,
-    fontSize: 11,
-    letterSpacing: 0.8,
+    fontSize: 13,
   },
   deltaValue: {
     fontSize: 13,
@@ -646,14 +629,12 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.background + '40',
     gap: 12,
   },
   catIcon: {
     width: 36,
     height: 36,
-    borderRadius: theme.radius.sm,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -676,7 +657,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   progressTrack: {
     height: 4,
-    backgroundColor: theme.colors.background + '80',
+    backgroundColor: theme.colors.overlay,
     borderRadius: theme.radius.full,
     overflow: 'hidden',
     marginBottom: 4,
@@ -693,7 +674,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   legendRow: {
     flexDirection: 'row',
     gap: 14,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   legendItem: {
     flexDirection: 'row',
@@ -709,7 +690,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     fontFamily: theme.fontFamilies.sansSemiBold,
     color: theme.colors.textMuted,
     fontSize: 10,
-    letterSpacing: 0.5,
   },
   trendRow: {
     flexDirection: 'row',
@@ -736,7 +716,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   trendBarTrack: {
     height: 6,
-    backgroundColor: theme.colors.background + '80',
+    backgroundColor: theme.colors.overlay,
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -754,26 +734,22 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.background + '40',
     gap: 12,
     position: 'relative',
   },
-  txRowLast: {
-    borderBottomWidth: 0,
-  },
+  txRowLast: {},
   txAccent: {
     position: 'absolute',
-    left: -14,
+    left: -16,
     top: 12,
     bottom: 12,
     width: 3,
-    borderRadius: theme.radius.sm,
+    borderRadius: theme.radius.full,
   },
   txIcon: {
     width: 34,
     height: 34,
-    borderRadius: theme.radius.sm,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },

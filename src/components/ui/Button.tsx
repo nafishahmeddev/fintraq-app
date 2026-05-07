@@ -63,7 +63,7 @@ export const Button = React.memo(function Button({
   }, [variant, disabled, colors]);
 
   const backgroundColor = useMemo(() => {
-    if (disabled) return colors.surface;
+    if (disabled) return colors.overlay;
     switch (variant) {
       case 'primary': return colors.primary;
       case 'danger': return colors.danger;

@@ -1,13 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, View, Platform } from 'react-native';
+import { ActivityIndicator, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Card, ConfirmDialog, EmptyState, Header, OptionsDialog, Typography } from '../../../components/ui';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import { Header } from '../../../components/ui/Header';
+import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { usePremium } from '../../../providers/PremiumProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
-import { useDeletePlace, usePlaces, Place } from '../api/places';
 import { fromDbColor } from '../../../utils/format';
+import { resolveIcon } from '../../../utils/icons';
+import { useDeletePlace, usePlaces, Place } from '../api/places';
 
 export const PlacesScreen = React.memo(function PlacesScreen() {
   const theme = useTheme();
@@ -31,8 +34,8 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
         type: 'warning',
         buttons: [
           { text: 'Maybe later', style: 'cancel' },
-          { text: 'Upgrade now', onPress: () => router.push('/premium') }
-        ]
+          { text: 'Upgrade now', onPress: () => router.push('/premium') },
+        ],
       });
       return;
     }
@@ -43,11 +46,6 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
     router.push(`/places/details/${id}`);
   }, [router]);
 
-  const handlePlaceLongPress = useCallback((place: Place) => {
-    setSelectedPlace(place);
-    setShowOptions(true);
-  }, []);
-
   const options = useMemo(() => [
     {
       key: 'view',
@@ -56,7 +54,7 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
       onPress: () => {
         setShowOptions(false);
         if (selectedPlace) handlePlacePress(selectedPlace.id);
-      }
+      },
     },
     {
       key: 'edit',
@@ -65,7 +63,7 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
       onPress: () => {
         setShowOptions(false);
         if (selectedPlace) router.push(`/places/edit/${selectedPlace.id}`);
-      }
+      },
     },
     {
       key: 'delete',
@@ -75,47 +73,46 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
       onPress: () => {
         setShowOptions(false);
         setShowDeleteConfirm(true);
-      }
-    }
+      },
+    },
   ], [selectedPlace, handlePlacePress, router]);
 
   const renderItem = useCallback(({ item }: { item: Place }) => {
+    const placeColor = fromDbColor(item.color);
     return (
-      <Card size="lg" variant="outlined" shadow="none" style={styles.card}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => handlePlacePress(item.id)}
-          onLongPress={() => handlePlaceLongPress(item)}
-          style={styles.cardContent}
-        >
-          <View style={[styles.avatar, { backgroundColor: fromDbColor(item.color) + '20' }]}>
-            <Ionicons name={(item.icon as any) || 'location'} size={24} color={fromDbColor(item.color)} />
-          </View>
-          <View style={styles.placeInfo}>
-            <Typography variant="h3" numberOfLines={1}>{item.name}</Typography>
-            {item.description && (
-              <Typography variant="bodySm" color={colors.textMuted} numberOfLines={1}>
-                {item.description}
-              </Typography>
-            )}
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={colors.border} />
-        </TouchableOpacity>
-      </Card>
+      <TouchableOpacity
+        style={styles.card}
+        activeOpacity={0.8}
+        onPress={() => handlePlacePress(item.id)}
+        onLongPress={() => {
+          setSelectedPlace(item);
+          setShowOptions(true);
+        }}
+      >
+        <View style={[styles.avatar, { backgroundColor: placeColor + '20' }]}>
+          <Ionicons name={resolveIcon(item.icon, 'location-outline')} size={24} color={placeColor} />
+        </View>
+        <View style={styles.placeInfo}>
+          <Text style={styles.placeName} numberOfLines={1}>{item.name}</Text>
+          {item.description && (
+            <Text style={styles.placeMeta} numberOfLines={1}>{item.description}</Text>
+          )}
+        </View>
+        <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
+      </TouchableOpacity>
     );
-  }, [colors, styles, handlePlacePress, handlePlaceLongPress]);
+  }, [colors, styles, handlePlacePress]);
 
   const keyExtractor = useCallback((item: Place) => item.id.toString(), []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header 
-        title="Places" 
-        
-        showBack 
+      <Header
+        title="Places"
+        showBack
         rightAction={
-          <TouchableOpacity onPress={handleCreate} style={styles.headerBtn}>
-            <Ionicons name="add-circle" size={24} color={colors.primary} />
+          <TouchableOpacity onPress={handleCreate} activeOpacity={0.75}>
+            <Ionicons name="add" size={26} color={colors.text} />
           </TouchableOpacity>
         }
       />
@@ -136,13 +133,14 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
           showsVerticalScrollIndicator={false}
           removeClippedSubviews={Platform.OS === 'android'}
           ListEmptyComponent={
-            <EmptyState
-              title="No places found"
-             
-              icon="location-outline"
-              actionLabel="Add first place"
-              onAction={handleCreate}
-            />
+            <View style={styles.emptyContainer}>
+              <Ionicons name="location-outline" size={32} color={colors.textMuted} />
+              <Text style={styles.emptyTitle}>No places yet</Text>
+              <Text style={styles.emptyText}>Tag transactions with locations you visit.</Text>
+              <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate} activeOpacity={0.8}>
+                <Text style={styles.emptyBtnText}>Add first place</Text>
+              </TouchableOpacity>
+            </View>
           }
         />
       )}
@@ -159,7 +157,7 @@ export const PlacesScreen = React.memo(function PlacesScreen() {
         visible={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         title="Delete place"
-        message={`Are you sure you want to delete "${selectedPlace?.name}"? Linked transactions will remain but won't be associated with this place.`}
+        message={`Delete "${selectedPlace?.name}"? Linked transactions will remain but won't be associated with this place.`}
         confirmLabel="Delete"
         destructive
         onConfirm={() => {
@@ -181,34 +179,71 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  headerBtn: {
-    padding: 8,
-  },
   listContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
     paddingBottom: 40,
-    gap: 16,
+    gap: theme.spacing[12],
   },
   card: {
-    padding: 0,
-    overflow: 'hidden',
-  },
-  cardContent: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    padding: theme.spacing[16],
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    gap: 16,
+    gap: theme.spacing[16],
   },
   avatar: {
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
   placeInfo: {
     flex: 1,
-    gap: 2,
+    gap: 3,
+  },
+  placeName: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+  },
+  placeMeta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  emptyContainer: {
+    paddingVertical: 64,
+    alignItems: 'center',
+    gap: theme.spacing[8],
+  },
+  emptyTitle: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.lg,
+    color: theme.colors.text,
+    marginTop: theme.spacing[8],
+  },
+  emptyText: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 13,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+    maxWidth: 240,
+  },
+  emptyBtn: {
+    marginTop: theme.spacing[8],
+    height: 40,
+    paddingHorizontal: theme.spacing[20],
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.overlay,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyBtnText: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 13,
+    color: theme.colors.text,
   },
 });

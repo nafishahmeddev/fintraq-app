@@ -24,19 +24,13 @@ import { useCreateAccount, useUpdateAccount } from '../hooks/accounts';
 const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
   cash: 'Cash',
   card: 'Card',
-  savings: 'Savings',
-  investment: 'Investment',
-  loan: 'Loan',
-  other: 'Other',
+  savings: 'Savings'
 };
 
 const ACCOUNT_TYPE_ICONS: Record<AccountType, IoniconName> = {
   cash: 'cash-outline',
   card: 'card-outline',
   savings: 'save-outline',
-  investment: 'trending-up-outline',
-  loan: 'receipt-outline',
-  other: 'folder-outline',
 };
 
 type AccountFormValues = {

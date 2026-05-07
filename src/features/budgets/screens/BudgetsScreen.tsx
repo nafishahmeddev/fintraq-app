@@ -1,23 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Header } from '../../../components/ui/Header';
+import { MoneyText } from '../../../components/ui/MoneyText';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
-import { Typography, Card, MoneyText } from '../../../components/ui';
 import { budgets } from '../../../db/schema';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { formatCurrency } from '../../../utils/format';
 import { useBudgets, useBudgetsProgress, useDeleteBudget } from '../api/budgets';
 
-export const BudgetsScreen = () => {
+export const BudgetsScreen = React.memo(function BudgetsScreen() {
   const theme = useTheme();
   const { colors } = theme;
   const { profile } = useSettings();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
 
   const { data: budgetsData, isLoading: loadingBudgets } = useBudgets();
@@ -28,13 +28,12 @@ export const BudgetsScreen = () => {
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     router.push('/budgets/create');
-  };
+  }, [router]);
 
-  const manageOptions = React.useMemo(() => {
+  const manageOptions = useMemo(() => {
     if (!selectedItem) return [];
-
     return [
       {
         key: 'view-details',
@@ -58,7 +57,7 @@ export const BudgetsScreen = () => {
     ];
   }, [selectedItem, router]);
 
-  const renderItem = ({ item }: { item: typeof budgets.$inferSelect }) => {
+  const renderItem = useCallback(({ item }: { item: typeof budgets.$inferSelect }) => {
     const progress = progressData?.find((p) => p.budgetId === item.id);
     const spent = progress?.spent || 0;
     const total = progress?.total || item.amount;
@@ -66,107 +65,97 @@ export const BudgetsScreen = () => {
     const percentage = Math.min(progress?.percentage || 0, 100);
     const adjustment = progress?.adjustment || 0;
 
-    // Determine status color
     const isExceeded = percentage >= 100;
     const isWarning = percentage >= 80 && !isExceeded;
     const statusColor = isExceeded ? colors.danger : isWarning ? colors.warning : colors.primary;
 
     return (
-      <Card
-        size="lg"
-        variant="outlined"
-        shadow="none"
+      <TouchableOpacity
         style={styles.card}
+        activeOpacity={0.8}
+        onLongPress={() => {
+          setSelectedItem(item);
+          setShowManageDialog(true);
+        }}
+        onPress={() => router.push(`/budgets/details/${item.id}`)}
       >
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onLongPress={() => {
-            setSelectedItem(item);
-            setShowManageDialog(true);
-          }}
-          onPress={() => router.push(`/budgets/details/${item.id}`)}
-        >
-          <View style={styles.cardHeader}>
-            <View style={styles.cardInfo}>
-              <Typography variant="h3" style={styles.cardName}>{item.name}</Typography>
-              <View style={styles.badgeRow}>
-                <Typography variant="label" style={styles.capitalize}>{item.period.toLowerCase()} • {item.mode.toLowerCase()}</Typography>
-                {item.isRolling && (
-                  <View style={styles.rollingBadge}>
-                    <Ionicons name="repeat" size={10} color={colors.primary} />
-                    <Typography variant="label" style={styles.rollingBadgeText}>Rolling</Typography>
-                  </View>
-                )}
-              </View>
-            </View>
-            <View style={styles.cardRight}>
-              <MoneyText 
-                amount={remaining} 
-                currency={profile.defaultCurrency} 
-                weight="sansBold" 
-                style={styles.cardAmount} 
-              />
-              <Typography variant="bodySm" color={colors.textMuted}>left</Typography>
+        <View style={styles.cardHeader}>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
+            <View style={styles.badgeRow}>
+              <Text style={styles.cardMeta}>{item.period.toLowerCase()} · {item.mode.toLowerCase()}</Text>
+              {item.isRolling && (
+                <View style={styles.rollingBadge}>
+                  <Ionicons name="repeat" size={10} color={colors.primary} />
+                  <Text style={styles.rollingBadgeText}>Rolling</Text>
+                </View>
+              )}
             </View>
           </View>
+          <View style={styles.cardRight}>
+            <MoneyText
+              amount={remaining}
+              currency={profile.defaultCurrency}
+              weight="sansBold"
+              style={styles.cardAmount}
+            />
+            <Text style={styles.cardSubLabel}>left</Text>
+          </View>
+        </View>
 
-          <View style={styles.progressSection}>
-            <View style={styles.progressRow}>
-              <Typography variant="bodySm" color={colors.textMuted}>
-                Spent {formatCurrency(spent, profile.defaultCurrency)}
-              </Typography>
-              <Typography variant="bodySm" color={colors.textMuted}>
-                {formatCurrency(total, profile.defaultCurrency)}
-              </Typography>
-            </View>
-            <View style={styles.progressBar}>
-              <View style={[styles.progressFill, { width: `${percentage}%`, backgroundColor: statusColor }]} />
-            </View>
-            {adjustment !== 0 && (
-              <Typography 
-                variant="monoSm" 
-                style={[styles.adjustmentText, { color: adjustment > 0 ? colors.success : colors.danger }]}
-              >
-                {adjustment > 0 ? '+' : ''}{formatCurrency(adjustment, profile.defaultCurrency)} carried forward
-              </Typography>
-            )}
-          </View>
-        </TouchableOpacity>
-      </Card>
+        <View style={styles.progressRow}>
+          <Text style={styles.progressLabel}>Spent {formatCurrency(spent, profile.defaultCurrency)}</Text>
+          <Text style={styles.progressLabel}>{formatCurrency(total, profile.defaultCurrency)}</Text>
+        </View>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${percentage}%`, backgroundColor: statusColor }]} />
+        </View>
+        {adjustment !== 0 && (
+          <Text style={[styles.adjustmentText, { color: adjustment > 0 ? colors.success : colors.danger }]}>
+            {adjustment > 0 ? '+' : ''}{formatCurrency(adjustment, profile.defaultCurrency)} carried forward
+          </Text>
+        )}
+      </TouchableOpacity>
     );
-  };
+  }, [colors, profile.defaultCurrency, styles, progressData, router]);
+
+  const keyExtractor = useCallback((item: typeof budgets.$inferSelect) => item.id.toString(), []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Budgets" showBack />
+      <Header
+        title="Budgets"
+        showBack
+        rightAction={
+          <TouchableOpacity onPress={handleCreate} activeOpacity={0.75}>
+            <Ionicons name="add" size={26} color={colors.text} />
+          </TouchableOpacity>
+        }
+      />
 
       {(loadingBudgets || loadingProgress) ? (
-        <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
       ) : (
         <FlatList
           data={budgetsData}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={keyExtractor}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Ionicons name="pie-chart-outline" size={32} color={colors.textMuted} />
-              <Typography variant="h3" style={styles.emptyTitle}>No budgets found</Typography>
-              <Typography variant="body" style={styles.emptyText}>
-                Set spending limits to stay on track.
-              </Typography>
-              <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate}>
-                <Typography variant="body" weight="sansSemiBold">Create budget</Typography>
+              <Text style={styles.emptyTitle}>No budgets yet</Text>
+              <Text style={styles.emptyText}>Set spending limits to stay on track.</Text>
+              <TouchableOpacity style={styles.emptyBtn} onPress={handleCreate} activeOpacity={0.8}>
+                <Text style={styles.emptyBtnText}>Create budget</Text>
               </TouchableOpacity>
             </View>
           }
         />
       )}
-
-      <TouchableOpacity style={styles.fab} onPress={handleCreate}>
-        <Ionicons name="add" size={28} color={colors.onPrimary} />
-      </TouchableOpacity>
 
       <OptionsDialog
         visible={showManageDialog}
@@ -188,119 +177,143 @@ export const BudgetsScreen = () => {
             deleteBudget(selectedItem.id);
             setSelectedItem(null);
           }
+          setShowDeleteDialog(false);
         }}
       />
     </SafeAreaView>
   );
-};
+});
 
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   listContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 100,
-    gap: 16,
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
+    paddingBottom: 40,
+    gap: theme.spacing[12],
   },
   card: {
-    padding: 20,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    padding: theme.spacing[20],
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 20,
+    marginBottom: theme.spacing[16],
   },
   cardInfo: {
     flex: 1,
+    gap: theme.spacing[4],
   },
   cardName: {
-    marginBottom: 2,
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.md,
+    color: theme.colors.text,
+    letterSpacing: -0.3,
   },
-  capitalize: {
-    textTransform: 'capitalize',
+  cardMeta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[8],
+  },
+  rollingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: theme.colors.primarySubtle,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: theme.radius.xl,
+  },
+  rollingBadgeText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 9,
+    color: theme.colors.primary,
   },
   cardRight: {
     alignItems: 'flex-end',
+    gap: 2,
   },
   cardAmount: {
-    fontSize: 20,
+    fontSize: 22,
+    letterSpacing: -0.5,
   },
-  progressSection: {},
+  cardSubLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
   progressRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: theme.spacing[8],
+  },
+  progressLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
   },
   progressBar: {
-    height: 6,
+    height: 4,
     borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.border + '40',
+    backgroundColor: theme.colors.overlay,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     borderRadius: theme.radius.full,
   },
-  fab: {
-    position: 'absolute',
-    bottom: 32,
-    right: 32,
-    width: 64,
-    height: 64,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.text,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+  adjustmentText: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
+    marginTop: theme.spacing[8],
+    textAlign: 'right',
   },
   emptyContainer: {
-    paddingVertical: 48,
+    paddingVertical: 64,
     alignItems: 'center',
+    gap: theme.spacing[8],
   },
   emptyTitle: {
-    marginTop: 16,
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: theme.fontSizes.lg,
+    color: theme.colors.text,
+    marginTop: theme.spacing[8],
   },
   emptyText: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 13,
     color: theme.colors.textMuted,
-    marginTop: 8,
-    marginBottom: 24,
     textAlign: 'center',
+    maxWidth: 240,
   },
   emptyBtn: {
-    height: 44,
+    marginTop: theme.spacing[8],
+    height: 40,
+    paddingHorizontal: theme.spacing[20],
     borderRadius: theme.radius.full,
-    paddingHorizontal: 20,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  badgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  rollingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: theme.colors.primary + '20',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: theme.radius.xs,
-  },
-  rollingBadgeText: {
-    fontSize: 9,
-    color: theme.colors.primary,
-  },
-  adjustmentText: {
-    marginTop: 8,
-    textAlign: 'right',
+  emptyBtnText: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 13,
+    color: theme.colors.text,
   },
 });

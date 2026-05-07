@@ -1,8 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { CategoryType } from '../../../db/schema';
+import { Theme } from '../../../providers/ThemeProvider';
 
 interface CategoryTypeSelectorProps {
   activeType: CategoryType;
@@ -25,23 +25,23 @@ export const CategoryTypeSelector: React.FC<CategoryTypeSelectorProps> = ({
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   return (
-    <View style={styles.typeTabsRail}>
+    <View style={styles.rail}>
       {(Object.keys(TYPE_CONFIG) as CategoryType[]).map((type) => {
         const config = TYPE_CONFIG[type];
         const isActive = activeType === type;
         return (
           <TouchableOpacity
             key={type}
-            style={[styles.segmentPill, isActive && styles.segmentPillActive]}
+            style={[styles.pill, isActive && styles.pillActive]}
             onPress={() => onTypeChange(type)}
-            activeOpacity={0.9}
+            activeOpacity={0.85}
           >
             <Ionicons
               name={config.icon}
               size={14}
               color={isActive ? colors.onPrimary : colors.textMuted}
             />
-            <Text style={[styles.segmentPillText, isActive && styles.segmentPillTextActive]}>
+            <Text style={[styles.pillText, isActive && styles.pillTextActive]}>
               {config.label}
             </Text>
           </TouchableOpacity>
@@ -52,17 +52,15 @@ export const CategoryTypeSelector: React.FC<CategoryTypeSelectorProps> = ({
 };
 
 const createStyles = (theme: Theme) => StyleSheet.create({
-  typeTabsRail: {
+  rail: {
     flexDirection: 'row',
     height: 48,
     borderRadius: theme.radius['3xl'],
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.overlay,
     padding: 4,
     gap: 4,
   },
-  segmentPill: {
+  pill: {
     flex: 1,
     height: '100%',
     justifyContent: 'center',
@@ -72,15 +70,15 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     borderRadius: theme.radius.xl,
     backgroundColor: 'transparent',
   },
-  segmentPillActive: {
+  pillActive: {
     backgroundColor: theme.colors.primary,
   },
-  segmentPillText: {
+  pillText: {
     fontFamily: theme.fontFamilies.sansBold,
     color: theme.colors.textMuted,
     fontSize: 12,
   },
-  segmentPillTextActive: {
+  pillTextActive: {
     color: theme.colors.onPrimary,
   },
 });

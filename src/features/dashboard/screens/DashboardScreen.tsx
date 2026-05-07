@@ -1,22 +1,21 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Header } from '../../../components/ui/Header';
-import { IconButton } from '../../../components/ui/IconButton';
 import { OptionsDialog } from '../../../components/ui/OptionsDialog';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
-import { useDashboard } from '../hooks/useDashboard';
-import { HeroBalanceCard } from '../components/HeroBalanceCard';
 import { AccountsCarousel } from '../components/AccountsCarousel';
 import { ActivityFeed } from '../components/ActivityFeed';
 import { BudgetSummaryCard } from '../components/BudgetSummaryCard';
 import { GoalsSummaryCard } from '../components/GoalsSummaryCard';
+import { HeroBalanceCard } from '../components/HeroBalanceCard';
 import { LoansSummaryCard } from '../components/LoansSummaryCard';
 import { PeopleSummaryCard } from '../components/PeopleSummaryCard';
 import { PlacesSummaryCard } from '../components/PlacesSummaryCard';
 import { TopExpenseCategoriesCard } from '../components/TopExpenseCategoriesCard';
+import { useDashboard } from '../hooks/useDashboard';
 
 export const DashboardScreen = React.memo(function DashboardScreen() {
   const theme = useTheme();
@@ -58,27 +57,19 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <SafeAreaView style={styles.loadingContainer} edges={['top']}>
         <ActivityIndicator size="large" color={colors.primary} />
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+
         <Header
           title="Dashboard"
           subtitle={`Hi! ${profile.name ? profile.name.split(' ')[0] : ''}`}
-          rightAction={(
-            <View style={styles.headerActions}>
-              <IconButton
-                icon="notifications-outline"
-                onPress={navigateToSettings}
-                size="md"
-              />
-            </View>
-          )}
         />
 
         <HeroBalanceCard
@@ -89,24 +80,19 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
           onCurrencySelect={handleCurrencySelect}
         />
 
-        <BudgetSummaryCard />
-
-        <View style={styles.halfRow}>
-          <GoalsSummaryCard />
-          <LoansSummaryCard />
-        </View>
-
-        <View style={styles.halfRow}>
-          <PeopleSummaryCard />
-          <PlacesSummaryCard />
-        </View>
-
         <AccountsCarousel
           accounts={accounts ?? []}
           onAccountPress={navigateToAccountTransactions}
           onAccountLongPress={handleAccountLongPress}
           onNewAccount={openAccountForm}
         />
+
+        <BudgetSummaryCard />
+
+        <View style={styles.halfRow}>
+          <GoalsSummaryCard />
+          <LoansSummaryCard />
+        </View>
 
         <TopExpenseCategoriesCard
           currencies={topCategoryCurrencies}
@@ -121,6 +107,11 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
           onEditTransaction={navigateToEditTransaction}
           onCreateTransaction={navigateToCreateTransaction}
         />
+
+        <View style={styles.halfRow}>
+          <PeopleSummaryCard />
+          <PlacesSummaryCard />
+        </View>
       </ScrollView>
 
       <TouchableOpacity style={styles.fab} onPress={navigateToCreateTransaction} activeOpacity={0.9}>

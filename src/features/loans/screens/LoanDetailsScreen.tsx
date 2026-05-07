@@ -1,15 +1,69 @@
 import { Ionicons } from '@expo/vector-icons';
+import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useCallback } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, Card, Typography, MoneyText, SectionLabel, TransactionRow, EmptyState, IconButton } from '../../../components/ui';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { EmptyState } from '../../../components/ui/EmptyState';
+import { Header } from '../../../components/ui/Header';
+import { MoneyText } from '../../../components/ui/MoneyText';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { useLoanById, useLoanProgress } from '../api/loans';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { formatCurrency, fromDbColor } from '../../../utils/format';
+import { resolveIcon } from '../../../utils/icons';
+import { TransactionListItem } from '../../transactions/api/transactions';
 import { useTransactions } from '../../transactions/hooks/transactions';
-import { formatCurrency } from '../../../utils/format';
+import { useLoanById, useLoanProgress } from '../api/loans';
 
+// ─── Local transaction row ────────────────────────────────────────────────────
+const TxRow = React.memo(function TxRow({
+  tx,
+  onPress,
+}: {
+  tx: TransactionListItem;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => createTxRowStyles(theme), [theme]);
+
+  const isTransfer = tx.type === 'TRANSFER';
+  const catColor = isTransfer
+    ? colors.primary
+    : tx.category
+    ? fromDbColor(tx.category.color)
+    : colors.textMuted;
+  const iconName = isTransfer
+    ? ('swap-horizontal-outline' as const)
+    : resolveIcon(tx.category?.icon, 'pricetag-outline');
+  const label = isTransfer
+    ? (tx.toAccount?.name ?? 'Transfer')
+    : (tx.category?.name ?? 'Transaction');
+
+  return (
+    <TouchableOpacity style={styles.row} onPress={onPress} activeOpacity={0.75}>
+      <View style={[styles.iconBox, { backgroundColor: catColor + '20' }]}>
+        <Ionicons name={iconName} size={20} color={catColor} />
+      </View>
+      <View style={styles.info}>
+        <Text style={styles.note} numberOfLines={1}>{tx.note || label}</Text>
+        <Text style={styles.meta} numberOfLines={1}>{label} · {tx.account.name}</Text>
+      </View>
+      <View style={styles.right}>
+        <MoneyText
+          amount={tx.amount}
+          currency={tx.account.currency}
+          type={tx.type}
+          weight="sansBold"
+          style={styles.amount}
+        />
+        <Text style={styles.time}>{format(new Date(tx.datetime), 'MMM d')}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+});
+
+// ─── Screen ──────────────────────────────────────────────────────────────────
 export const LoanDetailsScreen = React.memo(function LoanDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const loanId = parseInt(id, 10);
@@ -23,13 +77,19 @@ export const LoanDetailsScreen = React.memo(function LoanDetailsScreen() {
   const { data: progress, isLoading: loadingProgress } = useLoanProgress(loanId);
   const { data: transactions, isLoading: loadingTransactions } = useTransactions(50, { loanId });
 
-  const handleEdit = useCallback(() => {
-    router.push(`/loans/edit/${loanId}`);
-  }, [router, loanId]);
+  const handleTxPress = useCallback((txId: number) => {
+    router.push(`/transactions/edit/${txId}`);
+  }, [router]);
+
+  const renderItem = useCallback(({ item }: { item: TransactionListItem }) => (
+    <TxRow tx={item} onPress={() => handleTxPress(item.id)} />
+  ), [handleTxPress]);
+
+  const keyExtractor = useCallback((item: TransactionListItem) => item.id.toString(), []);
 
   if (loadingLoan || loadingProgress) {
     return (
-      <View style={styles.center}>
+      <View style={styles.loading}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -38,121 +98,98 @@ export const LoanDetailsScreen = React.memo(function LoanDetailsScreen() {
   if (!loan || !progress) {
     return (
       <SafeAreaView style={styles.container}>
-        <Header title="Error" showBack />
-        <EmptyState
-          title="Loan not found"
-         
-          icon="alert-circle-outline"
-        />
+        <Header title="Loan" showBack />
+        <EmptyState title="Loan not found" icon="alert-circle-outline" />
       </SafeAreaView>
     );
   }
 
-  const statusColor = loan.type === 'BORROW' ? colors.danger : colors.success;
+  const isBorrow = loan.type === 'BORROW';
+  const statusColor = isBorrow ? colors.danger : colors.success;
+  const currency = loan.account?.currency || profile.defaultCurrency;
 
   const renderHeader = () => (
     <View style={styles.headerContent}>
-      <Card variant="outlined" size="lg" shadow="none" style={styles.heroCard}>
+      <View style={styles.heroCard}>
         <View style={styles.heroTop}>
           <View>
-            <Typography variant="label">Remaining balance</Typography>
-            <MoneyText 
-              amount={progress.remaining} 
-              currency={loan.account?.currency || profile.defaultCurrency} 
+            <Text style={styles.heroLabel}>Remaining balance</Text>
+            <MoneyText
+              amount={progress.remaining}
+              currency={currency}
               style={styles.heroAmount}
+              weight="sansBold"
             />
           </View>
-          <IconButton
-            icon="create-outline"
-            onPress={handleEdit}
-            variant="ghost"
-            size="md"
-          />
+          <View style={[styles.loanTypeBadge, { backgroundColor: statusColor + '18' }]}>
+            <Text style={[styles.loanTypeText, { color: statusColor }]}>
+              {isBorrow ? 'Borrowed' : 'Lent'}
+            </Text>
+          </View>
         </View>
 
-        <View style={styles.progressSection}>
-          <View style={styles.progressInfo}>
-            <Typography variant="bodySm" color={colors.textMuted}>
-              {Math.round(progress.percentage)}% paid of {formatCurrency(progress.total, loan.account?.currency || profile.defaultCurrency)}
-            </Typography>
-            <Typography variant="monoSm" weight="sansBold">
-              {formatCurrency(progress.paid, loan.account?.currency || profile.defaultCurrency)} paid
-            </Typography>
-          </View>
-          <View style={styles.progressBar}>
-            <View 
-              style={[
-                styles.progressFill, 
-                { 
-                  width: `${Math.min(progress.percentage, 100)}%`, 
-                  backgroundColor: statusColor 
-                }
-              ]} 
-            />
-          </View>
+        <View style={styles.progressInfoRow}>
+          <Text style={styles.progressLabel}>
+            {Math.round(progress.percentage)}% paid of {formatCurrency(progress.total, currency)}
+          </Text>
+          <Text style={[styles.progressPct, { color: statusColor }]}>
+            {formatCurrency(progress.paid, currency)} paid
+          </Text>
         </View>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${Math.min(progress.percentage, 100)}%`, backgroundColor: statusColor }]} />
+        </View>
+
+        <View style={styles.sep} />
 
         <View style={styles.metaGrid}>
           <View style={styles.metaItem}>
-            <Typography variant="label">Type</Typography>
-            <Typography variant="bodySm" weight="sansSemiBold" style={{ color: statusColor }}>
-              {loan.type}
-            </Typography>
+            <Text style={styles.metaLabel}>Start date</Text>
+            <Text style={styles.metaValue}>
+              {loan.startDate ? new Date(loan.startDate).toLocaleDateString() : '–'}
+            </Text>
           </View>
           <View style={styles.metaItem}>
-            <Typography variant="label">Start date</Typography>
-            <Typography variant="bodySm" weight="sansSemiBold">
-              {loan.startDate ? new Date(loan.startDate).toLocaleDateString() : 'No date'}
-            </Typography>
+            <Text style={styles.metaLabel}>End date</Text>
+            <Text style={styles.metaValue}>
+              {loan.endDate ? new Date(loan.endDate).toLocaleDateString() : '–'}
+            </Text>
           </View>
           <View style={styles.metaItem}>
-            <Typography variant="label">End date</Typography>
-            <Typography variant="bodySm" weight="sansSemiBold">
-              {loan.endDate ? new Date(loan.endDate).toLocaleDateString() : 'No date'}
-            </Typography>
+            <Text style={styles.metaLabel}>Account</Text>
+            <Text style={styles.metaValue} numberOfLines={1}>
+              {loan.account?.name || '–'}
+            </Text>
           </View>
         </View>
-      </Card>
+      </View>
 
-      <SectionLabel text="Repayment history" style={styles.sectionHeader} />
+      <Text style={styles.sectionLabel}>Repayment history</Text>
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header 
-        title={loan.name} 
-        showBack 
+      <Header
+        title={loan.name}
+        showBack
         rightAction={
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.push(`/transactions/create?loanId=${loanId}`)}
-            style={styles.headerBtn}
+            activeOpacity={0.75}
           >
-            <Ionicons name="add" size={24} color={colors.primary} />
+            <Ionicons name="add" size={26} color={colors.text} />
           </TouchableOpacity>
         }
       />
-      
       <FlatList
         data={transactions}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item, index }) => (
-          <TransactionRow
-            tx={item}
-            isFirst={index === 0}
-            isLast={index === (transactions?.length || 0) - 1}
-            showDate
-            onPress={() => router.push(`/transactions/edit/${item.id}`)}
-          />
-        )}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={
           !loadingTransactions ? (
-            <EmptyState
-              title="No repayments yet"
-             
-              icon="receipt-outline"
-            />
+            <EmptyState title="No repayments yet" icon="receipt-outline" />
           ) : null
         }
         contentContainerStyle={styles.listContent}
@@ -162,72 +199,153 @@ export const LoanDetailsScreen = React.memo(function LoanDetailsScreen() {
   );
 });
 
+const createTxRowStyles = (theme: Theme) => StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: theme.spacing[16],
+    gap: theme.spacing[12],
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+  },
+  iconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  info: {
+    flex: 1,
+    gap: theme.spacing[2],
+  },
+  note: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: theme.fontSizes.sm,
+    color: theme.colors.text,
+  },
+  meta: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: theme.fontSizes.xs,
+    color: theme.colors.textMuted,
+  },
+  right: {
+    alignItems: 'flex-end',
+    gap: theme.spacing[4],
+  },
+  amount: {
+    fontSize: theme.fontSizes.sm,
+  },
+  time: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
+});
+
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  center: {
+  loading: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: theme.colors.background,
   },
-  headerBtn: {
-    padding: 8,
+  listContent: {
+    paddingHorizontal: theme.layout.screenPadding,
+    paddingTop: theme.spacing[16],
+    paddingBottom: 40,
+    gap: theme.spacing[8],
   },
   headerContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    gap: theme.spacing[20],
+    marginBottom: theme.spacing[8],
   },
   heroCard: {
-    padding: 24,
-    marginBottom: 24,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['3xl'],
+    padding: theme.spacing[20],
   },
   heroTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 24,
+    marginBottom: theme.spacing[20],
+  },
+  heroLabel: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    marginBottom: 4,
   },
   heroAmount: {
     fontSize: 32,
-    lineHeight: 38,
     letterSpacing: -1,
   },
-  progressSection: {
-    marginBottom: 24,
+  loanTypeBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: theme.radius.xl,
   },
-  progressInfo: {
+  loanTypeText: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 12,
+  },
+  progressInfoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: theme.spacing[8],
+  },
+  progressLabel: {
+    fontFamily: theme.fontFamilies.sans,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  progressPct: {
+    fontFamily: theme.fontFamilies.sansBold,
+    fontSize: 12,
   },
   progressBar: {
-    height: 8,
-    backgroundColor: theme.colors.border + '40',
+    height: 4,
     borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.overlay,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     borderRadius: theme.radius.full,
   },
+  sep: {
+    height: 1,
+    backgroundColor: theme.colors.overlay,
+    marginVertical: theme.spacing[20],
+  },
   metaGrid: {
     flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-    borderStyle: 'dashed',
-    paddingTop: 20,
-    gap: 16,
+    gap: theme.spacing[16],
   },
   metaItem: {
     flex: 1,
+    gap: 4,
   },
-  sectionHeader: {
-    marginBottom: 16,
+  metaLabel: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 11,
+    color: theme.colors.textMuted,
   },
-  listContent: {
-    paddingBottom: 40,
+  metaValue: {
+    fontFamily: theme.fontFamilies.sansSemiBold,
+    fontSize: 13,
+    color: theme.colors.text,
+  },
+  sectionLabel: {
+    fontFamily: theme.fontFamilies.sansMedium,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    paddingLeft: 4,
   },
 });

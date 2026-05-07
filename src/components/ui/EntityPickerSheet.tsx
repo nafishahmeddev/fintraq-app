@@ -149,7 +149,7 @@ export const EntityPickerSheet = React.memo(function EntityPickerSheet({
                   onPress={() => handleSelect(null)}
                   activeOpacity={0.7}
                 >
-                  <View style={[styles.avatar, { backgroundColor: colors.surface }]}>
+                  <View style={[styles.avatar, { backgroundColor: colors.overlay }]}>
                     <Ionicons name={nullIcon} size={20} color={colors.textMuted} />
                   </View>
                   <Text style={[styles.name, selectedId === null && styles.nameSelected]}>
@@ -163,7 +163,7 @@ export const EntityPickerSheet = React.memo(function EntityPickerSheet({
 
               {filtered.map(item => {
                 const isSelected = selectedId === item.id;
-                const avatarBg = item.color ? item.color + '20' : colors.surface;
+                const avatarBg = item.color ? item.color + '20' : colors.overlay;
                 return (
                   <TouchableOpacity
                     key={item.id}
@@ -258,7 +258,7 @@ const createStyles = (theme: Theme) =>
       width: 40,
       height: 40,
       borderRadius: theme.radius.full,
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.floating,
       justifyContent: 'center',
       alignItems: 'center',
       borderWidth: 1,
@@ -271,7 +271,7 @@ const createStyles = (theme: Theme) =>
       marginBottom: 16,
       height: 48,
       borderRadius: theme.radius.lg,
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.floating,
       paddingHorizontal: 16,
       gap: 12,
       borderWidth: 1,

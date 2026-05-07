@@ -120,7 +120,7 @@ const createStyles = (theme: Theme) =>
       borderRadius: theme.radius.lg,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.floating,
       alignItems: 'center',
       justifyContent: 'center',
     },

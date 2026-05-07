@@ -48,9 +48,9 @@ export const Card = React.memo(function Card({
         return { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border };
       case 'default':
       default:
-        return { backgroundColor: colors.card };
+        return { backgroundColor: colors.surface };
     }
-  }, [variant, colors.surface, colors.card, colors.border]);
+  }, [variant, colors.surface, colors.border]);
 
   const shadowStyle = useMemo(() => {
     if (shadowToken) return theme.shadow[shadowToken];

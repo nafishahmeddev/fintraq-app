@@ -170,7 +170,7 @@ const createStyles = (theme: Theme) =>
     currencyTrigger: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.surface,
       borderWidth: 1,
       borderColor: theme.colors.border,
       borderRadius: theme.radius.lg,

@@ -51,7 +51,7 @@ export const TransactionTypePicker = ({ value, onChange, disabled, allowedTypes 
             key={type}
             style={[
               styles.pill,
-              { backgroundColor: colors.card, borderColor: colors.border },
+              { backgroundColor: colors.surface, borderColor: colors.border },
               isSelected && { backgroundColor: activeColor, borderColor: activeColor },
             ]}
             onPress={() => onChange(type)}
@@ -75,19 +75,19 @@ export const TransactionTypePicker = ({ value, onChange, disabled, allowedTypes 
 
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 8,
     flexDirection: 'row',
-    gap: 8,
+    padding: theme.spacing[4],
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius['md'],
+    marginHorizontal: theme.layout.screenPadding
   },
   pill: {
     paddingHorizontal: 16,
     height: 40,
-    borderRadius: theme.radius.full,
+    borderRadius: theme.radius['md'],
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    flex: 1
   },
   pillText: {
     fontSize: 13,

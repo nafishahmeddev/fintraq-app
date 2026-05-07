@@ -15,22 +15,26 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header, Input, SectionLabel } from '../../../components/ui';
+import { GoalPickerDialog } from '../../../components/ui/GoalPickerDialog';
+import { LoanPickerDialog } from '../../../components/ui/LoanPickerDialog';
 import { PersonPickerDialog } from '../../../components/ui/PersonPickerDialog';
 import { PlacePickerDialog } from '../../../components/ui/PlacePickerDialog';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { TransactionType } from '../../../types';
+import { fromDbColor } from '../../../utils/format';
+import { resolveIcon } from '../../../utils/icons';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useBudgets } from '../../budgets/api/budgets';
 import { useCategories } from '../../categories/hooks/categories';
-import { useGoalById } from '../../goals/api/goals';
-import { useLoanById } from '../../loans/api/loans';
+import { useGoalById, useGoals } from '../../goals/api/goals';
+import { useLoanById, useLoans } from '../../loans/api/loans';
+import { usePersonById } from '../../people/api/people';
+import { usePlaceById } from '../../places/api/places';
 import { TransactionAccountPicker } from '../components/TransactionAccountPicker';
 import { TransactionAmountInput } from '../components/TransactionAmountInput';
 import { TransactionBudgetPicker } from '../components/TransactionBudgetPicker';
 import { TransactionCategoryPicker } from '../components/TransactionCategoryPicker';
-import { TransactionGoalPicker } from '../components/TransactionGoalPicker';
-import { TransactionLoanPicker } from '../components/TransactionLoanPicker';
 import { TransactionTypePicker } from '../components/TransactionTypePicker';
 import {
   useCreateTransaction,
@@ -66,9 +70,6 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
 
-  const { data: paramGoal } = useGoalById(params.goalId ? parseInt(params.goalId, 10) : null);
-  const { data: paramLoan } = useLoanById(params.loanId ? parseInt(params.loanId, 10) : null);
-
   const accounts = React.useMemo(() => accountsQuery.data ?? [], [accountsQuery.data]);
   const categories = React.useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
   const budgetsList = React.useMemo(() => budgetsQuery.data ?? [], [budgetsQuery.data]);
@@ -96,8 +97,42 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
   const [showTimePicker, setShowTimePicker] = React.useState(false);
   const [showPersonPicker, setShowPersonPicker] = React.useState(false);
   const [showPlacePicker, setShowPlacePicker] = React.useState(false);
+  const [showLoanPicker, setShowLoanPicker] = React.useState(false);
+  const [showGoalPicker, setShowGoalPicker] = React.useState(false);
   const [amountInput, setAmountInput] = React.useState('');
   const [note, setNote] = React.useState('');
+
+  // Entity queries for display in picker buttons
+  const { data: selectedGoalData } = useGoalById(selectedGoalId);
+  const { data: selectedLoanData } = useLoanById(selectedLoanId);
+  const { data: selectedPerson } = usePersonById(selectedPersonId);
+  const { data: selectedPlace } = usePlaceById(selectedPlaceId);
+
+  // For pre-population from URL params
+  const { data: paramGoal } = useGoalById(params.goalId ? parseInt(params.goalId, 10) : null);
+  const { data: paramLoan } = useLoanById(params.loanId ? parseInt(params.loanId, 10) : null);
+
+  // All loans/goals to determine if pickers should be shown
+  const { data: allLoans = [] } = useLoans();
+  const { data: allGoals = [] } = useGoals();
+
+  const hasActiveLoans = React.useMemo(() => {
+    if (type === 'TRANSFER') return false;
+    return allLoans.some(l => {
+      const isActive = l.status === 'ACTIVE';
+      const isCorrectType = (type === 'DR' && l.type === 'BORROW') || (type === 'CR' && l.type === 'LEND');
+      const isCorrectAccount = l.accountId === null || selectedAccountId === null || l.accountId === selectedAccountId;
+      return isActive && isCorrectType && isCorrectAccount;
+    });
+  }, [allLoans, type, selectedAccountId]);
+
+  const hasActiveGoals = React.useMemo(() => {
+    if (type !== 'CR') return false;
+    return allGoals.some(g =>
+      g.status === 'ACTIVE' &&
+      (g.accountId === null || selectedAccountId === null || g.accountId === selectedAccountId)
+    );
+  }, [allGoals, type, selectedAccountId]);
 
   React.useEffect(() => {
     if (!isEditMode || !editingTransaction) return;
@@ -306,15 +341,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
       <Header title={isEditMode ? 'Edit entry' : 'New entry'} showBack />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-
-
-
-
         <TransactionTypePicker value={type} onChange={setType} disabled={isEditMode} />
-
-
-
-
 
         <View style={styles.formBody}>
 
@@ -337,6 +364,7 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
               style={styles.noteInput}
             />
           </View>
+
           <TransactionAccountPicker
             accounts={accounts}
             selectedId={selectedAccountId}
@@ -385,20 +413,67 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
             />
           )}
 
-          <TransactionGoalPicker
-            selectedId={selectedGoalId}
-            onSelect={setSelectedGoalId}
-            accountId={selectedAccountId}
-            type={type}
-          />
+          {/* Goal picker */}
+          {(hasActiveGoals || selectedGoalId !== null) && (
+            <View style={styles.section}>
+              <SectionLabel size="sm" text="Goal (optional)" />
+              <TouchableOpacity
+                style={styles.pickerBtn}
+                onPress={() => setShowGoalPicker(true)}
+                activeOpacity={0.7}
+              >
+                {selectedGoalData ? (
+                  <View style={[styles.pickerEntityIcon, { backgroundColor: fromDbColor(selectedGoalData.color) + '20' }]}>
+                    <Ionicons name={resolveIcon(selectedGoalData.icon, 'flag-outline')} size={16} color={fromDbColor(selectedGoalData.color)} />
+                  </View>
+                ) : (
+                  <Ionicons name="flag-outline" size={18} color={colors.textMuted} />
+                )}
+                <Text style={[styles.pickerBtnText, !selectedGoalData && { color: colors.textMuted }]} numberOfLines={1}>
+                  {selectedGoalData ? selectedGoalData.name : 'Link a goal'}
+                </Text>
+                {selectedGoalData ? (
+                  <TouchableOpacity onPress={() => setSelectedGoalId(null)} activeOpacity={0.8} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                    <Ionicons name="close-circle" size={18} color={colors.textMuted} />
+                  </TouchableOpacity>
+                ) : (
+                  <Ionicons name="chevron-down" size={14} color={colors.textMuted} />
+                )}
+              </TouchableOpacity>
+            </View>
+          )}
 
-          <TransactionLoanPicker
-            selectedId={selectedLoanId}
-            onSelect={setSelectedLoanId}
-            accountId={selectedAccountId}
-            type={type}
-          />
+          {/* Loan picker */}
+          {(hasActiveLoans || selectedLoanId !== null) && (
+            <View style={styles.section}>
+              <SectionLabel size="sm" text="Loan (optional)" />
+              <TouchableOpacity
+                style={styles.pickerBtn}
+                onPress={() => setShowLoanPicker(true)}
+                activeOpacity={0.7}
+              >
+                {selectedLoanData ? (
+                  <View style={[styles.pickerEntityIcon, { backgroundColor: fromDbColor(selectedLoanData.color) + '20' }]}>
+                    <Ionicons name={resolveIcon(selectedLoanData.icon, 'cash-outline')} size={16} color={fromDbColor(selectedLoanData.color)} />
+                  </View>
+                ) : (
+                  <Ionicons name="cash-outline" size={18} color={colors.textMuted} />
+                )}
+                <Text style={[styles.pickerBtnText, !selectedLoanData && { color: colors.textMuted }]} numberOfLines={1}>
+                  {selectedLoanData ? selectedLoanData.name : 'Link a loan'}
+                </Text>
+                {selectedLoanData ? (
+                  <TouchableOpacity onPress={() => setSelectedLoanId(null)} activeOpacity={0.8} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                    <Ionicons name="close-circle" size={18} color={colors.textMuted} />
+                  </TouchableOpacity>
+                ) : (
+                  <Ionicons name="chevron-down" size={14} color={colors.textMuted} />
+                )}
+              </TouchableOpacity>
+            </View>
+          )}
 
+          {/* Person picker */}
           <View style={styles.section}>
             <SectionLabel size="sm" text="Person (optional)" />
             <TouchableOpacity
@@ -406,14 +481,27 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
               onPress={() => setShowPersonPicker(true)}
               activeOpacity={0.7}
             >
-              <Ionicons name="person-outline" size={18} color={colors.primary} />
-              <Text style={[styles.pickerBtnText, { color: selectedPersonId ? colors.text : colors.textMuted }]}>
-                {selectedPersonId ? 'Person linked' : 'Link a person'}
+              {selectedPerson ? (
+                <View style={[styles.pickerEntityIcon, { backgroundColor: fromDbColor(selectedPerson.color) + '20' }]}>
+                  <Ionicons name={resolveIcon(selectedPerson.icon, 'person-outline')} size={16} color={fromDbColor(selectedPerson.color)} />
+                </View>
+              ) : (
+                <Ionicons name="person-outline" size={18} color={colors.textMuted} />
+              )}
+              <Text style={[styles.pickerBtnText, !selectedPerson && { color: colors.textMuted }]} numberOfLines={1}>
+                {selectedPerson ? selectedPerson.name : 'Link a person'}
               </Text>
-              <Ionicons name="chevron-down" size={14} color={colors.textMuted} />
+              {selectedPerson ? (
+                <TouchableOpacity onPress={() => setSelectedPersonId(null)} activeOpacity={0.8} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Ionicons name="close-circle" size={18} color={colors.textMuted} />
+                </TouchableOpacity>
+              ) : (
+                <Ionicons name="chevron-down" size={14} color={colors.textMuted} />
+              )}
             </TouchableOpacity>
           </View>
 
+          {/* Place picker */}
           <View style={styles.section}>
             <SectionLabel size="sm" text="Place (optional)" />
             <TouchableOpacity
@@ -421,14 +509,27 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
               onPress={() => setShowPlacePicker(true)}
               activeOpacity={0.7}
             >
-              <Ionicons name="location-outline" size={18} color={colors.primary} />
-              <Text style={[styles.pickerBtnText, { color: selectedPlaceId ? colors.text : colors.textMuted }]}>
-                {selectedPlaceId ? 'Place linked' : 'Link a place'}
+              {selectedPlace ? (
+                <View style={[styles.pickerEntityIcon, { backgroundColor: fromDbColor(selectedPlace.color) + '20' }]}>
+                  <Ionicons name={resolveIcon(selectedPlace.icon, 'location-outline')} size={16} color={fromDbColor(selectedPlace.color)} />
+                </View>
+              ) : (
+                <Ionicons name="location-outline" size={18} color={colors.textMuted} />
+              )}
+              <Text style={[styles.pickerBtnText, !selectedPlace && { color: colors.textMuted }]} numberOfLines={1}>
+                {selectedPlace ? selectedPlace.name : 'Link a place'}
               </Text>
-              <Ionicons name="chevron-down" size={14} color={colors.textMuted} />
+              {selectedPlace ? (
+                <TouchableOpacity onPress={() => setSelectedPlaceId(null)} activeOpacity={0.8} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Ionicons name="close-circle" size={18} color={colors.textMuted} />
+                </TouchableOpacity>
+              ) : (
+                <Ionicons name="chevron-down" size={14} color={colors.textMuted} />
+              )}
             </TouchableOpacity>
           </View>
 
+          {/* Date & time */}
           <View style={styles.section}>
             <SectionLabel size="sm" text="Date & time" />
             <View style={styles.dateTimeRow}>
@@ -482,6 +583,25 @@ export function TransactionFormPage({ mode, transactionId }: Props) {
         onSelect={setSelectedPlaceId}
         onAddPlace={() => router.push('/places/create')}
       />
+
+      <LoanPickerDialog
+        visible={showLoanPicker}
+        onClose={() => setShowLoanPicker(false)}
+        selectedId={selectedLoanId}
+        onSelect={setSelectedLoanId}
+        accountId={selectedAccountId}
+        transactionType={type}
+        onAddLoan={() => router.push('/loans/create')}
+      />
+
+      <GoalPickerDialog
+        visible={showGoalPicker}
+        onClose={() => setShowGoalPicker(false)}
+        selectedId={selectedGoalId}
+        onSelect={setSelectedGoalId}
+        accountId={selectedAccountId}
+        onAddGoal={() => router.push('/goals/create')}
+      />
     </SafeAreaView>
   );
 }
@@ -521,10 +641,8 @@ const createStyles = (theme: Theme) =>
     dateTimeBtn: {
       flex: 1,
       height: 48,
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius['lg'],
       backgroundColor: theme.colors.surface,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -536,20 +654,26 @@ const createStyles = (theme: Theme) =>
       color: theme.colors.text,
     },
     pickerBtn: {
-      height: 48,
-      borderRadius: theme.radius.lg,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
+      height: 52,
+      borderRadius: theme.radius['lg'],
       flexDirection: 'row',
       alignItems: 'center',
       paddingHorizontal: theme.spacing[16],
       gap: theme.spacing[12],
       backgroundColor: theme.colors.surface,
     },
+    pickerEntityIcon: {
+      width: 30,
+      height: 30,
+      borderRadius: theme.radius.full,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     pickerBtnText: {
       flex: 1,
       fontFamily: theme.fontFamilies.sansMedium,
       fontSize: 14,
+      color: theme.colors.text,
     },
     footer: {
       position: 'absolute',
@@ -575,13 +699,10 @@ const createStyles = (theme: Theme) =>
     },
     disabledCard: {
       height: 48,
-      borderRadius: theme.radius.lg,
+      borderRadius: theme.radius['3xl'],
       backgroundColor: theme.colors.surface,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
       alignItems: 'center',
       justifyContent: 'center',
-      borderStyle: 'dashed',
     },
     disabledText: {
       fontFamily: theme.fontFamilies.sansSemiBold,

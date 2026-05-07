@@ -10,7 +10,7 @@ export function WelcomeStep() {
   return (
     <View style={styles.wrapper}>
       <View style={styles.badge}>
-        <Ionicons name="sparkles-outline" size={14} color={theme.colors.primaryDark} />
+        <Ionicons name="sparkles-outline" size={14} color={theme.colors.primary} />
         <Text style={styles.badgeText}>Local-first money OS</Text>
       </View>
 
@@ -55,7 +55,7 @@ const createStyles = (theme: Theme) =>
     badgeText: {
       fontFamily: theme.fontFamilies.sansBold,
       fontSize: 10,
-      color: theme.colors.primaryDark,
+      color: theme.colors.primary,
       letterSpacing: 0.8,
     },
     title: {

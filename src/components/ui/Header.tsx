@@ -1,8 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Theme, useTheme } from '../../providers/ThemeProvider';
-import { IconButton } from './IconButton';
 
 export type HeaderProps = {
   title: string;
@@ -27,6 +27,8 @@ export const Header = React.memo(function Header({
 }: HeaderProps) {
   const router = useRouter();
   const theme = useTheme();
+  const { colors } = theme;
+
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   const handleBack = useCallback(() => {
@@ -37,12 +39,9 @@ export const Header = React.memo(function Header({
     <View style={styles.container}>
       <View style={styles.left}>
         {showBack && (
-          <IconButton
-            icon="chevron-back"
-            onPress={handleBack}
-            size="md"
-            variant="default"
-          />
+          <TouchableOpacity onPress={handleBack} activeOpacity={0.7} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <Ionicons name="chevron-back" size={26} color={colors.text} />
+          </TouchableOpacity>
         )}
         <View style={styles.titleBlock}>
           <Text style={styles.title} numberOfLines={1}>

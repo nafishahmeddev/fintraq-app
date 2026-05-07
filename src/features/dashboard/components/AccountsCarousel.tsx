@@ -48,27 +48,29 @@ export const AccountsCarousel = React.memo(function AccountsCarousel({
               onPress={() => onAccountPress(acc.id)}
               onLongPress={() => onAccountLongPress(acc)}
               delayLongPress={250}
-              activeOpacity={0.88}
+              activeOpacity={0.85}
             >
               <View style={styles.topRow}>
                 <View style={[styles.iconBox, { backgroundColor: c + '18' }]}>
-                  <Ionicons name={resolveIcon(acc.icon, 'wallet-outline')} size={16} color={c} />
+                  <Ionicons name={resolveIcon(acc.icon, 'wallet-outline')} size={18} color={c} />
                 </View>
                 <View style={styles.meta}>
                   <Text style={styles.name} numberOfLines={1}>{acc.name}</Text>
-                  <View style={[styles.currencyBadge, { borderColor: c }]}>
-                    <Text style={[styles.currencyText, { color: c }]}>{acc.currency}</Text>
-                  </View>
+                  <Text style={[styles.currencyTag, { color: c }]}>{acc.currency}</Text>
                 </View>
               </View>
 
-              <MoneyText
-                amount={acc.balance}
-                currency={acc.currency}
-                style={styles.balance}
-                weight="sansBold"
-              />
-              <Text style={styles.balanceLabel}>Available</Text>
+              <View style={styles.balanceBlock}>
+                <MoneyText
+                  amount={acc.balance}
+                  currency={acc.currency}
+                  style={styles.balance}
+                  weight="sansBold"
+                />
+                <Text style={styles.balanceLabel}>Available balance</Text>
+              </View>
+
+              <View style={[styles.accentBar, { backgroundColor: c }]} />
             </TouchableOpacity>
           );
         })}
@@ -76,10 +78,10 @@ export const AccountsCarousel = React.memo(function AccountsCarousel({
         <TouchableOpacity
           style={styles.addCard}
           onPress={onNewAccount}
-          activeOpacity={0.88}
+          activeOpacity={0.85}
         >
           <View style={styles.addIcon}>
-            <Ionicons name="add" size={24} color={colors.text} />
+            <Ionicons name="add" size={22} color={colors.text} />
           </View>
           <Text style={styles.addTitle}>New account</Text>
         </TouchableOpacity>
@@ -94,76 +96,81 @@ const createStyles = (theme: Theme, screenWidth: number) => StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: theme.layout.screenPadding,
-    gap: theme.spacing[8],
+    gap: theme.spacing[12],
   },
   card: {
-    width: screenWidth * 0.6,
-    padding: theme.spacing[16],
-    borderRadius: theme.radius.xl,
-    backgroundColor: theme.colors.card,
+    width: screenWidth * 0.62,
+    padding: theme.spacing[20],
+    borderRadius: theme.radius['3xl'],
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderLeftWidth: 1,
     borderColor: theme.colors.border,
-    gap: theme.spacing[12],
+    gap: theme.spacing[16],
+    overflow: 'hidden',
   },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing[8],
+    gap: theme.spacing[12],
   },
   iconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: theme.radius.md,
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.full,
     alignItems: 'center',
     justifyContent: 'center',
   },
   meta: {
     flex: 1,
-    gap: 4,
+    gap: 3,
   },
   name: {
     fontFamily: theme.fontFamilies.sansBold,
-    fontSize: theme.fontSizes.md,
+    fontSize: 14,
     color: theme.colors.text,
   },
-  currencyBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
-  },
-  currencyText: {
+  currencyTag: {
     fontFamily: theme.fontFamilies.monoBold,
-    fontSize: 9,
+    fontSize: 10,
+  },
+  balanceBlock: {
+    gap: 2,
   },
   balance: {
-    fontSize: 18,
-    letterSpacing: -0.3,
+    fontSize: 22,
+    letterSpacing: -0.5,
+    color: theme.colors.text,
   },
   balanceLabel: {
     fontFamily: theme.fontFamilies.sans,
     fontSize: 10,
     color: theme.colors.textMuted,
-    marginTop: -4,
+  },
+  accentBar: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 3,
+    borderTopLeftRadius: theme.radius['3xl'],
+    borderBottomLeftRadius: theme.radius['3xl'],
   },
   addCard: {
-    width: screenWidth * 0.6,
-    borderRadius: theme.radius.xl,
-    borderWidth: 1.5,
+    width: screenWidth * 0.42,
+    borderRadius: theme.radius['3xl'],
+    borderWidth: 1,
     borderColor: theme.colors.border,
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: theme.spacing[24],
     gap: theme.spacing[8],
+    padding: theme.spacing[24],
   },
   addIcon: {
     width: 44,
     height: 44,
     borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -171,7 +178,7 @@ const createStyles = (theme: Theme, screenWidth: number) => StyleSheet.create({
   },
   addTitle: {
     fontFamily: theme.fontFamilies.sansBold,
-    fontSize: theme.fontSizes.sm,
-    color: theme.colors.text,
+    fontSize: 12,
+    color: theme.colors.textMuted,
   },
 });

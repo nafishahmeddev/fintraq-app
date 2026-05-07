@@ -40,7 +40,7 @@ export const IconButton = React.memo(function IconButton({
       case 'ghost':
         return 'transparent';
       default:
-        return colors.surface;
+        return colors.overlay;
     }
   };
 

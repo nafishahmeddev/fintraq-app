@@ -63,7 +63,7 @@ export default function AccountsTab() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.center}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -72,71 +72,81 @@ export default function AccountsTab() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Header title="Accounts" />
+    <SafeAreaView style={styles.container} edges={['top']}>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {accounts?.map((acc) => {
-          const accColor = '#' + acc.color.toString(16).padStart(6, '0');
-          return (
-            <TouchableOpacity
-              key={acc.id}
-              style={styles.card}
-              onPress={() => router.push(`/transactions?accountId=${acc.id}`)}
-              onLongPress={() => handleLongPress(acc)}
-              delayLongPress={250}
-              activeOpacity={0.88}
-            >
-              <View style={styles.cardTop}>
-                <View style={[styles.iconBox, { backgroundColor: accColor + '20' }]}>
-                  <Ionicons name={resolveIcon(acc.icon, 'wallet-outline')} size={20} color={accColor} />
-                </View>
-                <View style={styles.cardMeta}>
-                  <Text style={styles.cardName}>{acc.name}</Text>
-                  <Text style={styles.cardHint}>
-                    {acc.accountNumber && acc.accountNumber !== 'N/A'
-                      ? `•••• ${acc.accountNumber.slice(-4)}`
-                      : 'Tap to view activity'}
-                  </Text>
-                </View>
-                <View style={[styles.currencyBadge, { borderColor: accColor }]}>
-                  <Text style={[styles.currencyText, { color: accColor }]}>{acc.currency}</Text>
-                </View>
-              </View>
-
-              <MoneyText
-                amount={acc.balance}
-                currency={acc.currency}
-                style={styles.balance}
-                weight="sansBold"
-              />
-
-              <View style={styles.statsRow}>
-                <View style={styles.statCol}>
-                  <Text style={styles.statLabel}>Income</Text>
-                  <MoneyText amount={acc.income} currency={acc.currency} type="CR" style={styles.statValue} />
-                </View>
-                <View style={styles.statDivider} />
-                <View style={styles.statCol}>
-                  <Text style={styles.statLabel}>Expense</Text>
-                  <MoneyText amount={acc.expense} currency={acc.currency} type="DR" style={styles.statValue} />
-                </View>
-              </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Header
+          title="Accounts"
+          rightAction={(
+            <TouchableOpacity onPress={() => router.push('/accounts/create')} activeOpacity={0.75}>
+              <Ionicons name="add" size={26} color={colors.text} />
             </TouchableOpacity>
-          );
-        })}
+          )}
+        />
 
-        <TouchableOpacity
-          style={styles.addCard}
-          onPress={() => router.push('/accounts/create')}
-          activeOpacity={0.88}
-        >
-          <View style={styles.addIcon}>
-            <Ionicons name="add" size={24} color={colors.text} />
-          </View>
-          <Text style={styles.addTitle}>New account</Text>
-          <Text style={styles.addText}>Add another wallet, bank, or cash account.</Text>
-        </TouchableOpacity>
+        <View style={styles.content}>
+          {accounts?.map((acc) => {
+            const accColor = '#' + acc.color.toString(16).padStart(6, '0');
+            return (
+              <TouchableOpacity
+                key={acc.id}
+                style={styles.card}
+                onPress={() => router.push(`/transactions?accountId=${acc.id}`)}
+                onLongPress={() => handleLongPress(acc)}
+                delayLongPress={250}
+                activeOpacity={0.88}
+              >
+                <View style={styles.cardTop}>
+                  <View style={[styles.iconBox, { backgroundColor: accColor + '20' }]}>
+                    <Ionicons name={resolveIcon(acc.icon, 'wallet-outline')} size={20} color={accColor} />
+                  </View>
+                  <View style={styles.cardMeta}>
+                    <Text style={styles.cardName}>{acc.name}</Text>
+                    <Text style={styles.cardHint}>
+                      {acc.accountNumber && acc.accountNumber !== 'N/A'
+                        ? `•••• ${acc.accountNumber.slice(-4)}`
+                        : 'Tap to view activity'}
+                    </Text>
+                  </View>
+                  <View style={[styles.currencyBadge, { borderColor: accColor }]}>
+                    <Text style={[styles.currencyText, { color: accColor }]}>{acc.currency}</Text>
+                  </View>
+                </View>
+
+                <MoneyText
+                  amount={acc.balance}
+                  currency={acc.currency}
+                  style={styles.balance}
+                  weight="sansBold"
+                />
+
+                <View style={styles.statsRow}>
+                  <View style={styles.statCol}>
+                    <Text style={styles.statLabel}>Income</Text>
+                    <MoneyText amount={acc.income} currency={acc.currency} type="CR" style={styles.statValue} />
+                  </View>
+                  <View style={styles.statDivider} />
+                  <View style={styles.statCol}>
+                    <Text style={styles.statLabel}>Expense</Text>
+                    <MoneyText amount={acc.expense} currency={acc.currency} type="DR" style={styles.statValue} />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+
+          <TouchableOpacity
+            style={styles.addCard}
+            onPress={() => router.push('/accounts/create')}
+            activeOpacity={0.88}
+          >
+            <View style={styles.addIcon}>
+              <Ionicons name="add" size={24} color={colors.text} />
+            </View>
+            <Text style={styles.addTitle}>New account</Text>
+            <Text style={styles.addText}>Add another wallet, bank, or cash account.</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
 
       <OptionsDialog
@@ -177,9 +187,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   card: {
     padding: theme.spacing[20],
     borderRadius: theme.radius['3xl'],
-    backgroundColor: theme.colors.card,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
   cardTop: {
     flexDirection: 'row',
@@ -212,8 +220,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: theme.radius.full,
-    borderWidth: 1,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.overlay,
   },
   currencyText: {
     fontFamily: theme.fontFamilies.monoBold,
@@ -229,7 +236,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     gap: theme.spacing[16],
     paddingTop: theme.spacing[16],
     borderTopWidth: 1,
-    borderTopColor: theme.colors.border + '50',
+    borderTopColor: theme.colors.overlay,
   },
   statCol: {
     flex: 1,
@@ -245,27 +252,25 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    backgroundColor: theme.colors.border + '50',
+    backgroundColor: theme.colors.overlay,
   },
   addCard: {
     alignItems: 'center',
     gap: theme.spacing[8],
     padding: theme.spacing[24],
     borderRadius: theme.radius['3xl'],
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.surface,
     borderWidth: 1.5,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.primary + '40',
     borderStyle: 'dashed',
   },
   addIcon: {
     width: 48,
     height: 48,
     borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.overlay,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   addTitle: {
     fontFamily: theme.fontFamilies.sansBold,

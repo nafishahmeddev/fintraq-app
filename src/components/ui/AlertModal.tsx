@@ -160,7 +160,7 @@ const createStyles = (theme: Theme, width: number) =>
       borderColor: theme.colors.text,
     },
     cancelButton: {
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.floating,
       borderColor: theme.colors.border,
     },
     buttonText: {
