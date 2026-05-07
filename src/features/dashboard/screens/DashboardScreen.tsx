@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Header } from '../../../components/ui/Header';
@@ -21,6 +22,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
   const theme = useTheme();
   const { colors } = theme;
   const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const router = useRouter();
 
   const {
     isPremium,
@@ -70,6 +72,18 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
         <Header
           title="Dashboard"
           subtitle={`Hi! ${profile.name ? profile.name.split(' ')[0] : ''}`}
+          rightAction={
+            !isPremium ? (
+              <TouchableOpacity
+                style={styles.proBanner}
+                onPress={() => router.push('/premium')}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="sparkles" size={12} color={colors.primary} />
+                <Text style={styles.proBannerText}>Go Pro</Text>
+              </TouchableOpacity>
+            ) : undefined
+          }
         />
 
         <HeroBalanceCard
@@ -175,5 +189,21 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       justifyContent: 'center',
       ...theme.shadow.md,
+    },
+    proBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.primarySubtle,
+      borderWidth: 1,
+      borderColor: theme.colors.primary + '30',
+    },
+    proBannerText: {
+      fontFamily: theme.fontFamilies.sansBold,
+      fontSize: 12,
+      color: theme.colors.primary,
     },
   });
