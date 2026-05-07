@@ -29,6 +29,7 @@ import {
 } from '../hooks/transactions';
 
 import { format } from 'date-fns';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SWIPE_ACTION_WIDTH = 44;
 type SwipeableInstance = React.ComponentRef<typeof Swipeable>;
@@ -467,7 +468,7 @@ export function TransactionsScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
 
 
       <Header
@@ -576,7 +577,7 @@ export function TransactionsScreen() {
         categories={categoriesQuery.data ?? []}
         resultCount={transactions.length}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
