@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
 import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 export type ChipVariant = 'default' | 'primary' | 'success' | 'danger' | 'warning';
@@ -29,7 +29,7 @@ export const Chip = React.memo(function Chip({
 }: ChipProps) {
   const theme = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
-  
+
   const dimensions = useMemo(() => {
     switch (size) {
       case 'sm':

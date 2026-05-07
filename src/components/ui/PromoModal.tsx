@@ -46,7 +46,7 @@ export const PromoModal = React.memo(function PromoModal() {
     });
 
     return () => clearTimeout(timer);
-  }, [isPremium]);
+  }, [fadeAnim, isPremium, slideAnim]);
 
   const dismiss = useCallback(() => {
     Animated.parallel([

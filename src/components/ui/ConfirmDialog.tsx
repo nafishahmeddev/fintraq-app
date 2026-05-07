@@ -1,5 +1,5 @@
-import React, { useMemo, useCallback } from 'react';
-import { ActivityIndicator, Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { ActivityIndicator, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Theme, useTheme } from '../../providers/ThemeProvider';
 
 type ConfirmDialogProps = {
@@ -57,8 +57,8 @@ export const ConfirmDialog = React.memo(function ConfirmDialog({
 
             <TouchableOpacity
               style={[
-                styles.confirmButton, 
-                destructive ? styles.confirmButtonDestructive : styles.confirmButtonNeutral, 
+                styles.confirmButton,
+                destructive ? styles.confirmButtonDestructive : styles.confirmButtonNeutral,
                 isLoading && { opacity: 0.7 }
               ]}
               onPress={handleConfirm}
