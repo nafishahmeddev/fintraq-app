@@ -91,7 +91,7 @@ export const PersonFormPage = React.memo(function PersonFormPage({ mode, personI
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container}>
       <Header title={isEditMode ? 'Edit person' : 'New person'} showBack />
 
       <ScrollView
