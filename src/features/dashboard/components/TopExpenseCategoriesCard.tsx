@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useMemo } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { MoneyText } from '../../../components/ui/MoneyText';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { resolveIcon } from '../../../utils/icons';
@@ -13,16 +13,12 @@ type TopExpenseCategory = {
 };
 
 type TopExpenseCategoriesCardProps = {
-  currencies: string[];
   selectedCurrency: string;
-  onSelectCurrency: (value: string) => void;
   categories: TopExpenseCategory[];
 };
 
 export const TopExpenseCategoriesCard = React.memo(function TopExpenseCategoriesCard({
-  currencies,
   selectedCurrency,
-  onSelectCurrency,
   categories,
 }: TopExpenseCategoriesCardProps) {
   const theme = useTheme();
@@ -33,28 +29,11 @@ export const TopExpenseCategoriesCard = React.memo(function TopExpenseCategories
     [categories]
   );
 
-  const handleCurrencyPress = useCallback((curr: string) => {
-    onSelectCurrency(curr);
-  }, [onSelectCurrency]);
 
   return (
     <View style={styles.card}>
       <View style={styles.topRow}>
         <Text style={styles.cardLabel}>Top expenses</Text>
-        {currencies.length > 1 && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
-            {currencies.map((curr) => (
-              <TouchableOpacity
-                key={curr}
-                style={[styles.tab, selectedCurrency === curr && styles.tabActive]}
-                onPress={() => handleCurrencyPress(curr)}
-                activeOpacity={0.85}
-              >
-                <Text style={[styles.tabText, selectedCurrency === curr && styles.tabTextActive]}>{curr}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        )}
       </View>
 
       <View style={styles.content}>
@@ -117,31 +96,6 @@ const createStyles = (theme: Theme) =>
       fontFamily: theme.fontFamilies.sansBold,
       fontSize: 12,
       color: theme.colors.textMuted,
-    },
-    tabsRow: {
-      flexDirection: 'row',
-      gap: theme.spacing[4],
-    },
-    tab: {
-      height: 24,
-      borderRadius: theme.radius.full,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      backgroundColor: theme.colors.background,
-      paddingHorizontal: theme.spacing[10],
-      justifyContent: 'center',
-    },
-    tabActive: {
-      backgroundColor: theme.colors.primary,
-      borderColor: theme.colors.primary,
-    },
-    tabText: {
-      fontFamily: theme.fontFamilies.sansSemiBold,
-      color: theme.colors.textMuted,
-      fontSize: 10,
-    },
-    tabTextActive: {
-      color: theme.colors.onPrimary,
     },
     content: {
       paddingBottom: theme.spacing[4],
