@@ -1,3 +1,4 @@
+import { PageContainer } from '@/src/components/shared/PageContainer';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -66,89 +67,89 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <PageContainer showGradient>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-        <Header
-          title="Dashboard"
-          subtitle={`Hi! ${profile.name ? profile.name.split(' ')[0] : ''}`}
-          rightAction={
-            !isPremium ? (
-              <TouchableOpacity
-                style={styles.proBanner}
-                onPress={() => router.push('/premium')}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="sparkles" size={12} color={colors.primary} />
-                <Text style={styles.proBannerText}>Go Pro</Text>
-              </TouchableOpacity>
-            ) : undefined
-          }
+          <Header
+            title="Dashboard"
+            subtitle={`Hi! ${profile.name ? profile.name.split(' ')[0] : ''}`}
+            rightAction={
+              !isPremium ? (
+                <TouchableOpacity
+                  style={styles.proBanner}
+                  onPress={() => router.push('/premium')}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="sparkles" size={12} color={colors.primary} />
+                  <Text style={styles.proBannerText}>Go Pro</Text>
+                </TouchableOpacity>
+              ) : undefined
+            }
+          />
+
+          <HeroBalanceCard
+            balancesByCurrency={balancesByCurrency}
+            selectedCurrency={selectedCurrency}
+            currencyKeys={currencyKeys}
+            monthlyData={monthlyData}
+            onCurrencySelect={handleCurrencySelect}
+          />
+
+          <AccountsCarousel
+            accounts={accounts ?? []}
+            onAccountPress={navigateToAccountTransactions}
+            onAccountLongPress={handleAccountLongPress}
+            onNewAccount={openAccountForm}
+          />
+
+          <BudgetSummaryCard />
+
+          <View style={styles.halfRow}>
+            <GoalsSummaryCard />
+            <LoansSummaryCard />
+          </View>
+
+          <TopExpenseCategoriesCard
+            selectedCurrency={selectedTopCategoryCurrency}
+            categories={topExpenseCategories}
+          />
+
+          <ActivityFeed
+            transactions={transactions}
+            onViewAll={navigateToTransactions}
+            onEditTransaction={navigateToEditTransaction}
+            onCreateTransaction={navigateToCreateTransaction}
+          />
+
+          <View style={styles.halfRow}>
+            <PeopleSummaryCard />
+            <PlacesSummaryCard />
+          </View>
+        </ScrollView>
+
+        <TouchableOpacity style={styles.fab} onPress={navigateToCreateTransaction} activeOpacity={0.9}>
+          <Ionicons name="add" size={28} color={colors.onPrimary} />
+        </TouchableOpacity>
+
+        <OptionsDialog
+          visible={showAccountOptionsDialog}
+          onClose={closeOptionsDialog}
+          title="Manage Account"
+          subtitle={activeAccount?.name}
+          options={accountOptions}
         />
 
-        <HeroBalanceCard
-          balancesByCurrency={balancesByCurrency}
-          selectedCurrency={selectedCurrency}
-          currencyKeys={currencyKeys}
-          monthlyData={monthlyData}
-          onCurrencySelect={handleCurrencySelect}
+        <ConfirmDialog
+          visible={showDeleteAccountDialog}
+          onClose={closeDeleteDialog}
+          title="Delete Account"
+          message={activeAccount ? `Delete ${activeAccount.name}? This action cannot be undone.` : undefined}
+          confirmLabel="Delete"
+          onConfirm={handleDeleteConfirm}
         />
-
-        <AccountsCarousel
-          accounts={accounts ?? []}
-          onAccountPress={navigateToAccountTransactions}
-          onAccountLongPress={handleAccountLongPress}
-          onNewAccount={openAccountForm}
-        />
-
-        <BudgetSummaryCard />
-
-        <View style={styles.halfRow}>
-          <GoalsSummaryCard />
-          <LoansSummaryCard />
-        </View>
-
-        <TopExpenseCategoriesCard
-          currencies={topCategoryCurrencies}
-          selectedCurrency={selectedTopCategoryCurrency}
-          onSelectCurrency={setSelectedTopCategoryCurrency}
-          categories={topExpenseCategories}
-        />
-
-        <ActivityFeed
-          transactions={transactions}
-          onViewAll={navigateToTransactions}
-          onEditTransaction={navigateToEditTransaction}
-          onCreateTransaction={navigateToCreateTransaction}
-        />
-
-        <View style={styles.halfRow}>
-          <PeopleSummaryCard />
-          <PlacesSummaryCard />
-        </View>
-      </ScrollView>
-
-      <TouchableOpacity style={styles.fab} onPress={navigateToCreateTransaction} activeOpacity={0.9}>
-        <Ionicons name="add" size={28} color={colors.onPrimary} />
-      </TouchableOpacity>
-
-      <OptionsDialog
-        visible={showAccountOptionsDialog}
-        onClose={closeOptionsDialog}
-        title="Manage Account"
-        subtitle={activeAccount?.name}
-        options={accountOptions}
-      />
-
-      <ConfirmDialog
-        visible={showDeleteAccountDialog}
-        onClose={closeDeleteDialog}
-        title="Delete Account"
-        message={activeAccount ? `Delete ${activeAccount.name}? This action cannot be undone.` : undefined}
-        confirmLabel="Delete"
-        onConfirm={handleDeleteConfirm}
-      />
-    </SafeAreaView>
+      </SafeAreaView>
+    </PageContainer>
   );
 });
 
@@ -156,7 +157,6 @@ const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background,
     },
     loadingContainer: {
       flex: 1,
