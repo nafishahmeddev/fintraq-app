@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as IAP from 'expo-iap';
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
-import { AlertButton, AlertModal } from '../components/ui/AlertModal';
+import { AlertButton, AlertModal } from '../components/core/AlertModal';
 import { ALL_SKUS, SKU_LIFETIME } from '../constants/iap';
 import { IAPProduct, IAPService } from '../services/iap.service';
 
@@ -116,7 +116,7 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
     try {
       const active = await IAPService.getActivePurchases();
       const hasLifetime = active.some(p => p.productId === SKU_LIFETIME);
-      
+
       if (hasLifetime) {
         if (!premiumState.isPremium) await savePremiumState({ isPremium: true });
         return;
@@ -164,7 +164,7 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
           AsyncStorage.getItem(STORAGE_KEY),
           AsyncStorage.getItem(DEV_OVERRIDE_KEY),
         ]);
-        
+
         if (!unmounted) {
           if (storedPremium) setPremiumState(JSON.parse(storedPremium));
           if (storedDev) setDevOverrideState(storedDev as DevOverride);

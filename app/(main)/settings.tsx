@@ -8,9 +8,9 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
 import { Alert, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
-import { Header } from '../../src/components/ui/Header';
-import { OptionsDialog } from '../../src/components/ui/OptionsDialog';
+import { ConfirmDialog } from '../../src/components/core/ConfirmDialog';
+import { Header } from '../../src/components/core/Header';
+import { OptionsDialog } from '../../src/components/core/OptionsDialog';
 import { db } from '../../src/db/client';
 import { accounts, categories, payments } from '../../src/db/schema';
 import { useSettings } from '../../src/providers/SettingsProvider';
@@ -203,15 +203,21 @@ export default function SettingsScreen() {
   }, [router]);
 
   const themeOptions = useMemo(() => [
-    { key: 'light', label: 'Light mode', icon: 'sunny-outline' as IoniconName,
+    {
+      key: 'light', label: 'Light mode', icon: 'sunny-outline' as IoniconName,
       selected: (profile.theme || 'system') === 'light',
-      onPress: async () => { await updateProfile({ theme: 'light' }); } },
-    { key: 'dark', label: 'Dark mode', icon: 'moon-outline' as IoniconName,
+      onPress: async () => { await updateProfile({ theme: 'light' }); }
+    },
+    {
+      key: 'dark', label: 'Dark mode', icon: 'moon-outline' as IoniconName,
       selected: (profile.theme || 'system') === 'dark',
-      onPress: async () => { await updateProfile({ theme: 'dark' }); } },
-    { key: 'system', label: 'Follow system', icon: 'phone-portrait-outline' as IoniconName,
+      onPress: async () => { await updateProfile({ theme: 'dark' }); }
+    },
+    {
+      key: 'system', label: 'Follow system', icon: 'phone-portrait-outline' as IoniconName,
       selected: (profile.theme || 'system') === 'system',
-      onPress: async () => { await updateProfile({ theme: 'system' }); } },
+      onPress: async () => { await updateProfile({ theme: 'system' }); }
+    },
   ], [profile.theme, updateProfile]);
 
   const timePickerDate = useMemo(() => {

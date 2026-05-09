@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, IconPickerDialog, Input, SectionLabel } from '../../../components/ui';
+import { Header, IconPickerDialog, Input, SectionLabel } from '../../../components/core';
 import { CATEGORY_COLORS } from '../../../constants/picker';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { fromDbColor, toDbColor } from '../../../utils/format';

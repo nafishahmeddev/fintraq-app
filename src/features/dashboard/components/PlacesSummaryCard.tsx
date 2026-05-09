@@ -1,12 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { MoneyText } from '../../../components/core/MoneyText';
+import { useSettings } from '../../../providers/SettingsProvider';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { usePlaces } from '../../places/api/places';
 import { useTransactions } from '../../transactions/hooks/transactions';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
-import { useSettings } from '../../../providers/SettingsProvider';
-import { MoneyText } from '../../../components/ui/MoneyText';
 
 export const PlacesSummaryCard = React.memo(function PlacesSummaryCard() {
   const theme = useTheme();

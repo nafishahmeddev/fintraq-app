@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { TransactionRow } from '../../../components/ui/TransactionRow';
-import { SectionHeader } from '../components/SectionHeader';
+import { TransactionRow } from '../../../components/core/TransactionRow';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import type { TransactionListItem } from '../../transactions/api/transactions';
+import { SectionHeader } from '../components/SectionHeader';
 
 interface ActivityFeedProps {
   transactions: TransactionListItem[] | undefined;

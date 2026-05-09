@@ -50,7 +50,7 @@ This document outlines the core features of the Luno app and the step-by-step wo
 
 ## 4. Monetization & Paywall 
 **Feature:** Strategic feature-based gating meant to incentivize upgrading to Luno Pro.
-**Codebase Domain:** `app/premium.tsx`, `src/services/iap.service.ts`, `src/components/ui/PremiumGuard.tsx`
+**Codebase Domain:** `app/premium.tsx`, `src/services/iap.service.ts`, `src/components/core/PremiumGuard.tsx`
 
 **Workflow:**
 1. A user interacts with an analysis feature flagged as premium (e.g., Period Delta comparisons, long-form history).

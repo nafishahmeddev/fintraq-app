@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
-import { useBudgetsProgress } from '../../budgets/api/budgets';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { MoneyText } from '../../../components/core/MoneyText';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { MoneyText } from '../../../components/ui/MoneyText';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { useBudgetsProgress } from '../../budgets/api/budgets';
 
 export const BudgetSummaryCard = React.memo(function BudgetSummaryCard() {
   const theme = useTheme();

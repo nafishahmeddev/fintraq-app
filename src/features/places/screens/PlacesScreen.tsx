@@ -3,14 +3,14 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
-import { Header } from '../../../components/ui/Header';
-import { OptionsDialog } from '../../../components/ui/OptionsDialog';
+import { ConfirmDialog } from '../../../components/core/ConfirmDialog';
+import { Header } from '../../../components/core/Header';
+import { OptionsDialog } from '../../../components/core/OptionsDialog';
 import { usePremium } from '../../../providers/PremiumProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { fromDbColor } from '../../../utils/format';
 import { resolveIcon } from '../../../utils/icons';
-import { useDeletePlace, usePlaces, Place } from '../api/places';
+import { Place, useDeletePlace, usePlaces } from '../api/places';
 
 const PlaceCard = React.memo(function PlaceCard({
   item,

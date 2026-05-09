@@ -47,7 +47,7 @@ const createStyles = (theme: Theme) =>
       height: 30,
       borderRadius: theme.radius.full,
       paddingHorizontal: theme.spacing[12],
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.surface,
       flexDirection: 'row',
       alignItems: 'center',
       gap: theme.spacing[8],

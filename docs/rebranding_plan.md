@@ -48,7 +48,7 @@ Full-app rebranding to strict Wise design language. Every file, every component.
 
 ## Phase 2 — Core UI Library
 
-### `src/components/ui/Button.tsx`
+### `src/components/core/Button.tsx`
 - [x] All variants → `radius.full`
 - [x] Primary: `colors.onPrimary` text
 - [x] Heights: sm=32, md=44, lg=56
@@ -56,13 +56,13 @@ Full-app rebranding to strict Wise design language. Every file, every component.
 - [x] `secondary`/`outline` border → 1.5px
 - [x] No `shadow.sm` on primary
 
-### `src/components/ui/Card.tsx`
+### `src/components/core/Card.tsx`
 - [x] All variants → `radius['3xl']`
 - [x] No auto `shadow.sm`
 - [x] `sm=spacing[16]`, `md=spacing[20]`, `lg=spacing[24]`
 - [x] `pressable` prop added
 
-### `src/components/ui/Input.tsx`
+### `src/components/core/Input.tsx`
 - [x] Focus border → green 1.5px
 - [x] Label → 13px `sansSemiBold`
 - [x] `helperText` prop
@@ -70,7 +70,7 @@ Full-app rebranding to strict Wise design language. Every file, every component.
 - [x] `trailingElement` prop
 - [x] `filled`/`default` bg → `colors.card`
 
-### `src/components/ui/ListItem.tsx`
+### `src/components/core/ListItem.tsx`
 - [x] Min height 56px
 - [x] Bg → `colors.card`
 - [x] Auto chevron when `onPress`
@@ -78,89 +78,89 @@ Full-app rebranding to strict Wise design language. Every file, every component.
 - [x] Title 14px `sansSemiBold`, subtitle 12px `sans`
 - [x] Selected → primary tint bg
 
-### `src/components/ui/TransactionRow.tsx`
+### `src/components/core/TransactionRow.tsx`
 - [x] Icon box → `radius.full`
 - [x] No border on icon box
 - [x] Icon 20px
 - [x] Row min-height 64px
 - [x] Date 11px
 
-### `src/components/ui/MoneyText.tsx`
+### `src/components/core/MoneyText.tsx`
 - [x] `display` prop (40px, tight letterSpacing)
 - [x] CR → success, DR → danger, TRANSFER → text
 
-### `src/components/ui/Badge.tsx`
+### `src/components/core/Badge.tsx`
 - [x] `radius.full` pill
 - [x] Padding 3/10
 - [x] Font 11px `sansSemiBold`, no uppercase
 
-### `src/components/ui/Chip.tsx`
+### `src/components/core/Chip.tsx`
 - [x] `radius.full`
 - [x] Selected: `colors.primary` + `colors.onPrimary`
 - [x] Unselected: `colors.card`
 
-### `src/components/ui/IconBox.tsx`
+### `src/components/core/IconBox.tsx`
 - [x] Default shape → `'circle'`
 - [x] Sizes: xs=28, sm=32, md=40, lg=48, xl=56
 - [x] No default border
 
-### `src/components/ui/Header.tsx`
+### `src/components/core/Header.tsx`
 - [x] Back → bare `chevron-back`, `variant="ghost"`
 - [ ] Add `titleAlign` prop for modal headers (center alignment)
 
-### `src/components/ui/EmptyState.tsx`
+### `src/components/core/EmptyState.tsx`
 - [x] Icon container → `colors.primary+'1A'`, no border
 - [x] Icon color → `colors.primary`
 - [x] CTA → `Button` primary pill
 
-### `src/components/ui/Divider.tsx`
+### `src/components/core/Divider.tsx`
 - [x] `StyleSheet.hairlineWidth`
 - [x] `label` prop
 
-### `src/components/ui/SectionLabel.tsx`
+### `src/components/core/SectionLabel.tsx`
 - [x] Font → `sansMedium`
 - [ ] Audit all callers that pass `uppercase` prop and remove it
 
-### `src/components/ui/KPICard.tsx`
+### `src/components/core/KPICard.tsx`
 - [x] `radius['3xl']`
 - [x] Labels sentence case, `sansMedium` 12px/11px
 - [x] No border, bg → `colors.card`
 - [x] Active currency tab → `colors.primary` + `colors.onPrimary`
 - [ ] Primary metric → `MoneyText` with `display` prop
 
-### `src/components/ui/Typography.tsx`
+### `src/components/core/Typography.tsx`
 - [x] `display` variant (40px, heading, letterSpacing −1.5)
 - [x] `caption` variant (11px, `sans`, textMuted)
 - [x] `label` variant — no uppercase, `sansMedium`
 
-### `src/components/ui/AlertModal.tsx`
+### `src/components/core/AlertModal.tsx`
 - [ ] Container → `radius['3xl']` (currently `radius['2xl']`)
 - [ ] Confirm button: `colors.primary` bg → `colors.onPrimary` text (currently `colors.text` bg)
 - [ ] Cancel button: `radius.full`
 - [ ] Remove `letterSpacing` from title
 
-### `src/components/ui/ConfirmDialog.tsx`
+### `src/components/core/ConfirmDialog.tsx`
 - [ ] Container → `radius['3xl']` (currently `radius['2xl']`)
 - [ ] Confirm button: `colors.primary` bg + `colors.onPrimary` text (currently `colors.background`)
 - [ ] Destructive button: keep `colors.danger` bg
 - [ ] Cancel button: `colors.card` bg, `radius.full`
 - [ ] Remove `letterSpacing` from title
 
-### `src/components/ui/OptionsDialog.tsx`
+### `src/components/core/OptionsDialog.tsx`
 - [ ] Sheet top → `radius['3xl']`
 - [ ] Search bar → `radius.full`, `colors.card` bg
 - [ ] Option rows: `colors.card` bg, `radius['3xl']`
 - [ ] Selected: `colors.primary+'08'` bg (already close — verify `onPrimary` for checkmark)
 - [ ] Remove `letterSpacing` from section headers
 
-### `src/components/ui/CurrencyPickerModal.tsx`
+### `src/components/core/CurrencyPickerModal.tsx`
 - [ ] Sheet container top → `radius['3xl']`
 - [ ] Search bar → `radius.full`, `colors.card` bg
 - [ ] Selected item → `colors.primary+'15'` + `colors.primary` border (currently `colors.surface`)
 - [ ] Remove `letterSpacing` on section labels
 - [ ] Currency item rows → `colors.card` bg
 
-### `src/components/ui/IconPickerDialog.tsx`
+### `src/components/core/IconPickerDialog.tsx`
 - [ ] Sheet container top → `radius['3xl']`
 - [ ] Search bar → `radius.full`, `colors.card` bg
 - [ ] Selected icon cell → `colors.primary` bg (currently `colors.text` bg)
@@ -168,21 +168,21 @@ Full-app rebranding to strict Wise design language. Every file, every component.
 - [ ] Remove `letterSpacing` from category headers
 - [ ] Done/close button → `radius.full`, `colors.primary`, `colors.onPrimary`
 
-### `src/components/ui/PersonPickerDialog.tsx`
+### `src/components/core/PersonPickerDialog.tsx`
 - [ ] Sheet top → `radius['3xl']`
 - [ ] Search bar → `radius.full`, `colors.card` bg
 - [ ] Selected item → `colors.primary+'08'` bg + `colors.primary` checkmark
 - [ ] Avatar → `radius.full`, `colors.primary+'15'` bg
 - [ ] Remove `letterSpacing` from title
 
-### `src/components/ui/PlacePickerDialog.tsx`
+### `src/components/core/PlacePickerDialog.tsx`
 - [ ] Same as PersonPickerDialog above (identical structure)
 
-### `src/components/ui/PremiumGuard.tsx`
+### `src/components/core/PremiumGuard.tsx`
 - [ ] Teaser card → `radius['3xl']`, no shadow, `colors.card` bg
 - [ ] CTA button → `radius.full`, `colors.primary`, `colors.onPrimary`
 
-### `src/components/ui/IconButton.tsx`
+### `src/components/core/IconButton.tsx`
 - [ ] Ghost variant → no background by default (audit current bg values)
 - [ ] Active/filled → `colors.primary` bg + `colors.onPrimary` icon
 

@@ -15,10 +15,10 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Chip } from '../../../components/ui/Chip';
-import { Header } from '../../../components/ui/Header';
-import { PremiumGuard } from '../../../components/ui/PremiumGuard';
-import { IconPickerDialog } from '../../../components/ui/IconPickerDialog';
+import { Chip } from '../../../components/core/Chip';
+import { Header } from '../../../components/core/Header';
+import { IconPickerDialog } from '../../../components/core/IconPickerDialog';
+import { PremiumGuard } from '../../../components/core/PremiumGuard';
 import { ACCOUNT_COLORS } from '../../../constants/picker';
 import { RECURRING_INTERVAL_UNITS, RecurringEndCondition, RecurringFrequency, RecurringIntervalUnit } from '../../../db/schema';
 import { usePremium } from '../../../providers/PremiumProvider';

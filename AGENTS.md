@@ -34,7 +34,7 @@ npm run lint           # ESLint via expo config
   - `category/create.tsx` - Create category page
   - `category/edit/[id].tsx` - Edit category page
 - `src/features/{domain}/` - Domain-driven modules (dashboard, transactions, accounts, categories, insights, reports, backup, export, filters, search)
-- `src/components/ui/` - Universal components: `PremiumGuard`, `MoneyText`, `TransactionRow`, `KPICard`, `IconPickerDialog`, etc.
+- `src/components/core/` - Universal components: `PremiumGuard`, `MoneyText`, `TransactionRow`, `KPICard`, `IconPickerDialog`, etc.
 - `src/providers/` - Context providers: `ThemeProvider`, `PremiumProvider`, `QueryProvider`, `DatabaseProvider`
 - `src/theme/` - Design tokens: `colors.ts`, `typography.ts`, `tokens.ts`
 - `src/db/` - Schema and migrations (Drizzle config at root)
@@ -55,7 +55,7 @@ const { colors } = useTheme();
 Monetization is enforced via `PremiumGuard` component. **Non-premium users must never see premium data.**
 
 ```typescript
-import { PremiumGuard } from '@/src/components/ui/PremiumGuard';
+import { PremiumGuard } from '@/src/components/core/PremiumGuard';
 
 <PremiumGuard label="Insights">
   <AdvancedChart data={premiumData} />
@@ -294,7 +294,7 @@ if (data.type === 'TRANSFER') {
 
 ### Icon Picker Usage
 ```typescript
-import { IconPickerDialog } from '@/src/components/ui/IconPickerDialog';
+import { IconPickerDialog } from '@/src/components/core/IconPickerDialog';
 
 <IconPickerDialog
   visible={showIconPicker}

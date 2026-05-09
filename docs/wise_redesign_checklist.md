@@ -36,7 +36,7 @@ This is a **refinement pass** on top of the completed theme migration — not a 
 
 ## Phase 2 — Core UI Library
 
-### `src/components/ui/Button.tsx`
+### `src/components/core/Button.tsx`
 - [x] All size variants → `radius.full` (9999)
 - [x] Primary variant: text color → `colors.onPrimary`
 - [x] Resize heights: `sm=32px`, `md=44px`, `lg=56px`
@@ -44,13 +44,13 @@ This is a **refinement pass** on top of the completed theme migration — not a 
 - [x] `secondary` / `outline` border → 1.5px
 - [x] Remove `shadow.sm` on primary buttons
 
-### `src/components/ui/Card.tsx`
+### `src/components/core/Card.tsx`
 - [x] All variants → `radius['3xl']` (28px)
 - [x] Remove auto `shadow.sm` on `default` variant
 - [x] `sm=spacing[16]`, `md=spacing[20]`, `lg=spacing[24]` padding
 - [x] Add `pressable` boolean prop
 
-### `src/components/ui/Input.tsx`
+### `src/components/core/Input.tsx`
 - [x] Focus state — green border 1.5px on focus
 - [x] Label → 13px, `sansSemiBold`, `colors.text`
 - [x] Add `helperText?: string` prop
@@ -58,7 +58,7 @@ This is a **refinement pass** on top of the completed theme migration — not a 
 - [x] Add `trailingElement?: React.ReactNode` prop
 - [x] `filled` / `default` variant bg → `colors.card`
 
-### `src/components/ui/ListItem.tsx`
+### `src/components/core/ListItem.tsx`
 - [x] Min height → 56px
 - [x] Background → `colors.card`
 - [x] Auto-show `chevron-forward` when `onPress` and no `rightElement`
@@ -66,57 +66,57 @@ This is a **refinement pass** on top of the completed theme migration — not a 
 - [x] Title 14px `sansSemiBold`, Subtitle 12px `sans`
 - [x] Selected state → primary tint bg
 
-### `src/components/ui/TransactionRow.tsx`
+### `src/components/core/TransactionRow.tsx`
 - [x] Icon box → `radius.full` (circle)
 - [x] Remove `borderWidth` / `borderColor` from icon box
 - [x] Icon size → 20px
 - [x] Row min-height → 64px
 - [x] Date → 11px
 
-### `src/components/ui/MoneyText.tsx`
+### `src/components/core/MoneyText.tsx`
 - [x] Add `display` prop (40px, tight letter-spacing)
 - [x] `CR` → success, `DR` → danger, `NONE`/`TRANSFER` → text color
 
-### `src/components/ui/Badge.tsx`
+### `src/components/core/Badge.tsx`
 - [x] `radius.full` pill — was already correct
 - [x] Compact padding: 3/10
 - [x] Font 11px, `sansSemiBold`, no uppercase
 
-### `src/components/ui/Chip.tsx`
+### `src/components/core/Chip.tsx`
 - [x] `radius.full`
 - [x] Selected: `colors.primary` bg + `colors.onPrimary` text
 - [x] Unselected: `colors.card` bg
 
-### `src/components/ui/IconBox.tsx`
+### `src/components/core/IconBox.tsx`
 - [x] Default `shape` → `'circle'`
 - [x] Sizes: xs=28, sm=32, md=40, lg=48, xl=56
 - [x] No default border — only when `borderColor` explicitly passed
 
-### `src/components/ui/Header.tsx`
+### `src/components/core/Header.tsx`
 - [x] Back button → bare `chevron-back`, `variant="ghost"`
 - [ ] Title alignment → center for modal headers (future: add `titleAlign` prop)
 
-### `src/components/ui/EmptyState.tsx`
+### `src/components/core/EmptyState.tsx`
 - [x] Icon container → `colors.primary + '1A'` tint, no border
 - [x] Icon color → `colors.primary`
 - [x] CTA → `Button` component (primary pill)
 
-### `src/components/ui/Divider.tsx`
+### `src/components/core/Divider.tsx`
 - [x] `StyleSheet.hairlineWidth` for pixel-perfect line
 - [x] Add `label?: string` prop
 
-### `src/components/ui/SectionLabel.tsx`
+### `src/components/core/SectionLabel.tsx`
 - [x] Font → `sansMedium` (was `sansBold`)
 - [ ] `uppercase` prop default already `false` — callers using it need audit
 
-### `src/components/ui/KPICard.tsx`
+### `src/components/core/KPICard.tsx`
 - [x] Radius → `radius['3xl']`
 - [x] Labels → sentence case, `sansMedium`, 12px/11px
 - [x] Removed border, bg → `colors.card`
 - [x] Active currency tab text → `colors.onPrimary`
 - [ ] Primary metric → `MoneyText` with `display` prop (future enhancement)
 
-### `src/components/ui/Typography.tsx`
+### `src/components/core/Typography.tsx`
 - [x] Add `display` variant (40px, `heading`, letterSpacing −1.5)
 - [x] Add `caption` variant (11px, `sans`, textMuted)
 - [x] `label` variant — no uppercase, `sansMedium`

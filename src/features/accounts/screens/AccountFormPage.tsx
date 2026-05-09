@@ -1,15 +1,3 @@
-import { Chip } from '../../../components/ui/Chip';
-import { CurrencyPickerModal } from '../../../components/ui/CurrencyPickerModal';
-import { Header } from '../../../components/ui/Header';
-import { IconPickerDialog } from '../../../components/ui/IconPickerDialog';
-import { Input } from '../../../components/ui/Input';
-import { SectionLabel } from '../../../components/ui/SectionLabel';
-import { ACCOUNT_COLORS } from '../../../constants/picker';
-import { ACCOUNT_TYPES, AccountType } from '../../../db/schema';
-import { useAccountById, useCreateAccount, useUpdateAccount } from '../hooks/accounts';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
-import { parseAmount, toDbColor } from '../../../utils/format';
-import { IoniconName, resolveIcon } from '../../../utils/icons';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -24,6 +12,18 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Chip } from '../../../components/core/Chip';
+import { CurrencyPickerModal } from '../../../components/core/CurrencyPickerModal';
+import { Header } from '../../../components/core/Header';
+import { IconPickerDialog } from '../../../components/core/IconPickerDialog';
+import { Input } from '../../../components/core/Input';
+import { SectionLabel } from '../../../components/core/SectionLabel';
+import { ACCOUNT_COLORS } from '../../../constants/picker';
+import { ACCOUNT_TYPES, AccountType } from '../../../db/schema';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { parseAmount, toDbColor } from '../../../utils/format';
+import { IoniconName, resolveIcon } from '../../../utils/icons';
+import { useAccountById, useCreateAccount, useUpdateAccount } from '../hooks/accounts';
 
 type Props = {
   mode: 'create' | 'edit';

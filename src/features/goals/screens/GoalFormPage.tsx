@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Chip, Header, IconPickerDialog, Input, SectionLabel } from '../../../components/ui';
+import { Chip, Header, IconPickerDialog, Input, SectionLabel } from '../../../components/core';
 import { CATEGORY_COLORS } from '../../../constants/picker';
 import { GoalStatus } from '../../../db/schema';
 import { useSettings } from '../../../providers/SettingsProvider';

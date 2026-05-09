@@ -14,11 +14,11 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, Input, SectionLabel } from '../../../components/ui';
-import { GoalPickerDialog } from '../../../components/ui/GoalPickerDialog';
-import { LoanPickerDialog } from '../../../components/ui/LoanPickerDialog';
-import { PersonPickerDialog } from '../../../components/ui/PersonPickerDialog';
-import { PlacePickerDialog } from '../../../components/ui/PlacePickerDialog';
+import { Header, Input, SectionLabel } from '../../../components/core';
+import { GoalPickerDialog } from '../../../components/core/GoalPickerDialog';
+import { LoanPickerDialog } from '../../../components/core/LoanPickerDialog';
+import { PersonPickerDialog } from '../../../components/core/PersonPickerDialog';
+import { PlacePickerDialog } from '../../../components/core/PlacePickerDialog';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { TransactionType } from '../../../types';

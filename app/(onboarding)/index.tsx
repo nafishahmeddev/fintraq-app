@@ -12,8 +12,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button } from '../../src/components/ui/Button';
-import { ConfirmDialog } from '../../src/components/ui/ConfirmDialog';
+import { Button } from '../../src/components/core/Button';
+import { ConfirmDialog } from '../../src/components/core/ConfirmDialog';
 import { getDeviceCurrencyCode } from '../../src/constants/currency';
 import { ACCOUNT_COLORS } from '../../src/constants/picker';
 import { useCreateAccount } from '../../src/features/accounts/hooks/accounts';

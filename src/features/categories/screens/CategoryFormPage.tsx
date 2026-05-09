@@ -1,14 +1,3 @@
-import { Chip } from '../../../components/ui/Chip';
-import { Header } from '../../../components/ui/Header';
-import { IconPickerDialog } from '../../../components/ui/IconPickerDialog';
-import { Input } from '../../../components/ui/Input';
-import { SectionLabel } from '../../../components/ui/SectionLabel';
-import { CATEGORY_COLORS } from '../../../constants/picker';
-import { CategoryType } from '../../../db/schema';
-import { useCategoryById, useCreateCategory, useUpdateCategory } from '../hooks/categories';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
-import { toDbColor } from '../../../utils/format';
-import { resolveIcon } from '../../../utils/icons';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -23,6 +12,17 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Chip } from '../../../components/core/Chip';
+import { Header } from '../../../components/core/Header';
+import { IconPickerDialog } from '../../../components/core/IconPickerDialog';
+import { Input } from '../../../components/core/Input';
+import { SectionLabel } from '../../../components/core/SectionLabel';
+import { CATEGORY_COLORS } from '../../../constants/picker';
+import { CategoryType } from '../../../db/schema';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { toDbColor } from '../../../utils/format';
+import { resolveIcon } from '../../../utils/icons';
+import { useCategoryById, useCreateCategory, useUpdateCategory } from '../hooks/categories';
 
 type Props = {
   mode: 'create' | 'edit';

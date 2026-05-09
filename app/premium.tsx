@@ -1,4 +1,4 @@
-import { Header } from '@/src/components/ui/Header';
+import { Header } from '@/src/components/core/Header';
 import { FEATURES, SKU_LIFETIME } from '@/src/constants/iap';
 import { usePremium } from '@/src/providers/PremiumProvider';
 import { Theme, useTheme } from '@/src/providers/ThemeProvider';

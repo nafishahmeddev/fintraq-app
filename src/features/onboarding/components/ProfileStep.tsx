@@ -2,9 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { CurrencyPickerModal } from '../../../components/core/CurrencyPickerModal';
 import { CURRENCIES } from '../../../constants/currency';
-import { CurrencyPickerModal } from '../../../components/ui/CurrencyPickerModal';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { OnboardingFormValues } from '../types';
 
 export function ProfileStep() {
@@ -20,7 +20,7 @@ export function ProfileStep() {
         <Controller
           control={control}
           name="name"
-          rules={{ 
+          rules={{
             required: 'Name is required',
             minLength: { value: 2, message: 'Name must be at least 2 characters' }
           }}
@@ -38,7 +38,7 @@ export function ProfileStep() {
           )}
         />
         <View style={[styles.nameUnderline, errors.name && styles.nameUnderlineError]} />
-        
+
         {errors.name ? (
           <Text style={styles.errorMessage}>{errors.name.message}</Text>
         ) : (
@@ -59,8 +59,8 @@ export function ProfileStep() {
             const selectedCurrency = CURRENCIES.find(c => c.code === field.value);
             return (
               <>
-                <TouchableOpacity 
-                  style={[styles.currencyTrigger, errors.currency && styles.currencyTriggerError]} 
+                <TouchableOpacity
+                  style={[styles.currencyTrigger, errors.currency && styles.currencyTriggerError]}
                   onPress={() => setShowCurrencyPicker(true)}
                   activeOpacity={0.8}
                 >
@@ -75,10 +75,10 @@ export function ProfileStep() {
                       {selectedCurrency?.name || 'Select your default currency'}
                     </Text>
                   </View>
-                  <Ionicons 
-                    name="chevron-down" 
-                    size={20} 
-                    color={errors.currency ? theme.colors.danger : theme.colors.textMuted} 
+                  <Ionicons
+                    name="chevron-down"
+                    size={20}
+                    color={errors.currency ? theme.colors.danger : theme.colors.textMuted}
                   />
                 </TouchableOpacity>
 

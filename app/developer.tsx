@@ -1,15 +1,15 @@
-import { Ionicons } from '@expo/vector-icons';
-import * as Notifications from 'expo-notifications';
-import React from 'react';
-import { Alert, DevSettings, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ConfirmDialog } from '@/src/components/ui/ConfirmDialog';
-import { Header } from '@/src/components/ui/Header';
+import { ConfirmDialog } from '@/src/components/core/ConfirmDialog';
+import { Header } from '@/src/components/core/Header';
 import { usePremium } from '@/src/providers/PremiumProvider';
 import { Theme, useTheme } from '@/src/providers/ThemeProvider';
 import { NotificationService } from '@/src/services/notification.service';
 import { toErrorMessage } from '@/src/utils/errors';
 import { seedDummyData } from '@/src/utils/seed';
+import { Ionicons } from '@expo/vector-icons';
+import * as Notifications from 'expo-notifications';
+import React from 'react';
+import { Alert, DevSettings, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function DeveloperScreen() {
   const theme = useTheme();

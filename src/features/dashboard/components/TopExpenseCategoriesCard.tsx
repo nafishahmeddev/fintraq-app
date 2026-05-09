@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { MoneyText } from '../../../components/ui/MoneyText';
+import { MoneyText } from '../../../components/core/MoneyText';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { resolveIcon } from '../../../utils/icons';
 

@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Header, Input, PremiumGuard, SectionLabel } from '../../../components/ui';
+import { Header, Input, PremiumGuard, SectionLabel } from '../../../components/core';
 import { ACCOUNT_COLORS } from '../../../constants/picker';
 import { BudgetMode, BudgetPeriod, BudgetScope } from '../../../db/schema';
 import { usePremium } from '../../../providers/PremiumProvider';

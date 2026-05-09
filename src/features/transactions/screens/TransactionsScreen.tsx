@@ -12,11 +12,11 @@ import {
   View,
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
-import { Header } from '../../../components/ui/Header';
-import { KPICard } from '../../../components/ui/KPICard';
-import { MoneyText } from '../../../components/ui/MoneyText';
-import { TransactionRow } from '../../../components/ui/TransactionRow';
+import { ConfirmDialog } from '../../../components/core/ConfirmDialog';
+import { Header } from '../../../components/core/Header';
+import { KPICard } from '../../../components/core/KPICard';
+import { MoneyText } from '../../../components/core/MoneyText';
+import { TransactionRow } from '../../../components/core/TransactionRow';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { useAccounts } from '../../accounts/hooks/accounts';
 import { useCategories } from '../../categories/hooks/categories';

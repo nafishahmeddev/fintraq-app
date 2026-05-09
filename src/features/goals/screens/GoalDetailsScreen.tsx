@@ -4,11 +4,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
-import { EmptyState } from '../../../components/ui/EmptyState';
-import { Header } from '../../../components/ui/Header';
-import { MoneyText } from '../../../components/ui/MoneyText';
-import { OptionsDialog } from '../../../components/ui/OptionsDialog';
+import { ConfirmDialog } from '../../../components/core/ConfirmDialog';
+import { EmptyState } from '../../../components/core/EmptyState';
+import { Header } from '../../../components/core/Header';
+import { MoneyText } from '../../../components/core/MoneyText';
+import { OptionsDialog } from '../../../components/core/OptionsDialog';
 import { useSettings } from '../../../providers/SettingsProvider';
 import { Theme, useTheme } from '../../../providers/ThemeProvider';
 import { formatCurrency, fromDbColor } from '../../../utils/format';
@@ -33,8 +33,8 @@ const TxRow = React.memo(function TxRow({
   const catColor = isTransfer
     ? colors.primary
     : tx.category
-    ? fromDbColor(tx.category.color)
-    : colors.textMuted;
+      ? fromDbColor(tx.category.color)
+      : colors.textMuted;
   const iconName = isTransfer
     ? ('swap-horizontal-outline' as const)
     : resolveIcon(tx.category?.icon, 'pricetag-outline');

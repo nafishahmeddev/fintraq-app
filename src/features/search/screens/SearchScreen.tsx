@@ -1,6 +1,6 @@
-import { Header } from '@/src/components/ui/Header';
-import { MoneyText } from '@/src/components/ui/MoneyText';
-import { TransactionRow } from '@/src/components/ui/TransactionRow';
+import { Header } from '@/src/components/core/Header';
+import { MoneyText } from '@/src/components/core/MoneyText';
+import { TransactionRow } from '@/src/components/core/TransactionRow';
 import type { Account } from '@/src/features/accounts/api/accounts';
 import type { Category } from '@/src/features/categories/api/categories';
 import type { TransactionListItem } from '@/src/features/transactions/api/transactions';

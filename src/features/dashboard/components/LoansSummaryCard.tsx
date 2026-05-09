@@ -1,10 +1,10 @@
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
-import { useLoansProgress } from '../../loans/api/loans';
-import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { MoneyText } from '../../../components/core/MoneyText';
 import { useSettings } from '../../../providers/SettingsProvider';
-import { MoneyText } from '../../../components/ui/MoneyText';
+import { Theme, useTheme } from '../../../providers/ThemeProvider';
+import { useLoansProgress } from '../../loans/api/loans';
 
 export const LoansSummaryCard = React.memo(function LoansSummaryCard() {
   const theme = useTheme();

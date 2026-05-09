@@ -144,13 +144,13 @@ All FlatList/SectionList must have:
   - `account/edit/[id].tsx` - Edit existing account
   - `category/create.tsx` - Create new category
   - `category/edit/[id].tsx` - Edit existing category
-- `src/components/ui/` - Universal, generic, pure components (`PremiumGuard`, `MoneyText`, `TransactionRow`, `IconPickerDialog`, etc).
+- `src/components/core/` - Universal, generic, pure components (`PremiumGuard`, `MoneyText`, `TransactionRow`, `IconPickerDialog`, etc).
 - `src/features/` - Domain-specific layers containing their own `api/`, `components/`, `hooks/`, and `screens/` (e.g., `dashboard`, `transactions`, `accounts`, `categories`).
 - `src/providers/` - React Context providers (`ThemeProvider`, `PremiumProvider`).
 - `src/theme/` - Design tokens (`colors.ts`, `typography.ts`).
 
 ## 4. The `PremiumGuard` Pattern
-Monetization is driven by `src/components/ui/PremiumGuard.tsx`. 
+Monetization is driven by `src/components/core/PremiumGuard.tsx`. 
 - **Rule**: Non-premium users must *never* see premium data elements. The `PremiumGuard` completely hides its children and renders an elegant "Teaser Card" placeholder containing a watermark and a call-to-action to natively convert the user.
 - **Philosophy**: **Free = Tracking.** **Premium = Insights + Control.**
 

@@ -2,7 +2,7 @@ import { resolveIcon } from '@/src/utils/icons';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
-import { PromoModal } from '../../src/components/ui/PromoModal';
+import { PromoModal } from '../../src/components/core/PromoModal';
 import { useOnboarding } from '../../src/providers/OnboardingProvider';
 import { useTheme } from '../../src/providers/ThemeProvider';
 
