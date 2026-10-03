@@ -49,7 +49,7 @@ export const QuickActions = React.memo(function QuickActions({ canTransfer }: Pr
           accessibilityRole="button"
           accessibilityLabel={action.label}
         >
-          <Icon icon={action.icon} size={20} color={colors.onHeroPositive} weight="bold" />
+          <Icon icon={action.icon} size={20} color={colors.onInk} weight="bold" />
           <Text variant="label" color={colors.onInk} numberOfLines={1}>
             {action.label}
           </Text>
@@ -69,6 +69,6 @@ const createStyles = ({ colors, spacing, radius, alpha }: ThemeContextType) =>
       paddingVertical: spacing('3'),
       paddingHorizontal: spacing('1'),
       borderRadius: radius('lg'),
-      backgroundColor: alpha(colors.onInk, 'faint'),
+      backgroundColor: alpha(colors.onInk, 'subtle'),
     },
   });
