@@ -46,7 +46,7 @@ export const MonthPulseCard = React.memo(function MonthPulseCard({ currency }: P
         </View>
 
         <View style={styles.amountRow}>
-          <MoneyText amount={pulse.expense} currency={currency} style={styles.amount} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} />
+          <MoneyText amount={pulse.expense} currency={currency} weight="bold" style={styles.amount} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} />
         </View>
 
         {share !== null ? (
@@ -77,21 +77,21 @@ export const MonthPulseCard = React.memo(function MonthPulseCard({ currency }: P
           <Text variant="micro" tone="muted">
             {t('dashboard.income')}
           </Text>
-          <MoneyText amount={pulse.income} currency={currency} type="CR" style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit />
+          <MoneyText amount={pulse.income} currency={currency} type="CR" weight="semibold" style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit />
         </View>
         <View style={styles.divider} />
         <View style={styles.statGroup}>
           <Text variant="micro" tone="muted">
             {t('dashboard.pulseLastMonth')}
           </Text>
-          <MoneyText amount={pulse.lastMonthTotal} currency={currency} type="NONE" style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit />
+          <MoneyText amount={pulse.lastMonthTotal} currency={currency} type="NONE" weight="semibold" style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit />
         </View>
       </Card>
     </View>
   );
 });
 
-const TRACK = 8;
+const TRACK = 6;
 
 const createStyles = ({ colors, spacing, radius, layout, typography, alpha }: ThemeContextType) =>
   StyleSheet.create({
@@ -99,17 +99,17 @@ const createStyles = ({ colors, spacing, radius, layout, typography, alpha }: Th
     container: { flexDirection: 'row', gap: spacing('3') },
     card: {
       flex: 1,
-      gap: spacing('1.5'),
+      gap: spacing('2'),
       justifyContent: 'space-between',
     },
-    header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing('1') },
+    header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     amountRow: { flexDirection: 'row', alignItems: 'center', gap: spacing('1') },
-    amount: { ...typography.variants.amountLarge, flexShrink: 1 },
-    barBlock: { gap: spacing('1.5'), marginTop: 'auto' },
+    amount: { ...typography.metrics.xl, flexShrink: 1 },
+    barBlock: { gap: spacing('2'), marginTop: 'auto' },
     track: {
       height: TRACK,
       borderRadius: radius('full'),
-      backgroundColor: colors.card,
+      backgroundColor: alpha(colors.text, 'faint'),
       overflow: 'hidden',
       justifyContent: 'center',
     },
@@ -120,9 +120,10 @@ const createStyles = ({ colors, spacing, radius, layout, typography, alpha }: Th
       bottom: 0,
       width: 2,
       marginLeft: -1,
-      backgroundColor: colors.text,
+      backgroundColor: colors.surface,
+      borderRadius: radius('full'),
     },
     statGroup: { flex: 1, gap: spacing('0.5'), justifyContent: 'center' },
-    divider: { height: StyleSheet.hairlineWidth, backgroundColor: alpha(colors.text, 'subtle'), marginVertical: spacing('1') },
-    statValue: { ...typography.variants.amount, flexShrink: 1 },
+    divider: { height: StyleSheet.hairlineWidth, backgroundColor: alpha(colors.text, 'subtle'), marginVertical: spacing('2') },
+    statValue: { ...typography.metrics.lg, flexShrink: 1 },
   });

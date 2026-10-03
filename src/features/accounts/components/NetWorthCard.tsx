@@ -68,7 +68,7 @@ export const NetWorthCard = React.memo(function NetWorthCard({ groups }: Props) 
               accounts={group.accounts} 
               total={group.assets} 
               size={40} 
-              strokeWidth={6} 
+              strokeWidth={5} 
               emptyColor={theme.alpha(theme.colors.text, 'faint')} 
             />
             

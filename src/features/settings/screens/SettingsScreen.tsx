@@ -26,7 +26,7 @@ import {
   CloudIcon,
   DownloadSimpleIcon,
   FileTextIcon,
-  HandCoinsIcon,
+  BriefcaseIcon,
   LockKeyIcon,
   MoonIcon,
   PasswordIcon,
@@ -250,7 +250,7 @@ export const SettingsScreen = React.memo(function SettingsScreen() {
         />
         <ListItem icon={UsersIcon} iconColor={colors.info} title={t('settings.people')} subtitle={t('settings.peopleHint')} onPress={() => router.push('/persons')} />
         <ListItem
-          icon={HandCoinsIcon}
+          icon={BriefcaseIcon}
           iconColor={colors.warning}
           title={t('settings.loans')}
           subtitle={t('settings.loansHint')}

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { BentoPressable, Icon, Text } from '@/src/components/ui';
 import type { IconSource } from '@/src/components/ui';
-import { ArrowDownLeftIcon, ArrowsLeftRightIcon, ArrowUpRightIcon, HandCoinsIcon } from '@/src/components/ui/icons';
+import { ArrowDownLeftIcon, ArrowsLeftRightIcon, ArrowUpRightIcon, BriefcaseIcon } from '@/src/components/ui/icons';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
 
 type Action = { key: string; label: string; icon: IconSource; href: Href };
@@ -31,7 +31,7 @@ export const QuickActions = React.memo(function QuickActions({ canTransfer }: Pr
       { key: 'expense', label: t('dashboard.quickExpense'), icon: ArrowUpRightIcon, href: '/transactions/create?type=DR' },
       { key: 'income', label: t('dashboard.quickIncome'), icon: ArrowDownLeftIcon, href: '/transactions/create?type=CR' },
       canTransfer ? { key: 'transfer', label: t('dashboard.quickTransfer'), icon: ArrowsLeftRightIcon, href: '/transactions/create?type=TR' } : null,
-      { key: 'loan', label: t('dashboard.quickLoan'), icon: HandCoinsIcon, href: '/(main)/loans/form' },
+      { key: 'loan', label: t('dashboard.quickLoan'), icon: BriefcaseIcon, href: '/(main)/loans/form' },
     ];
     return all.filter((a): a is Action => a !== null);
   }, [t, canTransfer]);
