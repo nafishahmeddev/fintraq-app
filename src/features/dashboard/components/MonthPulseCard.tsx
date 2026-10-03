@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
-import { MoneyText, Skeleton, StatColumn, StatColumns, Text, TrendBadge } from '@/src/components/ui';
+import { Card, MoneyText, Skeleton, Text } from '@/src/components/ui';
 import { useMonthTotals } from '@/src/features/dashboard/hooks/dashboard';
 import { buildMonthPulse } from '@/src/features/dashboard/utils/widgets';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, View } from 'react-native';
 
 type Props = { currency: string };
 
@@ -21,75 +21,91 @@ export const MonthPulseCard = React.memo(function MonthPulseCard({ currency }: P
 
   const pulse = useMemo(() => (totals ? buildMonthPulse(totals, new Date()) : null), [totals]);
 
-  if (isLoading || !pulse) return <Skeleton height={176} radius="xl" style={styles.margin} />;
+  if (isLoading || !pulse) {
+    return (
+      <View style={[styles.container, styles.margin]}>
+        <Skeleton height={136} radius="xl" style={{ flex: 1 }} />
+        <Skeleton height={136} radius="xl" style={{ flex: 1 }} />
+      </View>
+    );
+  }
 
   const share = pulse.shareOfLastMonth;
   // Over last month's total, or ahead of the calendar with a real baseline, is worth a warning colour.
   const barColor = share !== null && share >= 1 ? colors.danger : share !== null && share > pulse.monthProgress ? colors.warning : colors.primary;
   const fill = Math.min(1, share ?? 0);
 
-  // Pace and the month-end forecast live in Analytics; home keeps the facts.
-  const stats: StatColumn[] = [
-    { key: 'income', label: t('dashboard.income'), amount: pulse.income, currency, type: 'CR' },
-    { key: 'lastMonth', label: t('dashboard.pulseLastMonth'), amount: pulse.lastMonthTotal, currency },
-  ];
   return (
-    <View style={[styles.card, styles.margin]}>
-      <View style={styles.header}>
-        <Text variant="label" tone="muted">
-          {t('dashboard.pulseSpent')}
-        </Text>
-        <Text variant="micro" tone="muted">
-          {t('dashboard.pulseDay', { day: pulse.dayOfMonth, total: pulse.daysInMonth })}
-        </Text>
-      </View>
-
-      <View style={styles.amountRow}>
-        <MoneyText amount={pulse.expense} currency={currency} weight="bold" style={styles.amount} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} />
-        <TrendBadge delta={pulse.deltaVsLastMonth} positiveIsGood={false} />
-      </View>
-
-      {share !== null ? (
-        <View style={styles.barBlock}>
-          <View
-            style={styles.track}
-            accessibilityRole="progressbar"
-            accessibilityLabel={t('dashboard.pulseOfLast', { pct: Math.round(share * 100) })}
-            accessibilityValue={{ min: 0, max: 100, now: Math.round(fill * 100) }}
-          >
-            <View style={[styles.fill, { width: `${fill * 100}%`, backgroundColor: barColor }]} />
-            <View style={[styles.todayTick, { left: `${pulse.monthProgress * 100}%` }]} />
-          </View>
-          <Text variant="caption" tone="muted">
-            {t('dashboard.pulseOfLast', { pct: Math.round(share * 100) })}
+    <View style={[styles.container, styles.margin]}>
+      {/* Left Column: Spend & Pace */}
+      <Card variant="surface" style={styles.card}>
+        <View style={styles.header}>
+          <Text variant="label" tone="muted">
+            {t('dashboard.pulseSpent')}
           </Text>
         </View>
-      ) : pulse.expense === 0 ? (
-        <Text variant="caption" tone="muted">
-          {t('dashboard.pulseEmpty')}
-        </Text>
-      ) : null}
 
-      <StatColumns columns={stats} />
+        <View style={styles.amountRow}>
+          <MoneyText amount={pulse.expense} currency={currency} style={styles.amount} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} />
+        </View>
+
+        {share !== null ? (
+          <View style={styles.barBlock}>
+            <View
+              style={styles.track}
+              accessibilityRole="progressbar"
+              accessibilityLabel={t('dashboard.pulseOfLast', { pct: Math.round(share * 100) })}
+              accessibilityValue={{ min: 0, max: 100, now: Math.round(fill * 100) }}
+            >
+              <View style={[styles.fill, { width: `${fill * 100}%`, backgroundColor: barColor }]} />
+              <View style={[styles.todayTick, { left: `${pulse.monthProgress * 100}%` }]} />
+            </View>
+            <Text variant="caption" tone="muted" numberOfLines={1} adjustsFontSizeToFit>
+              {t('dashboard.pulseOfLast', { pct: Math.round(share * 100) })}
+            </Text>
+          </View>
+        ) : pulse.expense === 0 ? (
+          <Text variant="caption" tone="muted">
+            {t('dashboard.pulseEmpty')}
+          </Text>
+        ) : null}
+      </Card>
+
+      {/* Right Column: Income & Last Month */}
+      <Card variant="surface" style={styles.card}>
+        <View style={styles.statGroup}>
+          <Text variant="micro" tone="muted">
+            {t('dashboard.income')}
+          </Text>
+          <MoneyText amount={pulse.income} currency={currency} type="CR" style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit />
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.statGroup}>
+          <Text variant="micro" tone="muted">
+            {t('dashboard.pulseLastMonth')}
+          </Text>
+          <MoneyText amount={pulse.lastMonthTotal} currency={currency} type="NONE" style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit />
+        </View>
+      </Card>
     </View>
   );
 });
 
-const TRACK = 10;
+const TRACK = 8;
 
-const createStyles = ({ colors, spacing, radius, layout, typography }: ThemeContextType) =>
+const createStyles = ({ colors, spacing, radius, layout, typography, alpha }: ThemeContextType) =>
   StyleSheet.create({
     margin: { marginHorizontal: layout.screenPadding },
+    container: { flexDirection: 'row', gap: spacing('3') },
     card: {
-      backgroundColor: colors.surface,
-      borderRadius: radius('xl'),
-      padding: spacing('4'),
-      gap: spacing('3'),
+      flex: 1,
+      gap: spacing('1.5'),
+      justifyContent: 'space-between',
     },
-    header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    amountRow: { flexDirection: 'row', alignItems: 'center', gap: spacing('2'), marginTop: -spacing('1') },
-    amount: { ...typography.metrics.xxl, flexShrink: 1 },
-    barBlock: { gap: spacing('1.5') },
+    header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing('1') },
+    amountRow: { flexDirection: 'row', alignItems: 'center', gap: spacing('1') },
+    amount: { ...typography.variants.amountLarge, flexShrink: 1 },
+    barBlock: { gap: spacing('1.5'), marginTop: 'auto' },
     track: {
       height: TRACK,
       borderRadius: radius('full'),
@@ -98,7 +114,6 @@ const createStyles = ({ colors, spacing, radius, layout, typography }: ThemeCont
       justifyContent: 'center',
     },
     fill: { position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: radius('full') },
-    // A notch in the track at today's position in the month.
     todayTick: {
       position: 'absolute',
       top: 0,
@@ -107,4 +122,7 @@ const createStyles = ({ colors, spacing, radius, layout, typography }: ThemeCont
       marginLeft: -1,
       backgroundColor: colors.text,
     },
+    statGroup: { flex: 1, gap: spacing('0.5'), justifyContent: 'center' },
+    divider: { height: StyleSheet.hairlineWidth, backgroundColor: alpha(colors.text, 'subtle'), marginVertical: spacing('1') },
+    statValue: { ...typography.variants.amount, flexShrink: 1 },
   });

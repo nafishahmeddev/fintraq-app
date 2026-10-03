@@ -93,7 +93,10 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
         <View style={styles.skeleton}>
           <Skeleton width="45%" height={20} />
           <Skeleton height={248} radius="2xl" />
-          <Skeleton height={176} radius="xl" />
+          <View style={styles.pulseSkeleton}>
+            <Skeleton height={136} radius="xl" style={{ flex: 1 }} />
+            <Skeleton height={136} radius="xl" style={{ flex: 1 }} />
+          </View>
           <ListGroup>
             <SkeletonRow />
             <SkeletonRow />
@@ -181,5 +184,9 @@ const createStyles = ({ colors, spacing, radius, layout, tabBarClearance }: Them
       paddingHorizontal: layout.screenPadding,
       paddingTop: spacing('6'),
       gap: spacing('4'),
+    },
+    pulseSkeleton: {
+      flexDirection: 'row',
+      gap: spacing('3'),
     },
   });
