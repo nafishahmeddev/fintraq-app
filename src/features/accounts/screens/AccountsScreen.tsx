@@ -98,7 +98,7 @@ export const AccountsScreen = React.memo(function AccountsScreen() {
         title: t('accounts.title'),
       }}
       tabBar
-      contentContainerStyle={styles.content}
+      contentContainerStyle={accounts?.length === 0 ? [styles.content, styles.emptyContent] : styles.content}
       overlays={
         <>
           <OptionsDialog
@@ -184,6 +184,7 @@ export const AccountsScreen = React.memo(function AccountsScreen() {
 const createStyles = ({ spacing, typography }: ThemeContextType) =>
   StyleSheet.create({
     content: { gap: spacing('3') },
+    emptyContent: { flexGrow: 1, justifyContent: 'center' },
     card: { gap: spacing('4') },
     cardTop: { flexDirection: 'row', alignItems: 'center', gap: spacing('3') },
     cardMeta: { flex: 1, gap: 2 },
