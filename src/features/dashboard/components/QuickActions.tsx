@@ -50,7 +50,7 @@ export const QuickActions = React.memo(function QuickActions({ canTransfer }: Pr
           accessibilityLabel={action.label}
         >
           <Icon icon={action.icon} size={20} color={colors.onInk} weight="bold" />
-          <Text variant="label" color={colors.onInk} numberOfLines={1}>
+          <Text variant="caption" color={colors.onInk} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
             {action.label}
           </Text>
         </BentoPressable>
@@ -61,13 +61,14 @@ export const QuickActions = React.memo(function QuickActions({ canTransfer }: Pr
 
 const createStyles = ({ colors, spacing, radius, alpha }: ThemeContextType) =>
   StyleSheet.create({
-    row: { flexDirection: 'row', gap: spacing('2') },
+    row: { flexDirection: 'row', gap: spacing('1.5') },
     action: {
       flex: 1,
       alignItems: 'center',
-      gap: spacing('1.5'),
-      paddingVertical: spacing('3'),
-      paddingHorizontal: spacing('1'),
+      justifyContent: 'center',
+      gap: spacing('1'),
+      paddingVertical: spacing('2'),
+      paddingHorizontal: spacing('0.5'),
       borderRadius: radius('lg'),
       backgroundColor: alpha(colors.onInk, 'subtle'),
     },

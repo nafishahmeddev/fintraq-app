@@ -1,7 +1,7 @@
 import { BentoPressable } from '@/src/components/ui/BentoPressable';
 import type { IconSource } from '@/src/components/ui/Icon';
 import { Icon } from '@/src/components/ui/Icon';
-import { PlusIcon, TabAccountsIcon, TabAnalyticsIcon, TabHomeIcon, TabSettingsIcon } from '@/src/components/ui/icons';
+import { PlusIcon, HouseIcon, WalletIcon, ChartBarIcon, GearIcon } from '@/src/components/ui/icons';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import * as Haptics from 'expo-haptics';
@@ -12,7 +12,7 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Tab indices matching _layout.tsx order: 0=index, 1=accounts, 2=analytics, 3=settings
-const TAB_ICONS: IconSource[] = [TabHomeIcon, TabAccountsIcon, TabAnalyticsIcon, TabSettingsIcon];
+const TAB_ICONS: IconSource[] = [HouseIcon, WalletIcon, ChartBarIcon, GearIcon];
 const LEFT_INDICES = [0, 1];
 const RIGHT_INDICES = [2, 3];
 
