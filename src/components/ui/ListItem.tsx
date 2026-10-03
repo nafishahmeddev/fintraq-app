@@ -3,9 +3,9 @@ import { IconAvatar } from './IconAvatar';
 import { Switch } from './Switch';
 import { Text } from './Text';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
-import { CaretRightIcon, CheckCircleIcon } from './icons';
-import type { IconSource } from './Icon';
-import { Icon } from './Icon';
+
+import type {  IconName  } from './Icon';
+import {  Icon  } from './Icon';
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -17,7 +17,7 @@ export type ListItemProps = {
   subtitle?: string;
   /** Right-aligned secondary value, e.g. the current setting. */
   value?: string;
-  icon?: IconSource;
+  icon?: IconName;
   /** Tint for the leading icon tile. Defaults to text colour (or danger when destructive). */
   iconColor?: string;
   /** Custom leading element (PersonAvatar, flag…) — replaces `icon`. */
@@ -82,9 +82,9 @@ export const ListItem = React.memo(function ListItem({
           hasSwitch ? (
             <Switch value={switchValue} onValueChange={onSwitchChange} disabled={disabled} accessibilityLabel={title} />
           ) : selected ? (
-            <Icon icon={CheckCircleIcon} size={22} color={colors.primaryInk} weight="fill" />
+            <Icon name="CheckCircleIcon" size={22} color={colors.primaryInk} weight="fill" />
           ) : chevron ? (
-            <Icon icon={CaretRightIcon} size={14} color={alpha(colors.textMuted, 'strong')} weight="bold" />
+            <Icon name="CaretRightIcon" size={14} color={alpha(colors.textMuted, 'strong')} weight="bold" />
           ) : null
         )}
       </View>

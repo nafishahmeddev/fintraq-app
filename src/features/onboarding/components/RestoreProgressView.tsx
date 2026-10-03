@@ -1,8 +1,7 @@
 import { Text } from '@/src/components/ui/Text';
 import { IconAvatar } from '@/src/components/ui/IconAvatar';
 import { ProgressBar } from '@/src/components/ui/ProgressBar';
-import { CloudIcon, ShieldKeyIcon } from '@hugeicons/core-free-icons';
-import type { IconSource } from '@/src/components/ui/Icon';
+import type {  IconName  } from '@/src/components/ui';
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
@@ -32,7 +31,7 @@ export const RestoreProgressView = React.memo(function RestoreProgressView({
       <View style={styles.card}>
         <View style={styles.topRow}>
           <IconAvatar
-            icon={CloudIcon as IconSource}
+            icon={'CloudIcon' as IconName}
             color={colors.primaryInk}
             variant="subtle"
             size={52}
@@ -59,7 +58,7 @@ export const RestoreProgressView = React.memo(function RestoreProgressView({
       {/* Reassurance Info Card */}
       <View style={styles.infoCard}>
         <IconAvatar
-          icon={ShieldKeyIcon as IconSource}
+          icon="Shield01Icon"
           color={colors.success}
           variant="subtle"
           size={40}

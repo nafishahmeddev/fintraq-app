@@ -4,8 +4,8 @@ import { Text } from './Text';
 import { TrendBadge } from './TrendBadge';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
 import type { TransactionType } from '@/src/types';
-import type { IconSource } from './Icon';
-import { Icon } from './Icon';
+import type {  IconName  } from './Icon';
+import {  Icon  } from './Icon';
 import React, { useMemo } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
@@ -19,7 +19,7 @@ type StatTileProps = {
   value?: string;
   /** Muted line under the value — what the number is about (a category, a date). */
   caption?: string;
-  icon?: IconSource;
+  icon?: IconName;
   iconColor?: string;
   /** Percentage change vs previous period. */
   delta?: number | null;
@@ -53,7 +53,7 @@ export const StatTile = React.memo(function StatTile({
       <View style={styles.header}>
         {icon ? (
           <View style={[styles.iconDot, { backgroundColor: theme.alpha(iconColor ?? theme.colors.textMuted, 'subtle') }]}>
-            <Icon icon={icon} size={13} color={iconColor ?? theme.colors.textMuted} weight="bold" />
+            <Icon name={icon} size={13} color={iconColor ?? theme.colors.textMuted} weight="bold" />
           </View>
         ) : null}
         <Text variant="label" tone="muted" numberOfLines={1} style={styles.label}>{label}</Text>

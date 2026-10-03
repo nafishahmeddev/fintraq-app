@@ -3,8 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
 import { BentoPressable, HeroSurface, Icon, Text } from '@/src/components/ui';
-import type { IconSource } from '@/src/components/ui';
-import { ArrowDownLeftIcon, ArrowsLeftRightIcon, ArrowUpRightIcon, CalculatorIcon } from '@/src/components/ui/icons';
+import type {  IconName  } from '@/src/components/ui';
 import { CalculatorBottomSheet } from '@/src/components/pickers/CalculatorBottomSheet';
 import { CURRENCIES } from '@/src/constants/currency';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
@@ -22,7 +21,7 @@ type Props = {
   currency: string;
 };
 
-type TypeOption = { value: TransactionType; label: string; icon: IconSource; color: string };
+type TypeOption = { value: TransactionType; label: string; icon: IconName; color: string };
 
 /**
  * The top of the entry form on the same ink card as the Home and Transactions heroes: what kind of
@@ -48,9 +47,9 @@ export const TransactionEntryHero = React.memo(function TransactionEntryHero({
 
   const options = useMemo(
     (): TypeOption[] => [
-      { value: 'DR', label: t('transactions.expense'), icon: ArrowUpRightIcon, color: colors.onHeroNegative },
-      { value: 'CR', label: t('transactions.income'), icon: ArrowDownLeftIcon, color: colors.onHeroPositive },
-      { value: 'TR', label: t('transactions.transfer'), icon: ArrowsLeftRightIcon, color: colors.onHeroInfo },
+      { value: 'DR', label: t('transactions.expense'), icon: 'ArrowUpRightIcon', color: colors.onHeroNegative },
+      { value: 'CR', label: t('transactions.income'), icon: 'ArrowDownLeftIcon', color: colors.onHeroPositive },
+      { value: 'TR', label: t('transactions.transfer'), icon: 'ArrowsLeftRightIcon', color: colors.onHeroInfo },
     ],
     [t, colors],
   );
@@ -76,7 +75,7 @@ export const TransactionEntryHero = React.memo(function TransactionEntryHero({
                 accessibilityRole="tab"
                 accessibilityState={{ selected: isActive, disabled: typeLocked }}
               >
-                <Icon icon={option.icon} size={15} color={isActive ? option.color : colors.onInkMuted} weight="bold" />
+                <Icon name={option.icon} size={15} color={isActive ? option.color : colors.onInkMuted} weight="bold" />
                 <Text variant="label" color={isActive ? colors.onInk : colors.onInkMuted} numberOfLines={1}>
                   {option.label}
                 </Text>
@@ -115,7 +114,7 @@ export const TransactionEntryHero = React.memo(function TransactionEntryHero({
             accessibilityRole="button"
             accessibilityLabel={t('transactions.calculator')}
           >
-            <Icon icon={CalculatorIcon} size={20} color={colors.onInk} />
+            <Icon name="CalculatorIcon" size={20} color={colors.onInk} />
           </BentoPressable>
         </View>
       </View>

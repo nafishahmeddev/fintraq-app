@@ -1,6 +1,6 @@
-import type { IconSource } from './Icon';
-import { Icon } from './Icon';
-import { XIcon } from './icons';
+import type {  IconName  } from './Icon';
+import {  Icon  } from './Icon';
+
 import React, { useMemo, useCallback } from 'react';
 import { StyleProp, StyleSheet, Text, ViewStyle } from 'react-native';
 import { useTheme } from '@/src/providers/ThemeProvider';
@@ -12,7 +12,7 @@ type ChipProps = {
   isActive?: boolean;
   /** Accent color for active bg tint + text. Defaults to theme primary. */
   color?: string;
-  icon?: IconSource;
+  icon?: IconName;
   onPress: () => void;
   /** Shows a ✕ that removes the chip (active filters). */
   onClear?: () => void;
@@ -74,12 +74,12 @@ export const Chip = React.memo(function Chip({
       accessibilityState={{ selected: isActive }}
     >
       {icon && (
-        <Icon icon={icon} size={14} color={isActive ? ink : colors.textMuted} />
+        <Icon name={icon} size={14} color={isActive ? ink : colors.textMuted} />
       )}
       <Text style={textStyle} numberOfLines={1}>{label}</Text>
       {onClear ? (
         <BentoPressable onPress={onClear} hitSlop={10} accessibilityRole="button" accessibilityLabel={`${label} ✕`} style={styles.clear}>
-          <Icon icon={XIcon} size={12} color={isActive ? ink : colors.textMuted} weight="bold" />
+          <Icon name="XIcon" size={12} color={isActive ? ink : colors.textMuted} weight="bold" />
         </BentoPressable>
       ) : null}
     </BentoPressable>

@@ -4,7 +4,6 @@ import { useTheme } from '@/src/providers/ThemeProvider';
 import type { ThemePalette } from '@/src/theme/colors';
 import { ALPHA, AlphaToken, RADIUS, RadiusToken, SPACING, SpacingToken } from '@/src/theme/tokens';
 import { TEXT_VARIANTS, TextVariant } from '@/src/theme/typography';
-import { HouseIcon } from '@/src/components/ui/icons';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -183,7 +182,7 @@ export function FoundationsSection() {
           <SpecimenRow>
             {[layout.iconSm, layout.iconMd, layout.iconLg, layout.iconXl].map((s) => (
               <View key={s} style={{ alignItems: 'center', gap: spacing('1'), width: 56 }}>
-                <Icon icon={HouseIcon} size={s} color={colors.text} />
+                <Icon name="HouseIcon" size={s} color={colors.text} />
                 <Text variant="caption" tone="muted">{s}</Text>
               </View>
             ))}

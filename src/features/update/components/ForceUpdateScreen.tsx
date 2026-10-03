@@ -2,7 +2,6 @@ import { Screen } from '@/src/components/ui/Screen';
 import { Text } from '@/src/components/ui/Text';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Animated, Linking, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { FlashIcon, LockPasswordIcon, BarChartIcon } from '@hugeicons/core-free-icons';
 import { IconAvatar } from '@/src/components/ui/IconAvatar';
 import { Button } from '@/src/components/ui/Button';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
@@ -18,17 +17,17 @@ type Props = {
 
 const INFO_CARDS = [
   {
-    icon: FlashIcon,
+    icon: 'FlashIcon',
     colorKey: 'primary' as const,
     label: 'whatsNew' as const,
   },
   {
-    icon: LockPasswordIcon,
+    icon: 'LockPasswordIcon',
     colorKey: 'success' as const,
     label: 'dataSafe' as const,
   },
   {
-    icon: BarChartIcon,
+    icon: 'BarChartIcon',
     colorKey: 'info' as const,
     label: 'freeUpdate' as const,
   },

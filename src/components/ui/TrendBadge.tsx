@@ -1,7 +1,7 @@
 import { Text } from './Text';
 import { useTheme } from '@/src/providers/ThemeProvider';
-import { TrendDownIcon, TrendUpIcon } from './icons';
-import { Icon } from './Icon';
+
+import {  Icon  } from './Icon';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
@@ -40,7 +40,7 @@ export const TrendBadge = React.memo(function TrendBadge({ delta, positiveIsGood
         style,
       ]}
     >
-      <Icon icon={isUp ? TrendUpIcon : TrendDownIcon} size={12} color={color} weight="bold" />
+      <Icon name={isUp ? 'TrendUpIcon' : 'TrendDownIcon'} size={12} color={color} weight="bold" />
       <Text variant="micro" color={color}>{Math.abs(delta).toFixed(0)}%</Text>
     </View>
   );

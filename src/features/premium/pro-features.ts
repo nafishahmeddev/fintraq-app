@@ -1,17 +1,4 @@
-import {
-  BarChartIcon,
-  ChartLineData01Icon,
-  CloudUploadIcon,
-  Download01Icon,
-  InfinityCircleIcon,
-  PieChart01Icon,
-  Search01Icon,
-  SparklesIcon,
-  TrendingUpDownIcon,
-  UserGroupIcon,
-  ZapIcon,
-} from '@hugeicons/core-free-icons';
-import type { IconSource } from '@/src/components/ui';
+import type {  IconName  } from '@/src/components/ui';
 import { FREE_LOAN_LIMIT, FREE_PERSON_LIMIT } from '@/src/constants/iap';
 
 /**
@@ -20,18 +7,18 @@ import { FREE_LOAN_LIMIT, FREE_PERSON_LIMIT } from '@/src/constants/iap';
  * advertised without being locked. Ids double as i18n keys under `premium.features.*`.
  */
 export const PRO_FEATURES = {
-  analytics: { icon: ChartLineData01Icon, group: 'analytics' },
-  highlights: { icon: ZapIcon, group: 'analytics' },
-  categories: { icon: PieChart01Icon, group: 'analytics' },
-  people: { icon: UserGroupIcon, group: 'analytics' },
-  forecast: { icon: TrendingUpDownIcon, group: 'analytics' },
-  weekly: { icon: BarChartIcon, group: 'analytics' },
-  insights: { icon: SparklesIcon, group: 'analytics' },
-  search: { icon: Search01Icon, group: 'tools' },
-  csv: { icon: Download01Icon, group: 'tools' },
-  backup: { icon: CloudUploadIcon, group: 'more' },
-  unlimited: { icon: InfinityCircleIcon, group: 'more' },
-} as const satisfies Record<string, { icon: IconSource; group: ProFeatureGroup }>;
+  analytics: { icon: 'ChartLineData01Icon', group: 'analytics' },
+  highlights: { icon: 'ZapIcon', group: 'analytics' },
+  categories: { icon: 'PieChart01Icon', group: 'analytics' },
+  people: { icon: 'UserGroupIcon', group: 'analytics' },
+  forecast: { icon: 'TrendingUpDownIcon', group: 'analytics' },
+  weekly: { icon: 'BarChartIcon', group: 'analytics' },
+  insights: { icon: 'SparklesIcon', group: 'analytics' },
+  search: { icon: 'Search01Icon', group: 'tools' },
+  csv: { icon: 'Download01Icon', group: 'tools' },
+  backup: { icon: 'CloudUploadIcon', group: 'more' },
+  unlimited: { icon: 'InfinityCircleIcon', group: 'more' },
+} as const satisfies Record<string, { icon: IconName; group: ProFeatureGroup }>;
 
 export type ProFeatureGroup = 'analytics' | 'tools' | 'more';
 export type ProFeatureId = keyof typeof PRO_FEATURES;

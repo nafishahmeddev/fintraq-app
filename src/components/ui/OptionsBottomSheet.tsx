@@ -1,6 +1,6 @@
-import { CheckIcon } from './icons';
-import { Icon } from './Icon';
-import type { IconSource } from './Icon';
+
+import {  Icon  } from './Icon';
+import type {  IconName  } from './Icon';
 import * as Haptics from 'expo-haptics';
 import React, { useCallback, useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -11,7 +11,7 @@ import { BentoBottomSheet, useBottomSheet } from './BottomSheet';
 export type OptionsBottomSheetOption = {
   key: string;
   label: string;
-  icon?: IconSource;
+  icon?: IconName;
   selected?: boolean;
   destructive?: boolean;
   closeOnPress?: boolean;
@@ -80,7 +80,7 @@ export const OptionsBottomSheet = React.memo(function OptionsBottomSheet({
               >
                 {opt.icon ? (
                   <Icon
-                    icon={opt.icon}
+                    name={opt.icon}
                     size={22}
                     color={selected ? colors.primaryInk : opt.destructive ? colors.danger : colors.text}
                   />
@@ -95,7 +95,7 @@ export const OptionsBottomSheet = React.memo(function OptionsBottomSheet({
                   {opt.label}
                 </Text>
                 {selected ? (
-                  <Icon icon={CheckIcon} size={18} color={colors.primaryInk} weight="bold" />
+                  <Icon name="CheckIcon" size={18} color={colors.primaryInk} weight="bold" />
                 ) : null}
               </BentoPressable>
             );

@@ -1,6 +1,5 @@
 import { Badge, Card, ConfirmDialog, Divider, EmptyState, Icon, IconAvatar, IconButton, MoneyText, OptionsDialog, Screen, Text } from '@/src/components/ui';
 import type { OptionsDialogOption } from '@/src/components/ui';
-import { ArrowDownLeftIcon, ArrowUpRightIcon, DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon, WalletIcon } from '@/src/components/ui/icons';
 import type { Account } from '@/src/features/accounts/api/accounts';
 import { useAccounts, useDeleteAccount } from '@/src/features/accounts/hooks/accounts';
 import { NetWorthCard } from '@/src/features/accounts/components/NetWorthCard';
@@ -79,11 +78,11 @@ export const AccountsScreen = React.memo(function AccountsScreen() {
     if (!selectedAccount) return [];
     const hasTransactions = selectedAccount.income > 0 || selectedAccount.expense > 0;
     return [
-      { key: 'edit', label: t('accounts.edit'), icon: PencilSimpleIcon, onPress: handleEdit },
+      { key: 'edit', label: t('accounts.edit'), icon: 'PencilSimpleIcon', onPress: handleEdit },
       {
         key: 'delete',
         label: t('accounts.delete'),
-        icon: TrashIcon,
+        icon: 'TrashIcon',
         destructive: true,
         disabled: hasTransactions,
         hint: hasTransactions ? t('accounts.removeTransactions') : undefined,
@@ -122,7 +121,7 @@ export const AccountsScreen = React.memo(function AccountsScreen() {
     >
       {/* Adding lives on the tab bar's centre button, which means "new account" on this tab. */}
       {accounts && accounts.length === 0 ? (
-        <EmptyState icon={WalletIcon} title={t('accounts.none')} actionLabel={t('accountForm.new')} onAction={handleAdd} />
+        <EmptyState icon="WalletIcon" title={t('accounts.none')} actionLabel={t('accountForm.new')} onAction={handleAdd} />
       ) : null}
 
       {netWorth.length > 0 ? <NetWorthCard groups={netWorth} /> : null}
@@ -142,7 +141,7 @@ export const AccountsScreen = React.memo(function AccountsScreen() {
               </View>
               <Badge label={account.currency} variant="muted" style={styles.centered} />
               <IconButton
-                icon={DotsThreeVerticalIcon}
+                icon="DotsThreeVerticalIcon"
                 variant="ghost"
                 size="sm"
                 onPress={() => handleMenuOpen(account)}
@@ -160,7 +159,7 @@ export const AccountsScreen = React.memo(function AccountsScreen() {
             <View style={styles.stats}>
               <View style={styles.statCell}>
                 <View style={styles.statLabel}>
-                  <Icon icon={ArrowDownLeftIcon} size={14} color={colors.success} weight="bold" />
+                  <Icon name="ArrowDownLeftIcon" size={14} color={colors.success} weight="bold" />
                   <Text variant="caption" tone="muted">{t('accounts.totalIn')}</Text>
                 </View>
                 <MoneyText amount={account.income} currency={account.currency} type="CR" compact style={styles.statValue} />
@@ -168,7 +167,7 @@ export const AccountsScreen = React.memo(function AccountsScreen() {
               <Divider vertical />
               <View style={styles.statCell}>
                 <View style={styles.statLabel}>
-                  <Icon icon={ArrowUpRightIcon} size={14} color={colors.danger} weight="bold" />
+                  <Icon name="ArrowUpRightIcon" size={14} color={colors.danger} weight="bold" />
                   <Text variant="caption" tone="muted">{t('accounts.totalOut')}</Text>
                 </View>
                 <MoneyText amount={account.expense} currency={account.currency} type="DR" compact style={styles.statValue} />

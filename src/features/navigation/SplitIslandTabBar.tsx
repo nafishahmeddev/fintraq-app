@@ -1,7 +1,6 @@
 import { BentoPressable } from '@/src/components/ui/BentoPressable';
-import type { IconSource } from '@/src/components/ui/Icon';
+import type {  IconName  } from '@/src/components/ui';
 import { Icon } from '@/src/components/ui/Icon';
-import { ChartBarIcon, GearIcon, HouseIcon, PlusIcon, WalletCardsIcon } from '@/src/components/ui/icons';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import * as Haptics from 'expo-haptics';
@@ -12,7 +11,7 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Tab indices matching _layout.tsx order: 0=index, 1=accounts, 2=analytics, 3=settings
-const TAB_ICONS: IconSource[] = [HouseIcon, WalletCardsIcon, ChartBarIcon, GearIcon];
+const TAB_ICONS: IconName[] = ['HouseIcon', 'WalletCardsIcon', 'ChartBarIcon', 'GearIcon'];
 const LEFT_INDICES = [0, 1];
 const RIGHT_INDICES = [2, 3];
 
@@ -22,7 +21,7 @@ const PAD = 6;
 const HEIGHT = TILE + PAD * 2;
 
 type TabButtonProps = {
-  icon: IconSource;
+  icon: IconName;
   label: string;
   focused: boolean;
   onPress: () => void;
@@ -41,7 +40,7 @@ const TabButton = React.memo(function TabButton({ icon, label, focused, onPress 
       accessibilityState={{ selected: focused }}
       style={[styles.tab, focused && { backgroundColor: colors.primary }]}
     >
-      <Icon icon={icon} size={24} color={focused ? colors.primaryForeground : colors.onInkMuted} weight={focused ? 'bold' : 'regular'} />
+      <Icon name={icon} size={24} color={focused ? colors.primaryForeground : colors.onInkMuted} weight={focused ? 'bold' : 'regular'} />
     </BentoPressable>
   );
 });
@@ -109,7 +108,7 @@ export const SplitIslandTabBar = React.memo(function SplitIslandTabBar({
           accessibilityRole="button"
           accessibilityLabel={onAccounts ? t('common.addAccount') : t('dashboard.addTransaction')}
         >
-          <Icon icon={PlusIcon} size={24} color={theme.colors.primaryForeground} weight="bold" />
+          <Icon name="PlusIcon" size={24} color={theme.colors.primaryForeground} weight="bold" />
         </BentoPressable>
       </View>
 

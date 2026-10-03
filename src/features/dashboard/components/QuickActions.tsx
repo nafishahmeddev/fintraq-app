@@ -4,11 +4,10 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { BentoPressable, Icon, Text } from '@/src/components/ui';
-import type { IconSource } from '@/src/components/ui';
-import { ArrowDownLeftIcon, ArrowsLeftRightIcon, ArrowUpRightIcon, BriefcaseIcon } from '@/src/components/ui/icons';
+import type {  IconName  } from '@/src/components/ui';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
 
-type Action = { key: string; label: string; icon: IconSource; href: Href };
+type Action = { key: string; label: string; icon: IconName; href: Href };
 
 type Props = {
   /** Transfers need two accounts; the button is hidden until there are. */
@@ -28,10 +27,10 @@ export const QuickActions = React.memo(function QuickActions({ canTransfer }: Pr
 
   const actions = useMemo((): Action[] => {
     const all: (Action | null)[] = [
-      { key: 'expense', label: t('dashboard.quickExpense'), icon: ArrowUpRightIcon, href: '/transactions/create?type=DR' },
-      { key: 'income', label: t('dashboard.quickIncome'), icon: ArrowDownLeftIcon, href: '/transactions/create?type=CR' },
-      canTransfer ? { key: 'transfer', label: t('dashboard.quickTransfer'), icon: ArrowsLeftRightIcon, href: '/transactions/create?type=TR' } : null,
-      { key: 'loan', label: t('dashboard.quickLoan'), icon: BriefcaseIcon, href: '/(main)/loans/form' },
+      { key: 'expense', label: t('dashboard.quickExpense'), icon: 'ArrowUpRightIcon', href: '/transactions/create?type=DR' },
+      { key: 'income', label: t('dashboard.quickIncome'), icon: 'ArrowDownLeftIcon', href: '/transactions/create?type=CR' },
+      canTransfer ? { key: 'transfer', label: t('dashboard.quickTransfer'), icon: 'ArrowsLeftRightIcon', href: '/transactions/create?type=TR' } : null,
+      { key: 'loan', label: t('dashboard.quickLoan'), icon: 'BriefcaseIcon', href: '/(main)/loans/form' },
     ];
     return all.filter((a): a is Action => a !== null);
   }, [t, canTransfer]);
@@ -49,7 +48,7 @@ export const QuickActions = React.memo(function QuickActions({ canTransfer }: Pr
           accessibilityRole="button"
           accessibilityLabel={action.label}
         >
-          <Icon icon={action.icon} size={20} color={colors.onInk} weight="bold" />
+          <Icon name={action.icon} size={20} color={colors.onInk} weight="bold" />
           <Text variant="caption" color={colors.onInk} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
             {action.label}
           </Text>

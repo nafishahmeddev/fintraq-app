@@ -1,8 +1,8 @@
 import { BentoPressable } from './BentoPressable';
 import { Dialog } from './Dialog';
-import { Icon } from './Icon';
-import type { IconSource } from './Icon';
-import { CheckCircleIcon } from './icons';
+import {  Icon  } from './Icon';
+import type {  IconName  } from './Icon';
+
 import { Text } from './Text';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
 import * as Haptics from 'expo-haptics';
@@ -13,7 +13,7 @@ import { StyleSheet, View } from 'react-native';
 export type OptionsDialogOption = {
   key: string;
   label: string;
-  icon?: IconSource;
+  icon?: IconName;
   selected?: boolean;
   destructive?: boolean;
   disabled?: boolean;
@@ -77,12 +77,12 @@ export const OptionsDialog = React.memo(function OptionsDialog({
                 opt.disabled && styles.disabled,
               ]}
             >
-              {opt.icon ? <Icon icon={opt.icon} size={20} color={tint} /> : null}
+              {opt.icon ? <Icon name={opt.icon} size={20} color={tint} /> : null}
               <View style={styles.optionText}>
                 <Text variant="bodyStrong" color={tint}>{opt.label}</Text>
                 {opt.hint ? <Text variant="caption" tone="muted">{opt.hint}</Text> : null}
               </View>
-              {selected ? <Icon icon={CheckCircleIcon} size={20} color={colors.primaryInk} weight="fill" /> : null}
+              {selected ? <Icon name="CheckCircleIcon" size={20} color={colors.primaryInk} weight="fill" /> : null}
             </BentoPressable>
           );
         })}

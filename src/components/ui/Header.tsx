@@ -1,5 +1,5 @@
-import { CaretLeftIcon } from './icons';
-import { Icon } from './Icon';
+
+import {  Icon  } from './Icon';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import React, { useMemo, useCallback } from 'react';
@@ -41,7 +41,7 @@ export const Header = React.memo(function Header({
             accessibilityLabel={t('common.back')}
             style={styles.backButton}
           >
-            <Icon icon={CaretLeftIcon} size={20} color={colors.text} weight="bold" />
+            <Icon name="CaretLeftIcon" size={20} color={colors.text} weight="bold" />
           </BentoPressable>
         )}
         <View style={styles.titleBlock}>

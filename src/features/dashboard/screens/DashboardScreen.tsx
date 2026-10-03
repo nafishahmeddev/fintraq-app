@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, ListGroup, Screen, SectionHeader, Skeleton, SkeletonRow } from '@/src/components/ui';
-import { ReceiptIcon } from '@/src/components/ui/icons';
 import { DEFAULT_CURRENCY, sortCurrenciesWithDefault } from '@/src/constants/currency';
 import { useAccounts } from '@/src/features/accounts/hooks/accounts';
 import { BackupPromptModal } from '@/src/features/backup/components/BackupPromptModal';
@@ -145,7 +144,7 @@ export const DashboardScreen = React.memo(function DashboardScreen() {
             ))
           ) : (
             <EmptyState
-              icon={ReceiptIcon}
+              icon="ReceiptIcon"
               title={t('dashboard.noTransactions')}
               description={t('dashboard.transactionHint')}
               actionLabel={t('dashboard.addTransaction')}

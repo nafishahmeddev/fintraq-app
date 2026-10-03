@@ -1,6 +1,5 @@
 import { Card, IconAvatar, Text } from '@/src/components/ui';
-import { ChartBarIcon, LightningIcon, LockKeyIcon } from '@/src/components/ui/icons';
-import type { IconSource } from '@/src/components/ui';
+import type {  IconName  } from '@/src/components/ui';
 import { useTheme } from '@/src/providers/ThemeProvider';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,10 +7,10 @@ import { View } from 'react-native';
 
 type ColorKey = 'primaryInk' | 'info' | 'success';
 
-const FEATURES: { icon: IconSource; label: 'fastCapture' | 'analytics' | 'privacy'; colorKey: ColorKey }[] = [
-  { icon: LightningIcon, label: 'fastCapture', colorKey: 'primaryInk' },
-  { icon: ChartBarIcon, label: 'analytics', colorKey: 'info' },
-  { icon: LockKeyIcon, label: 'privacy', colorKey: 'success' },
+const FEATURES: { icon: IconName; label: 'fastCapture' | 'analytics' | 'privacy'; colorKey: ColorKey }[] = [
+  { icon: 'LightningIcon', label: 'fastCapture', colorKey: 'primaryInk' },
+  { icon: 'ChartBarIcon', label: 'analytics', colorKey: 'info' },
+  { icon: 'LockKeyIcon', label: 'privacy', colorKey: 'success' },
 ];
 
 /** Three reasons to use Fintraq, grouped in one calm card instead of three competing ones. */

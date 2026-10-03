@@ -1,7 +1,6 @@
 import { BentoPressable } from '@/src/components/ui/BentoPressable';
 import { Icon } from '@/src/components/ui/Icon';
 import { Text } from '@/src/components/ui/Text';
-import { CrownIcon, Search } from '@hugeicons/core-free-icons';
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
@@ -39,21 +38,21 @@ export const DashboardHeader = React.memo(function DashboardHeader({ name, isPre
           {displayName ? <Text variant="headline" numberOfLines={1}>{displayName}</Text> : null}
         </View>
 
-        {/* Search + avatar in one widget: the whole thing opens search. */}
+        {/* 'Search' + avatar in one widget: the whole thing opens search. */}
         <BentoPressable
           style={styles.searchWidget}
           onPress={onSearch}
           accessibilityRole="button"
           accessibilityLabel={t('search.placeholder')}
         >
-          <Icon icon={Search} size={18} color={colors.textMuted} />
+          <Icon name="Search" size={18} color={colors.textMuted} />
           <View>
             <View style={styles.avatar}>
               <Text variant="label" color={colors.primaryInk}>{monogram}</Text>
             </View>
             {isPremium ? (
               <View style={styles.crownBadge}>
-                <Icon icon={CrownIcon} size={8} color={colors.onColor} />
+                <Icon name="CrownIcon" size={8} color={colors.onColor} />
               </View>
             ) : null}
           </View>

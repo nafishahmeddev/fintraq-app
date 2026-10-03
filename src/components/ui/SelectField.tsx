@@ -1,6 +1,6 @@
 import { BentoPressable } from './BentoPressable';
-import { Icon, IconSource } from './Icon';
-import { CaretRightIcon } from './icons';
+import {  Icon, IconName  } from './Icon';
+
 import { Text } from './Text';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
 import React, { useMemo } from 'react';
@@ -15,7 +15,7 @@ type SelectFieldProps = {
   /** Optional leading visual (avatar, icon tile). */
   leading?: React.ReactNode;
   /** Replaces the chevron (calendar icon, clear button…). */
-  trailingIcon?: IconSource;
+  trailingIcon?: IconName;
   error?: string;
   disabled?: boolean;
 };
@@ -30,7 +30,7 @@ export const SelectField = React.memo(function SelectField({
   placeholder,
   onPress,
   leading,
-  trailingIcon = CaretRightIcon,
+  trailingIcon = 'CaretRightIcon',
   error,
   disabled = false,
 }: SelectFieldProps) {
@@ -55,7 +55,7 @@ export const SelectField = React.memo(function SelectField({
         </Text>
         {error ? <Text variant="caption" tone="danger">{error}</Text> : null}
       </View>
-      <Icon icon={trailingIcon} size={18} color={theme.colors.textMuted} />
+      <Icon name={trailingIcon} size={18} color={theme.colors.textMuted} />
     </BentoPressable>
   );
 });

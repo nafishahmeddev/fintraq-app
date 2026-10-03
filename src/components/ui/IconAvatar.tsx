@@ -1,13 +1,14 @@
-import type { IconProps, IconSource } from './Icon';
-import { Icon } from './Icon';
+import type {  IconProps, IconName  } from './Icon';
+import {  Icon  } from './Icon';
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import { alpha, foregroundOn } from '@/src/theme/tokens';
 
 type IconAvatarVariant = 'solid' | 'subtle' | 'outline';
 
-type IconAvatarProps = {
-  icon: IconSource;
+type IconAvatarProps<F extends import("./Icon").IconFamily = "hugeicons"> = {
+  family?: F;
+  icon: import('./Icon').IconRegistry[F];
   color: string;
   variant?: IconAvatarVariant;
   size?: number;
@@ -17,7 +18,7 @@ type IconAvatarProps = {
   style?: ViewStyle;
 };
 
-export const IconAvatar = React.memo(function IconAvatar({
+export const IconAvatar = React.memo(function IconAvatar<F extends import("./Icon").IconFamily = "hugeicons">({
   icon,
   color,
   variant = 'subtle',
@@ -25,7 +26,7 @@ export const IconAvatar = React.memo(function IconAvatar({
   iconSize,
   weight = 'regular',
   style,
-}: IconAvatarProps) {
+}: IconAvatarProps<F>) {
 
   const { bg, iconColor, border, resolvedIconSize, borderRadius } = React.useMemo(() => {
     let bg: string;
@@ -68,7 +69,7 @@ export const IconAvatar = React.memo(function IconAvatar({
 
   return (
     <View style={containerStyle}>
-      <Icon icon={icon} size={resolvedIconSize} color={iconColor} weight={weight} />
+      <Icon name={icon} size={resolvedIconSize} color={iconColor} weight={weight} />
     </View>
   );
 });

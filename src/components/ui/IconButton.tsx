@@ -1,8 +1,8 @@
 import { BentoPressable } from './BentoPressable';
 import { useTheme } from '@/src/providers/ThemeProvider';
 import { foregroundOn } from '@/src/theme/tokens';
-import type { IconSource } from './Icon';
-import { Icon } from './Icon';
+import type {  IconName  } from './Icon';
+import {  Icon  } from './Icon';
 import React, { useMemo } from 'react';
 import { ActivityIndicator, StyleProp, View, ViewStyle } from 'react-native';
 import { Text } from './Text';
@@ -10,8 +10,9 @@ import { Text } from './Text';
 export type IconButtonVariant = 'ghost' | 'surface' | 'tonal' | 'filled' | 'danger';
 export type IconButtonSize = 'sm' | 'md' | 'lg';
 
-type IconButtonProps = {
-  icon: IconSource;
+type IconButtonProps<F extends import("./Icon").IconFamily = "hugeicons"> = {
+  family?: F;
+  icon: import('./Icon').IconRegistry[F];
   onPress: () => void;
   /** Required: icon-only controls have no visible label for screen readers. */
   accessibilityLabel: string;
@@ -28,7 +29,7 @@ type IconButtonProps = {
 
 const ICON_SIZE: Record<IconButtonSize, number> = { sm: 17, md: 20, lg: 22 };
 
-export const IconButton = React.memo(function IconButton({
+export const IconButton = React.memo(function IconButton<F extends import("./Icon").IconFamily = "hugeicons">({
   icon,
   onPress,
   accessibilityLabel,
@@ -39,7 +40,7 @@ export const IconButton = React.memo(function IconButton({
   isLoading = false,
   badge,
   style,
-}: IconButtonProps) {
+}: IconButtonProps<F>) {
   const { colors, sizes, radius, alpha, layout } = useTheme();
   const accent = color ?? colors.primary;
   const dimension = sizes.iconButton[size];
@@ -83,7 +84,7 @@ export const IconButton = React.memo(function IconButton({
     >
       {isLoading
         ? <ActivityIndicator size="small" color={fg} />
-        : <Icon icon={icon} size={ICON_SIZE[size]} color={fg} />}
+        : <Icon name={icon} size={ICON_SIZE[size]} color={fg} />}
       {badge ? (
         <View style={{ position: 'absolute', top: 4, right: 4, minWidth: 16, height: 16, paddingHorizontal: 4, borderRadius: radius('full'), backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
           <Text variant="micro" tone="onPrimary">{badge}</Text>

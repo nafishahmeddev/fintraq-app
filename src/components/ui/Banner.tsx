@@ -1,9 +1,9 @@
 import { BentoPressable } from './BentoPressable';
 import { Text } from './Text';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
-import { CheckCircleIcon, InfoIcon, WarningCircleIcon, WarningIcon, XIcon } from './icons';
-import type { IconSource } from './Icon';
-import { Icon } from './Icon';
+
+import type {  IconName  } from './Icon';
+import {  Icon  } from './Icon';
 import React, { useMemo } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
@@ -14,18 +14,18 @@ type BannerProps = {
   title: string;
   message?: string;
   /** Overrides the tone's default icon. */
-  icon?: IconSource;
+  icon?: IconName;
   actionLabel?: string;
   onAction?: () => void;
   onDismiss?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
-const TONE_ICON: Record<BannerTone, IconSource> = {
-  info: InfoIcon,
-  success: CheckCircleIcon,
-  warning: WarningIcon,
-  danger: WarningCircleIcon,
+const TONE_ICON: Record<BannerTone, IconName> = {
+  info: 'InfoIcon',
+  success: 'CheckCircleIcon',
+  warning: 'WarningIcon',
+  danger: 'WarningCircleIcon',
 };
 
 /** Inline, persistent message inside a screen. For blocking decisions use ConfirmDialog. */
@@ -49,7 +49,7 @@ export const Banner = React.memo(function Banner({
       accessibilityRole={tone === 'danger' || tone === 'warning' ? 'alert' : undefined}
       style={[styles.container, { backgroundColor: alpha(color, 'subtle') }, style]}
     >
-      <Icon icon={icon ?? TONE_ICON[tone]} size={20} color={color} weight="fill" />
+      <Icon name={icon ?? TONE_ICON[tone]} size={20} color={color} weight="fill" />
       <View style={styles.body}>
         <Text variant="calloutStrong">{title}</Text>
         {message ? <Text variant="caption" tone="muted">{message}</Text> : null}
@@ -61,7 +61,7 @@ export const Banner = React.memo(function Banner({
       </View>
       {onDismiss ? (
         <BentoPressable onPress={onDismiss} hitSlop={12} accessibilityRole="button" accessibilityLabel="Dismiss" style={styles.dismiss}>
-          <Icon icon={XIcon} size={16} color={colors.textMuted} weight="bold" />
+          <Icon name="XIcon" size={16} color={colors.textMuted} weight="bold" />
         </BentoPressable>
       ) : null}
     </View>

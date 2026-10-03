@@ -1,5 +1,5 @@
 import { Button } from './Button';
-import type { IconSource } from './Icon';
+import type {  IconName  } from './Icon';
 import { IconAvatar } from './IconAvatar';
 import { Text } from './Text';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
@@ -24,7 +24,7 @@ type DialogProps = {
   title: string;
   message?: string;
   /** Adds a tone-coloured icon tile above the title. */
-  icon?: IconSource;
+  icon?: IconName;
   tone?: DialogTone;
   /** Actions render in order; put the recommended one last so it sits under the thumb. */
   actions: DialogAction[];

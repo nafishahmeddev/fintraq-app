@@ -2,12 +2,12 @@ import { Button } from './Button';
 import { IconAvatar } from './IconAvatar';
 import { Text } from './Text';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
-import type { IconSource } from './Icon';
+import type {  IconName  } from './Icon';
 import React, { useMemo } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
 type EmptyStateProps = {
-  icon: IconSource;
+  icon: IconName;
   title: string;
   description?: string;
   /** Primary recovery action — "Add transaction", "Clear filters". */

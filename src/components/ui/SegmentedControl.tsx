@@ -1,7 +1,7 @@
 import { Text } from './Text';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
-import type { IconSource } from './Icon';
-import { Icon } from './Icon';
+import type {  IconName  } from './Icon';
+import {  Icon  } from './Icon';
 import * as Haptics from 'expo-haptics';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { LayoutChangeEvent, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
@@ -10,7 +10,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-na
 export type SegmentOption<T extends string> = {
   value: T;
   label: string;
-  icon?: IconSource;
+  icon?: IconName;
 };
 
 type SegmentedControlProps<T extends string> = {
@@ -72,7 +72,7 @@ function SegmentedControlBase<T extends string>({
             accessibilityLabel={opt.label}
           >
             {opt.icon ? (
-              <Icon icon={opt.icon} size={size === 'sm' ? 14 : 16} color={active ? colors.text : colors.textMuted} />
+              <Icon name={opt.icon} size={size === 'sm' ? 14 : 16} color={active ? colors.text : colors.textMuted} />
             ) : null}
             <Text
               variant={size === 'sm' ? 'caption' : 'calloutStrong'}

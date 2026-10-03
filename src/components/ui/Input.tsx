@@ -2,8 +2,8 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
 import { useTheme, ThemeContextType } from '@/src/providers/ThemeProvider';
 import { alpha } from '@/src/theme/tokens';
-import type { IconSource } from './Icon';
-import { Icon } from './Icon';
+import type {  IconName  } from './Icon';
+import {  Icon  } from './Icon';
 
 type InputSize = 'sm' | 'md' | 'lg';
 type InputVariant = 'default' | 'minimal' | 'filled';
@@ -15,7 +15,7 @@ interface InputProps extends TextInputProps {
   helperText?: string;
   size?: InputSize;
   variant?: InputVariant;
-  leadingIcon?: IconSource;
+  leadingIcon?: IconName;
   /** Clear button, unit label, visibility toggle… */
   trailing?: React.ReactNode;
 }
@@ -84,7 +84,7 @@ export const Input = React.memo(function Input({
       {label ? <Text style={[styles.label, { fontFamily: typography.fonts.medium, color: colors.textMuted }]}>{label}</Text> : null}
       <View style={[styles.box, { height: sizeConfig.height, paddingHorizontal: variant === 'minimal' ? 0 : sizeConfig.paddingHorizontal, borderRadius: variant === 'minimal' ? 0 : sizeConfig.borderRadius }, containerStyle]}>
         {leadingIcon ? (
-          <Icon icon={leadingIcon} size={18} color={isFocused ? colors.text : colors.textMuted} />
+          <Icon name={leadingIcon} size={18} color={isFocused ? colors.text : colors.textMuted} />
         ) : null}
         <TextInput
           accessibilityLabel={props.accessibilityLabel ?? label}
