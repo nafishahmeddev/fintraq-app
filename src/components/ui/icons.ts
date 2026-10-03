@@ -36,6 +36,8 @@ export {
   Coffee01Icon as CoffeeIcon,
   Coins01Icon as CoinsIcon,
   Copy01Icon as CopyIcon,
+  Wallet04Icon as Wallet04Icon,
+  WalletCardsIcon as WalletCardsIcon,
   MoreHorizontalIcon as DotsThreeIcon,
   MoreVerticalIcon as DotsThreeVerticalIcon,
   Download01Icon as DownloadSimpleIcon,
