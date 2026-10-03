@@ -10,6 +10,7 @@ import { SearchField } from '@/src/components/ui/SearchField';
 import { SheetHeader } from '@/src/components/ui/SheetHeader';
 import { Text } from '@/src/components/ui/Text';
 import { CURRENCIES, type Currency } from '@/src/constants/currency';
+import { getCurrencySymbol } from '@/src/utils/format';
 import { useSettings } from '@/src/providers/SettingsProvider';
 import { ThemeContextType, useTheme } from '@/src/providers/ThemeProvider';
 
@@ -43,7 +44,7 @@ export const CurrencyPickerBottomSheet = React.memo(function CurrencyPickerBotto
     const q = query.trim().toLowerCase();
     if (q) {
       const matches = CURRENCIES.filter(
-        (c) => c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q) || c.symbol.toLowerCase() === q,
+        (c) => c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q) || c.symbol.toLowerCase() === q || getCurrencySymbol(c.code).toLowerCase() === q,
       );
       return matches.length ? [{ key: 'results', title: '', data: matches }] : [];
     }
@@ -93,7 +94,7 @@ export const CurrencyPickerBottomSheet = React.memo(function CurrencyPickerBotto
             adjustsFontSizeToFit
             minimumFontScale={0.6}
           >
-            {item.symbol}
+            {getCurrencySymbol(item.code)}
           </Text>
         </View>
         <View style={styles.rowBody}>

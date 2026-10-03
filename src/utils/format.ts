@@ -1,27 +1,20 @@
 import * as Localization from 'expo-localization';
 import i18n, { getIntlLocale } from '@/src/i18n';
 import { parseAmountInput } from '@/src/utils/amount';
+import { CURRENCIES } from '@/src/constants/currency';
 
 /** A typed amount as a number, 0 when blank or unreadable. See parseAmountInput for the rules. */
 export const parseAmount = (value: string | undefined | null): number => parseAmountInput(value ?? '') ?? 0;
 
-/**
- * Converts a hex color string to a numeric value for database storage.
- */
 export const toDbColor = (value: string): number => {
   return Number.parseInt(value.replace('#', ''), 16);
 };
 
-/**
- * Converts a numeric color (as stored in the DB) to a CSS hex string.
- * e.g. 11591744 → '#B0E000'
- */
 export const colorNumberToHex = (value: number): string =>
   `#${value.toString(16).padStart(6, '0')}`;
 
 export const withAlpha = (color: string, hexAlpha: string): string =>
   `${color}${hexAlpha}`;
-
 
 const COMPACT_TIERS: { limit: number; suffix: string }[] = [
   { limit: 1e12, suffix: 'T' },
@@ -30,57 +23,22 @@ const COMPACT_TIERS: { limit: number; suffix: string }[] = [
   { limit: 1e3, suffix: 'K' },
 ];
 
-/**
- * Hermes ships a reduced Intl build that silently ignores `notation: 'compact'`
- * while still honouring `maximumFractionDigits`, so every compact amount came
- * out as an ugly one-decimal full number (₹61,254.0 instead of ₹61.3K).
- *
- * Scale and suffix by hand so output is identical on every JS engine, and use
- * formatToParts so the suffix lands against the digits in both prefix (₹61.3K)
- * and suffix (61,3 K €) currency locales.
- */
-const formatCompactCurrency = (amount: number, locale: string, currencyCode: string): string => {
-  const abs = Math.abs(amount);
-  const tier = COMPACT_TIERS.find((t) => abs >= t.limit);
-  const scaled = tier ? amount / tier.limit : amount;
-
-  const parts = new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: currencyCode,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 1,
-  }).formatToParts(scaled);
-
-  if (!tier) return parts.map((part) => part.value).join('');
-
-  const NUMERIC = new Set(['integer', 'group', 'decimal', 'fraction']);
-  let lastDigit = -1;
-  parts.forEach((part, i) => {
-    if (NUMERIC.has(part.type)) lastDigit = i;
-  });
-
-  return parts
-    .map((part, i) => (i === lastDigit ? `${part.value}${tier.suffix}` : part.value))
-    .join('');
-};
-
-/**
- * Formats a numeric amount into a currency string using the Intl library.
- * If no currency code is provided, it formats the number as a localized decimal.
- */
 /** The Intl locale for the app's language, falling back to the device's. */
 const appLocale = (): string => {
   const deviceLocale = Localization.getLocales()?.[0]?.languageTag ?? 'en-US';
   return getIntlLocale(i18n.resolvedLanguage ?? i18n.language, deviceLocale);
 };
 
-/** Formats a date in the app's language, e.g. `formatDate(d, { dateStyle: 'full' })`. */
 export const formatDate = (date: Date, options: Intl.DateTimeFormatOptions): string => {
   try {
     return new Intl.DateTimeFormat(appLocale(), options).format(date);
   } catch {
     return date.toDateString();
   }
+};
+
+export const getCurrencySymbol = (currencyCode: string): string => {
+  return CURRENCIES.find((c) => c.code === currencyCode.toUpperCase())?.symbol ?? currencyCode;
 };
 
 export const formatCurrency = (amount: number, currencyCode?: string, compact?: boolean): string => {
@@ -95,13 +53,34 @@ export const formatCurrency = (amount: number, currencyCode?: string, compact?: 
   }
 
   try {
-    if (compact) {
-      return formatCompactCurrency(amount, locale, currencyCode.toUpperCase());
-    }
-    return new Intl.NumberFormat(locale, {
+    const code = currencyCode.toUpperCase();
+    const abs = Math.abs(amount);
+    const tier = compact ? COMPACT_TIERS.find((t) => abs >= t.limit) : undefined;
+    const scaled = tier ? amount / tier.limit : amount;
+
+    const parts = new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: currencyCode.toUpperCase(),
-    }).format(amount);
+      currency: code,
+      currencyDisplay: 'narrowSymbol',
+      ...(compact ? { minimumFractionDigits: 0, maximumFractionDigits: 1 } : {}),
+    }).formatToParts(scaled);
+
+    const NUMERIC = new Set(['integer', 'group', 'decimal', 'fraction']);
+    let lastDigit = -1;
+    if (tier) {
+      parts.forEach((part, i) => {
+        if (NUMERIC.has(part.type)) lastDigit = i;
+      });
+    }
+
+    return parts.map((part, i) => {
+      let val = part.value;
+      // Hermes fallback: If Intl didn't resolve a native symbol (e.g. outputs "TRY" for TRY), use our registry.
+      if (part.type === 'currency' && val === code) {
+        val = getCurrencySymbol(code);
+      }
+      return i === lastDigit && tier ? `${val}${tier.suffix}` : val;
+    }).join('');
   } catch {
     return `${currencyCode.toUpperCase()} ${amount.toFixed(2)}`;
   }
